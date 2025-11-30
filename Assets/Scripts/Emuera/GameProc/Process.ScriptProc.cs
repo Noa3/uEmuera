@@ -75,6 +75,15 @@ namespace MinorShift.Emuera.GameProc
 					continue;//＄ラベル。何もすることはない。
 				else if (line is InvalidLine)
 				{
+					// NEW: Allow execution to continue if CompatiIgnoreInvalidLine is enabled
+					if (Config.CompatiIgnoreInvalidLine)
+					{
+						// Log warning but don't throw error
+						if (!string.IsNullOrEmpty(line.ErrMes))
+							console.PrintError("警告：" + line.ErrMes + "（行をスキップして続行）");
+						continue;
+					}
+					
 					if (string.IsNullOrEmpty(line.ErrMes))
 						throw new CodeEE("読込に失敗した行が実行されました。エラーの詳細は読込時の警告を参照してください。");
 					else

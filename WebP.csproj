@@ -49,16 +49,19 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\unity.webp\Info.cs" />
+    <Compile Include="Assets\unity.webp\Texture2DExt.cs" />
     <Compile Include="Assets\unity.webp\NativeBindings.cs" />
     <Compile Include="Assets\unity.webp\Error.cs" />
     <Compile Include="Assets\unity.webp\libwebpdemux.cs" />
-    <Compile Include="Assets\unity.webp\Texture2DExt.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Assets\EMUERA_EXTENDED_COMPATIBILITY.md" />
     <None Include="Assets\unity.webp\Plugins\x64\libwebpdemux.dll" />
     <None Include="Assets\unity.webp\Plugins\x64\libwebpdecoder.dll" />
     <None Include="Assets\unity.webp\Plugins\x64\libwebp.dll" />
     <None Include="Assets\unity.webp\WebP.asmdef" />
+    <None Include="GAME_COMPATIBILITY_ISSUE_EXPLANATION.md" />
+    <None Include="QUICK_START_EXTENDED_COMPATIBILITY_DE.md" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
@@ -567,6 +570,10 @@
     </Reference>
     <Reference Include="ReportGeneratorMerged">
       <HintPath>Library\PackageCache\com.unity.testtools.codecoverage@e4e5058206c0\lib\ReportGenerator\ReportGeneratorMerged.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>Library\PackageCache\com.unity.nuget.newtonsoft-json@74deb55db2a0\Runtime\Newtonsoft.Json.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.Android.Types">

@@ -120,13 +120,10 @@ namespace MinorShift.Emuera
 			SystemSaveInBinary = instance.GetConfigValue<bool>(ConfigCode.SystemSaveInBinary);
 			SystemIgnoreTripleSymbol = instance.GetConfigValue<bool>(ConfigCode.SystemIgnoreTripleSymbol);
 			SystemIgnoreStringSet = instance.GetConfigValue<bool>(ConfigCode.SystemIgnoreStringSet);
-			
-			CompatiFuncArgAutoConvert = instance.GetConfigValue<bool>(ConfigCode.CompatiFuncArgAutoConvert);
-			CompatiFuncArgOptional = instance.GetConfigValue<bool>(ConfigCode.CompatiFuncArgOptional);
-			CompatiCallEvent = instance.GetConfigValue<bool>(ConfigCode.CompatiCallEvent);
-			CompatiSPChara = instance.GetConfigValue<bool>(ConfigCode.CompatiSPChara);
+			CompatiIgnoreInvalidLine = instance.GetConfigValue<bool>(ConfigCode.CompatiIgnoreInvalidLine);  // NEW
 
-            AllowLongInputByMouse = instance.GetConfigValue<bool>(ConfigCode.AllowLongInputByMouse);
+
+			AllowLongInputByMouse = instance.GetConfigValue<bool>(ConfigCode.AllowLongInputByMouse);
 
            TimesNotRigorousCalculation = instance.GetConfigValue<bool>(ConfigCode.TimesNotRigorousCalculation);
             //一文字変数の禁止オプションを考えた名残
@@ -515,6 +512,7 @@ namespace MinorShift.Emuera
 		public static bool SystemIgnoreTripleSymbol { get; private set; }
 		public static bool SystemNoTarget { get; private set; }
 		public static bool SystemIgnoreStringSet { get; private set; }
+		public static bool CompatiIgnoreInvalidLine { get; private set; }  // NEW: Allow execution with unparseable lines
 
 		public static int Language { get; private set; }
 

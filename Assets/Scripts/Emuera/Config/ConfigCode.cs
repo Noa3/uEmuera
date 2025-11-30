@@ -1,5 +1,4 @@
-﻿
-namespace MinorShift.Emuera
+﻿namespace MinorShift.Emuera
 {
 	//難読化用属性。enum.ToString()やenum.Parse()を行うなら(Exclude=true)にすること。
 	[global::System.Reflection.Obfuscation(Exclude=true)]
@@ -130,6 +129,7 @@ namespace MinorShift.Emuera
         //ForbidOneCodeVariable,
 		SystemNoTarget,
 		SystemIgnoreStringSet,
+		CompatiIgnoreInvalidLine,  // NEW: Allow execution even with unparseable lines
 
 		MoneyLabel = 100,
 		MoneyFirst = 101,

@@ -1,5 +1,4 @@
-﻿
-namespace MinorShift.Emuera.GameProc.Function
+﻿namespace MinorShift.Emuera.GameProc.Function
 {
 	/// <summary>
 	/// 命令コード
@@ -355,5 +354,7 @@ namespace MinorShift.Emuera.GameProc.Function
 		PRINT_SPACE,
 
 		INPUTMOUSEKEY,
+		
+		BINPUT,  // NEW: Extended Emuera command stub (batch input processing)
 	}
 }
