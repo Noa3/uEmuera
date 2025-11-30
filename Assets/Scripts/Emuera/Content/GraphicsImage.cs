@@ -125,14 +125,21 @@ namespace MinorShift.Emuera.Content
             int endX = Math.Min(width, rect.X + rect.Width);
             int endY = Math.Min(height, rect.Y + rect.Height);
             
-            for (int y = startY; y < endY; y++)
+            int rectWidth = endX - startX;
+            int rectHeight = endY - startY;
+            
+            if (rectWidth <= 0 || rectHeight <= 0)
+                return;
+            
+            // Use bulk operations for better performance
+            UnityEngine.Color[] pixels = new UnityEngine.Color[rectWidth * rectHeight];
+            for (int i = 0; i < pixels.Length; i++)
             {
-                for (int x = startX; x < endX; x++)
-                {
-                    // Unity textures have origin at bottom-left, so flip Y
-                    texture.SetPixel(x, height - 1 - y, fillColor);
-                }
+                pixels[i] = fillColor;
             }
+            
+            // SetPixels uses bottom-left origin, so flip Y
+            texture.SetPixels(startX, height - endY, rectWidth, rectHeight, pixels);
             texture.Apply();
         }
 
@@ -150,33 +157,52 @@ namespace MinorShift.Emuera.Content
 			if (ti == null || ti.texture == null)
 				return;
 			
-			// Get source pixels
+			// Get source pixels using bulk operation
 			var srcRect = img.Rectangle;
+			var srcPixels = ti.texture.GetPixels();
 			
-			// Draw source to destination with scaling
-			for (int dy = 0; dy < destRect.Height; dy++)
+			// Calculate clamped destination bounds
+			int clampedStartX = Math.Max(0, destRect.X);
+			int clampedStartY = Math.Max(0, destRect.Y);
+			int clampedEndX = Math.Min(width, destRect.X + destRect.Width);
+			int clampedEndY = Math.Min(height, destRect.Y + destRect.Height);
+			
+			int clampedWidth = clampedEndX - clampedStartX;
+			int clampedHeight = clampedEndY - clampedStartY;
+			
+			if (clampedWidth <= 0 || clampedHeight <= 0)
+				return;
+			
+			// Create destination pixel array
+			UnityEngine.Color[] destPixels = new UnityEngine.Color[clampedWidth * clampedHeight];
+			
+			for (int dy = 0; dy < clampedHeight; dy++)
 			{
-				for (int dx = 0; dx < destRect.Width; dx++)
+				for (int dx = 0; dx < clampedWidth; dx++)
 				{
+					// Calculate actual destination position
+					int actualDestX = clampedStartX + dx - destRect.X;
+					int actualDestY = clampedStartY + dy - destRect.Y;
+					
 					// Calculate source coordinates with scaling
-					int sx = srcRect.X + (dx * srcRect.Width / destRect.Width);
-					int sy = srcRect.Y + (dy * srcRect.Height / destRect.Height);
+					int sx = srcRect.X + (actualDestX * srcRect.Width / destRect.Width);
+					int sy = srcRect.Y + (actualDestY * srcRect.Height / destRect.Height);
 					
-					// Calculate destination coordinates
-					int destX = destRect.X + dx;
-					int destY = destRect.Y + dy;
-					
-					// Bounds checking
-					if (destX < 0 || destX >= width || destY < 0 || destY >= height)
-						continue;
+					// Bounds checking for source
 					if (sx < 0 || sx >= ti.texture.width || sy < 0 || sy >= ti.texture.height)
+					{
+						destPixels[dy * clampedWidth + dx] = new UnityEngine.Color(0, 0, 0, 0);
 						continue;
+					}
 					
-					// Get pixel and set (flip Y for Unity coordinate system)
-					UnityEngine.Color srcPixel = ti.texture.GetPixel(sx, ti.texture.height - 1 - sy);
-					texture.SetPixel(destX, height - 1 - destY, srcPixel);
+					// Get pixel (flip Y for source Unity coordinate system)
+					int srcIndex = (ti.texture.height - 1 - sy) * ti.texture.width + sx;
+					destPixels[dy * clampedWidth + dx] = srcPixels[srcIndex];
 				}
 			}
+			
+			// Set pixels using bulk operation (flip Y for destination)
+			texture.SetPixels(clampedStartX, height - clampedEndY, clampedWidth, clampedHeight, destPixels);
 			texture.Apply();
 		}
 
@@ -194,34 +220,52 @@ namespace MinorShift.Emuera.Content
 			if (ti == null || ti.texture == null)
 				return;
 			
-			// Get source pixels
+			// Get source pixels using bulk operation
 			var srcRect = img.Rectangle;
+			var srcPixels = ti.texture.GetPixels();
 			
-			// Draw source to destination with scaling and color matrix
-			for (int dy = 0; dy < destRect.Height; dy++)
+			// Calculate clamped destination bounds
+			int clampedStartX = Math.Max(0, destRect.X);
+			int clampedStartY = Math.Max(0, destRect.Y);
+			int clampedEndX = Math.Min(width, destRect.X + destRect.Width);
+			int clampedEndY = Math.Min(height, destRect.Y + destRect.Height);
+			
+			int clampedWidth = clampedEndX - clampedStartX;
+			int clampedHeight = clampedEndY - clampedStartY;
+			
+			if (clampedWidth <= 0 || clampedHeight <= 0)
+				return;
+			
+			// Create destination pixel array
+			UnityEngine.Color[] destPixels = new UnityEngine.Color[clampedWidth * clampedHeight];
+			
+			for (int dy = 0; dy < clampedHeight; dy++)
 			{
-				for (int dx = 0; dx < destRect.Width; dx++)
+				for (int dx = 0; dx < clampedWidth; dx++)
 				{
+					// Calculate actual destination position
+					int actualDestX = clampedStartX + dx - destRect.X;
+					int actualDestY = clampedStartY + dy - destRect.Y;
+					
 					// Calculate source coordinates with scaling
-					int sx = srcRect.X + (dx * srcRect.Width / destRect.Width);
-					int sy = srcRect.Y + (dy * srcRect.Height / destRect.Height);
+					int sx = srcRect.X + (actualDestX * srcRect.Width / destRect.Width);
+					int sy = srcRect.Y + (actualDestY * srcRect.Height / destRect.Height);
 					
-					// Calculate destination coordinates
-					int destX = destRect.X + dx;
-					int destY = destRect.Y + dy;
-					
-					// Bounds checking
-					if (destX < 0 || destX >= width || destY < 0 || destY >= height)
-						continue;
+					// Bounds checking for source
 					if (sx < 0 || sx >= ti.texture.width || sy < 0 || sy >= ti.texture.height)
+					{
+						destPixels[dy * clampedWidth + dx] = new UnityEngine.Color(0, 0, 0, 0);
 						continue;
+					}
 					
-					// Get source pixel and apply color matrix
-					UnityEngine.Color srcPixel = ti.texture.GetPixel(sx, ti.texture.height - 1 - sy);
-					UnityEngine.Color result = ApplyColorMatrix(srcPixel, cm);
-					texture.SetPixel(destX, height - 1 - destY, result);
+					// Get pixel and apply color matrix
+					int srcIndex = (ti.texture.height - 1 - sy) * ti.texture.width + sx;
+					destPixels[dy * clampedWidth + dx] = ApplyColorMatrix(srcPixels[srcIndex], cm);
 				}
 			}
+			
+			// Set pixels using bulk operation (flip Y for destination)
+			texture.SetPixels(clampedStartX, height - clampedEndY, clampedWidth, clampedHeight, destPixels);
 			texture.Apply();
 		}
 		
@@ -255,30 +299,51 @@ namespace MinorShift.Emuera.Content
             if (texture == null || srcGra == null || srcGra.texture == null)
                 return;
             
-            // Draw source graphics to destination with scaling
-            for (int dy = 0; dy < destRect.Height; dy++)
+            // Get source pixels using bulk operation
+            var srcPixels = srcGra.texture.GetPixels();
+            
+            // Calculate clamped destination bounds
+            int clampedStartX = Math.Max(0, destRect.X);
+            int clampedStartY = Math.Max(0, destRect.Y);
+            int clampedEndX = Math.Min(width, destRect.X + destRect.Width);
+            int clampedEndY = Math.Min(height, destRect.Y + destRect.Height);
+            
+            int clampedWidth = clampedEndX - clampedStartX;
+            int clampedHeight = clampedEndY - clampedStartY;
+            
+            if (clampedWidth <= 0 || clampedHeight <= 0)
+                return;
+            
+            // Create destination pixel array
+            UnityEngine.Color[] destPixels = new UnityEngine.Color[clampedWidth * clampedHeight];
+            
+            for (int dy = 0; dy < clampedHeight; dy++)
             {
-                for (int dx = 0; dx < destRect.Width; dx++)
+                for (int dx = 0; dx < clampedWidth; dx++)
                 {
+                    // Calculate actual destination position relative to destRect
+                    int actualDestX = clampedStartX + dx - destRect.X;
+                    int actualDestY = clampedStartY + dy - destRect.Y;
+                    
                     // Calculate source coordinates with scaling
-                    int sx = srcRect.X + (dx * srcRect.Width / destRect.Width);
-                    int sy = srcRect.Y + (dy * srcRect.Height / destRect.Height);
+                    int sx = srcRect.X + (actualDestX * srcRect.Width / destRect.Width);
+                    int sy = srcRect.Y + (actualDestY * srcRect.Height / destRect.Height);
                     
-                    // Calculate destination coordinates
-                    int destX = destRect.X + dx;
-                    int destY = destRect.Y + dy;
-                    
-                    // Bounds checking
-                    if (destX < 0 || destX >= width || destY < 0 || destY >= height)
-                        continue;
+                    // Bounds checking for source
                     if (sx < 0 || sx >= srcGra.width || sy < 0 || sy >= srcGra.height)
+                    {
+                        destPixels[dy * clampedWidth + dx] = new UnityEngine.Color(0, 0, 0, 0);
                         continue;
+                    }
                     
-                    // Get source pixel and set (flip Y for Unity coordinate system)
-                    UnityEngine.Color srcPixel = srcGra.texture.GetPixel(sx, srcGra.height - 1 - sy);
-                    texture.SetPixel(destX, height - 1 - destY, srcPixel);
+                    // Get source pixel (flip Y for Unity coordinate system)
+                    int srcIndex = (srcGra.height - 1 - sy) * srcGra.width + sx;
+                    destPixels[dy * clampedWidth + dx] = srcPixels[srcIndex];
                 }
             }
+            
+            // Set pixels using bulk operation (flip Y for destination)
+            texture.SetPixels(clampedStartX, height - clampedEndY, clampedWidth, clampedHeight, destPixels);
             texture.Apply();
         }
 
@@ -292,31 +357,51 @@ namespace MinorShift.Emuera.Content
             if (texture == null || srcGra == null || srcGra.texture == null)
                 return;
             
-            // Draw source graphics to destination with scaling and color matrix
-            for (int dy = 0; dy < destRect.Height; dy++)
+            // Get source pixels using bulk operation
+            var srcPixels = srcGra.texture.GetPixels();
+            
+            // Calculate clamped destination bounds
+            int clampedStartX = Math.Max(0, destRect.X);
+            int clampedStartY = Math.Max(0, destRect.Y);
+            int clampedEndX = Math.Min(width, destRect.X + destRect.Width);
+            int clampedEndY = Math.Min(height, destRect.Y + destRect.Height);
+            
+            int clampedWidth = clampedEndX - clampedStartX;
+            int clampedHeight = clampedEndY - clampedStartY;
+            
+            if (clampedWidth <= 0 || clampedHeight <= 0)
+                return;
+            
+            // Create destination pixel array
+            UnityEngine.Color[] destPixels = new UnityEngine.Color[clampedWidth * clampedHeight];
+            
+            for (int dy = 0; dy < clampedHeight; dy++)
             {
-                for (int dx = 0; dx < destRect.Width; dx++)
+                for (int dx = 0; dx < clampedWidth; dx++)
                 {
+                    // Calculate actual destination position relative to destRect
+                    int actualDestX = clampedStartX + dx - destRect.X;
+                    int actualDestY = clampedStartY + dy - destRect.Y;
+                    
                     // Calculate source coordinates with scaling
-                    int sx = srcRect.X + (dx * srcRect.Width / destRect.Width);
-                    int sy = srcRect.Y + (dy * srcRect.Height / destRect.Height);
+                    int sx = srcRect.X + (actualDestX * srcRect.Width / destRect.Width);
+                    int sy = srcRect.Y + (actualDestY * srcRect.Height / destRect.Height);
                     
-                    // Calculate destination coordinates
-                    int destX = destRect.X + dx;
-                    int destY = destRect.Y + dy;
-                    
-                    // Bounds checking
-                    if (destX < 0 || destX >= width || destY < 0 || destY >= height)
-                        continue;
+                    // Bounds checking for source
                     if (sx < 0 || sx >= srcGra.width || sy < 0 || sy >= srcGra.height)
+                    {
+                        destPixels[dy * clampedWidth + dx] = new UnityEngine.Color(0, 0, 0, 0);
                         continue;
+                    }
                     
-                    // Get source pixel, apply color matrix, and set
-                    UnityEngine.Color srcPixel = srcGra.texture.GetPixel(sx, srcGra.height - 1 - sy);
-                    UnityEngine.Color result = ApplyColorMatrix(srcPixel, cm);
-                    texture.SetPixel(destX, height - 1 - destY, result);
+                    // Get source pixel and apply color matrix
+                    int srcIndex = (srcGra.height - 1 - sy) * srcGra.width + sx;
+                    destPixels[dy * clampedWidth + dx] = ApplyColorMatrix(srcPixels[srcIndex], cm);
                 }
             }
+            
+            // Set pixels using bulk operation (flip Y for destination)
+            texture.SetPixels(clampedStartX, height - clampedEndY, clampedWidth, clampedHeight, destPixels);
             texture.Apply();
         }
 
@@ -331,24 +416,51 @@ namespace MinorShift.Emuera.Content
                 maskGra == null || maskGra.texture == null)
                 return;
             
-            // Draw source to destination using mask for alpha blending
-            for (int y = 0; y < srcGra.Height; y++)
+            // Get source, mask, and destination pixels using bulk operations
+            var srcPixels = srcGra.texture.GetPixels();
+            var maskPixels = maskGra.texture.GetPixels();
+            
+            // Calculate clamped destination bounds
+            int clampedStartX = Math.Max(0, destPoint.X);
+            int clampedStartY = Math.Max(0, destPoint.Y);
+            int clampedEndX = Math.Min(width, destPoint.X + srcGra.Width);
+            int clampedEndY = Math.Min(height, destPoint.Y + srcGra.Height);
+            
+            int clampedWidth = clampedEndX - clampedStartX;
+            int clampedHeight = clampedEndY - clampedStartY;
+            
+            if (clampedWidth <= 0 || clampedHeight <= 0)
+                return;
+            
+            // Get current destination pixels for blending
+            var currentDestPixels = texture.GetPixels(clampedStartX, height - clampedEndY, clampedWidth, clampedHeight);
+            
+            // Create result pixel array
+            UnityEngine.Color[] resultPixels = new UnityEngine.Color[clampedWidth * clampedHeight];
+            
+            for (int dy = 0; dy < clampedHeight; dy++)
             {
-                for (int x = 0; x < srcGra.Width; x++)
+                for (int dx = 0; dx < clampedWidth; dx++)
                 {
-                    int destX = destPoint.X + x;
-                    int destY = destPoint.Y + y;
+                    // Calculate source position
+                    int sx = clampedStartX + dx - destPoint.X;
+                    int sy = clampedStartY + dy - destPoint.Y;
                     
-                    // Bounds checking
-                    if (destX < 0 || destX >= width || destY < 0 || destY >= height)
+                    // Bounds checking for source and mask
+                    if (sx < 0 || sx >= srcGra.Width || sy < 0 || sy >= srcGra.Height ||
+                        sx < 0 || sx >= maskGra.Width || sy < 0 || sy >= maskGra.Height)
+                    {
+                        resultPixels[dy * clampedWidth + dx] = currentDestPixels[dy * clampedWidth + dx];
                         continue;
-                    if (x < 0 || x >= maskGra.Width || y < 0 || y >= maskGra.Height)
-                        continue;
+                    }
                     
-                    // Get source and mask pixels (flip Y for Unity coordinate system)
-                    UnityEngine.Color srcPixel = srcGra.texture.GetPixel(x, srcGra.height - 1 - y);
-                    UnityEngine.Color maskPixel = maskGra.texture.GetPixel(x, maskGra.height - 1 - y);
-                    UnityEngine.Color destPixel = texture.GetPixel(destX, height - 1 - destY);
+                    // Get source, mask, and dest pixels (flip Y for Unity)
+                    int srcIndex = (srcGra.height - 1 - sy) * srcGra.width + sx;
+                    int maskIndex = (maskGra.height - 1 - sy) * maskGra.width + sx;
+                    
+                    UnityEngine.Color srcPixel = srcPixels[srcIndex];
+                    UnityEngine.Color maskPixel = maskPixels[maskIndex];
+                    UnityEngine.Color destPixel = currentDestPixels[dy * clampedWidth + dx];
                     
                     // Use mask's grayscale value as alpha (average of RGB)
                     float maskAlpha = (maskPixel.r + maskPixel.g + maskPixel.b) / 3.0f;
@@ -373,9 +485,12 @@ namespace MinorShift.Emuera.Content
                         );
                     }
                     
-                    texture.SetPixel(destX, height - 1 - destY, result);
+                    resultPixels[dy * clampedWidth + dx] = result;
                 }
             }
+            
+            // Set pixels using bulk operation
+            texture.SetPixels(clampedStartX, height - clampedEndY, clampedWidth, clampedHeight, resultPixels);
             texture.Apply();
         }
 
