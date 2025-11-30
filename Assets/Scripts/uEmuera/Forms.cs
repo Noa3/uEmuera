@@ -119,7 +119,8 @@ namespace uEmuera.Forms
     {
         public static DialogResult Show(string text)
         {
-            return Show(text, "提示");
+            string caption = LocalizationHelper.GetSystemString("MessageBox.Title") ?? "\u63d0\u793a";
+            return Show(text, caption);
         }
         public static DialogResult Show(string text, string caption)
         {
@@ -127,7 +128,6 @@ namespace uEmuera.Forms
         }
         public static DialogResult Show(string text, string caption, MessageBoxButtons buttons)
         {
-            //todo
             uEmuera.Logger.Info(text);
             return DialogResult.None;
         }

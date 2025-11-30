@@ -19,7 +19,7 @@ public class MainEntry : MonoBehaviour
         LoadConfigMaps();
         if(!MultiLanguage.SetLanguage())
         {
-            Object.FindObjectOfType<OptionWindow>().ShowLanguageBox();
+            Object.FindFirstObjectByType<OptionWindow>().ShowLanguageBox();
         }
 
 #if UNITY_EDITOR

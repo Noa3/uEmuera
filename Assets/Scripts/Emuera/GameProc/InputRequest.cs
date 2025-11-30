@@ -6,22 +6,24 @@ namespace MinorShift.Emuera.GameProc
 {
 	enum InputType
 	{
-		EnterKey = 1,// Enter key or click
-		AnyKey = 2,// Any input
-		IntValue = 3,// Integer value. Whether OneInput or not is determined by a separate variable
-		StrValue = 4,// String value.
-		Void = 5,// Input disabled. Can only wait - becomes no-op during skip or macro mode
+		EnterKey = 1,  // Enter key or click / Enterキーかクリック
+		AnyKey = 2,    // Any input / なんでもいいから入力
+		IntValue = 3,  // Integer value. OneInput or not is in a separate variable / 整数値。OneInputかどうかは別の変数で
+		StrValue = 4,  // String / 文字列。
+		Void = 5,      // No input possible. Just wait → Skip or macro cancels it / 入力不能。待つしかない→スキップ中orマクロ中ならなかったことになる
 
-		// Added in version 1823
+		//1823
 		PrimitiveMouseKey = 11,
 
 	}
 	
 
-	// Added in version 1819: Part of a plan to reduce coupling between input/display systems and Data/Process systems
-	// Goal is to add as much cushioning as possible between layers. Eventually for separate threading.
+	// 1819 Added: Plan to weaken the coupling between input/display and Data/Process systems
+	// Want to put cushioning in between as much as possible. Eventually separate threads
+	// 1819追加 入力・表示系とData、Process系の結合を弱くしよう計画の一つ
+	// できるだけ間にクッションをおいていきたい。最終的には別スレッドに
 
-	// TODO: Consider whether to reuse or dispose this class each time
+	// Should this class be disposable or reusable? / クラスを毎回使い捨てるのはどうなんだろう 使いまわすべきか
 	internal sealed class InputRequest
 	{
 		public InputRequest()

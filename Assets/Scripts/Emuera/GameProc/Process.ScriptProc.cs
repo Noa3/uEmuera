@@ -75,6 +75,15 @@ namespace MinorShift.Emuera.GameProc
 					continue;// $ label. Nothing to do.
 				else if (line is InvalidLine)
 				{
+					// NEW: Allow execution to continue if CompatiIgnoreInvalidLine is enabled
+					if (Config.CompatiIgnoreInvalidLine)
+					{
+						// Log warning but don't throw error
+						if (!string.IsNullOrEmpty(line.ErrMes))
+							console.PrintError("警告：" + line.ErrMes + "（行をスキップして続行）");
+						continue;
+					}
+					
 					if (string.IsNullOrEmpty(line.ErrMes))
 						throw new CodeEE("A line that failed to load was executed. See the load warnings for error details.");
 					else

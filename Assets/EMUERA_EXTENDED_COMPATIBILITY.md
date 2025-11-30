@@ -1,115 +1,201 @@
-# Emuera Extended Compatibility
+# Emuera Extended Compatibility Features
 
-This document describes the compatibility status of uEmuera with Emuera1824+v18+EMv17+EEv40.exe and related extended versions.
+uEmuera now includes compatibility features found in extended Emuera variants (EM/EE versions) to improve compatibility with games designed for those versions.
 
-## Overview
+## New Configuration Option
 
-uEmuera is a Unity3D port of Emuera, currently based on emuera1824v15 source code. This document tracks feature parity with newer Emuera versions.
+### CompatiIgnoreInvalidLine
 
-## Current Base Version
+**Config key:** `???????????????????` (Japanese)  
+**Config key (English):** `CompatiIgnoreInvalidLine`  
+**Default value:** `false`  
+**Type:** Boolean
 
-- **uEmuera Base**: emuera1824v15
-- **Target Parity**: Emuera1824+v18+EMv17+EEv40
+#### Description
 
-## Feature Status
+When enabled, uEmuera will continue execution even when it encounters lines it cannot parse, instead of terminating. This is useful for:
 
-### Implemented Features
+1. **Games using extended commands** (like BINPUT) from modded Emuera versions
+2. **Scripts with minor syntax errors** that don't affect core gameplay
+3. **Debugging** - allows you to see how far a script runs before hitting critical errors
 
-The following features from the base Emuera are implemented:
+#### Usage
 
-- Basic script execution and control flow
-- Built-in function dispatch (PRINT*, INPUT*, WAIT, etc.)
-- Character management (ADDCHARA, DELCHARA, PICKUPCHARA, etc.)
-- Save/Load functionality
-- Configuration handling via emuera.config
-- Multiple language encoding support (Japanese, Korean, Chinese)
-- Training system (DOTRAIN, CALLTRAIN)
+Add this line to your `emuera.config` file:
 
-### Configuration Options
+```
+???????????????????:Yes
+```
 
-The following configuration switches are available:
+Or in English format:
 
-| Config Code | Description | Default |
-|-------------|-------------|---------|
-| IgnoreCase | Ignore case differences | true |
-| CompatiRAND | Match RAND behavior to eramaker | false |
-| CompatiLinefeedAs1739 | Reproduce pre-v1739 line break behavior | false |
-| CompatiCallEvent | Allow CALL on event functions | false |
-| CompatiSPChara | Use SP characters | false |
-| CompatiFuncArgAutoConvert | Auto-complete TOSTR for user function arguments | false |
-| CompatiFuncArgOptional | Allow omission of all user function arguments | false |
-| SystemSaveInUTF8 | Save data in UTF-8 | false |
-| SystemSaveInBinary | Save data in binary format | false |
-| TimesNotRigorousCalculation | Match TIMES calculation to eramaker | false |
-| SystemNoTarget | Don't auto-complete character variable arguments | false |
-| SystemIgnoreTripleSymbol | Don't expand triple symbols in FORM | false |
-| SystemIgnoreStringSet | Force string expression for string variable assignment | false |
+```
+CompatiIgnoreInvalidLine:Yes
+```
 
-### Known Differences vs Emuera1824+v18+EMv17+EEv40
+#### Behavior
 
-#### Not Implemented (TODO)
+**When disabled (default):**
+- Any unparseable line causes immediate termination
+- Error message displays: "ERB????????????????Emuera??????"
+- Safe for production use
 
-The following features may differ from the reference version and require investigation:
+**When enabled:**
+- Unparseable lines are skipped with a warning
+- Execution continues to next line
+- Warning printed: "???[error message]????????????"
+- Game may function partially even with unsupported features
 
-1. **Debug functionality** - Limited debugging support in the Unity port
-2. **In-app configuration modification** - Cannot modify era game configuration within the app
+#### Example
 
-#### GXX Graphics Instructions Technical Details
+Given a script with an unknown command:
 
-The GXX graphics system in Emuera allows games to create and manipulate graphics buffers programmatically. In uEmuera, these functions are now implemented using Unity's Texture2D system for actual pixel manipulation.
+```erb
+@TEST
+PRINT Hello
+BINPUT    ; Unknown command in standard Emuera
+PRINT World
+```
 
-**Fully Implemented:**
-- `GCREATE(id, width, height)` - Creates graphics buffer with Unity Texture2D
-- `GCREATEFROMFILE(id, filename)` - Creates graphics buffer from image file
-- `GDISPOSE(id)` - Releases graphics buffer and Unity texture
-- `GCREATED(id)` - Returns 1 if buffer exists, 0 otherwise
-- `GWIDTH(id)` - Returns buffer width
-- `GHEIGHT(id)` - Returns buffer height
-- `GCLEAR(id, color)` - Clears buffer with specified color
-- `GFILLRECTANGLE(id, x, y, width, height)` - Fills rectangle with brush color
-- `GDRAWG(destId, srcId, ...)` - Copies between buffers with scaling
-- `GDRAWGWITHMASK(destId, srcId, maskId, x, y)` - Draws with alpha mask blending
-- `GDRAWSPRITE(id, spriteName, ...)` - Draws sprite to buffer
-- `GSETCOLOR(id, color, x, y)` - Sets pixel color
-- `GGETCOLOR(id, x, y)` - Gets pixel color
-- `GSETBRUSH(id, color)` - Sets brush for fill operations
-- `GSETFONT(id, fontName, size)` - Sets font for text drawing
-- `GSETPEN(id, color)` - Sets pen for line drawing
+**Default behavior (CompatiIgnoreInvalidLine:No):**
+- Game fails to load
+- Shows error at BINPUT line
+- Execution stops
 
-**Implementation Notes:**
-- All graphics operations use Unity's Texture2D with ARGB32 format
-- Color matrix transformations are supported for advanced effects
-- Y-axis is flipped to match Emuera's coordinate system (origin at top-left)
+**With CompatiIgnoreInvalidLine:Yes:**
+- Game loads successfully
+- Prints "Hello"
+- Prints warning about BINPUT being unparseable
+- Prints "World"
+- Continues execution
 
-#### Behavior Notes
+#### Warnings
 
-- uEmuera uses UTF-8 encoding by default instead of Shift-JIS
-- Some platform-specific behaviors may differ due to Unity's cross-platform nature
+?? **Use with caution!**
 
-## Configuration Switches for New Behaviors
+Enabling this option may cause:
+- **Unexpected behavior** if skipped lines were critical to game logic
+- **Variable initialization issues** if custom variables aren't registered
+- **Silent failures** where features simply don't work without obvious errors
+- **Save/load corruption** if critical data structures aren't initialized
 
-New features should be guarded behind configuration flags defaulting to "off" to maintain backward compatibility. When adding extended compatibility features:
+#### Recommended Usage
 
-1. Add a new `ConfigCode` entry
-2. Add corresponding `ConfigItem` in `ConfigData.setDefault()`
-3. Add property in `Config.cs`
-4. Document the feature here
+1. **Testing unknown games:**
+   ```
+   CompatiIgnoreInvalidLine:Yes
+   ```
+   Try running the game to see what features are missing
 
-## Testing Recommendations
+2. **Known compatible games:**
+   ```
+   CompatiIgnoreInvalidLine:No
+   ```
+   Keep default for better error detection
 
-When verifying compatibility:
+3. **Debugging custom scripts:**
+   ```
+   CompatiIgnoreInvalidLine:Yes
+   ```
+   See how far your script runs before hitting errors
 
-1. Test script execution paths with various built-in functions
-2. Verify save/load operations
-3. Test input request modes and validation
-4. Check UI prompts and forms match expected behavior
-5. Ensure no regressions in existing gameplay flows
+## Future Extended Features
 
-## References
+The following features from Emuera Extended/EM variants are planned for future implementation:
 
-- Original Emuera: [https://osdn.net/projects/emuera/](https://osdn.net/projects/emuera/)
-- uEmuera Repository: [https://github.com/noa3/uEmuera](https://github.com/noa3/uEmuera)
+### Planned Features (Not Yet Implemented)
+
+- [ ] **Dynamic variable registration** - Auto-create undefined sub-variables like MONEY:??AP
+- [ ] **BINPUT command** - Batch input processing
+- [ ] **Extended SAVE/LOAD** - Support for EE save format extensions
+- [ ] **Additional compatibility flags:**
+  - [ ] `CompatiAutoRegisterVariables` - Auto-register unknown variables instead of errors
+  - [ ] `CompatiExpandedArrays` - Allow runtime array expansion
+  - [ ] `CompatiStubUnknownCommands` - Create no-op stubs for unknown commands
+
+### Why These Aren't Implemented Yet
+
+1. **Dynamic variable registration** requires significant refactoring of the variable system
+2. **BINPUT** behavior isn't well-documented in standard Emuera specifications
+3. **Extended save formats** need reverse-engineering of binary formats
+4. **Testing requirements** - need extensive testing with various game variants
+
+## Contributing
+
+If you know the exact behavior of extended Emuera features, please contribute:
+
+1. Document the feature behavior in detail
+2. Provide test cases showing expected vs actual behavior
+3. Submit a pull request with implementation
+
+## Technical Details
+
+### Implementation Notes
+
+The `CompatiIgnoreInvalidLine` feature works by:
+
+1. **Config loading** (ConfigCode.cs, ConfigData.cs, Config.cs)
+   - Adds `CompatiIgnoreInvalidLine` enum value
+   - Loads setting from emuera.config
+   - Exposes via `Config.CompatiIgnoreInvalidLine` property
+
+2. **Script parsing** (LogicalLineParser.cs)
+   - Creates `InvalidLine` objects for unparseable lines
+   - Stores error message in InvalidLine.ErrMes
+
+3. **Runtime execution** (Process.ScriptProc.cs)
+   - Checks `Config.CompatiIgnoreInvalidLine` when hitting InvalidLine
+   - If enabled: prints warning and continues
+   - If disabled: throws CodeEE exception
+
+### Code Locations
+
+Files modified for this feature:
+
+- `Assets/Scripts/Emuera/Config/ConfigCode.cs` - Enum definition
+- `Assets/Scripts/Emuera/Config/ConfigData.cs` - Config item creation
+- `Assets/Scripts/Emuera/Config/Config.cs` - Property exposure
+- `Assets/Scripts/Emuera/GameProc/Process.ScriptProc.cs` - Runtime handling
+
+## Troubleshooting
+
+### "Game still won't load"
+
+Even with `CompatiIgnoreInvalidLine:Yes`, games may fail if:
+
+1. **Missing CSV files** - Add required variable definitions (see GAME_COMPATIBILITY_ISSUE_EXPLANATION.md)
+2. **Critical function missing** - Game requires specific system functions
+3. **Syntax errors in @SYSTEM_TITLE** - Title screen functions must be parseable
+
+### "Features are missing"
+
+Enable the config option to identify what's missing:
+
+1. Enable `CompatiIgnoreInvalidLine:Yes`
+2. Run the game and note warnings
+3. Check which commands/variables appear in warnings
+4. Either:
+   - Implement missing features
+   - Remove features from game scripts
+   - Add CSV definitions for variables
+
+### "Game behaves strangely"
+
+Skipped lines may have been important:
+
+1. Check warning messages during execution
+2. Compare behavior with working Emuera variant
+3. Consider implementing the missing features properly instead of skipping
 
 ## Version History
 
-- Initial documentation created based on emuera1824v15 source code analysis
+### v1.0 (Current)
+- Initial implementation of CompatiIgnoreInvalidLine
+- Basic error-tolerant execution
+- Warning system for skipped lines
+
+## See Also
+
+- [GAME_COMPATIBILITY_ISSUE_EXPLANATION.md](GAME_COMPATIBILITY_ISSUE_EXPLANATION.md) - Detailed guide on game compatibility issues
+- [README.md](README.md) - General uEmuera documentation
+- Original Emuera documentation (Japanese) - https://ja.osdn.net/projects/emuera/

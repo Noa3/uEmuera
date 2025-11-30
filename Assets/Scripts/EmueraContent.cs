@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using MinorShift.Emuera;
 using MinorShift.Emuera.GameView;
@@ -29,7 +30,7 @@ public class EmueraContent : MonoBehaviour
     void Awake()
     {
         FontUtils.SetDefaultFont(default_fontname);
-        main_camere = GameObject.FindObjectOfType<Camera>();
+        main_camere = GameObject.FindFirstObjectByType<Camera>();
     }
 
     void Start()
@@ -329,19 +330,19 @@ public class EmueraContent : MonoBehaviour
 
     bool dirty = false;
     uint last_click_tic = 0;
-    void OnBeginDrag(UnityEngine.EventSystems.PointerEventData e)
+    void OnBeginDrag(PointerEventData e)
     {
         drag_begin_position = e.position;
         drag_curr_position = e.position;
         drag_delta = Vector3.zero;
     }
-    void OnDrag(UnityEngine.EventSystems.PointerEventData e)
+    void OnDrag(PointerEventData e)
     {
         dirty = true;
         drag_curr_position = e.position;
         drag_delta = Vector3.zero;
     }
-    void OnEndDrag(UnityEngine.EventSystems.PointerEventData e)
+    void OnEndDrag(PointerEventData e)
     {
         dirty = true;
         float display_width = DISPLAY_WIDTH;
