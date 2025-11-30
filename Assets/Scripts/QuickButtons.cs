@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 public class QuickButtons : MonoBehaviour
@@ -143,19 +144,19 @@ public class QuickButtons : MonoBehaviour
         return local;
     }
 
-    void OnBeginDrag(UnityEngine.EventSystems.PointerEventData e)
+    void OnBeginDrag(PointerEventData e)
     {
         drag_begin_position = e.position;
         drag_curr_position = e.position;
         drag_delta = Vector3.zero;
     }
-    void OnDrag(UnityEngine.EventSystems.PointerEventData e)
+    void OnDrag(PointerEventData e)
     {
         dirty = true;
         drag_curr_position = e.position;
         drag_delta = Vector3.zero;
     }
-    void OnEndDrag(UnityEngine.EventSystems.PointerEventData e)
+    void OnEndDrag(PointerEventData e)
     {
         dirty = true;
 
