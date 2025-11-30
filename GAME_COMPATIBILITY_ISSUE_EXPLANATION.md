@@ -31,11 +31,11 @@ On Android, game files should be placed in one of these locations:
 
 ### 1. Graphics Instructions
 
-Some GXX-related drawing instructions are not fully implemented. Games heavily relying on advanced graphics features may have display issues.
+GXX-related drawing instructions are now implemented using Unity's Texture2D system. Most graphics operations should work as expected.
 
-#### Partially Implemented GXX Instructions
+#### GXX Instructions Status
 
-The following graphics instructions exist but have limited or no actual implementation:
+The following graphics instructions are available:
 
 | Instruction | Status | Description |
 |-------------|--------|-------------|
@@ -45,31 +45,25 @@ The following graphics instructions exist but have limited or no actual implemen
 | `GCREATED` | ✅ Works | Checks if a graphics buffer exists |
 | `GWIDTH` | ✅ Works | Returns graphics buffer width |
 | `GHEIGHT` | ✅ Works | Returns graphics buffer height |
-| `GCLEAR` | ⚠️ Stub | Clears graphics buffer with color (no visual effect) |
-| `GFILLRECTANGLE` | ⚠️ Stub | Fills rectangle with color (no visual effect) |
-| `GDRAWG` | ⚠️ Stub | Draws one graphics buffer to another (no visual effect) |
-| `GDRAWGWITHMASK` | ⚠️ Stub | Draws with mask (no visual effect) |
-| `GDRAWSPRITE` | ⚠️ Stub | Draws sprite to graphics buffer (no visual effect) |
-| `GSETCOLOR` | ⚠️ Stub | Sets pixel color (no visual effect) |
-| `GGETCOLOR` | ⚠️ Partial | Gets pixel color (returns default values instead of actual pixel colors) |
-| `GSETBRUSH` | ⚠️ Stub | Sets brush for drawing (no effect) |
-| `GSETFONT` | ⚠️ Stub | Sets font for text drawing (no effect) |
-| `GSETPEN` | ⚠️ Stub | Sets pen for line drawing (no effect) |
+| `GCLEAR` | ✅ Works | Clears graphics buffer with color |
+| `GFILLRECTANGLE` | ✅ Works | Fills rectangle with brush color |
+| `GDRAWG` | ✅ Works | Draws one graphics buffer to another with scaling |
+| `GDRAWGWITHMASK` | ✅ Works | Draws with alpha mask blending |
+| `GDRAWSPRITE` | ✅ Works | Draws sprite to graphics buffer |
+| `GSETCOLOR` | ✅ Works | Sets pixel color at specified coordinates |
+| `GGETCOLOR` | ✅ Works | Gets pixel color at specified coordinates |
+| `GSETBRUSH` | ✅ Works | Sets brush color for fill operations |
+| `GSETFONT` | ✅ Works | Sets font for text drawing |
+| `GSETPEN` | ✅ Works | Sets pen for line drawing |
 
 **Legend:**
 - ✅ Works: Instruction functions as expected
-- ⚠️ Stub: Instruction is recognized but does not perform actual drawing operations
-- ⚠️ Partial: Instruction has limited functionality
 
-#### Impact on Games
+#### Notes
 
-Games that use these graphics instructions for:
-- Dynamic image generation
-- Custom UI rendering
-- Image manipulation and compositing
-- Text-to-image conversion
-
-May experience missing graphics, blank areas, or incorrect visual output.
+- Graphics operations use Unity's Texture2D for pixel manipulation
+- Color matrix transformations are supported for advanced image effects
+- Large graphics buffers may impact performance on lower-end devices
 
 ### 2. Configuration Modification
 
@@ -107,15 +101,15 @@ Several configuration options can help resolve compatibility issues:
 ### Display Issues
 
 1. Try adjusting resolution settings in the app menu
-2. Check if the game uses unsupported GXX instructions (see Graphics Instructions section above)
-3. Adjust font settings if text appears incorrectly
-4. If graphics appear missing or blank, the game may rely on unimplemented GXX drawing functions
+2. Adjust font settings if text appears incorrectly
+3. For large graphics operations, allow extra time for texture processing
 
 ### Performance Problems
 
 1. Reduce log history line count in configuration
 2. Close other applications to free memory
 3. Try lower resolution settings
+4. Large graphics buffers or frequent GXX operations may impact performance
 
 ## Reporting Issues
 
