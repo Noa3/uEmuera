@@ -33,6 +33,44 @@ On Android, game files should be placed in one of these locations:
 
 Some GXX-related drawing instructions are not fully implemented. Games heavily relying on advanced graphics features may have display issues.
 
+#### Partially Implemented GXX Instructions
+
+The following graphics instructions exist but have limited or no actual implementation:
+
+| Instruction | Status | Description |
+|-------------|--------|-------------|
+| `GCREATE` | ✅ Works | Creates a graphics buffer with specified dimensions |
+| `GCREATEFROMFILE` | ✅ Works | Creates a graphics buffer from an image file |
+| `GDISPOSE` | ✅ Works | Disposes of a graphics buffer |
+| `GCREATED` | ✅ Works | Checks if a graphics buffer exists |
+| `GWIDTH` | ✅ Works | Returns graphics buffer width |
+| `GHEIGHT` | ✅ Works | Returns graphics buffer height |
+| `GCLEAR` | ⚠️ Stub | Clears graphics buffer with color (no visual effect) |
+| `GFILLRECTANGLE` | ⚠️ Stub | Fills rectangle with color (no visual effect) |
+| `GDRAWG` | ⚠️ Stub | Draws one graphics buffer to another (no visual effect) |
+| `GDRAWGWITHMASK` | ⚠️ Stub | Draws with mask (no visual effect) |
+| `GDRAWSPRITE` | ⚠️ Stub | Draws sprite to graphics buffer (no visual effect) |
+| `GSETCOLOR` | ⚠️ Stub | Sets pixel color (no visual effect) |
+| `GGETCOLOR` | ⚠️ Partial | Gets pixel color (may not return correct values) |
+| `GSETBRUSH` | ⚠️ Stub | Sets brush for drawing (no effect) |
+| `GSETFONT` | ⚠️ Stub | Sets font for text drawing (no effect) |
+| `GSETPEN` | ⚠️ Stub | Sets pen for line drawing (no effect) |
+
+**Legend:**
+- ✅ Works: Instruction functions as expected
+- ⚠️ Stub: Instruction is recognized but does not perform actual drawing operations
+- ⚠️ Partial: Instruction has limited functionality
+
+#### Impact on Games
+
+Games that use these graphics instructions for:
+- Dynamic image generation
+- Custom UI rendering
+- Image manipulation and compositing
+- Text-to-image conversion
+
+May experience missing graphics, blank areas, or incorrect visual output.
+
 ### 2. Configuration Modification
 
 In-app modification of era game configuration is not currently supported. Configuration changes must be made by editing the `emuera.config` file directly.
@@ -69,8 +107,9 @@ Several configuration options can help resolve compatibility issues:
 ### Display Issues
 
 1. Try adjusting resolution settings in the app menu
-2. Check if the game uses unsupported GXX instructions
+2. Check if the game uses unsupported GXX instructions (see Graphics Instructions section above)
 3. Adjust font settings if text appears incorrectly
+4. If graphics appear missing or blank, the game may rely on unimplemented GXX drawing functions
 
 ### Performance Problems
 

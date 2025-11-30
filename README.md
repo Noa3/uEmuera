@@ -16,7 +16,7 @@ Emuera stands for "Emulator of Eramaker", a text-based game platform for Windows
 
 This project is a Unity3D port of Emuera. It leverages Unity3D's cross-platform capabilities to make it easier to port to non-Windows platforms.
 
-The current project is based on the emuera1824v15 source code. Some GXX-related drawing instructions have not been implemented.
+The current project is based on the emuera1824v15 source code. Some GXX-related drawing instructions are not fully implemented. Games heavily relying on advanced graphics features may have display issues. See [GAME_COMPATIBILITY_ISSUE_EXPLANATION.md](GAME_COMPATIBILITY_ISSUE_EXPLANATION.md) for details.
 
 It can run almost all era script games!
 
@@ -72,7 +72,7 @@ Emuera是Emulator of Eramaker的缩写，是Windows平台下文字游戏平台�
 
 该项目为Emuera的Unity3D移植版本。意在利用Unity3D多平台特性，方便移植到非Windows平台。
 
-当前项目以基于emuera1824v15版本源代码，部分GXX相关绘制指令没有实现。
+当前项目以基于emuera1824v15版本源代码，部分GXX相关绘制指令没有完全实现。依赖高级图形功能的游戏可能会有显示问题。详情请参阅 [GAME_COMPATIBILITY_ISSUE_EXPLANATION.md](GAME_COMPATIBILITY_ISSUE_EXPLANATION.md)。
 
 几乎可以执行所有era脚本游戏！
 

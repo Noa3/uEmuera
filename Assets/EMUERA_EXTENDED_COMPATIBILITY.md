@@ -51,9 +51,37 @@ The following configuration switches are available:
 
 The following features may differ from the reference version and require investigation:
 
-1. **GXX-related drawing instructions** - Some graphics-related instructions are not fully implemented
+1. **GXX-related drawing instructions** - Graphics buffer manipulation functions have limited implementation (see details below)
 2. **Debug functionality** - Limited debugging support in the Unity port
 3. **In-app configuration modification** - Cannot modify era game configuration within the app
+
+#### GXX Graphics Instructions Technical Details
+
+The GXX graphics system in Emuera allows games to create and manipulate graphics buffers programmatically. In uEmuera, these functions are registered and recognized, but most actual drawing operations are not performed due to the Unity3D platform differences.
+
+**Fully Functional:**
+- `GCREATE(id, width, height)` - Creates graphics buffer (metadata only)
+- `GCREATEFROMFILE(id, filename)` - Creates graphics buffer from file (metadata only)
+- `GDISPOSE(id)` - Releases graphics buffer
+- `GCREATED(id)` - Returns 1 if buffer exists, 0 otherwise
+- `GWIDTH(id)` - Returns buffer width
+- `GHEIGHT(id)` - Returns buffer height
+
+**Stub Implementations (No Visual Effect):**
+- `GCLEAR(id, color)` - Should clear buffer with color
+- `GFILLRECTANGLE(id, x, y, width, height)` - Should fill rectangle
+- `GDRAWG(destId, srcId, ...)` - Should copy between buffers
+- `GDRAWGWITHMASK(destId, srcId, maskId, x, y)` - Should draw with alpha mask
+- `GDRAWSPRITE(id, spriteName, ...)` - Should draw sprite to buffer
+- `GSETCOLOR(id, color, x, y)` - Should set pixel color
+- `GSETBRUSH(id, color)` - Should set brush for fill operations
+- `GSETFONT(id, fontName, size)` - Should set font for text drawing
+- `GSETPEN(id, color)` - Should set pen for line drawing
+
+**Partial Implementation:**
+- `GGETCOLOR(id, x, y)` - May not return accurate color values
+
+These limitations stem from the original Windows GDI+ graphics code being commented out during the Unity port, as Unity uses a different graphics system.
 
 #### Behavior Notes
 
