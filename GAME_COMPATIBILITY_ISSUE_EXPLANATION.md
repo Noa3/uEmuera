@@ -51,7 +51,7 @@ The following graphics instructions exist but have limited or no actual implemen
 | `GDRAWGWITHMASK` | ⚠️ Stub | Draws with mask (no visual effect) |
 | `GDRAWSPRITE` | ⚠️ Stub | Draws sprite to graphics buffer (no visual effect) |
 | `GSETCOLOR` | ⚠️ Stub | Sets pixel color (no visual effect) |
-| `GGETCOLOR` | ⚠️ Partial | Gets pixel color (may not return correct values) |
+| `GGETCOLOR` | ⚠️ Partial | Gets pixel color (returns default values instead of actual pixel colors) |
 | `GSETBRUSH` | ⚠️ Stub | Sets brush for drawing (no effect) |
 | `GSETFONT` | ⚠️ Stub | Sets font for text drawing (no effect) |
 | `GSETPEN` | ⚠️ Stub | Sets pen for line drawing (no effect) |

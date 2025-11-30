@@ -60,8 +60,8 @@ The following features may differ from the reference version and require investi
 The GXX graphics system in Emuera allows games to create and manipulate graphics buffers programmatically. In uEmuera, these functions are registered and recognized, but most actual drawing operations are not performed due to the Unity3D platform differences.
 
 **Fully Functional:**
-- `GCREATE(id, width, height)` - Creates graphics buffer (metadata only)
-- `GCREATEFROMFILE(id, filename)` - Creates graphics buffer from file (metadata only)
+- `GCREATE(id, width, height)` - Creates graphics buffer (tracks dimensions and existence, but no actual pixel buffer)
+- `GCREATEFROMFILE(id, filename)` - Creates graphics buffer from file (tracks dimensions from file, but no actual pixel buffer)
 - `GDISPOSE(id)` - Releases graphics buffer
 - `GCREATED(id)` - Returns 1 if buffer exists, 0 otherwise
 - `GWIDTH(id)` - Returns buffer width
@@ -79,9 +79,9 @@ The GXX graphics system in Emuera allows games to create and manipulate graphics
 - `GSETPEN(id, color)` - Should set pen for line drawing
 
 **Partial Implementation:**
-- `GGETCOLOR(id, x, y)` - May not return accurate color values
+- `GGETCOLOR(id, x, y)` - Returns default values instead of actual pixel colors
 
-These limitations stem from the original Windows GDI+ graphics code being commented out during the Unity port, as Unity uses a different graphics system.
+These limitations stem from the original Windows GDI+ graphics code being commented out during the Unity port, as Unity uses a different graphics system. Future updates may implement Unity-based alternatives for these graphics operations.
 
 #### Behavior Notes
 
