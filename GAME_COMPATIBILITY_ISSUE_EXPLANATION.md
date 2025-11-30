@@ -31,7 +31,39 @@ On Android, game files should be placed in one of these locations:
 
 ### 1. Graphics Instructions
 
-Some GXX-related drawing instructions are not fully implemented. Games heavily relying on advanced graphics features may have display issues.
+GXX-related drawing instructions are now implemented using Unity's Texture2D system. Most graphics operations should work as expected.
+
+#### GXX Instructions Status
+
+The following graphics instructions are available:
+
+| Instruction | Status | Description |
+|-------------|--------|-------------|
+| `GCREATE` | ✅ Works | Creates a graphics buffer with specified dimensions |
+| `GCREATEFROMFILE` | ✅ Works | Creates a graphics buffer from an image file |
+| `GDISPOSE` | ✅ Works | Disposes of a graphics buffer |
+| `GCREATED` | ✅ Works | Checks if a graphics buffer exists |
+| `GWIDTH` | ✅ Works | Returns graphics buffer width |
+| `GHEIGHT` | ✅ Works | Returns graphics buffer height |
+| `GCLEAR` | ✅ Works | Clears graphics buffer with color |
+| `GFILLRECTANGLE` | ✅ Works | Fills rectangle with brush color |
+| `GDRAWG` | ✅ Works | Draws one graphics buffer to another with scaling |
+| `GDRAWGWITHMASK` | ✅ Works | Draws with alpha mask blending |
+| `GDRAWSPRITE` | ✅ Works | Draws sprite to graphics buffer |
+| `GSETCOLOR` | ✅ Works | Sets pixel color at specified coordinates |
+| `GGETCOLOR` | ✅ Works | Gets pixel color at specified coordinates |
+| `GSETBRUSH` | ✅ Works | Sets brush color for fill operations |
+| `GSETFONT` | ✅ Works | Sets font for text drawing |
+| `GSETPEN` | ✅ Works | Sets pen for line drawing |
+
+**Legend:**
+- ✅ Works: Instruction functions as expected
+
+#### Notes
+
+- Graphics operations use Unity's Texture2D for pixel manipulation
+- Color matrix transformations are supported for advanced image effects
+- Large graphics buffers may impact performance on lower-end devices
 
 ### 2. Configuration Modification
 
@@ -69,14 +101,15 @@ Several configuration options can help resolve compatibility issues:
 ### Display Issues
 
 1. Try adjusting resolution settings in the app menu
-2. Check if the game uses unsupported GXX instructions
-3. Adjust font settings if text appears incorrectly
+2. Adjust font settings if text appears incorrectly
+3. For large graphics operations, allow extra time for texture processing
 
 ### Performance Problems
 
 1. Reduce log history line count in configuration
 2. Close other applications to free memory
 3. Try lower resolution settings
+4. Large graphics buffers or frequent GXX operations may impact performance
 
 ## Reporting Issues
 

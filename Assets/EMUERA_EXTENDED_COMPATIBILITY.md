@@ -51,9 +51,35 @@ The following configuration switches are available:
 
 The following features may differ from the reference version and require investigation:
 
-1. **GXX-related drawing instructions** - Some graphics-related instructions are not fully implemented
-2. **Debug functionality** - Limited debugging support in the Unity port
-3. **In-app configuration modification** - Cannot modify era game configuration within the app
+1. **Debug functionality** - Limited debugging support in the Unity port
+2. **In-app configuration modification** - Cannot modify era game configuration within the app
+
+#### GXX Graphics Instructions Technical Details
+
+The GXX graphics system in Emuera allows games to create and manipulate graphics buffers programmatically. In uEmuera, these functions are now implemented using Unity's Texture2D system for actual pixel manipulation.
+
+**Fully Implemented:**
+- `GCREATE(id, width, height)` - Creates graphics buffer with Unity Texture2D
+- `GCREATEFROMFILE(id, filename)` - Creates graphics buffer from image file
+- `GDISPOSE(id)` - Releases graphics buffer and Unity texture
+- `GCREATED(id)` - Returns 1 if buffer exists, 0 otherwise
+- `GWIDTH(id)` - Returns buffer width
+- `GHEIGHT(id)` - Returns buffer height
+- `GCLEAR(id, color)` - Clears buffer with specified color
+- `GFILLRECTANGLE(id, x, y, width, height)` - Fills rectangle with brush color
+- `GDRAWG(destId, srcId, ...)` - Copies between buffers with scaling
+- `GDRAWGWITHMASK(destId, srcId, maskId, x, y)` - Draws with alpha mask blending
+- `GDRAWSPRITE(id, spriteName, ...)` - Draws sprite to buffer
+- `GSETCOLOR(id, color, x, y)` - Sets pixel color
+- `GGETCOLOR(id, x, y)` - Gets pixel color
+- `GSETBRUSH(id, color)` - Sets brush for fill operations
+- `GSETFONT(id, fontName, size)` - Sets font for text drawing
+- `GSETPEN(id, color)` - Sets pen for line drawing
+
+**Implementation Notes:**
+- All graphics operations use Unity's Texture2D with ARGB32 format
+- Color matrix transformations are supported for advanced effects
+- Y-axis is flipped to match Emuera's coordinate system (origin at top-left)
 
 #### Behavior Notes
 
