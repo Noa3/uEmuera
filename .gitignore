@@ -1,6 +1,4 @@
-
-/Library
-/Logs
 .vs/
+Library/
+Logs/
 Temp/
-.vsconfig

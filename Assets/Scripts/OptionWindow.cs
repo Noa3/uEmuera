@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 public class OptionWindow : MonoBehaviour
@@ -391,7 +392,7 @@ public class OptionWindow : MonoBehaviour
         HideMenu();
         language_box.SetActive(true);
     }
-    void OnSelectLanguage(UnityEngine.EventSystems.PointerEventData e)
+    void OnSelectLanguage(PointerEventData e)
     {
         MultiLanguage.SetLanguage(e.pointerPress.name);
         language_box.SetActive(false);
