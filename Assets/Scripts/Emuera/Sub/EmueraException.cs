@@ -21,7 +21,7 @@ namespace MinorShift.Emuera.Sub
 	}
 
 	/// <summary>
-	/// Error that appears to be caused by the Emuera engine itself
+	/// emuera本体に起因すると思われるエラー
 	/// </summary>
     [Serializable]
     internal sealed class ExeEE : EmueraException
@@ -37,7 +37,7 @@ namespace MinorShift.Emuera.Sub
 	}
 
 	/// <summary>
-	/// Error that appears to be caused by the script
+	/// スクリプト側に起因すると思われるエラー
 	/// </summary>
     [Serializable]
     internal class CodeEE : EmueraException
@@ -53,7 +53,7 @@ namespace MinorShift.Emuera.Sub
 	}
 
 	/// <summary>
-	/// Error related to undefined identifiers (a type of script-caused error)
+	/// スクリプト側に起因すると思われるエラーのうち、未定義の識別子に関連するもの
 	/// </summary>
 	[Serializable]
 	internal class IdentifierNotFoundCodeEE : CodeEE
@@ -69,23 +69,23 @@ namespace MinorShift.Emuera.Sub
 	}
 
 	/// <summary>
-	/// Not implemented error
+	/// 未実装エラー
 	/// </summary>
     [Serializable]
     internal sealed class NotImplCodeEE : CodeEE
 	{
 		public NotImplCodeEE(ScriptPosition position)
-			: base("This feature is not available in the current version", position)
+			: base(LocalizationHelper.GetSystemString("Error.NotImplemented") ?? "この機能は現バージョンでは使えません", position)
 		{
 		}
 		public NotImplCodeEE()
-			: base("This feature is not available in the current version")
+			: base(LocalizationHelper.GetSystemString("Error.NotImplemented") ?? "この機能は現バージョンでは使えません")
 		{
 		}
 	}
 
 	/// <summary>
-	/// Error during Save/Load operations
+	/// Save, Load中のエラー
 	/// </summary>
     [Serializable]
     internal sealed class FileEE : EmueraException
@@ -96,7 +96,7 @@ namespace MinorShift.Emuera.Sub
 	}
 
 	/// <summary>
-	/// Position data for displaying error locations. This is pre-formatting data and should not be referenced for purposes other than error display.
+	/// エラー箇所を表示するための位置データ。整形前のデータなのでエラー表示以外の理由で参照するべきではない。
 	/// </summary>
 	internal sealed class ScriptPosition : IEquatable<ScriptPosition>, IEqualityComparer<ScriptPosition>
 	{

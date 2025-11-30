@@ -37,15 +37,14 @@ public class FirstWindow : MonoBehaviour
             yield return null;
 
         EmueraContent.instance.SetNoReady();
-        var emuera = GameObject.FindObjectOfType<EmueraMain>();
+        var emuera = GameObject.FindFirstObjectByType<EmueraMain>();
         emuera.Run();
     }
 
     void Start()
     {
-        if(!string.IsNullOrEmpty(MultiLanguage.FirstWindowTitlebar))
-            titlebar.text = MultiLanguage.FirstWindowTitlebar;  
-
+        InitializeLocalization();
+        
         scroll_rect_ = GenericUtils.FindChildByName<ScrollRect>(gameObject, "ScrollRect");
         item_ = GenericUtils.FindChildByName(gameObject, "Item", true);
         setting_ = GenericUtils.FindChildByName(gameObject, "optionbtn", true);
@@ -58,7 +57,7 @@ public class FirstWindow : MonoBehaviour
         setting_.SetActive(true);
 
 #if UNITY_EDITOR
-        var main_entry = GameObject.FindObjectOfType<MainEntry>();
+        var main_entry = GameObject.FindFirstObjectByType<MainEntry>();
         if(!string.IsNullOrEmpty(main_entry.era_path))
             GetList(main_entry.era_path);
 #endif
@@ -74,6 +73,43 @@ public class FirstWindow : MonoBehaviour
 #if UNITY_STANDALONE && !UNITY_EDITOR
         GetList(Path.GetFullPath(Application.dataPath + "/.."));
 #endif
+    }
+
+    void OnEnable()
+    {
+        LocalizationHelper.OnLanguageChanged += UpdateLocalization;
+    }
+
+    void OnDisable()
+    {
+        LocalizationHelper.OnLanguageChanged -= UpdateLocalization;
+    }
+
+    private void InitializeLocalization()
+    {
+        UpdateTitlebar();
+    }
+
+    private void UpdateLocalization()
+    {
+        UpdateTitlebar();
+    }
+
+    private void UpdateTitlebar()
+    {
+        if (titlebar != null)
+        {
+            string localizedTitle = LocalizationHelper.GetUIString("FirstWindow.Titlebar.title");
+            
+            if (localizedTitle == "FirstWindow.Titlebar.title" || string.IsNullOrEmpty(localizedTitle))
+            {
+                if (!string.IsNullOrEmpty(MultiLanguage.FirstWindowTitlebar))
+                    localizedTitle = MultiLanguage.FirstWindowTitlebar;
+            }
+            
+            if (!string.IsNullOrEmpty(localizedTitle))
+                titlebar.text = localizedTitle;
+        }
     }
 
     void OnOptionClick()

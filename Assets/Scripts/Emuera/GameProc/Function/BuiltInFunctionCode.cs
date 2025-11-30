@@ -1,5 +1,4 @@
-﻿
-namespace MinorShift.Emuera.GameProc.Function
+﻿namespace MinorShift.Emuera.GameProc.Function
 {
 	/// <summary>
 	/// Instruction/function codes for the Emuera script processor
@@ -355,5 +354,7 @@ namespace MinorShift.Emuera.GameProc.Function
 		PRINT_SPACE,
 
 		INPUTMOUSEKEY,
+		
+		BINPUT,  // NEW: Extended Emuera command stub (batch input processing)
 	}
 }

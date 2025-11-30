@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 public class OptionWindow : MonoBehaviour
@@ -65,6 +66,37 @@ public class OptionWindow : MonoBehaviour
         default:
             resolution_1080p_icon.SetActive(true);
             break;
+        }
+    }
+
+    void OnEnable()
+    {
+        LocalizationHelper.OnLanguageChanged += UpdateAllLocalizedTexts;
+    }
+
+    void OnDisable()
+    {
+        LocalizationHelper.OnLanguageChanged -= UpdateAllLocalizedTexts;
+    }
+
+    /// <summary>
+    /// Updates all localized texts when language changes.
+    /// This is called automatically when language is switched.
+    /// </summary>
+    private void UpdateAllLocalizedTexts()
+    {
+        UpdateAllTextsInHierarchy(gameObject);
+    }
+
+    /// <summary>
+    /// Recursively updates all Text components with LocalizedTextComponent.
+    /// </summary>
+    private void UpdateAllTextsInHierarchy(GameObject root)
+    {
+        var localizedComponents = root.GetComponentsInChildren<LocalizedTextComponent>(true);
+        foreach (var component in localizedComponents)
+        {
+            component.UpdateText();
         }
     }
 
@@ -162,7 +194,7 @@ public class OptionWindow : MonoBehaviour
                 MultiLanguage.GetText("[BackMenuContent]"),
                 () =>
                 {
-                    var emuera = GameObject.FindObjectOfType<EmueraMain>();
+                    var emuera = GameObject.FindFirstObjectByType<EmueraMain>();
                     emuera.Clear();
                 }, () => { });
         }
@@ -183,7 +215,7 @@ public class OptionWindow : MonoBehaviour
                 MultiLanguage.GetText("[ReloadGameContent]"),
             () =>
             {
-                var emuera = GameObject.FindObjectOfType<EmueraMain>();
+                var emuera = GameObject.FindFirstObjectByType<EmueraMain>();
                 emuera.Restart();
             }, () => { });
         }
@@ -391,10 +423,30 @@ public class OptionWindow : MonoBehaviour
         HideMenu();
         language_box.SetActive(true);
     }
-    void OnSelectLanguage(UnityEngine.EventSystems.PointerEventData e)
+
+    void OnSelectLanguage(PointerEventData e)
     {
-        MultiLanguage.SetLanguage(e.pointerPress.name);
+        string languageCode = MapButtonNameToLanguageCode(e.pointerPress.name);
+        MultiLanguage.SetLanguage(languageCode);
         language_box.SetActive(false);
+    }
+
+    /// <summary>
+    /// Maps button GameObject names to language codes.
+    /// </summary>
+    private string MapButtonNameToLanguageCode(string buttonName)
+    {
+        switch (buttonName)
+        {
+            case "zh_cn":
+                return "zh_cn";
+            case "jp":
+                return "jp";
+            case "en_us":
+                return "en_us";
+            default:
+                return "zh_cn";
+        }
     }
 
     void OnGithub()

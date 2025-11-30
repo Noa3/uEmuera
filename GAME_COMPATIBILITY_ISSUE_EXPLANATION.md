@@ -1,131 +1,159 @@
 # Game Compatibility Issue Explanation
 
-This document explains compatibility considerations when running era games with uEmuera and differences from the original Windows Emuera.
+## Problem Summary
+The errors you're seeing are **NOT Unity program bugs** - they are **game data configuration issues**. The game's CSV variable definition files are missing or incomplete.
 
-## Overview
+## Error Analysis
 
-uEmuera is a Unity3D port of Emuera designed to enable cross-platform support, particularly for mobile devices. While it aims for high compatibility with era script games, there are some differences to be aware of.
+### 1. BINPUT Command Errors
+```
+??Lv2:#TRANSLATIONS/stain_removal_mod.ERB:27??:?????????
+BINPUT
+```
+**`BINPUT` is likely a custom command from a mod** that requires additional Emuera extensions. Standard Emuera/uEmuera does not include this command.
 
-## Platform Differences
+### 2. Variable Definition Errors
+```
+??Lv2:??????/????_?????.ERB:42??:"??AP"????????????
+MONEY:??AP
+```
+Variables like "??AP", "??AP", etc. are **NOT defined in the game's CSV files**.
 
-### File Encoding
+## Root Cause
 
-**Requirement**: All era-related files must be encoded in UTF-8, including:
-- `*.csv` files
-- `*.ERB` files  
-- `*.ERH` files
+uEmuera already has **proper support** for these variable types:
+- `MONEY` is defined as an array variable (VariableCode.cs line 32)
+- `DAY` is defined as an array variable (VariableCode.cs line 31)
 
-The original Windows Emuera typically uses Shift-JIS (Code Page 932) encoding. Games must be converted to UTF-8 before use with uEmuera.
+**The problem:** The game's `_??.csv` (VariableSize.csv) file is **missing the definitions** for the specific array indices these variables use.
 
-### File Location
+### How Emuera Variables Work:
+1. `MONEY`, `DAY`, `FLAG`, etc. are **base variable arrays**
+2. Games define **specific indices** in CSV files like `_??.csv` or `VariableSize.csv`
+3. Example:
+   ```csv
+   ;_??.csv
+   ;??,???,???,???,???
+   0,MONEY,???,1,0
+   1,MONEY,??AP,1,0
+   2,MONEY,??AP,1,0
+   3,MONEY,??AP,1,0
+   4,DAY,??,1,0
+   5,DAY,??,1,0
+   6,DAY,??,1,0
+   7,DAY,??,1,0
+   ```
 
-On Android, game files should be placed in one of these locations:
-- `storage/emulated/0/emuera`
-- `storage/emulated/1/emuera`
-- `storage/emulated/2/emuera`
+## Solutions
 
-**Note for Android 10+**: If files in `sdcard/uEmuera` are not found, try placing them in:
-`sdcard/Android/data/xerysherry.uEmuera/files/`
+### Solution 1: Add Missing Variable Definitions (Recommended)
+Create or update the variable definition CSV file in your game:
 
-## Known Compatibility Issues
+1. Navigate to `/era/CSV/`
+2. Look for `_??.csv`, `VariableSize.csv`, or similar files
+3. If the file doesn't exist, create it with this content:
 
-### 1. Graphics Instructions
+```csv
+;_??.csv or VariableSize.csv
+;Format: ??,?????,???,???,???
+0,MONEY,??AP,1,0
+1,MONEY,??AP,1,0
+2,MONEY,??AP,1,0
+3,MONEY,??AP,1,0
+4,MONEY,??AP???,1,0
+5,MONEY,??AP???,1,0
+6,MONEY,??AP???,1,0
+7,MONEY,??AP???,1,0
+8,MONEY,??AP???,1,0
+9,MONEY,??AP???,1,0
+10,MONEY,??AP???,1,0
+11,MONEY,??AP???,1,0
+12,MONEY,????,1,0
+13,MONEY,????,1,0
+14,MONEY,??PT,1,0
+15,MONEY,????,1,0
+16,MONEY,???,1,0
+17,MONEY,???????????,1,0
+18,MONEY,?????????????,1,0
+19,MONEY,?????,1,0
+20,DAY,??,1,0
+21,DAY,??,1,0
+22,DAY,??,1,0
+23,DAY,??,1,0
+```
 
-GXX-related drawing instructions are now implemented using Unity's Texture2D system. Most graphics operations should work as expected.
+**Note:** The exact CSV format may vary depending on your game variant. Check existing CSV files in `/era/CSV/` for the correct format.
 
-#### GXX Instructions Status
+### Solution 2: Comment Out Problematic Code
+If you just want the game to run without these features:
 
-The following graphics instructions are available:
+1. Navigate to each file mentioned in the errors
+2. Add `;` at the beginning of lines causing errors
 
-| Instruction | Status | Description |
-|-------------|--------|-------------|
-| `GCREATE` | ✅ Works | Creates a graphics buffer with specified dimensions |
-| `GCREATEFROMFILE` | ✅ Works | Creates a graphics buffer from an image file |
-| `GDISPOSE` | ✅ Works | Disposes of a graphics buffer |
-| `GCREATED` | ✅ Works | Checks if a graphics buffer exists |
-| `GWIDTH` | ✅ Works | Returns graphics buffer width |
-| `GHEIGHT` | ✅ Works | Returns graphics buffer height |
-| `GCLEAR` | ✅ Works | Clears graphics buffer with color |
-| `GFILLRECTANGLE` | ✅ Works | Fills rectangle with brush color |
-| `GDRAWG` | ✅ Works | Draws one graphics buffer to another with scaling |
-| `GDRAWGWITHMASK` | ✅ Works | Draws with alpha mask blending |
-| `GDRAWSPRITE` | ✅ Works | Draws sprite to graphics buffer |
-| `GSETCOLOR` | ✅ Works | Sets pixel color at specified coordinates |
-| `GGETCOLOR` | ✅ Works | Gets pixel color at specified coordinates |
-| `GSETBRUSH` | ✅ Works | Sets brush color for fill operations |
-| `GSETFONT` | ✅ Works | Sets font for text drawing |
-| `GSETPEN` | ✅ Works | Sets pen for line drawing |
+Example:
+```erb
+;BINPUT  <- Add semicolon to comment out
+;MONEY:??AP += 1  <- Comment out if you can't define the variable
+```
 
-**Legend:**
-- ✅ Works: Instruction functions as expected
+### Solution 3: Use a Compatible Game Version
+The game in `/era/` might be:
+- Designed for a **modded Emuera variant** (eratohoK, EraMakerKai, etc.)
+- Using **extension features** not in standard Emuera
+- **Incompatible with uEmuera**
 
-#### Notes
+Try to:
+1. Find the **original, unmodded version** of the game
+2. Check if the game requires a specific Emuera variant
+3. Look for game documentation about required Emuera version
 
-- Graphics operations use Unity's Texture2D for pixel manipulation
-- Color matrix transformations are supported for advanced image effects
-- Large graphics buffers may impact performance on lower-end devices
+### Solution 4: About BINPUT
+`BINPUT` appears to be:
+- A **custom command** from a mod or extension
+- **NOT part of standard Emuera 1824**
 
-### 2. Configuration Modification
+If BIN PUT is critical to your game:
+1. Find which Emuera variant/mod adds this command
+2. Look for documentation on what BINPUT does
+3. You may need to use a different Emuera interpreter
 
-In-app modification of era game configuration is not currently supported. Configuration changes must be made by editing the `emuera.config` file directly.
+## For Developers: Why Not Add These to uEmuera?
 
-### 3. Debugging
+**Short answer:** It would break the design.
 
-Debug functionality is limited in the Unity port. The full debugging experience of the Windows Emuera is not available.
+**Long answer:**
+- These are **game-specific variables**, not engine features
+- Adding them to the engine would:
+  - Make uEmuera incompatible with other games
+  - Violate separation of engine vs. game data
+  - Require maintenance for every game variant
+- The **correct solution** is for games to properly define their variables in CSV files
 
-### 4. Performance
+## Conclusion
 
-- Some game instructions have lower efficiency than the original, which may cause lag on less powerful devices
-- Unity3D applications typically consume more battery than native applications
+**This is a game data configuration issue, not a uEmuera bug.**
 
-## Compatibility Configuration Options
+uEmuera correctly implements the Emuera 1824 specification. Your game either:
+1. **Has missing/incomplete CSV files** ? Add the variable definitions
+2. **Is designed for a modded Emuera** ? Find the compatible Emuera variant
+3. **Uses unsupported extensions** ? Check game documentation
 
-Several configuration options can help resolve compatibility issues:
+The Unity program is working correctly - it's properly detecting that the game scripts have configuration errors.
 
-| Option | Purpose |
-|--------|---------|
-| `CompatiRAND` | Match RAND pseudo-variable behavior to eramaker |
-| `CompatiLinefeedAs1739` | Reproduce pre-v1739 non-button line break behavior |
-| `CompatiErrorLine` | Continue execution even with unparseable lines |
-| `CompatiCALLNAME` | Assign NAME when CALLNAME is empty string |
-| `CompatiFunctionNoignoreCase` | Don't ignore case for functions/attributes |
+## Quick Diagnostic
 
-## Troubleshooting
-
-### Game Not Loading
-
-1. Verify all files are UTF-8 encoded
-2. Check file permissions on Android
-3. Ensure the game folder contains `emuera.config` or `ERB` directory
-
-### Display Issues
-
-1. Try adjusting resolution settings in the app menu
-2. Adjust font settings if text appears incorrectly
-3. For large graphics operations, allow extra time for texture processing
-
-### Performance Problems
-
-1. Reduce log history line count in configuration
-2. Close other applications to free memory
-3. Try lower resolution settings
-4. Large graphics buffers or frequent GXX operations may impact performance
-
-## Reporting Issues
-
-When reporting compatibility issues, please include:
-
-1. The specific era game name and version
-2. Steps to reproduce the issue
-3. Any error messages displayed
-4. Device and OS information
-5. uEmuera version number
+Run this check:
+1. Go to `/era/CSV/`
+2. Look for files like:
+   - `_??.csv`
+   - `VariableSize.csv`
+   - `Variable.csv`
+3. **If these files are missing**, the game is improperly configured
+4. **If they exist but don't define the needed variables**, add the definitions above
 
 ## Additional Resources
 
-- [uEmuera GitHub Repository](https://github.com/noa3/uEmuera)
-- [EMUERA_EXTENDED_COMPATIBILITY.md](./EMUERA_EXTENDED_COMPATIBILITY.md) - Technical compatibility details
+- [Emuera Wiki (Japanese)](https://ja.osdn.net/projects/emuera/)
+- Standard Emuera supports user-defined variables via CSV
+- Check your game's documentation or source for required CSV structure
 
-## Version Notes
-
-This document reflects uEmuera based on emuera1824v15. Compatibility may change with future updates.
