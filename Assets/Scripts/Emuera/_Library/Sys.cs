@@ -19,22 +19,22 @@ namespace MinorShift._Library
         }
         
 		/// <summary>
-		/// 実行ファイルのパス
+		/// Path to the executable file
 		/// </summary>
 		//public static readonly string ExePath;
 
 		/// <summary>
-		/// 実行ファイルのディレクトリ。最後に\を付けたstring
+		/// Directory of the executable file. String ending with \
 		/// </summary>
 		public static string ExeDir { get; private set; }
 
 		/// <summary>
-		/// 実行ファイルの名前。ディレクトリなし
+		/// Name of the executable file. Without directory
 		/// </summary>
 		//public static readonly string ExeName;
 
 		/// <summary>
-		/// 2重起動防止。既に同名exeが実行されているならばtrueを返す
+		/// Prevent duplicate startup. Returns true if an exe with the same name is already running
 		/// </summary>
 		/// <returns></returns>
 		public static bool PrevInstance()

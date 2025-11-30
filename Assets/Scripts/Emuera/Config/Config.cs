@@ -129,7 +129,7 @@ namespace MinorShift.Emuera
             AllowLongInputByMouse = instance.GetConfigValue<bool>(ConfigCode.AllowLongInputByMouse);
 
            TimesNotRigorousCalculation = instance.GetConfigValue<bool>(ConfigCode.TimesNotRigorousCalculation);
-            //一文字変数の禁止オプションを考えた名残
+            // Remnant of a planned option to forbid single-character variables
 		   //ForbidOneCodeVariable = instance.GetConfigValue<bool>(ConfigCode.ForbidOneCodeVariable);
 		   SystemNoTarget = instance.GetConfigValue<bool>(ConfigCode.SystemNoTarget);
 			
@@ -156,27 +156,27 @@ namespace MinorShift.Emuera
 
 			if (FontSize < 8)
 			{
-				MessageBox.Show("フォントサイズが小さすぎます(8が下限)", "設定のエラー");
+				MessageBox.Show("Font size is too small (minimum is 8)", "Configuration Error");
 				FontSize = 8;
 			}
 			if (LineHeight < FontSize)
 			{
-				MessageBox.Show("行の高さがフォントサイズより小さいため、フォントサイズと同じ高さと解釈されます", "設定のエラー");
+				MessageBox.Show("Line height is smaller than font size; will be treated as equal to font size", "Configuration Error");
 				LineHeight = FontSize;
 			}
 			if (SaveDataNos < 20)
 			{
-				MessageBox.Show("表示するセーブデータ数が少なすぎます(20が下限)", "設定のエラー");
+				MessageBox.Show("Number of displayed save data slots is too low (minimum is 20)", "Configuration Error");
 				SaveDataNos = 20;
 			}
 			if (SaveDataNos > 80)
 			{
-				MessageBox.Show("表示するセーブデータ数が多すぎます(80が上限)", "設定のエラー");
+				MessageBox.Show("Number of displayed save data slots is too high (maximum is 80)", "Configuration Error");
 				SaveDataNos = 80;
 			}
 			if (MaxLog < 500)
 			{
-				MessageBox.Show("ログ表示行数が少なすぎます(500が下限)", "設定のエラー");
+				MessageBox.Show("Log display line count is too low (minimum is 500)", "Configuration Error");
 				MaxLog = 500;
 			}
 
@@ -239,7 +239,7 @@ namespace MinorShift.Emuera
 		}
 
 		/// <summary>
-		/// ディレクトリ作成失敗のExceptionは呼び出し元で処理すること
+		/// Exception from directory creation failure should be handled by the caller
 		/// </summary>
 		public static void ForceCreateSavDir()
 		{
@@ -250,7 +250,7 @@ namespace MinorShift.Emuera
 		}
 
 		/// <summary>
-		/// ディレクトリ作成失敗のExceptionは呼び出し元で処理すること
+		/// Exception from directory creation failure should be handled by the caller
 		/// </summary>
 		public static void CreateSavDir()
 		{
@@ -268,23 +268,23 @@ namespace MinorShift.Emuera
 			}
 			catch
 			{
-				MessageBox.Show("savフォルダの作成に失敗しました", "フォルダ作成失敗");
+				MessageBox.Show("Failed to create sav folder", "Folder Creation Failed");
 				return;
 			}
 			bool existGlobal = File.Exists(Program.ExeDir + "global.sav");
 			string[] savFiles = Directory.GetFiles(Program.ExeDir, "save*.sav", SearchOption.TopDirectoryOnly);
 			if (!existGlobal && savFiles.Length == 0)
 				return;
-			DialogResult result = MessageBox.Show("savフォルダを作成しました\n現在のデータをsavフォルダ内に移動しますか？", "データ移動", MessageBoxButtons.YesNo);
+			DialogResult result = MessageBox.Show("Created sav folder.\nWould you like to move current data into the sav folder?", "Move Data", MessageBoxButtons.YesNo);
 			if (result != DialogResult.Yes)
 				return;
-			//ダイアログが開いている間にフォルダを消してしまうような邪悪なユーザーがいるかもしれない
+			// A malicious user might delete the folder while the dialog is open
 			if (!Directory.Exists(SavDir))
 			{
-				MessageBox.Show("savフォルダの作成が見当たりません", "フォルダ作成失敗");
+				MessageBox.Show("The sav folder cannot be found", "Folder Creation Failed");
 				return;
 			}
-			//ダイアログが開いている間にファイルを変更するような邪悪なユーザーがいるかもしれない
+			// A malicious user might modify files while the dialog is open
 			try
 			{
 				if (File.Exists(Program.ExeDir + "global.sav"))
@@ -295,11 +295,11 @@ namespace MinorShift.Emuera
 			}
 			catch
 			{
-				MessageBox.Show("savファイルの移動に失敗しました", "移動失敗");
+				MessageBox.Show("Failed to move sav files", "Move Failed");
 			}
 		}
-		//先にSetConfigを呼ぶこと
-		//戻り値はセーブが必要かどうか
+		// Call SetConfig first
+		// Returns whether a save is needed
 		public static bool CheckUpdate()
 		{
 			if (ReduceArgumentOnLoad != ReduceArgumentOnLoadFlag.ONCE)
@@ -358,13 +358,13 @@ namespace MinorShift.Emuera
 		}
 		static readonly StrIgnoreCaseComparer ignoreCaseComparer = new StrIgnoreCaseComparer();
 
-		//KeyValuePair<相対パス, 完全パス>のリストを返す。
+		// Returns a list of KeyValuePair<relative_path, full_path>
 		private static List<KeyValuePair<string, string>> getFiles(string dir, string rootdir, string pattern, bool toponly, bool sort)
 		{
 			StringComparison strComp = StringComparison.OrdinalIgnoreCase;
 			List<KeyValuePair<string, string>> retList = new List<KeyValuePair<string, string>>();
 			if (!toponly)
-			{//サブフォルダ内の検索
+			{// Search within subfolders
 				string[] dirList = Directory.GetDirectories(dir, "*", SearchOption.TopDirectoryOnly);
 				if (dirList.Length > 0)
 				{
@@ -374,68 +374,68 @@ namespace MinorShift.Emuera
 						retList.AddRange(getFiles(dirList[i], rootdir, pattern, toponly, sort));
 				}
 			}
-			string RelativePath;//相対ディレクトリ名
-			if (string.Equals(dir, rootdir, strComp))//現在のパスが検索ルートパスに等しい
+			string RelativePath;// Relative directory name
+			if (string.Equals(dir, rootdir, strComp))// Current path equals search root path
 				RelativePath = "";
 			else
 			{
 				if (!dir.StartsWith(rootdir, strComp))
 					RelativePath = dir;
 				else
-					RelativePath = dir.Substring(rootdir.Length);//前方が検索ルートパスと一致するならその部分を切り取る
+					RelativePath = dir.Substring(rootdir.Length);// Remove the matching root path portion
 				if (!RelativePath.EndsWith("\\") && !RelativePath.EndsWith("/"))
-					RelativePath += "/";//末尾が\又は/で終わるように。後でFile名を直接加算できるようにしておく
+					RelativePath += "/";// Ensure ending with \ or / so file names can be directly appended
 			}
-			//filepathsは完全パスである
+			// filepaths contains full paths
 			string[] filepaths = Directory.GetFiles(dir, pattern, SearchOption.TopDirectoryOnly);
 			if (sort)
 				Array.Sort(filepaths, ignoreCaseComparer);
 			for (int i = 0; i < filepaths.Length; i++)
-				if (Path.GetExtension(filepaths[i]).Length <= 4)//".erb"や".csv"であること。放置すると".erb*"等を拾う。
+				if (Path.GetExtension(filepaths[i]).Length <= 4)// Must be ".erb" or ".csv"; otherwise it might pick up ".erb*" etc.
 					retList.Add(new KeyValuePair<string, string>(RelativePath + Path.GetFileName(filepaths[i]), filepaths[i]));
 			return retList;
 		}
 		
 
 		/// <summary>
-		/// IgnoreCaseはprivateに。代わりにICFunctionかICVariableを使う。
+		/// IgnoreCase is private. Use ICFunction or ICVariable instead.
 		/// </summary>
 		private static bool IgnoreCase { get; set; }
 		private static bool CompatiFunctionNoignoreCase { get; set; }
 		
 
 		/// <summary>
-		/// 関数名・属性名的な名前のIgnoreCaseフラグ
-		/// 関数・属性・BEGINのキーワード 
-		/// どうせeramaker用の互換処理なのでEmuera専用構文については適当に。
+		/// IgnoreCase flag for function-like names.
+		/// Applies to functions, attributes, and BEGIN keywords.
+		/// Since this is compatibility processing for eramaker, Emuera-specific syntax is handled loosely.
 		/// </summary>
 		public static bool ICFunction { get; private set; }
 		
 		/// <summary>
-		/// 変数名、命令名的な名前のIgnoreCaseフラグ 
-		/// 変数・命令・$ラベル名、GOTOの引数 
+		/// IgnoreCase flag for variable and instruction names.
+		/// Applies to variables, instructions, $ labels, and GOTO arguments.
 		/// </summary>
 		public static bool ICVariable { get; private set; }
 
 		/// <summary>
-		/// 関数名・属性名的な名前の比較フラグ
+		/// Comparison flag for function-like names
 		/// </summary>
 		public static StringComparison SCFunction { get; private set; }
 		/// <summary>
-		/// 変数名、命令名的な名前の比較フラグ
+		/// Comparison flag for variable and instruction names
 		/// </summary>
 		public static StringComparison SCVariable { get; private set; }
 		/// <summary>
-		/// ファイル名的な名前の比較フラグ
+		/// Comparison flag for file-like names
 		/// </summary>
 		public const StringComparison SCIgnoreCase = StringComparison.OrdinalIgnoreCase;
 		/// <summary>
-		/// 式中での文字列比較フラグ
+		/// Comparison flag for string comparisons within expressions
 		/// </summary>
 		public const StringComparison SCExpression = StringComparison.Ordinal;
 
 		/// <summary>
-		/// GDI+利用時に発生する文字列と図形・画像間の位置ずれ補正
+		/// Position shift correction between text and shapes/images when using GDI+
 		/// </summary>
 		public static int DrawingParam_ShapePositionShift { get; private set; }
 
@@ -453,7 +453,7 @@ namespace MinorShift.Emuera
 		public static TextDrawingMode TextDrawingMode { get { return TextDrawingMode.GRAPHICS; } private set { } }
 		public static int WindowX { get; private set; }
 		/// <summary>
-		/// 実際に描画可能な横幅
+		/// Actual drawable width
 		/// </summary>
 		public static int DrawableWidth { get; private set; }
 		public static int WindowY { get; private set; }
@@ -526,7 +526,7 @@ namespace MinorShift.Emuera
         public static bool AllowLongInputByMouse { get; private set; }
 
         public static bool TimesNotRigorousCalculation { get; private set; }
-        //一文字変数の禁止オプションを考えた名残
+        // Remnant of a planned option to forbid single-character variables
         //public static bool ForbidOneCodeVariable { get; private set; }
 		#endregion
 

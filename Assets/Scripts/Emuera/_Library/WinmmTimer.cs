@@ -5,7 +5,7 @@
 namespace MinorShift._Library
 {
 	/// <summary>
-	/// wrapされたtimer。外からは、このTickCountだけを呼び出す。
+	/// Wrapped timer. Externally, only TickCount should be called.
 	/// </summary>
 	internal sealed class WinmmTimer
 	{
@@ -23,8 +23,8 @@ namespace MinorShift._Library
 		//}
 
 		/// <summary>
-		/// 起動時にBeginPeriod、終了時にEndPeriodを呼び出すためだけのインスタンス。
-		/// staticなデストラクタがあればいらないんだけど
+		/// Instance only for calling BeginPeriod at startup and EndPeriod at shutdown.
+		/// This would be unnecessary if there were static destructors.
 		/// </summary>
 		private static volatile WinmmTimer instance;
 
@@ -36,11 +36,11 @@ namespace MinorShift._Library
             }
         }
 		/// <summary>
-		/// 現在のフレームの描画に使うためのミリ秒数
+		/// Milliseconds to use for rendering the current frame
 		/// </summary>
 		public static uint CurrentFrameTime;
 		/// <summary>
-		/// フレーム描画開始合図の時点でのミリ秒を固定するための数値
+		/// Value for fixing the milliseconds at the point of frame rendering start signal
 		/// </summary>
 		public static void FrameStart() { CurrentFrameTime =TickCount; }
 
