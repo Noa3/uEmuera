@@ -162,7 +162,7 @@ public class OptionWindow : MonoBehaviour
                 MultiLanguage.GetText("[BackMenuContent]"),
                 () =>
                 {
-                    var emuera = GameObject.FindObjectOfType<EmueraMain>();
+                    var emuera = Object.FindFirstObjectByType<EmueraMain>();
                     emuera.Clear();
                 }, () => { });
         }
@@ -183,7 +183,7 @@ public class OptionWindow : MonoBehaviour
                 MultiLanguage.GetText("[ReloadGameContent]"),
             () =>
             {
-                var emuera = GameObject.FindObjectOfType<EmueraMain>();
+                var emuera = Object.FindFirstObjectByType<EmueraMain>();
                 emuera.Restart();
             }, () => { });
         }
