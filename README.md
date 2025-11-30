@@ -23,7 +23,7 @@ It can run almost all era script games!
 ### Download
 ----
 
-[https://github.com/xerysherry/uEmuera/releases](https://github.com/xerysherry/uEmuera/releases)
+[https://github.com/noa3/uEmuera/releases](https://github.com/noa3/uEmuera/releases)
 
 ### How to Use
 --------
@@ -79,7 +79,7 @@ Emuera是Emulator of Eramaker的缩写，是Windows平台下文字游戏平台�
 ### 下载
 ----
 
-[https://github.com/xerysherry/uEmuera/releases](https://github.com/xerysherry/uEmuera/releases)
+[https://github.com/noa3/uEmuera/releases](https://github.com/noa3/uEmuera/releases)
 
 ### 如何使用：
 --------
