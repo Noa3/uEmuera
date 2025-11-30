@@ -37,8 +37,8 @@ GraphicsSettings:
   m_CustomRenderPipeline: {fileID: 0}
   m_TransparencySortMode: 0
   m_TransparencySortAxis: {x: 0, y: 0, z: 1}
-  m_DefaultRenderingPath: 1
-  m_DefaultMobileRenderingPath: 1
+  m_DefaultRenderingPath: 0
+  m_DefaultMobileRenderingPath: 0
   m_TierSettings: []
   m_LightmapStripping: 0
   m_FogStripping: 0
