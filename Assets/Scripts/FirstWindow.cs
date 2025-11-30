@@ -15,6 +15,7 @@ public class FirstWindow : MonoBehaviour
     }
     static System.Collections.IEnumerator Run(string workspace, string era)
     {
+        StartupFeedback.Step($"Preparing to start: {era}");
         var async = Resources.UnloadUnusedAssets();
         while(!async.isDone)
             yield return null;
@@ -22,14 +23,16 @@ public class FirstWindow : MonoBehaviour
         var ow = EmueraContent.instance.option_window;
         ow.gameObject.SetActive(true);
         ow.ShowGameButton(true);
-        ow.ShowInProgress(true);
+        StartupFeedback.Step("Loading resources...");
         yield return null;
 
         System.GC.Collect();
         SpriteManager.Init();
+        StartupFeedback.Step("Resources ready");
 
         Sys.SetWorkFolder(workspace);
         Sys.SetSourceFolder(era);
+        StartupFeedback.Step("Reading game folders...");
         uEmuera.Utils.ResourcePrepare();
 
         async = Resources.UnloadUnusedAssets();
@@ -38,7 +41,9 @@ public class FirstWindow : MonoBehaviour
 
         EmueraContent.instance.SetNoReady();
         var emuera = GameObject.FindFirstObjectByType<EmueraMain>();
+        StartupFeedback.Step("Launching game core...");
         emuera.Run();
+        StartupFeedback.Final("Game started");
     }
 
     void Start()
@@ -53,6 +58,7 @@ public class FirstWindow : MonoBehaviour
         GenericUtils.FindChildByName<Text>(gameObject, "version")
             .text = Application.version + " ";
 
+        StartupFeedback.Step("Scanning game folders...");
         GetList(Application.persistentDataPath);
         setting_.SetActive(true);
 
@@ -73,6 +79,7 @@ public class FirstWindow : MonoBehaviour
 #if UNITY_STANDALONE && !UNITY_EDITOR
         GetList(Path.GetFullPath(Application.dataPath + "/.."));
 #endif
+        StartupFeedback.Step("Waiting for selection...");
     }
 
     void OnEnable()

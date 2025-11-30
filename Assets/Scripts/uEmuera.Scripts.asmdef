@@ -2,7 +2,9 @@
     "name": "uEmuera.Scripts",
     "rootNamespace": "",
     "references": [
-        "WebP"
+        "WebP",
+        "Unity.Localization",
+        "Unity.ResourceManager"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

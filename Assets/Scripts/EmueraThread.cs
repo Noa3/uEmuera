@@ -58,8 +58,10 @@ public class EmueraThread
     void Work()
     {
         //初始化
+        StartupFeedback.Post("Booting core...");
         MinorShift.Emuera.Program.debugMode = debugmode;
         MinorShift.Emuera.Program.Main(new string[0] { });
+        StartupFeedback.Post("Core started. Initializing resources...");
 
         uEmuera.Utils.ResourceClear();
         GC.Collect();
@@ -77,6 +79,7 @@ public class EmueraThread
                 if(!running)
                     return;
                 uEmuera.Forms.Timer.Update();
+                // Drain queued startup messages on main thread elsewhere
             }
 
             if(console.IsWaitingInput)
@@ -93,8 +96,10 @@ public class EmueraThread
     System.Collections.IEnumerator WorkCo()
     {
         //初始化
+        StartupFeedback.Post("Booting core...");
         MinorShift.Emuera.Program.debugMode = debugmode;
         MinorShift.Emuera.Program.Main(new string[0] { });
+        StartupFeedback.Post("Core started. Initializing resources...");
 
         uEmuera.Utils.ResourceClear();
         GC.Collect();
@@ -112,6 +117,7 @@ public class EmueraThread
                 if(!running)
                     yield break;
                 uEmuera.Forms.Timer.Update();
+                StartupFeedback.Flush();
             }
 
             if(console.IsWaitingInput)

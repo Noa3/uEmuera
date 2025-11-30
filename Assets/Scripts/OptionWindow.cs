@@ -370,6 +370,18 @@ public class OptionWindow : MonoBehaviour
         inprogress.SetActive(value);
     }
 
+    // Allow runtime update of the in-progress overlay message
+    public void SetInProgressMessage(string message)
+    {
+        if (inprogress == null)
+            return;
+        var texts = inprogress.GetComponentsInChildren<Text>(true);
+        foreach (var t in texts)
+        {
+            t.text = message;
+        }
+    }
+
     void SwitchButton(int index)
     {
         for(int i=0; i < button_shadows.Count; ++i)

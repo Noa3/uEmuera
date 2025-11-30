@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System.IO;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -83,6 +84,12 @@ public class EmueraContent : MonoBehaviour
         if(found < 0)
             return -1;
         return found;
+    }
+
+    // Flush queued startup messages to overlay each frame
+    void LateUpdate()
+    {
+        StartupFeedback.Flush();
     }
 
     int GetLineNoIndexForPosY(float y)

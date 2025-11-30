@@ -56,6 +56,7 @@ namespace MinorShift.Emuera.GameProc
             initialiing = true;
             try
             {
+                StartupFeedback.Step("Initializing parser and console...");
 				ParserMediator.Initialize(console);
 				//コンフィグファイルに関するエラーの処理（コンフィグファイルはこの関数に入る前に読込済み）
 				if (ParserMediator.HasWarning)
@@ -69,14 +70,17 @@ namespace MinorShift.Emuera.GameProc
 					}
 				}
 				//リソースフォルダ読み込み
+                StartupFeedback.Step("Loading resources folder...");
 				if (!Content.AppContents.LoadContents())
 				{
 					ParserMediator.FlushWarningList();
 					console.PrintSystemLine("リソースフォルダ読み込み中に異常が発見されたため処理を終了します");
 					return false;
 				}
+                StartupFeedback.Step("Resources folder loaded");
 				ParserMediator.FlushWarningList();
 				//キーマクロ読み込み
+                StartupFeedback.Step("Reading macros and config overrides...");
                 if (Config.UseKeyMacro && !Program.AnalysisMode)
                 {
                     if (File.Exists(Program.ExeDir + "macro.txt"))
@@ -128,6 +132,7 @@ namespace MinorShift.Emuera.GameProc
                     console.RefreshStrings(true);
 				}
 				//gamebase.csv読み込み
+                StartupFeedback.Step("Loading GAMEBASE.CSV...");
 				gamebase = new GameBase();
                 if (!gamebase.LoadGameBaseCsv(Program.CsvDir + "GAMEBASE.CSV"))
                 {
@@ -135,12 +140,15 @@ namespace MinorShift.Emuera.GameProc
                     console.PrintSystemLine("GAMEBASE.CSVの読み込み中に問題が発生したため処理を終了しました");
                     return false;
                 }
+                StartupFeedback.Step("GAMEBASE.CSV loaded");
 				console.SetWindowTitle(gamebase.ScriptWindowTitle);
 				GlobalStatic.GameBaseData = gamebase;
 
 				//前記以外のcsvを全て読み込み
+                StartupFeedback.Step("Loading CSV data...");
 				ConstantData constant = new ConstantData();
 				constant.LoadData(Program.CsvDir, console, Config.DisplayReport);
+                StartupFeedback.Step("CSV data loaded");
 				GlobalStatic.ConstantData = constant;
 				TrainName = constant.GetCsvNameList(VariableCode.TRAINNAME);
 
@@ -163,24 +171,29 @@ namespace MinorShift.Emuera.GameProc
 				LexicalAnalyzer.UseMacro = false;
 
 				//ERH読込
+                StartupFeedback.Step("Loading ERH headers...");
 				if (!hLoader.LoadHeaderFiles(Program.ErbDir, Config.DisplayReport))
 				{
 					ParserMediator.FlushWarningList();
 					console.PrintSystemLine("ERHの読み込み中にエラーが発生したため処理を終了しました");
 					return false;
 				}
+                StartupFeedback.Step("ERH headers loaded");
 				LexicalAnalyzer.UseMacro = idDic.UseMacro();
 
 				//TODO:ユーザー定義変数用のcsvの適用
 
 				//ERB読込
+                StartupFeedback.Step("Loading ERB scripts...");
 				ErbLoader loader = new ErbLoader(console, exm, this);
                 if (Program.AnalysisMode)
                     noError = loader.loadErbs(Program.AnalysisFiles, labelDic);
                 else
                     noError = loader.LoadErbFiles(Program.ErbDir, Config.DisplayReport, labelDic);
+                StartupFeedback.Step("ERB scripts loaded");
                 initSystemProcess();
                 initialiing = false;
+                StartupFeedback.Final("Initialization complete");
             }
 			catch (Exception e)
 			{
