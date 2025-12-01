@@ -478,7 +478,7 @@ namespace MinorShift.Emuera.Sub
 		}
 
 		/// <summary>
-		/// endWithが見つかるuntil読み込む.始点と終端のチェックはcall側でlineうthis.
+		/// endWithが見つかるuntil読み込む.始pointと終端のチェックはcall側でlineうthis.
 		/// エスケープあり.
 		/// </summary>
 		/// <param name="st"></param>
@@ -902,7 +902,7 @@ namespace MinorShift.Emuera.Sub
 							//throw new CodeEE("字句parseduring 予期しnot文字'[['を発見しました");
 							////1808alpha006 renameprocess変更
 							//1808beta009 ここだけ戻す
-							//currentのprocessだとここに来たwhen点でrenamefailed確定だがwarningin容をoriginalに戻すbecause
+							//currentのprocessだとここに来たwhenpointでrenamefailed確定だがwarningin容をoriginalに戻すbecause
 							if (ParserMediator.RenameDic == null)
 								throw new CodeEE("字句parseduring 予期しnot文字\"[[\"を発見しました");
 							int start = st.CurrentPosition;

@@ -16,7 +16,7 @@ namespace MinorShift.Emuera
 	public static class Program
 	{
 		/*
-		コードのstart地点.
+		コードのstart地point.
 		ここでMainWindowを作り,
 		MainWindowがProcessを作り,
 		ProcessがGameBase-ConstantData-Variableを作る.

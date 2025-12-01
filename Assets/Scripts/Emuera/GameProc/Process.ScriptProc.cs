@@ -48,7 +48,7 @@ namespace MinorShift.Emuera.GameProc
 						{
 							console.PrintError("displayスキップduring デフォルトvalueを持たnotINPUTに遭遇しました");
 							console.PrintError("INPUTに必要なprocessing NOSKIP～ENDNOSKIPで囲むか,SKIPDISP 0～SKIPDISP 1で囲ってください");
-							throw new CodeEE("無限ループに入るpossible性が高いbecause実lineをwill terminate");
+							throw new CodeEE("無限ループに入るpossible性がheightいbecause実lineをwill terminate");
 						}
 						continue;
 					}

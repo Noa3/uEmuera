@@ -396,7 +396,7 @@ namespace MinorShift.Emuera.GameProc
 					called.ShiftNextGroup();
 				else
                     called.ShiftNext();//next 同名functionに進む.
-                currentLine = called.CurrentLabel;//functionの始点(@～～)tomove.呼ぶべきfunctionが無ければnull
+                currentLine = called.CurrentLabel;//functionの始point(@～～)tomove.呼ぶべきfunctionが無ければnull
                 if (called.CurrentLabel != null)
                 {
                     lineCount++;
@@ -413,7 +413,7 @@ namespace MinorShift.Emuera.GameProc
                 functionList.RemoveAt(functionList.Count - 1);
 				if (currentLine == null)
 				{
-					//このwhen点でfunctionListは空のはず
+					//このwhenpointでfunctionListは空のはず
 					//functionList.Clear();//allend.stateEndProcessにprocessing 返す
 					if (begintype != BeginType.NULL)//BEGIN XXがlineなわれていれば
 					{

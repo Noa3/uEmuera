@@ -120,7 +120,7 @@ namespace MinorShift.Emuera.GameData.Expression
         }
 
 		/// <summary>
-		/// 大きい方が優ahead度が高い. '&' < '+' < '*'等
+		/// 大きい方が優ahead度がheightい. '&' < '+' < '*'等
 		/// </summary>
 		/// <param name="type"></param>
 		/// <returns></returns>

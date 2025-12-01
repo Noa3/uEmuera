@@ -236,7 +236,7 @@ namespace MinorShift.Emuera.GameData.Variable
 				}
 				else
 				{
-					//characterーdataの第1argumentはこのwhen点でチェックしても意味がnotのと
+					//characterーdataの第1argumentはこのwhenpointでチェックしても意味がnotのと
 					//ARG系は限界超えてても必要な数に拡張be doneのでチェックしなくていい
 					if ((i == 0 && Identifier.IsCharacterData) || Identifier.Name == "ARG" || Identifier.Name == "ARGS")
 						canCheck[i] = false;

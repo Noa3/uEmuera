@@ -275,7 +275,7 @@ namespace MinorShift.Emuera.GameView
 
 		/// <summary>
 		/// cssListをbuttonにconvertし,buttonListにadd.
-		/// このwhen点ではWidthetcは考えnot.
+		/// このwhenpointではWidthetcは考えnot.
 		/// </summary>
 		private void fromCssToButton()
 		{

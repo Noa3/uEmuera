@@ -21,7 +21,7 @@ public static class GenericUtils
         UnityEngine.Debug.LogError(content);
     }
     /// <summary>
-    /// 获得子对象
+    /// 获得子object
     /// </summary>
     public static Component FindChildByName(System.Type type, GameObject obj,
                                             string childname, bool includeInactive = false)
@@ -39,7 +39,7 @@ public static class GenericUtils
         return null;
     }
     /// <summary>
-    /// 获取子对象列表
+    /// Get子objectlist
     /// </summary>
     public static List<T> FindChildren<T>(GameObject obj, bool includeInactive = false)
         where T : Component
@@ -61,7 +61,7 @@ public static class GenericUtils
         return result_list;
     }
     /// <summary>
-    /// 获得子对象
+    /// 获得子object
     /// </summary>
     public static T FindChildByName<T>(GameObject obj, string childname, bool includeInactive = false) where T : Component
     {
@@ -78,7 +78,7 @@ public static class GenericUtils
         return null;
     }
     /// <summary>
-    /// 获得子对象
+    /// 获得子object
     /// </summary>
     public static GameObject FindChildByName(GameObject obj, string childname, bool includeInactive = false)
     {
@@ -201,10 +201,10 @@ public static class GenericUtils
         public HashSet<Action<PointerEventData>> callbacks2 = new HashSet<Action<PointerEventData>>();
     }
     /// <summary>
-    /// 设置OnClick回调
+    /// SetOnClickcallback
     /// </summary>
-    /// <param name="obj">设置回调的目标UI</param>
-    /// <param name="callback">回调函数</param>
+    /// <param name="obj">Setcallback的targetUI</param>
+    /// <param name="callback">callback函数</param>
     public static void SetListenerOnClick(GameObject obj, Action callback)
     {
         if(!obj || callback == null)
@@ -381,10 +381,10 @@ public static class GenericUtils
     }
 
     /// <summary>
-    /// 设置OnDrag回调
+    /// SetOnDragcallback
     /// </summary>
-    /// <param name="obj">设置回调的目标UI</param>
-    /// <param name="callback">回调函数</param>
+    /// <param name="obj">Setcallback的targetUI</param>
+    /// <param name="callback">callback函数</param>
     public static void SetListenerOnDrag(GameObject obj, Action<PointerEventData> callback)
     {
         if(!obj || callback == null)
@@ -413,10 +413,10 @@ public static class GenericUtils
         l.callbacks.Clear();
     }
     /// <summary>
-    /// 设置OnBeginDrag回调
+    /// SetOnBeginDragcallback
     /// </summary>
-    /// <param name="obj">设置回调的目标UI</param>
-    /// <param name="callback">回调函数</param>
+    /// <param name="obj">Setcallback的targetUI</param>
+    /// <param name="callback">callback函数</param>
     public static void SetListenerOnBeginDrag(GameObject obj, Action<PointerEventData> callback)
     {
         if(!obj || callback == null)
@@ -445,10 +445,10 @@ public static class GenericUtils
         l.callbacks.Clear();
     }
     /// <summary>
-    /// 设置OnEndDrag回调
+    /// SetOnEndDragcallback
     /// </summary>
-    /// <param name="obj">设置回调的目标UI</param>
-    /// <param name="callback">回调函数</param>
+    /// <param name="obj">Setcallback的targetUI</param>
+    /// <param name="callback">callback函数</param>
     public static void SetListenerOnEndDrag(GameObject obj, Action<PointerEventData> callback)
     {
         if(!obj || callback == null)
@@ -608,7 +608,7 @@ public static class GenericUtils
         }
     }
     /// <summary>
-    /// 开启协程，方便在非MonoBehaviour对象inside使for协程
+    /// 开启协程，方便在非MonoBehaviourobjectinside使for协程
     /// </summary>
     public static Coroutine StartCoroutine(System.Collections.IEnumerator e)
     {

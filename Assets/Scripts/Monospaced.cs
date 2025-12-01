@@ -72,7 +72,7 @@ namespace UnityEngine.UI
             UIVertex v2 = new UIVertex();
             float linestart = -rectTransform.sizeDelta.x * rectTransform.pivot.x;
 
-            //顶点索引记录
+            //顶point索引记录
             int vi = 0;
             char c = '\x0';
             for (; i < length && vi < count; ++i)
@@ -116,8 +116,8 @@ namespace UnityEngine.UI
 
                 d = v2.position.x - v1.position.x;
                 if (d > b)
-                    //字形大小超过文本尺寸时
-                    //可能使for<size>富文本标记
+                    //When glyph size exceeds text size
+                    //May be using <size> rich text tag
                     si = d;
                 else if (uEmuera.Utils.CheckFullSize(c))
                     si = size;

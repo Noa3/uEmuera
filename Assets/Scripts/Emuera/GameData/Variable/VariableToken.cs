@@ -2546,7 +2546,7 @@ namespace MinorShift.Emuera.GameData.Variable
 		//1808beta009でadd
 		/// <summary>
 		/// public staticとprivate dynamicをclassレベルでは区別しnot
-		/// 1808beta009when点ではprivate dynamicのみ
+		/// 1808beta009whenpointではprivate dynamicのみ
 		/// </summary>
 		private sealed class ReferenceInt1DToken : ReferenceToken
 		{

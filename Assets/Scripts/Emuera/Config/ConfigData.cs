@@ -46,11 +46,11 @@ static ConfigData() { }
 			configArray[i++] = new ConfigItem<bool>(ConfigCode.AllowMultipleInstances, "多重起動をallowdo", true);
 			configArray[i++] = new ConfigItem<bool>(ConfigCode.AutoSave, "オートsaveをlineなう", true);
 			configArray[i++] = new ConfigItem<bool>(ConfigCode.UseKeyMacro, "keyボードマクロをusedo", true);
-			configArray[i++] = new ConfigItem<bool>(ConfigCode.SizableWindow, "windowの高さを可変にdo", true);
+			configArray[i++] = new ConfigItem<bool>(ConfigCode.SizableWindow, "windowのheightさを可変にdo", true);
 			configArray[i++] = new ConfigItem<TextDrawingMode>(ConfigCode.TextDrawingMode, "描画インターフェース", TextDrawingMode.TEXTRENDERER);
 			//configArray[i++] = new ConfigItem<bool>(ConfigCode.UseImageBuffer, "イメージバッファをusedo", true);
 			configArray[i++] = new ConfigItem<int>(ConfigCode.WindowX, "window幅", 760);
-			configArray[i++] = new ConfigItem<int>(ConfigCode.WindowY, "window高さ", 480);
+			configArray[i++] = new ConfigItem<int>(ConfigCode.WindowY, "windowheightさ", 480);
 			configArray[i++] = new ConfigItem<int>(ConfigCode.WindowPosX, "window位置X", 0);
 			configArray[i++] = new ConfigItem<int>(ConfigCode.WindowPosY, "window位置Y", 0);
 			configArray[i++] = new ConfigItem<bool>(ConfigCode.SetWindowPos, "起動whenのwindow位置を指定do", false);
@@ -60,7 +60,7 @@ static ConfigData() { }
 			configArray[i++] = new ConfigItem<int>(ConfigCode.PrintCLength, "PRINTCの文字数", 25);
 			configArray[i++] = new ConfigItem<string>(ConfigCode.FontName, "フォント名", "ＭＳ ゴシック");
 			configArray[i++] = new ConfigItem<int>(ConfigCode.FontSize, "フォントサイズ", 18);
-			configArray[i++] = new ConfigItem<int>(ConfigCode.LineHeight, "一lineの高さ", 19);
+			configArray[i++] = new ConfigItem<int>(ConfigCode.LineHeight, "一lineのheightさ", 19);
 			configArray[i++] = new ConfigItem<Color>(ConfigCode.ForeColor, "文字色", Color.FromArgb(192, 192, 192));//LIGHTGRAY
 			configArray[i++] = new ConfigItem<Color>(ConfigCode.BackColor, "背景色", Color.FromArgb(0, 0, 0));//BLACK
 			configArray[i++] = new ConfigItem<Color>(ConfigCode.FocusColor, "選択inside文字色", Color.FromArgb(255, 255, 0));//YELLOW
@@ -118,7 +118,7 @@ static ConfigData() { }
 			debugArray[i++] = new ConfigItem<bool>(ConfigCode.DebugShowWindow, "起動whenにdebugウインドウをdisplaydo", true);
 			debugArray[i++] = new ConfigItem<bool>(ConfigCode.DebugWindowTopMost, "debugウインドウを最前面にdisplaydo", true);
 			debugArray[i++] = new ConfigItem<int>(ConfigCode.DebugWindowWidth, "debugwindow幅", 400);
-			debugArray[i++] = new ConfigItem<int>(ConfigCode.DebugWindowHeight, "debugwindow高さ", 300);
+			debugArray[i++] = new ConfigItem<int>(ConfigCode.DebugWindowHeight, "debugwindowheightさ", 300);
 			debugArray[i++] = new ConfigItem<bool>(ConfigCode.DebugSetWindowPos, "debugwindow位置を指定do", false);
 			debugArray[i++] = new ConfigItem<int>(ConfigCode.DebugWindowPosX, "debugwindow位置X", 0);
 			debugArray[i++] = new ConfigItem<int>(ConfigCode.DebugWindowPosY, "debugwindow位置Y", 0);

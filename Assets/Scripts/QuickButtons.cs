@@ -116,7 +116,7 @@ public class QuickButtons : MonoBehaviour
     {
         if(content_width > display_width)
         {
-            //左右移动
+            //left-rightMove
             if(local.x < 0)
                 local.x = 0;
             else if(local.x > content_width - display_width)

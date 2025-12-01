@@ -154,7 +154,7 @@ namespace MinorShift.Emuera.GameView
 			//		GDI.FillRectBGColor(rect);
 			//	}
 			//	button.GDIDrawTo(pointY, isBackLog);
-			//	//フォントの実高さ＜line間のcase隙間ができてしまうので埋めるprocess
+			//	//フォントの実heightさ＜line間のcase隙間ができてしまうので埋めるprocess
 			//	GDI.FillGap(Config.LineHeight, button.Width + (button.PointX - pointX), new Point(pointX, pointY));
 			//	pointX = button.PointX + button.Width;
 			//}

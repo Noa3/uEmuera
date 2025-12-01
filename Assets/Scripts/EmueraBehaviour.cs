@@ -236,11 +236,11 @@ public abstract class EmueraBehaviour : MonoBehaviour
         /// </summary>
         public float position_y = 0.0f;
         /// <summary>
-        /// 高度
+        /// height度
         /// </summary>
         public float height = 0.0f;
         /// <summary>
-        /// 子对象
+        /// 子object
         /// </summary>
         public List<UnitDesc> units = null;
     }

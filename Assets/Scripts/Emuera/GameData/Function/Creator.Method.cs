@@ -2002,7 +2002,7 @@ namespace MinorShift.Emuera.GameData.Function
 					for (int i = 0; i < sortedArray.Length; i++)
 						sortedArray[i] = sortList[i].Value;
 				}
-				foreach (VariableTerm term in arguments)//もう少し賢い方法はnotthingだろうか
+				foreach (VariableTerm term in arguments)//もう少し賢いmethodはnotthingだろうか
 				{
 					if (term.Identifier.IsArray1D)
 					{
@@ -4221,7 +4221,7 @@ namespace MinorShift.Emuera.GameData.Function
                     ret = System.IO.File.ReadAllText(filepath, encoding);
                 }
                 catch { return ""; }
-                //一貫性の観点で\rには死んでもらう
+                //一貫性の観pointで\rには死んでもらう
                 return ret.Replace("\r","");
 			}
 		}

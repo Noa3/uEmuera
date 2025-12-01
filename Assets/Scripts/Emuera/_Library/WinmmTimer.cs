@@ -40,7 +40,7 @@ namespace MinorShift._Library
 		/// </summary>
 		public static uint CurrentFrameTime;
 		/// <summary>
-		/// フレーム描画start合図のwhen点でのミリ秒を固定becauseのnumeric
+		/// フレーム描画start合図のwhenpointでのミリ秒を固定becauseのnumeric
 		/// </summary>
 		public static void FrameStart() { CurrentFrameTime =TickCount; }
 

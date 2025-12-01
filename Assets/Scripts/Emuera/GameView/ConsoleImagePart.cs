@@ -69,9 +69,9 @@ namespace MinorShift.Emuera.GameView
             }
 #endif  
 			int height = 0;
-			if (raw_height.num == 0)//HTMLで高さが指定されていnot又は0が指定されたcase,フォントサイズをそのまま高さ(px単位)asusedo.
+			if (raw_height.num == 0)//HTMLでheightさが指定されていnot又は0が指定されたcase,フォントサイズをそのままheightさ(px単位)asusedo.
 				height = Config.FontSize;
-			else//HTMLで高さが指定されたcase,フォントサイズの100分率と解釈do.
+			else//HTMLでheightさが指定されたcase,フォントサイズの100分率と解釈do.
 				height = raw_height.isPx ? raw_height.num : (Config.FontSize * raw_height.num / 100);
 			//幅が指定されていnot又は0が指定されたcase,original画像の縦横比を維持doように幅(px単位)をsettingdo.1未満は端数asXsubpixelに記録.
 			//負のvalueが指定be donepossible性がexistが,最終的なWidthは正のvalueになるようにあとで調整do.

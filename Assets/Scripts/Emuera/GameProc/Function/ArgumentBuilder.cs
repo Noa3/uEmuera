@@ -538,7 +538,7 @@ namespace MinorShift.Emuera.GameProc.Function
                     wc.ShiftNext();
                 }
                 else if (id != null)
-                { warn("第２argumentにソート方法指定子(FORWARD or BACK)以outが指定されています", line, 2, false); return null; }
+                { warn("第２argumentにソートmethod指定子(FORWARD or BACK)以outが指定されています", line, 2, false); return null; }
 
                 if (id != null)
                 {

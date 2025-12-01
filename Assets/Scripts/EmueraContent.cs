@@ -295,7 +295,7 @@ public class EmueraContent : MonoBehaviour
     {
         if(content_width > display_width)
         {
-            //左右移动
+            //left-rightMove
             if(local.x > 0)
                 local.x = 0;
             else if(local.x < display_width - content_width)
@@ -447,14 +447,14 @@ public class EmueraContent : MonoBehaviour
         console_lines_[max_index % max_log_count] = ld;
         if(invalid_count > 0)
             invalid_count -= 1;
-        //添加偏移高
+        //Addoffsetheight
         if(valid_count >= max_log_count)
             offset_height += Config.LineHeight;
         max_index += 1;
 
         ld.Update();
         
-        //添加容器高
+        //Addcontainerheight
         content_height += Config.LineHeight;
         if(roll_to_bottom)
         {
@@ -669,7 +669,7 @@ public class EmueraContent : MonoBehaviour
     float DISPLAY_HEIGHT { get { return rect_transform.rect.height; } }
 
     /// <summary>
-    /// 偏移高
+    /// offsetheight
     /// </summary>
     float offset_height = 0;
     /// <summary>
@@ -677,18 +677,18 @@ public class EmueraContent : MonoBehaviour
     /// </summary>
     float content_width = 0;
     /// <summary>
-    /// in容高
+    /// in容height
     /// </summary>
     float content_height = 0;
     /// <summary>
-    /// 当前移动点
+    /// currentMovepoint
     /// </summary>
     Vector2 local_position = Vector2.zero;
 
     List<EmueraLine> display_lines_ = new List<EmueraLine>();
     Dictionary<int, EmueraImage> display_images_ = new Dictionary<int, EmueraImage>();
     /// <summary>
-    /// 获取文本显示控件
+    /// Gettextdisplaycontrol
     /// </summary>
     /// <returns></returns>
     EmueraLine PullLine()
@@ -710,7 +710,7 @@ public class EmueraContent : MonoBehaviour
         return line;
     }
     /// <summary>
-    /// 交还文本显示控件
+    /// 交还textdisplaycontrol
     /// </summary>
     /// <param name="line"></param>
     void PushLine(EmueraLine line)
@@ -732,7 +732,7 @@ public class EmueraContent : MonoBehaviour
     Queue<EmueraLine> cache_lines_ = new Queue<EmueraLine>();
 
     /// <summary>
-    /// 获取图片显示控件
+    /// Getimagedisplaycontrol
     /// </summary>
     /// <returns></returns>
     EmueraImage PullImageContainer()
@@ -751,7 +751,7 @@ public class EmueraContent : MonoBehaviour
         return image;
     }
     /// <summary>
-    /// 交还图片显示控件
+    /// 交还imagedisplaycontrol
     /// </summary>
     /// <param name="image"></param>
     void PushImageContainer(EmueraImage image)

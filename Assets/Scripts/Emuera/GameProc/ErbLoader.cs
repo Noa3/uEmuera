@@ -38,7 +38,7 @@ namespace MinorShift.Emuera.GameProc
 		public bool LoadErbFiles(string erbDir, bool displayReport, LabelDictionary labelDictionary)
 		{
 			//1.713 labelDicをnewdo位置を変更.
-			//checkScript();のwhen点でExpressionPerserがProcess.instance.LabelDicを必要とdofrom.
+			//checkScript();のwhenpointでExpressionPerserがProcess.instance.LabelDicを必要とdofrom.
 			labelDic = labelDictionary;
 			labelDic.Initialized = false;
 			List<KeyValuePair<string, string>> erbFiles = Config.GetFiles(erbDir, "*.ERB");
@@ -550,7 +550,7 @@ namespace MinorShift.Emuera.GameProc
 					{
 						SingleTerm def = null;
 						IOperandTerm term = argsRow[i * 2];
-                        //argument読み取りwhen点で判別されnotといけnot
+                        //argument読み取りwhenpointで判別されnotといけnot
                         //if (term == null)
                         //{ errMes = "functiondefinitionのargumentは省略できません"; goto err; }
                         if ((!(term.Restructure(exm) is VariableTerm vTerm)) || (vTerm.Identifier.IsConst))

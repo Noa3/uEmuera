@@ -312,7 +312,7 @@ namespace MinorShift.Emuera.GameProc
 						goto err;
 					ParserMediator.Warn(errMes, position, warnLevel);
 				}
-				if (!isFunction)//$ならこのwhen点でend
+				if (!isFunction)//$ならこのwhenpointでend
 				{
 					if (!wc.EOL)
 						ParserMediator.Warn("$で始まるラベルにargumentがsettingされています", position, 1);
@@ -332,7 +332,7 @@ namespace MinorShift.Emuera.GameProc
 				//        goto err;
 				//    ParserMediator.Warn(errMes, position, warnLevel);
 				//}
-				//if (!isFunction)//$ならこのwhen点でend
+				//if (!isFunction)//$ならこのwhenpointでend
 				//{
 				//    LexicalAnalyzer.SkipWhiteSpace(stream);
 				//    if (!stream.EOS)

@@ -501,7 +501,7 @@ namespace MinorShift.Emuera.GameData.Expression
                     if (waitAfter)
                         reduceUnary();
                     int priority = OperatorManager.GetPriority(op);
-                    //直previous calculateの優ahead度がsameか高いなら還original.
+                    //直previous calculateの優ahead度がsameかheightいなら還original.
                     while (lastPriority() >= priority)
                     {
                         this.reduceLastThree();
