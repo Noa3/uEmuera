@@ -7,16 +7,40 @@ using uEmuera.Drawing;
 
 namespace MinorShift.Emuera.Content
 {
+	/// <summary>
+	/// Abstract base class for content items.
+	/// </summary>
 	abstract class AContentItem
 	{
+		/// <summary>
+		/// Initializes a new content item with the specified name.
+		/// </summary>
+		/// <param name="name">The name of the content item.</param>
 		protected AContentItem(string name) { Name = name; }
+		
+		/// <summary>
+		/// The name of this content item.
+		/// </summary>
 		public readonly string Name;
+		
 		//public bool Enabled { get; protected set; }
+		
+		/// <summary>
+		/// Gets whether this content item has been created.
+		/// </summary>
 		public abstract bool IsCreated { get; }
 	}
 	
+	/// <summary>
+	/// Abstract base class for sprite content items.
+	/// </summary>
 	internal abstract class ASprite : AContentItem, IDisposable
 	{
+		/// <summary>
+		/// Initializes a new sprite with the specified name and size.
+		/// </summary>
+		/// <param name="name">The name of the sprite.</param>
+		/// <param name="size">The size of the sprite.</param>
 		public ASprite(string name, Size size)
 			: base(name)
 		{
@@ -26,7 +50,18 @@ namespace MinorShift.Emuera.Content
 				size.Height = -size.Height;
 			DestBaseSize = size;
 		}
+		
+		/// <summary>
+		/// Gets the color at the specified coordinates.
+		/// </summary>
+		/// <param name="x">X coordinate.</param>
+		/// <param name="y">Y coordinate.</param>
+		/// <returns>The color at the specified position.</returns>
 		public abstract Color SpriteGetColor(int x, int y);
+		
+		/// <summary>
+		/// Gets the underlying bitmap of this sprite.
+		/// </summary>
         public abstract Bitmap Bitmap { get; }
         /// <summary>
         /// Standard output size. Positive values only.
@@ -52,14 +87,27 @@ namespace MinorShift.Emuera.Content
 	}
 
 
+	/// <summary>
+	/// Abstract base class for single-frame sprites.
+	/// </summary>
 	internal abstract class ASpriteSingle : ASprite
 	{
+		/// <summary>
+		/// Initializes a new single-frame sprite.
+		/// </summary>
+		/// <param name="name">The name of the sprite.</param>
+		/// <param name="img">The source image.</param>
+		/// <param name="rect">The source rectangle.</param>
 		public ASpriteSingle(string name, AbstractImage img, Rectangle rect)
 			: base(name, rect.Size)
 		{
 			SrcRectangle = rect;
 			BaseImage = img;
 		}
+		
+		/// <summary>
+		/// The base image this sprite is derived from.
+		/// </summary>
 		public AbstractImage BaseImage;
 
 		/// <summary>

@@ -21,8 +21,13 @@ public static class GenericUtils
         UnityEngine.Debug.LogError(content);
     }
     /// <summary>
-    /// 获得子object
+    /// Finds a child component by name.
     /// </summary>
+    /// <param name="type">The type of component to find.</param>
+    /// <param name="obj">The parent GameObject.</param>
+    /// <param name="childname">The name of the child to find.</param>
+    /// <param name="includeInactive">Whether to include inactive GameObjects.</param>
+    /// <returns>The found component, or null if not found.</returns>
     public static Component FindChildByName(System.Type type, GameObject obj,
                                             string childname, bool includeInactive = false)
     {
@@ -39,8 +44,12 @@ public static class GenericUtils
         return null;
     }
     /// <summary>
-    /// Get子objectlist
+    /// Gets a list of child components of the specified type.
     /// </summary>
+    /// <typeparam name="T">The type of components to find.</typeparam>
+    /// <param name="obj">The parent GameObject.</param>
+    /// <param name="includeInactive">Whether to include inactive GameObjects.</param>
+    /// <returns>A list of found components.</returns>
     public static List<T> FindChildren<T>(GameObject obj, bool includeInactive = false)
         where T : Component
     {
@@ -61,8 +70,13 @@ public static class GenericUtils
         return result_list;
     }
     /// <summary>
-    /// 获得子object
+    /// Finds a child component by name.
     /// </summary>
+    /// <typeparam name="T">The type of component to find.</typeparam>
+    /// <param name="obj">The parent GameObject.</param>
+    /// <param name="childname">The name of the child to find.</param>
+    /// <param name="includeInactive">Whether to include inactive GameObjects.</param>
+    /// <returns>The found component, or null if not found.</returns>
     public static T FindChildByName<T>(GameObject obj, string childname, bool includeInactive = false) where T : Component
     {
         if(!obj)
@@ -78,8 +92,12 @@ public static class GenericUtils
         return null;
     }
     /// <summary>
-    /// 获得子object
+    /// Finds a child GameObject by name.
     /// </summary>
+    /// <param name="obj">The parent GameObject.</param>
+    /// <param name="childname">The name of the child to find.</param>
+    /// <param name="includeInactive">Whether to include inactive GameObjects.</param>
+    /// <returns>The found GameObject, or null if not found.</returns>
     public static GameObject FindChildByName(GameObject obj, string childname, bool includeInactive = false)
     {
         if(!obj)
@@ -136,11 +154,11 @@ public static class GenericUtils
         return t;
     }
     /// <summary>
-    /// 获得文件名
+    /// Gets the filename from a full path.
     /// ex. FolderA/FolderB/Filename -> Filename
     /// </summary>
-    /// <param name="fullname"></param>
-    /// <returns></returns>
+    /// <param name="fullname">The full path to extract the filename from.</param>
+    /// <returns>The filename without the path.</returns>
     public static string GetFilename(string fullname)
     {
         int last_slash = fullname.LastIndexOf('/');
@@ -201,10 +219,10 @@ public static class GenericUtils
         public HashSet<Action<PointerEventData>> callbacks2 = new HashSet<Action<PointerEventData>>();
     }
     /// <summary>
-    /// SetOnClickcallback
+    /// Sets an OnClick callback on a GameObject.
     /// </summary>
-    /// <param name="obj">Setcallback的targetUI</param>
-    /// <param name="callback">callback函数</param>
+    /// <param name="obj">The target UI GameObject.</param>
+    /// <param name="callback">The callback function.</param>
     public static void SetListenerOnClick(GameObject obj, Action callback)
     {
         if(!obj || callback == null)
@@ -381,10 +399,10 @@ public static class GenericUtils
     }
 
     /// <summary>
-    /// SetOnDragcallback
+    /// Sets an OnDrag callback on a GameObject.
     /// </summary>
-    /// <param name="obj">Setcallback的targetUI</param>
-    /// <param name="callback">callback函数</param>
+    /// <param name="obj">The target UI GameObject.</param>
+    /// <param name="callback">The callback function.</param>
     public static void SetListenerOnDrag(GameObject obj, Action<PointerEventData> callback)
     {
         if(!obj || callback == null)
@@ -413,10 +431,10 @@ public static class GenericUtils
         l.callbacks.Clear();
     }
     /// <summary>
-    /// SetOnBeginDragcallback
+    /// Sets an OnBeginDrag callback on a GameObject.
     /// </summary>
-    /// <param name="obj">Setcallback的targetUI</param>
-    /// <param name="callback">callback函数</param>
+    /// <param name="obj">The target UI GameObject.</param>
+    /// <param name="callback">The callback function.</param>
     public static void SetListenerOnBeginDrag(GameObject obj, Action<PointerEventData> callback)
     {
         if(!obj || callback == null)
@@ -445,10 +463,10 @@ public static class GenericUtils
         l.callbacks.Clear();
     }
     /// <summary>
-    /// SetOnEndDragcallback
+    /// Sets an OnEndDrag callback on a GameObject.
     /// </summary>
-    /// <param name="obj">Setcallback的targetUI</param>
-    /// <param name="callback">callback函数</param>
+    /// <param name="obj">The target UI GameObject.</param>
+    /// <param name="callback">The callback function.</param>
     public static void SetListenerOnEndDrag(GameObject obj, Action<PointerEventData> callback)
     {
         if(!obj || callback == null)
