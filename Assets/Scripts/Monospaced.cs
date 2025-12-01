@@ -72,7 +72,7 @@ namespace UnityEngine.UI
             UIVertex v2 = new UIVertex();
             float linestart = -rectTransform.sizeDelta.x * rectTransform.pivot.x;
 
-            //顶point索引记录
+            //Vertex index record
             int vi = 0;
             char c = '\x0';
             for (; i < length && vi < count; ++i)

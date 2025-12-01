@@ -6,7 +6,7 @@ public static class ResolutionHelper
 {
     public static readonly string kResolutionIndex = "ResolutionIndex";
     /// <summary>
-    /// 分辨率list
+    /// Resolution list
     /// </summary>
     public static List<int> resolutions = new List<int>
     {

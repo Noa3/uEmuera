@@ -83,7 +83,7 @@ namespace uEmuera
             return filename;
         }
         /// <summary>
-        /// Gettextlength
+        /// Get text length
         /// </summary>
         /// <param name="s"></param>
         /// <param name="font"></param>
@@ -117,7 +117,7 @@ namespace uEmuera
             return c < 0x127 || halfsize.Contains(c);
         }
         /// <summary>
-        /// Gettextlength
+        /// Get text length
         /// </summary>
         /// <param name="s"></param>
         /// <param name="font"></param>
