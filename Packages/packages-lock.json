@@ -34,7 +34,7 @@
     },
     "com.unity.ext.nunit": {
       "version": "2.0.5",
-      "depth": 1,
+      "depth": 2,
       "source": "builtin",
       "dependencies": {}
     },
@@ -67,13 +67,6 @@
       "dependencies": {
         "com.unity.test-framework": "1.1.31"
       },
-      "url": "https://packages.unity.com"
-    },
-    "com.unity.ide.vscode": {
-      "version": "1.2.5",
-      "depth": 0,
-      "source": "registry",
-      "dependencies": {},
       "url": "https://packages.unity.com"
     },
     "com.unity.localization": {
@@ -134,7 +127,7 @@
     },
     "com.unity.test-framework": {
       "version": "1.6.0",
-      "depth": 0,
+      "depth": 1,
       "source": "builtin",
       "dependencies": {
         "com.unity.ext.nunit": "2.0.3",
@@ -151,14 +144,6 @@
         "com.unity.settings-manager": "1.0.1"
       },
       "url": "https://packages.unity.com"
-    },
-    "com.unity.textmeshpro": {
-      "version": "5.0.0",
-      "depth": 0,
-      "source": "builtin",
-      "dependencies": {
-        "com.unity.ugui": "2.0.0"
-      }
     },
     "com.unity.ugui": {
       "version": "2.0.0",

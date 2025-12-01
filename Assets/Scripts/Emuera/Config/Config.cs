@@ -120,13 +120,16 @@ namespace MinorShift.Emuera
 			SystemSaveInBinary = instance.GetConfigValue<bool>(ConfigCode.SystemSaveInBinary);
 			SystemIgnoreTripleSymbol = instance.GetConfigValue<bool>(ConfigCode.SystemIgnoreTripleSymbol);
 			SystemIgnoreStringSet = instance.GetConfigValue<bool>(ConfigCode.SystemIgnoreStringSet);
-			CompatiIgnoreInvalidLine = instance.GetConfigValue<bool>(ConfigCode.CompatiIgnoreInvalidLine);  // NEW
+			
+			CompatiFuncArgAutoConvert = instance.GetConfigValue<bool>(ConfigCode.CompatiFuncArgAutoConvert);
+			CompatiFuncArgOptional = instance.GetConfigValue<bool>(ConfigCode.CompatiFuncArgOptional);
+			CompatiCallEvent = instance.GetConfigValue<bool>(ConfigCode.CompatiCallEvent);
+			CompatiSPChara = instance.GetConfigValue<bool>(ConfigCode.CompatiSPChara);
 
-
-			AllowLongInputByMouse = instance.GetConfigValue<bool>(ConfigCode.AllowLongInputByMouse);
+            AllowLongInputByMouse = instance.GetConfigValue<bool>(ConfigCode.AllowLongInputByMouse);
 
            TimesNotRigorousCalculation = instance.GetConfigValue<bool>(ConfigCode.TimesNotRigorousCalculation);
-            // Remnant of a planned option to forbid single-character variables
+            //一文字変数の禁止オプションを考えた名残
 		   //ForbidOneCodeVariable = instance.GetConfigValue<bool>(ConfigCode.ForbidOneCodeVariable);
 		   SystemNoTarget = instance.GetConfigValue<bool>(ConfigCode.SystemNoTarget);
 			
@@ -153,27 +156,27 @@ namespace MinorShift.Emuera
 
 			if (FontSize < 8)
 			{
-				MessageBox.Show("Font size is too small (minimum is 8)", "Configuration Error");
+				MessageBox.Show("フォントサイズが小さすぎます(8が下限)", "設定のエラー");
 				FontSize = 8;
 			}
 			if (LineHeight < FontSize)
 			{
-				MessageBox.Show("Line height is smaller than font size; will be treated as equal to font size", "Configuration Error");
+				MessageBox.Show("行の高さがフォントサイズより小さいため、フォントサイズと同じ高さと解釈されます", "設定のエラー");
 				LineHeight = FontSize;
 			}
 			if (SaveDataNos < 20)
 			{
-				MessageBox.Show("Number of displayed save data slots is too low (minimum is 20)", "Configuration Error");
+				MessageBox.Show("表示するセーブデータ数が少なすぎます(20が下限)", "設定のエラー");
 				SaveDataNos = 20;
 			}
 			if (SaveDataNos > 80)
 			{
-				MessageBox.Show("Number of displayed save data slots is too high (maximum is 80)", "Configuration Error");
+				MessageBox.Show("表示するセーブデータ数が多すぎます(80が上限)", "設定のエラー");
 				SaveDataNos = 80;
 			}
 			if (MaxLog < 500)
 			{
-				MessageBox.Show("Log display line count is too low (minimum is 500)", "Configuration Error");
+				MessageBox.Show("ログ表示行数が少なすぎます(500が下限)", "設定のエラー");
 				MaxLog = 500;
 			}
 
@@ -236,7 +239,7 @@ namespace MinorShift.Emuera
 		}
 
 		/// <summary>
-		/// Exception from directory creation failure should be handled by the caller
+		/// ディレクトリ作成失敗のExceptionは呼び出し元で処理すること
 		/// </summary>
 		public static void ForceCreateSavDir()
 		{
@@ -247,7 +250,7 @@ namespace MinorShift.Emuera
 		}
 
 		/// <summary>
-		/// Exception from directory creation failure should be handled by the caller
+		/// ディレクトリ作成失敗のExceptionは呼び出し元で処理すること
 		/// </summary>
 		public static void CreateSavDir()
 		{
@@ -265,23 +268,23 @@ namespace MinorShift.Emuera
 			}
 			catch
 			{
-				MessageBox.Show("Failed to create sav folder", "Folder Creation Failed");
+				MessageBox.Show("savフォルダの作成に失敗しました", "フォルダ作成失敗");
 				return;
 			}
 			bool existGlobal = File.Exists(Program.ExeDir + "global.sav");
 			string[] savFiles = Directory.GetFiles(Program.ExeDir, "save*.sav", SearchOption.TopDirectoryOnly);
 			if (!existGlobal && savFiles.Length == 0)
 				return;
-			DialogResult result = MessageBox.Show("Created sav folder.\nWould you like to move current data into the sav folder?", "Move Data", MessageBoxButtons.YesNo);
+			DialogResult result = MessageBox.Show("savフォルダを作成しました\n現在のデータをsavフォルダ内に移動しますか？", "データ移動", MessageBoxButtons.YesNo);
 			if (result != DialogResult.Yes)
 				return;
-			// A malicious user might delete the folder while the dialog is open
+			//ダイアログが開いている間にフォルダを消してしまうような邪悪なユーザーがいるかもしれない
 			if (!Directory.Exists(SavDir))
 			{
-				MessageBox.Show("The sav folder cannot be found", "Folder Creation Failed");
+				MessageBox.Show("savフォルダの作成が見当たりません", "フォルダ作成失敗");
 				return;
 			}
-			// A malicious user might modify files while the dialog is open
+			//ダイアログが開いている間にファイルを変更するような邪悪なユーザーがいるかもしれない
 			try
 			{
 				if (File.Exists(Program.ExeDir + "global.sav"))
@@ -292,11 +295,11 @@ namespace MinorShift.Emuera
 			}
 			catch
 			{
-				MessageBox.Show("Failed to move sav files", "Move Failed");
+				MessageBox.Show("savファイルの移動に失敗しました", "移動失敗");
 			}
 		}
-		// Call SetConfig first
-		// Returns whether a save is needed
+		//先にSetConfigを呼ぶこと
+		//戻り値はセーブが必要かどうか
 		public static bool CheckUpdate()
 		{
 			if (ReduceArgumentOnLoad != ReduceArgumentOnLoadFlag.ONCE)
@@ -355,13 +358,13 @@ namespace MinorShift.Emuera
 		}
 		static readonly StrIgnoreCaseComparer ignoreCaseComparer = new StrIgnoreCaseComparer();
 
-		// Returns a list of KeyValuePair<relative_path, full_path>
+		//KeyValuePair<相対パス, 完全パス>のリストを返す。
 		private static List<KeyValuePair<string, string>> getFiles(string dir, string rootdir, string pattern, bool toponly, bool sort)
 		{
 			StringComparison strComp = StringComparison.OrdinalIgnoreCase;
 			List<KeyValuePair<string, string>> retList = new List<KeyValuePair<string, string>>();
 			if (!toponly)
-			{// Search within subfolders
+			{//サブフォルダ内の検索
 				string[] dirList = Directory.GetDirectories(dir, "*", SearchOption.TopDirectoryOnly);
 				if (dirList.Length > 0)
 				{
@@ -371,68 +374,68 @@ namespace MinorShift.Emuera
 						retList.AddRange(getFiles(dirList[i], rootdir, pattern, toponly, sort));
 				}
 			}
-			string RelativePath;// Relative directory name
-			if (string.Equals(dir, rootdir, strComp))// Current path equals search root path
+			string RelativePath;//相対ディレクトリ名
+			if (string.Equals(dir, rootdir, strComp))//現在のパスが検索ルートパスに等しい
 				RelativePath = "";
 			else
 			{
 				if (!dir.StartsWith(rootdir, strComp))
 					RelativePath = dir;
 				else
-					RelativePath = dir.Substring(rootdir.Length);// Remove the matching root path portion
+					RelativePath = dir.Substring(rootdir.Length);//前方が検索ルートパスと一致するならその部分を切り取る
 				if (!RelativePath.EndsWith("\\") && !RelativePath.EndsWith("/"))
-					RelativePath += "/";// Ensure ending with \ or / so file names can be directly appended
+					RelativePath += "/";//末尾が\又は/で終わるように。後でFile名を直接加算できるようにしておく
 			}
-			// filepaths contains full paths
+			//filepathsは完全パスである
 			string[] filepaths = Directory.GetFiles(dir, pattern, SearchOption.TopDirectoryOnly);
 			if (sort)
 				Array.Sort(filepaths, ignoreCaseComparer);
 			for (int i = 0; i < filepaths.Length; i++)
-				if (Path.GetExtension(filepaths[i]).Length <= 4)// Must be ".erb" or ".csv"; otherwise it might pick up ".erb*" etc.
+				if (Path.GetExtension(filepaths[i]).Length <= 4)//".erb"や".csv"であること。放置すると".erb*"等を拾う。
 					retList.Add(new KeyValuePair<string, string>(RelativePath + Path.GetFileName(filepaths[i]), filepaths[i]));
 			return retList;
 		}
 		
 
 		/// <summary>
-		/// IgnoreCase is private. Use ICFunction or ICVariable instead.
+		/// IgnoreCaseはprivateに。代わりにICFunctionかICVariableを使う。
 		/// </summary>
 		private static bool IgnoreCase { get; set; }
 		private static bool CompatiFunctionNoignoreCase { get; set; }
 		
 
 		/// <summary>
-		/// IgnoreCase flag for function-like names.
-		/// Applies to functions, attributes, and BEGIN keywords.
-		/// Since this is compatibility processing for eramaker, Emuera-specific syntax is handled loosely.
+		/// 関数名・属性名的な名前のIgnoreCaseフラグ
+		/// 関数・属性・BEGINのキーワード 
+		/// どうせeramaker用の互換処理なのでEmuera専用構文については適当に。
 		/// </summary>
 		public static bool ICFunction { get; private set; }
 		
 		/// <summary>
-		/// IgnoreCase flag for variable and instruction names.
-		/// Applies to variables, instructions, $ labels, and GOTO arguments.
+		/// 変数名、命令名的な名前のIgnoreCaseフラグ 
+		/// 変数・命令・$ラベル名、GOTOの引数 
 		/// </summary>
 		public static bool ICVariable { get; private set; }
 
 		/// <summary>
-		/// Comparison flag for function-like names
+		/// 関数名・属性名的な名前の比較フラグ
 		/// </summary>
 		public static StringComparison SCFunction { get; private set; }
 		/// <summary>
-		/// Comparison flag for variable and instruction names
+		/// 変数名、命令名的な名前の比較フラグ
 		/// </summary>
 		public static StringComparison SCVariable { get; private set; }
 		/// <summary>
-		/// Comparison flag for file-like names
+		/// ファイル名的な名前の比較フラグ
 		/// </summary>
 		public const StringComparison SCIgnoreCase = StringComparison.OrdinalIgnoreCase;
 		/// <summary>
-		/// Comparison flag for string comparisons within expressions
+		/// 式中での文字列比較フラグ
 		/// </summary>
 		public const StringComparison SCExpression = StringComparison.Ordinal;
 
 		/// <summary>
-		/// Position shift correction between text and shapes/images when using GDI+
+		/// GDI+利用時に発生する文字列と図形・画像間の位置ずれ補正
 		/// </summary>
 		public static int DrawingParam_ShapePositionShift { get; private set; }
 
@@ -450,7 +453,7 @@ namespace MinorShift.Emuera
 		public static TextDrawingMode TextDrawingMode { get { return TextDrawingMode.GRAPHICS; } private set { } }
 		public static int WindowX { get; private set; }
 		/// <summary>
-		/// Actual drawable width
+		/// 実際に描画可能な横幅
 		/// </summary>
 		public static int DrawableWidth { get; private set; }
 		public static int WindowY { get; private set; }
@@ -512,7 +515,6 @@ namespace MinorShift.Emuera
 		public static bool SystemIgnoreTripleSymbol { get; private set; }
 		public static bool SystemNoTarget { get; private set; }
 		public static bool SystemIgnoreStringSet { get; private set; }
-		public static bool CompatiIgnoreInvalidLine { get; private set; }  // NEW: Allow execution with unparseable lines
 
 		public static int Language { get; private set; }
 
@@ -524,7 +526,7 @@ namespace MinorShift.Emuera
         public static bool AllowLongInputByMouse { get; private set; }
 
         public static bool TimesNotRigorousCalculation { get; private set; }
-        // Remnant of a planned option to forbid single-character variables
+        //一文字変数の禁止オプションを考えた名残
         //public static bool ForbidOneCodeVariable { get; private set; }
 		#endregion
 

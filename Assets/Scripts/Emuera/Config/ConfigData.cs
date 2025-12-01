@@ -12,9 +12,9 @@ using uEmuera.Drawing;
 namespace MinorShift.Emuera
 {
 	/// <summary>
-	/// Values used throughout the program that are set before Window creation and not changed thereafter
-	/// (That was the original plan, but it's different now)
-	/// 1756: Renamed from Config to ConfigData
+	/// プログラム全体で使用される値でWindow作成前に設定して以後変更されないもの
+	/// (という予定だったが今は違う)
+	/// 1756 Config → ConfigDataへ改名
 	/// </summary>
 	internal sealed class ConfigData
 	{
@@ -29,7 +29,7 @@ static ConfigData() { }
 
 		private ConfigData() { setDefault(); }
 
-		// Create arrays with sufficiently large sizes
+		//適当に大き目の配列を作っておく。
 		private AConfigItem[] configArray = new AConfigItem[70];
 		private AConfigItem[] replaceArray = new AConfigItem[50];
 		private AConfigItem[] debugArray = new AConfigItem[20];
@@ -109,11 +109,10 @@ static ConfigData() { }
 			configArray[i++] = new ConfigItem<bool>(ConfigCode.CompatiFuncArgAutoConvert, "ユーザー関数の引数に自動的にTOSTRを補完する", false);
 			configArray[i++] = new ConfigItem<bool>(ConfigCode.SystemIgnoreTripleSymbol, "FORM中の三連記号を展開しない", false);
             configArray[i++] = new ConfigItem<bool>(ConfigCode.TimesNotRigorousCalculation, "TIMESの計算をeramakerにあわせる", false);
-            // Remnant of a planned option to forbid single-character variables
+            //一文字変数の禁止オプションを考えた名残
 			//configArray[i++] = new ConfigItem<bool>(ConfigCode.ForbidOneCodeVariable, "一文字変数の使用を禁止する", false);
 			configArray[i++] = new ConfigItem<bool>(ConfigCode.SystemNoTarget, "キャラクタ変数の引数を補完しない", false);
 			configArray[i++] = new ConfigItem<bool>(ConfigCode.SystemIgnoreStringSet, "文字列変数の代入に文字列式を強制する", false);
-			configArray[i++] = new ConfigItem<bool>(ConfigCode.CompatiIgnoreInvalidLine, "解釈不可能な行を無視して実行を続行する", false);
 
 			i = 0;
 			debugArray[i++] = new ConfigItem<bool>(ConfigCode.DebugShowWindow, "起動時にデバッグウインドウを表示する", true);
@@ -372,14 +371,14 @@ static ConfigData() { }
 
 			try
 			{
-			(writer = new StreamWriter(configPath, false, Config.Encode)).AutoFlush = true;
+				writer = new StreamWriter(configPath, false, Config.Encode);
 				for (int i = 0; i < configArray.Length; i++)
 				{
 					AConfigItem item = configArray[i];
 					if (item == null)
 						continue;
 					
-					//1806beta001: CompatiDRAWLINE deprecated, migrated to CompatiLinefeedAs1739
+					//1806beta001 CompatiDRAWLINEの廃止、CompatiLinefeedAs1739へ移行
 					if (item.Code == ConfigCode.CompatiDRAWLINE)
 						continue;
 					if ((item.Code == ConfigCode.ChangeMasterNameIfDebug) && (item.GetValue<bool>()))
@@ -410,7 +409,7 @@ static ConfigData() { }
 
         public bool ReLoadConfig()
         {
-            // If _fixed.config contents changed, non-fixed items would be retained, so release all here first
+            //_fixed.configの中身が変わった場合、非固定になったものが保持されてしまうので、ここで一旦すべて解除
             foreach (AConfigItem item in configArray)
             {
                 if (item == null)
@@ -458,7 +457,7 @@ static ConfigData() { }
 			if (!eReader.Open(confPath))
 				return false;
 
-			//Load binary data
+			//加载二进制数据
 			var bytes = File.ReadAllBytes(confPath);
 			var md5s = GenericUtils.CalcMd5ListForConfig(bytes);
 
@@ -487,7 +486,7 @@ static ConfigData() { }
                     }
 					if (item != null)
 					{
-						//1806beta001: CompatiDRAWLINE deprecated, migrated to CompatiLinefeedAs1739
+						//1806beta001 CompatiDRAWLINEの廃止、CompatiLinefeedAs1739へ移行
 						if(item.Code == ConfigCode.CompatiDRAWLINE)
 						{
 							item = GetConfigItem(ConfigCode.CompatiLinefeedAs1739);
@@ -503,7 +502,7 @@ static ConfigData() { }
 						
 						if (item.Code == ConfigCode.TextEditor)
 						{
-							// Due to path handling, tokens[2] must be used
+							//パスの関係上tokens[2]は使わないといけない
 							if (tokens.Length > 2)
 							{
 								if (tokens[2].StartsWith("\\"))
@@ -519,13 +518,13 @@ static ConfigData() { }
 						}
 						if (item.Code == ConfigCode.EditorArgument)
 						{
-							// Some editors require arguments with half-width spaces, handle separately
+							//半角スペースを要求する引数が必要なエディタがあるので別処理で
 							((ConfigItem<string>)item).Value = tokens[1];
 							continue;
 						}
                         if (item.Code == ConfigCode.MaxLog && Program.AnalysisMode)
                         {
-                            // In analysis mode, override here to ensure sufficient length
+                            //解析モード時はここを上書きして十分な長さを確保する
                             tokens[1] = "10000";
                         }
 						if ((item.TryParse(tokens[1])) && (fix))
@@ -533,7 +532,7 @@ static ConfigData() { }
 					}
 #if UEMUERA_DEBUG
 					//else
-					//	throw new Exception("Config file is corrupt");
+					//	throw new Exception("コンフィグファイルが変");
 #endif
 				}
 			}
@@ -550,7 +549,7 @@ static ConfigData() { }
 		}
 
 #region replace
-		// 1.52a modification: Config processing for unit replacement and prefix/suffix placement
+		// 1.52a改変部分　（単位の差し替えおよび前置、後置のためのコンフィグ処理）
 		public void LoadReplaceFile(string filename)
 		{
 			EraStreamReader eReader = new EraStreamReader(false);
@@ -645,7 +644,7 @@ static ConfigData() { }
 					}
 #if UEMUERA_DEBUG
 					//else
-					//	throw new Exception("Config file is corrupt");
+					//	throw new Exception("コンフィグファイルが変");
 #endif
 				}
 			}

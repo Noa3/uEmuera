@@ -15,7 +15,6 @@ public class FirstWindow : MonoBehaviour
     }
     static System.Collections.IEnumerator Run(string workspace, string era)
     {
-        StartupFeedback.Step($"Preparing to start: {era}");
         var async = Resources.UnloadUnusedAssets();
         while(!async.isDone)
             yield return null;
@@ -23,16 +22,14 @@ public class FirstWindow : MonoBehaviour
         var ow = EmueraContent.instance.option_window;
         ow.gameObject.SetActive(true);
         ow.ShowGameButton(true);
-        StartupFeedback.Step("Loading resources...");
+        ow.ShowInProgress(true);
         yield return null;
 
         System.GC.Collect();
         SpriteManager.Init();
-        StartupFeedback.Step("Resources ready");
 
         Sys.SetWorkFolder(workspace);
         Sys.SetSourceFolder(era);
-        StartupFeedback.Step("Reading game folders...");
         uEmuera.Utils.ResourcePrepare();
 
         async = Resources.UnloadUnusedAssets();
@@ -40,16 +37,15 @@ public class FirstWindow : MonoBehaviour
             yield return null;
 
         EmueraContent.instance.SetNoReady();
-        var emuera = GameObject.FindFirstObjectByType<EmueraMain>();
-        StartupFeedback.Step("Launching game core...");
+        var emuera = GameObject.FindObjectOfType<EmueraMain>();
         emuera.Run();
-        StartupFeedback.Final("Game started");
     }
 
     void Start()
     {
-        InitializeLocalization();
-        
+        if(!string.IsNullOrEmpty(MultiLanguage.FirstWindowTitlebar))
+            titlebar.text = MultiLanguage.FirstWindowTitlebar;  
+
         scroll_rect_ = GenericUtils.FindChildByName<ScrollRect>(gameObject, "ScrollRect");
         item_ = GenericUtils.FindChildByName(gameObject, "Item", true);
         setting_ = GenericUtils.FindChildByName(gameObject, "optionbtn", true);
@@ -58,12 +54,11 @@ public class FirstWindow : MonoBehaviour
         GenericUtils.FindChildByName<Text>(gameObject, "version")
             .text = Application.version + " ";
 
-        StartupFeedback.Step("Scanning game folders...");
         GetList(Application.persistentDataPath);
         setting_.SetActive(true);
 
 #if UNITY_EDITOR
-        var main_entry = GameObject.FindFirstObjectByType<MainEntry>();
+        var main_entry = GameObject.FindObjectOfType<MainEntry>();
         if(!string.IsNullOrEmpty(main_entry.era_path))
             GetList(main_entry.era_path);
 #endif
@@ -79,44 +74,6 @@ public class FirstWindow : MonoBehaviour
 #if UNITY_STANDALONE && !UNITY_EDITOR
         GetList(Path.GetFullPath(Application.dataPath + "/.."));
 #endif
-        StartupFeedback.Step("Waiting for selection...");
-    }
-
-    void OnEnable()
-    {
-        LocalizationHelper.OnLanguageChanged += UpdateLocalization;
-    }
-
-    void OnDisable()
-    {
-        LocalizationHelper.OnLanguageChanged -= UpdateLocalization;
-    }
-
-    private void InitializeLocalization()
-    {
-        UpdateTitlebar();
-    }
-
-    private void UpdateLocalization()
-    {
-        UpdateTitlebar();
-    }
-
-    private void UpdateTitlebar()
-    {
-        if (titlebar != null)
-        {
-            string localizedTitle = LocalizationHelper.GetUIString("FirstWindow.Titlebar.title");
-            
-            if (localizedTitle == "FirstWindow.Titlebar.title" || string.IsNullOrEmpty(localizedTitle))
-            {
-                if (!string.IsNullOrEmpty(MultiLanguage.FirstWindowTitlebar))
-                    localizedTitle = MultiLanguage.FirstWindowTitlebar;
-            }
-            
-            if (!string.IsNullOrEmpty(localizedTitle))
-                titlebar.text = localizedTitle;
-        }
     }
 
     void OnOptionClick()

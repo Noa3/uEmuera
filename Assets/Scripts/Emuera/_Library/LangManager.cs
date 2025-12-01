@@ -4,7 +4,7 @@ using System.Text;
 
 namespace MinorShift._Library
 {
-    // Modified to support multi-language format
+    //マルチ言語に対応可能な形式に変更
     internal static class LangManager
     {
         static Encoding lang;

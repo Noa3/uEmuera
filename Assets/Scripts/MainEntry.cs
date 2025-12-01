@@ -16,7 +16,6 @@ public class MainEntry : MonoBehaviour
 
     void Start()
     {
-        StartupFeedback.Step("Initializing language and configs...");
         LoadConfigMaps();
         if(!MultiLanguage.SetLanguage())
         {
@@ -28,7 +27,6 @@ public class MainEntry : MonoBehaviour
         uEmuera.Logger.warn = GenericUtils.Warn;
         uEmuera.Logger.error = GenericUtils.Error;
 #endif
-        StartupFeedback.Step("Ready. Select a game to start.");
     }
 
 #if UNITY_EDITOR

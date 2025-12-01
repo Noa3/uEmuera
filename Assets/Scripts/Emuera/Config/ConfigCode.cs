@@ -1,6 +1,7 @@
-﻿namespace MinorShift.Emuera
+﻿
+namespace MinorShift.Emuera
 {
-	// Obfuscation attribute: Set Exclude=true if enum.ToString() or enum.Parse() will be used.
+	//難読化用属性。enum.ToString()やenum.Parse()を行うなら(Exclude=true)にすること。
 	[global::System.Reflection.Obfuscation(Exclude=true)]
 	internal enum DisplayWarningFlag
 	{
@@ -44,7 +45,7 @@
         USER_SETTING = 3,
     }
 
-	// The numeric values have no special meaning.
+	//数字に意味は無い。
 	[global::System.Reflection.Obfuscation(Exclude = true)]
 	internal enum ConfigCode
 	{
@@ -125,11 +126,10 @@
 		SystemIgnoreTripleSymbol,
 		CompatiSPChara,
         TimesNotRigorousCalculation,
-        // Remnant of a planned option to forbid single-character variables
+        //一文字変数の禁止オプションを考えた名残
         //ForbidOneCodeVariable,
 		SystemNoTarget,
 		SystemIgnoreStringSet,
-		CompatiIgnoreInvalidLine,  // NEW: Allow execution even with unparseable lines
 
 		MoneyLabel = 100,
 		MoneyFirst = 101,

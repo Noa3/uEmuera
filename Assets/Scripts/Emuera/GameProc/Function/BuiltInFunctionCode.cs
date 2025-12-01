@@ -1,110 +1,111 @@
-﻿namespace MinorShift.Emuera.GameProc.Function
+﻿
+namespace MinorShift.Emuera.GameProc.Function
 {
 	/// <summary>
-	/// Instruction/function codes for the Emuera script processor
+	/// 命令コード
 	/// </summary>
-	// Obfuscation attribute: Set Exclude=true if enum.ToString() or enum.Parse() will be used.
+	//難読化用属性。enum.ToString()やenum.Parse()を行うなら(Exclude=true)にすること。
 	[global::System.Reflection.Obfuscation(Exclude = true)]
 	enum FunctionCode
-	{// Numeric values are not required for these enums
-		// When defining a FunctionCode, call addFunction in the static FunctionIdentifier() constructor.
-		// Choose the appropriate FunctionArg and flags at that time.
+	{//数値不要
+		//FunctionCodeを定義したらstatic FunctionIdentifier()内でaddFunctionすること。
+		//その際に適切なFunctionArgとフラグを選ぶ。
 
-		// When defining a FunctionMethod (in-expression function), it will be picked up automatically.
-		// However, if the in-expression version and the instruction version behave differently, you need to add it.
+		//FunctionMethod(式中関数)を定義した場合には自動で拾うので何もしなくてよい。
+		//ただし、式中関数バージョンと命令バージョンで動作が違うなら追加する必要がある。
 
 		__NULL__ = 0x0000,
-		SET,// Numeric assignment or string assignment statement
-		//SETS,// String assignment statement
-		PRINT,// Display text
-		PRINTL,// Print with newline
-		PRINTW,// Wait for input (effectively a newline)
+		SET,//数値代入文 or 文字列代入文
+		//SETS,//文字列代入文
+		PRINT,//文字を表示する
+		PRINTL,//改行
+		PRINTW,//入力待ち(実質改行)
 
-		PRINTV,// Print variable contents
+		PRINTV,//変数の内容
 		PRINTVL,
 		PRINTVW,
 
-		PRINTS,// Print string variable contents
+		PRINTS,//文字列変数の内容
 		PRINTSL,
 		PRINTSW,
 
-		PRINTFORM,// Supports format syntax like {expression} and %string_variable%
+		PRINTFORM,//{数式}、%文字列変数%などの書式が使える。
 		PRINTFORML,
 		PRINTFORMW,
 
-		PRINTFORMS,// Convert and display string variable contents
+		PRINTFORMS,//文字列変数の内容を変換して表示。
 		PRINTFORMSL,
 		PRINTFORMSW,
 
-		PRINTC,// Print with column alignment (fixed-width columnar output)
+		PRINTC,//??
 
 		CLEARLINE,
 		REUSELASTLINE,
 
-		WAIT,// Wait for line break input
-		INPUT,// Integer input. Result goes to RESULT variable.
-		INPUTS,// String input. Result goes to RESULTS variable.
+		WAIT,//改行待ち。
+		INPUT,//整数入力。入力はRESULTへ。
+		INPUTS,//文字列入力。入力はRESULTSへ。
 		TINPUT,
 		TINPUTS,
 		TWAIT,
 		WAITANYKEY,
-		FORCEWAIT,// WAIT that cannot be skipped - unlike forced TWAIT, this interrupts skip mode
+		FORCEWAIT,//スキップで省略できないWAIT、強制TWAITと違い、スキップを打ち切る
 		ONEINPUT,
 		ONEINPUTS,
 		TONEINPUT,
 		TONEINPUTS,
-		AWAIT,// No input allowed - DoEvents only
+		AWAIT,//入力不可 DoEvents
 
-		DRAWLINE,// Draw a line of dashes from left edge to right edge of screen
-		BAR,// Draw a graph like [*****....]. Usage: BAR (variable), (max_value), (length)
-		BARL,// BAR with newline
-		TIMES,// Decimal calculation. Usage: TIMES (variable), (decimal_value)
+		DRAWLINE,//画面の左端から右端まで----と線を引く。
+		BAR,//[*****....]のようなグラフを書く。BAR (変数) , (最大値), (長さ)
+		BARL,//改行付き。
+		TIMES,//小数計算。TIMES (変数) , (小数値)という形で使う。
 
-		PRINT_ABL,// Print ability. Argument is registration number
-		PRINT_TALENT,// Print talent/trait
-		PRINT_MARK,// Print mark/stamp
-		PRINT_EXP,// Print experience
-		PRINT_PALAM,// Print parameter
-		PRINT_ITEM,// Print held items
-		PRINT_SHOPITEM,// Print items for sale in shop
+		PRINT_ABL,//能力。引数は登録番号
+		PRINT_TALENT,//素質
+		PRINT_MARK,//刻印
+		PRINT_EXP,//経験
+		PRINT_PALAM,//パラメータ
+		PRINT_ITEM,//所持アイテム
+		PRINT_SHOPITEM,//ショップで売っているアイテム
 
-		UPCHECK,// Parameter change check
+		UPCHECK,//パラメータの変動
 		CUPCHECK,
-		ADDCHARA,// Add character by character number
-		ADDSPCHARA,// Add SP character by number (created with flag 0 set to 1)
+		ADDCHARA,//(キャラ番号)のキャラクタを追加
+		ADDSPCHARA,//(キャラ番号)のSPキャラクタを追加（フラグ0を1にして作成）
 		ADDDEFCHARA,
-		ADDVOIDCHARA,// Create a character with no variable settings
-		DELCHARA,// Delete character by registration number
+		ADDVOIDCHARA,//変数に何の設定のないキャラを作成
+		DELCHARA,//(キャラ登録番号)のキャラクタを削除。
 
-		PUTFORM,// Only usable in @SAVEINFO function. Same format as PRINTFORM but adds description to save data.
-		QUIT,// End the game
+		PUTFORM,//@SAVEINFO関数でのみ使用可能。PRINTFORMと同様の書式でセーブデータに概要をつける。
+		QUIT,//ゲームを終了
 		OUTPUTLOG,
 
-		BEGIN,// Execute system function. Executing this loses the CALL origin and other context.
+		BEGIN,//システム関数の実行。実行するとCALLの呼び出し元などを忘れてしまう。
 
-		SAVEGAME,// Call save screen. Shop only.
+		SAVEGAME,//セーブ画面を呼ぶ。ショップのみ。
 		LOADGAME,//
 
-		SIF,// Single-line IF
+		SIF,//一行のみIF
 		IF,
 		ELSE,
 		ELSEIF,
 		ENDIF,
 
-		REPEAT,// Repeat until REND. Number of repetitions goes to COUNT. Cannot nest.
+		REPEAT,//RENDまで繰り返し。繰り返した回数がCOUNTへ。ネスト不可。
 		REND,
-		CONTINUE,// Return to REPEAT
-		BREAK,// Jump to line after REND
+		CONTINUE,//REPEATに戻る
+		BREAK,//RENDの次の行まで
 
-		GOTO,// Jump to $ label
+		GOTO,//$ラベルへジャンプ
 
-		JUMP,// Move to function
-		CALL,// Move to function. Remembers origin and returns with RETURN.
+		JUMP,//関数に移動
+		CALL,//関数に移動。移動元を記憶し、RETURNで帰る。
 		CALLEVENT,
-		RETURN,//__INT_EXPRESSION__,// End function. Can store integer in RESULT. Defaults to 0 if omitted. (Next @~~ is treated as RETURN.)
-		RETURNFORM,//__FORM_STR__,// End function. Can store integer in RESULT. Defaults to 0 if omitted. (Next @~~ is treated as RETURN.)
+		RETURN,//__INT_EXPRESSION__,//関数の終了。RESULTに整数を格納可能。省略した場合、０。(次の@～～がRETURNと見なされる。)  
+		RETURNFORM,//__FORM_STR__,//関数の終了。RESULTに整数を格納可能。省略した場合、０。(次の@～～がRETURNと見なされる。)  
 		RETURNF,
-		RESTART,// Restart function. Returns to the beginning of the function.
+		RESTART,//関数の再開。関数の最初に戻る。
 
 
 		STRLEN,
@@ -121,7 +122,7 @@
 		SWAPCHARA,
 		COPYCHARA,
 		ADDCOPYCHARA,
-		VARSIZE,// Cannot convert to __METHOD__ because behavior differs
+		VARSIZE,//動作が違うので__METHOD__化できない
 		SPLIT,
 
 		PRINTSINGLE,
@@ -140,7 +141,7 @@
 		SAVEDATA,
 		LOADDATA,
 		DELDATA,
-		GETTIME,// Cannot convert to __METHOD__ because it needs to assign to two variables
+		GETTIME,//2つに代入する必要があるので__METHOD__化できない
 
 		TRYJUMP,
 		TRYCALL,
@@ -192,7 +193,7 @@
 		WHILE,
 		WEND,
 
-		POWER,// Cannot convert to METHOD because arguments differ
+		POWER,//引数が違うのでMETHOD化できない。
 		SAVEGLOBAL,
 		LOADGLOBAL,
 		SWAP,
@@ -225,7 +226,7 @@
 		ENDLIST,
 		STRDATA,
 
-		PRINTCPERLINE,// Cannot convert - argument specification differs
+		PRINTCPERLINE,//よく考えたら引数の仕様違うや
 
 
 		SETBIT,
@@ -239,7 +240,7 @@
 
 		RESET_STAIN,
 
-		SAVENOS,// Cannot convert - argument specification differs
+		SAVENOS,//引数の仕様が違うので(ry
 
 		FORCEKANA,
 
@@ -276,23 +277,23 @@
 		PRINTKL,
 		PRINTKW,
 
-		PRINTVK,// Print variable contents (Kana variant)
+		PRINTVK,//変数の内容
 		PRINTVKL,
 		PRINTVKW,
 
-		PRINTSK,// Print string variable contents (Kana variant)
+		PRINTSK,//文字列変数の内容
 		PRINTSKL,
 		PRINTSKW,
 
-		PRINTFORMK,// Supports format syntax like {expression} and %string_variable% (Kana variant)
+		PRINTFORMK,//{数式}、%文字列変数%などの書式が使える。
 		PRINTFORMKL,
 		PRINTFORMKW,
 
-		PRINTFORMSK,// Convert and display string variable contents (Kana variant)
+		PRINTFORMSK,//文字列変数の内容を変換して表示。
 		PRINTFORMSKL,
 		PRINTFORMSKW,
 
-		PRINTCK,// Print with column alignment (Kana variant)
+		PRINTCK,//??
 		PRINTLCK,
 		PRINTFORMCK,
 		PRINTFORMLCK,
@@ -307,27 +308,27 @@
 		PRINTDATAKL,
 		PRINTDATAKW,
 
-		PRINTD,// Display text (Debug variant)
-		PRINTDL,// Print with newline (Debug variant)
-		PRINTDW,// Wait for input (Debug variant)
+		PRINTD,//文字を表示する
+		PRINTDL,//改行
+		PRINTDW,//入力待ち(実質改行)
 
-		PRINTVD,// Print variable contents (Debug variant)
+		PRINTVD,//変数の内容
 		PRINTVDL,
 		PRINTVDW,
 
-		PRINTSD,// Print string variable contents (Debug variant)
+		PRINTSD,//文字列変数の内容
 		PRINTSDL,
 		PRINTSDW,
 
-		PRINTFORMD,// Supports format syntax like {expression} and %string_variable% (Debug variant)
+		PRINTFORMD,//{数式}、%文字列変数%などの書式が使える。
 		PRINTFORMDL,
 		PRINTFORMDW,
 
-		PRINTFORMSD,// Convert and display string variable contents (Debug variant)
+		PRINTFORMSD,//文字列変数の内容を変換して表示。
 		PRINTFORMSDL,
 		PRINTFORMSDW,
 
-		PRINTCD,// Print with column alignment (Debug variant)
+		PRINTCD,//??
 		PRINTLCD,
 		PRINTFORMCD,
 		PRINTFORMLCD,
@@ -354,7 +355,5 @@
 		PRINT_SPACE,
 
 		INPUTMOUSEKEY,
-		
-		BINPUT,  // NEW: Extended Emuera command stub (batch input processing)
 	}
 }

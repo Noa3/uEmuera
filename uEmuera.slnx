@@ -1,7 +1,5 @@
 ﻿<Solution>
-  <Project Path="uEmuera.Scripts.csproj" />
+  <Project Path="Assembly-CSharp.csproj" />
   <Project Path="WebP.csproj" />
-  <Project Path="uEmuera.Tests.EditMode.csproj" />
   <Project Path="Assembly-CSharp-Editor.csproj" />
-  <Project Path="uEmuera.Tests.PlayMode.csproj" />
 </Solution>

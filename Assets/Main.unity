@@ -128,38 +128,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 1391082850145562, guid: 74ea63321f7a1db4ba70952259c180e4, type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1419834793688358, guid: 74ea63321f7a1db4ba70952259c180e4, type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1436830759875928, guid: 74ea63321f7a1db4ba70952259c180e4, type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1480627810709880, guid: 74ea63321f7a1db4ba70952259c180e4, type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1579310669949748, guid: 74ea63321f7a1db4ba70952259c180e4, type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1669899495780266, guid: 74ea63321f7a1db4ba70952259c180e4, type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1704459454130018, guid: 74ea63321f7a1db4ba70952259c180e4, type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1790011572861952, guid: 74ea63321f7a1db4ba70952259c180e4, type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 114640590945617540, guid: 74ea63321f7a1db4ba70952259c180e4,
         type: 3}
       propertyPath: emuera_main
@@ -256,14 +224,7 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects:
-    - {fileID: 1480627810709880, guid: 74ea63321f7a1db4ba70952259c180e4, type: 3}
-    - {fileID: 1419834793688358, guid: 74ea63321f7a1db4ba70952259c180e4, type: 3}
-    - {fileID: 1669899495780266, guid: 74ea63321f7a1db4ba70952259c180e4, type: 3}
-    - {fileID: 1704459454130018, guid: 74ea63321f7a1db4ba70952259c180e4, type: 3}
-    - {fileID: 1579310669949748, guid: 74ea63321f7a1db4ba70952259c180e4, type: 3}
-    - {fileID: 1790011572861952, guid: 74ea63321f7a1db4ba70952259c180e4, type: 3}
-    - {fileID: 1391082850145562, guid: 74ea63321f7a1db4ba70952259c180e4, type: 3}
+    m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 74ea63321f7a1db4ba70952259c180e4, type: 3}
@@ -376,7 +337,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6112d4d90a5cb494aa1c9cae2e6a3a3c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  era_path: E:\Unity\uEmuera\era
+  era_path: E:\era
 --- !u!4 &461951792
 Transform:
   m_ObjectHideFlags: 0
@@ -403,11 +364,6 @@ PrefabInstance:
     - target: {fileID: 1603676538021120, guid: b5e75604fdc68dd4cb884936202f2f48, type: 3}
       propertyPath: m_IsActive
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 114956849330662536, guid: b5e75604fdc68dd4cb884936202f2f48,
-        type: 3}
-      propertyPath: m_Text
-      value: https://github.com/noa3/uEmuera
       objectReference: {fileID: 0}
     - target: {fileID: 224442390580129970, guid: b5e75604fdc68dd4cb884936202f2f48,
         type: 3}

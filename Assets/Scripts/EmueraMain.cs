@@ -7,10 +7,8 @@ public class EmueraMain : MonoBehaviour
 {
     public void Run()
     {
-        StartupFeedback.Step("Starting script thread...");
         EmueraThread.instance.Start(debug, use_coroutine);
         working_ = true;
-        StartupFeedback.Final("Game running. Rendering console...");
     }
 
     public void Clear()
@@ -73,7 +71,6 @@ public class EmueraMain : MonoBehaviour
 
         yield return null;
         EmueraThread.instance.Start(debug, use_coroutine);
-        StartupFeedback.Final("Restarted game core");
     }
 
     void Start()

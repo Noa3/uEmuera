@@ -69,37 +69,6 @@ public class OptionWindow : MonoBehaviour
         }
     }
 
-    void OnEnable()
-    {
-        LocalizationHelper.OnLanguageChanged += UpdateAllLocalizedTexts;
-    }
-
-    void OnDisable()
-    {
-        LocalizationHelper.OnLanguageChanged -= UpdateAllLocalizedTexts;
-    }
-
-    /// <summary>
-    /// Updates all localized texts when language changes.
-    /// This is called automatically when language is switched.
-    /// </summary>
-    private void UpdateAllLocalizedTexts()
-    {
-        UpdateAllTextsInHierarchy(gameObject);
-    }
-
-    /// <summary>
-    /// Recursively updates all Text components with LocalizedTextComponent.
-    /// </summary>
-    private void UpdateAllTextsInHierarchy(GameObject root)
-    {
-        var localizedComponents = root.GetComponentsInChildren<LocalizedTextComponent>(true);
-        foreach (var component in localizedComponents)
-        {
-            component.UpdateText();
-        }
-    }
-
     void OnQuickButtonClick()
     {
         if(quick_buttons.IsShow)
@@ -194,7 +163,7 @@ public class OptionWindow : MonoBehaviour
                 MultiLanguage.GetText("[BackMenuContent]"),
                 () =>
                 {
-                    var emuera = GameObject.FindFirstObjectByType<EmueraMain>();
+                    var emuera = GameObject.FindObjectOfType<EmueraMain>();
                     emuera.Clear();
                 }, () => { });
         }
@@ -215,7 +184,7 @@ public class OptionWindow : MonoBehaviour
                 MultiLanguage.GetText("[ReloadGameContent]"),
             () =>
             {
-                var emuera = GameObject.FindFirstObjectByType<EmueraMain>();
+                var emuera = GameObject.FindObjectOfType<EmueraMain>();
                 emuera.Restart();
             }, () => { });
         }
@@ -370,18 +339,6 @@ public class OptionWindow : MonoBehaviour
         inprogress.SetActive(value);
     }
 
-    // Allow runtime update of the in-progress overlay message
-    public void SetInProgressMessage(string message)
-    {
-        if (inprogress == null)
-            return;
-        var texts = inprogress.GetComponentsInChildren<Text>(true);
-        foreach (var t in texts)
-        {
-            t.text = message;
-        }
-    }
-
     void SwitchButton(int index)
     {
         for(int i=0; i < button_shadows.Count; ++i)
@@ -435,30 +392,10 @@ public class OptionWindow : MonoBehaviour
         HideMenu();
         language_box.SetActive(true);
     }
-
     void OnSelectLanguage(PointerEventData e)
     {
-        string languageCode = MapButtonNameToLanguageCode(e.pointerPress.name);
-        MultiLanguage.SetLanguage(languageCode);
+        MultiLanguage.SetLanguage(e.pointerPress.name);
         language_box.SetActive(false);
-    }
-
-    /// <summary>
-    /// Maps button GameObject names to language codes.
-    /// </summary>
-    private string MapButtonNameToLanguageCode(string buttonName)
-    {
-        switch (buttonName)
-        {
-            case "zh_cn":
-                return "zh_cn";
-            case "jp":
-                return "jp";
-            case "en_us":
-                return "en_us";
-            default:
-                return "zh_cn";
-        }
     }
 
     void OnGithub()

@@ -75,11 +75,11 @@ namespace MinorShift.Emuera.Sub
     internal sealed class NotImplCodeEE : CodeEE
 	{
 		public NotImplCodeEE(ScriptPosition position)
-			: base(LocalizationHelper.GetSystemString("Error.NotImplemented") ?? "この機能は現バージョンでは使えません", position)
+			: base("この機能は現バージョンでは使えません", position)
 		{
 		}
 		public NotImplCodeEE()
-			: base(LocalizationHelper.GetSystemString("Error.NotImplemented") ?? "この機能は現バージョンでは使えません")
+			: base("この機能は現バージョンでは使えません")
 		{
 		}
 	}
