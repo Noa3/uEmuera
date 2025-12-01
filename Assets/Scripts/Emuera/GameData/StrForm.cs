@@ -256,7 +256,7 @@ namespace MinorShift.Emuera.GameData
 				int currentLength = LangManager.GetStrlenLang(ret);
 				totalLength -= currentLength - ret.Length;//全角文字の数だけマイナス。タブ文字？ゼロ幅文字？知るか！
 				if (totalLength < ret.Length)
-					return ret;//PadLeftは0未満を送ると例外を投げる
+					return ret;//PadLeftは0未満を送るとExceptionを投げる
 				if (arguments[2] != null)
 					ret = ret.PadRight(totalLength, ' ');//LEFT
 				else

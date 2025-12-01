@@ -4,7 +4,7 @@ using System.Text;
 
 namespace MinorShift.Emuera.GameData.Variable
 {
-	//難読化用属性。enum.ToString()やenum.Parse()を行うなら(Exclude=true)にすること。
+	//Obfuscation attribute. Set (Exclude=true) when using enum.ToString() or enum.Parse().
 	[global::System.Reflection.Obfuscation(Exclude=true)]
 	internal enum VariableCode
 	{
@@ -13,7 +13,7 @@ namespace MinorShift.Emuera.GameData.Variable
 		__INTEGER__ = 0x00020000,
 		__STRING__ = 0x00040000,
 		__ARRAY_1D__ = 0x00080000,
-		__CHARACTER_DATA__ = 0x00100000,//第一引数を省略可能。TARGETで補う
+		__CHARACTER_DATA__ = 0x00100000,//第一argumentを省略可能。TARGETで補う
 		__UNCHANGEABLE__ = 0x00400000,//変更不可属性
 		__CALC__ = 0x00800000,//計算値
 		__EXTENDED__ = 0x01000000,//Emueraで追加した変数
@@ -95,7 +95,7 @@ namespace MinorShift.Emuera.GameData.Variable
 
 		ITEMPRICE = 0x3C | __INTEGER__ | __ARRAY_1D__ | __UNCHANGEABLE__ | __EXTENDED__ | __CAN_FORBID__,//アイテム価格
 		LOCAL = 0x3D | __INTEGER__ | __ARRAY_1D__ | __LOCAL__ | __EXTENDED__ | __CAN_FORBID__,//ローカル変数
-		ARG = 0x3E | __INTEGER__ | __ARRAY_1D__ | __LOCAL__ | __EXTENDED__ | __CAN_FORBID__,//関数の引数用
+		ARG = 0x3E | __INTEGER__ | __ARRAY_1D__ | __LOCAL__ | __EXTENDED__ | __CAN_FORBID__,//関数のargument用
 		GLOBAL = 0x3F | __INTEGER__ | __ARRAY_1D__ | __GLOBAL__ | __EXTENDED__ | __CAN_FORBID__,//グローバル数値型変数
 		RANDDATA = 0x40 | __INTEGER__ | __ARRAY_1D__ | __SAVE_EXTENDED__ | __EXTENDED__,//グローバル数値型変数
 		__COUNT_INTEGER_ARRAY__ = 0x41,
@@ -109,7 +109,7 @@ namespace MinorShift.Emuera.GameData.Variable
 		STR = 0x01 | __STRING__ | __ARRAY_1D__ | __CAN_FORBID__,//文字列データ。STR.CSV。書き換え可能。
 		RESULTS = 0x02 | __STRING__ | __ARRAY_1D__,//実はこいつも配列
 		LOCALS = 0x03 | __STRING__ | __ARRAY_1D__ | __LOCAL__ | __EXTENDED__ | __CAN_FORBID__, //ローカル文字列変数
-		ARGS = 0x04 | __STRING__ | __ARRAY_1D__ | __LOCAL__ | __EXTENDED__ | __CAN_FORBID__,//関数の引数用
+		ARGS = 0x04 | __STRING__ | __ARRAY_1D__ | __LOCAL__ | __EXTENDED__ | __CAN_FORBID__,//関数のargument用
 		GLOBALS = 0x05 | __STRING__ | __ARRAY_1D__ | __GLOBAL__ | __EXTENDED__ | __CAN_FORBID__, //グローバル文字列変数
 		TSTR = 0x06 | __STRING__ | __ARRAY_1D__ | __SAVE_EXTENDED__ | __EXTENDED__ | __CAN_FORBID__,
 
@@ -197,7 +197,7 @@ namespace MinorShift.Emuera.GameData.Variable
 		//CALCな変数については番号順はどうでもいい。
 		//1803beta004 ～～NAME系については番号順をConstantDataが使用するので重要
 		
-		RAND = 0x00 | __INTEGER__ | __ARRAY_1D__ | __CALC__ | __UNCHANGEABLE__,//乱数。０～引数-1までの値を返す。
+		RAND = 0x00 | __INTEGER__ | __ARRAY_1D__ | __CALC__ | __UNCHANGEABLE__,//乱数。０～argument-1までの値を返す。
 		CHARANUM = 0x01 | __INTEGER__ | __CALC__ | __UNCHANGEABLE__,//キャラクタ数。キャラクタ登録数を返す。
 
 		ABLNAME = 0x00 | __STRING__ | __ARRAY_1D__ | __UNCHANGEABLE__ | __CONSTANT__ | __CAN_FORBID__,//能力。ABL.CSV//csvから読まれるデータは保存されない。変更不可

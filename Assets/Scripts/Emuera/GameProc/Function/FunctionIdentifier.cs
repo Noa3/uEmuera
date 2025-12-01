@@ -14,9 +14,9 @@ namespace MinorShift.Emuera.GameProc.Function
 		public const int FLOW_CONTROL = 0x00001;
 		public const int EXTENDED = 0x00002;//Emuera拡張命令
 		public const int METHOD_SAFE = 0x00004;//#Function中で呼び出してよい命令。WAITなど入力を伴うもの、CALLなど関数呼び出しを伴うものは不可。
-		public const int DEBUG_FUNC = 0x00008;//-Debug引数付きで起動した場合にのみ実行される命令。
+		public const int DEBUG_FUNC = 0x00008;//-Debugargument付きで起動した場合にのみ実行される命令。
 		public const int PARTIAL = 0x00010;//複数行に渡る構文の一部である命令。SIF文の次に来てはいけない。debugコマンドからの呼び出しも不適当。
-		public const int FORCE_SETARG = 0x00020;//ロード時に必ず引数解析を行う必要のあるもの。IFやSELECTCASEなど
+		public const int FORCE_SETARG = 0x00020;//ロード時に必ずargument解析を行う必要のあるもの。IFやSELECTCASEなど
 		public const int IS_JUMP = 0x00040;//JUMP命令
 		public const int IS_TRY = 0x00080;//TRY系命令
 		public const int IS_TRYC = 0x08000;//TRY系命令
@@ -173,7 +173,7 @@ namespace MinorShift.Emuera.GameProc.Function
 			addFunction(FunctionCode.PRINTPLAIN, argb[FunctionArgType.STR_NULLABLE], METHOD_SAFE | EXTENDED);
 			addFunction(FunctionCode.PRINTPLAINFORM, argb[FunctionArgType.FORM_STR_NULLABLE], METHOD_SAFE | EXTENDED);
 
-			addFunction(FunctionCode.PRINT_ABL, argb[FunctionArgType.INT_EXPRESSION], METHOD_SAFE);//能力。引数は登録番号
+			addFunction(FunctionCode.PRINT_ABL, argb[FunctionArgType.INT_EXPRESSION], METHOD_SAFE);//能力。argumentは登録番号
 			addFunction(FunctionCode.PRINT_TALENT, argb[FunctionArgType.INT_EXPRESSION], METHOD_SAFE);//素質
 			addFunction(FunctionCode.PRINT_MARK, argb[FunctionArgType.INT_EXPRESSION], METHOD_SAFE);//刻印
 			addFunction(FunctionCode.PRINT_EXP, argb[FunctionArgType.INT_EXPRESSION], METHOD_SAFE);//経験
@@ -379,12 +379,12 @@ namespace MinorShift.Emuera.GameProc.Function
 
 			addFunction(FunctionCode.INPUTMOUSEKEY, new INPUTMOUSEKEY_Instruction());
 			addFunction(FunctionCode.AWAIT, new AWAIT_Instruction());
-			#region 式中関数の引数違い
+			#region 式中関数のargument違い
 			addFunction(FunctionCode.VARSIZE, argb[FunctionArgType.SP_VAR], METHOD_SAFE | EXTENDED);//動作が違うのでMETHOD化できない
 			addFunction(FunctionCode.GETTIME, argb[FunctionArgType.VOID], METHOD_SAFE | EXTENDED);//2つに代入する必要があるのでMETHOD化できない
-			addFunction(FunctionCode.POWER, argb[FunctionArgType.SP_POWER], METHOD_SAFE | EXTENDED);//引数が違うのでMETHOD化できない。
-			addFunction(FunctionCode.PRINTCPERLINE, argb[FunctionArgType.SP_GETINT], METHOD_SAFE | EXTENDED);//よく考えたら引数の仕様違うや
-			addFunction(FunctionCode.SAVENOS, argb[FunctionArgType.SP_GETINT], METHOD_SAFE | EXTENDED);//引数の仕様が違うので(ry
+			addFunction(FunctionCode.POWER, argb[FunctionArgType.SP_POWER], METHOD_SAFE | EXTENDED);//argumentが違うのでMETHOD化できない。
+			addFunction(FunctionCode.PRINTCPERLINE, argb[FunctionArgType.SP_GETINT], METHOD_SAFE | EXTENDED);//よく考えたらargumentの仕様違うや
+			addFunction(FunctionCode.SAVENOS, argb[FunctionArgType.SP_GETINT], METHOD_SAFE | EXTENDED);//argumentの仕様が違うので(ry
 			addFunction(FunctionCode.ENCODETOUNI, argb[FunctionArgType.FORM_STR_NULLABLE], METHOD_SAFE | EXTENDED);//式中関数版を追加。処理が全然違う
 			#endregion
 

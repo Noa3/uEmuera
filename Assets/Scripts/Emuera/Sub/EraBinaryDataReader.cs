@@ -76,7 +76,7 @@ namespace MinorShift.Emuera.Sub
 		public abstract int ReaderVersion { get; }
 		/// <summary>
 		/// FileStreamからReaderを作成
-		/// 不正なファイルの場合はnullを返す・例外は投げない
+		/// Invalid ファイルの場合はnullを返す・Exceptionは投げない
 		/// </summary>
 		/// <param name="fs"></param>
 		/// <returns></returns>

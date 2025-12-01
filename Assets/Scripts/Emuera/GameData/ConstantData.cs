@@ -8,7 +8,7 @@ using MinorShift.Emuera.GameData.Variable;
 
 namespace MinorShift.Emuera.GameData
 {
-	//難読化用属性。enum.ToString()やenum.Parse()を行うなら(Exclude=true)にすること。
+	//Obfuscation attribute. Set (Exclude=true) when using enum.ToString() or enum.Parse().
 	[global::System.Reflection.Obfuscation(Exclude = false)]
 	internal enum CharacterStrData
 	{
@@ -19,7 +19,7 @@ namespace MinorShift.Emuera.GameData
 		CSTR = 4,
 	}
 	
-	//難読化用属性。enum.ToString()やenum.Parse()を行うなら(Exclude=true)にすること。
+	//Obfuscation attribute. Set (Exclude=true) when using enum.ToString() or enum.Parse().
 	[global::System.Reflection.Obfuscation(Exclude = false)]
 	internal enum CharacterIntData
 	{
@@ -208,9 +208,9 @@ namespace MinorShift.Emuera.GameData
 			{
 				uEmuera.Media.SystemSounds.Hand.Play();
 				if (position != null)
-					ParserMediator.Warn("予期しないエラーが発生しました", position, 3);
+					ParserMediator.Warn("予期しないErrorが発生しました", position, 3);
 				else
-					output.PrintError("予期しないエラーが発生しました");
+					output.PrintError("予期しないErrorが発生しました");
 				return;
 			}
 			finally
@@ -1136,9 +1136,9 @@ check1break:
 			{
 				uEmuera.Media.SystemSounds.Hand.Play();
 				if (position != null)
-					ParserMediator.Warn("予期しないエラーが発生しました", position, 3);
+					ParserMediator.Warn("予期しないErrorが発生しました", position, 3);
 				else
-					output.PrintError("予期しないエラーが発生しました");
+					output.PrintError("予期しないErrorが発生しました");
 				return;
 			}
 			finally
@@ -1426,9 +1426,9 @@ check1break:
 			{
 				uEmuera.Media.SystemSounds.Hand.Play();
 				if (position != null)
-					ParserMediator.Warn("予期しないエラーが発生しました", position, 3);
+					ParserMediator.Warn("予期しないErrorが発生しました", position, 3);
 				else
-					output.PrintError("予期しないエラーが発生しました");
+					output.PrintError("予期しないErrorが発生しました");
 				return;
 			}
 			finally

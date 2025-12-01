@@ -546,7 +546,7 @@ namespace MinorShift.Emuera.GameProc.Function
 				{
 					Int64 x = terms[i].GetIntValue(exm);
 					if ((x < 0) || (x > 63))
-						throw new CodeEE("第2引数がビットのレンジ(0から63)を超えています");
+						throw new CodeEE("第2argumentがビットのレンジ(0から63)を超えています");
 					Int64 baseValue = varTerm.GetIntValue(exm);
 					Int64 shift = 1L << (int)x;
 					if (op == 1)
@@ -683,7 +683,7 @@ namespace MinorShift.Emuera.GameProc.Function
 				req.OneInput = true;
 				if (arg.Term != null)
 				{
-					//TODO:二文字以上セットできるようにするかエラー停止するか
+					//TODO:二文字以上セットできるようにするかError停止するか
 					//少なくともONETINPUTとの仕様を統一すべき
 					Int64 def;
 					if (arg.IsConst)
@@ -1185,14 +1185,14 @@ namespace MinorShift.Emuera.GameProc.Function
 				{
 					start = (int)spvarsetarg.Start.GetIntValue(exm);
 					if (start < 0 || start >= charaNum)
-						throw new CodeEE("命令CVARSETの第４引数(" + start.ToString() + ")がキャラクタの範囲外です");
+						throw new CodeEE("命令CVARSETの第４argument(" + start.ToString() + ")がキャラクタの範囲外です");
 				}
 				int end;
 				if (spvarsetarg.End != null)
 				{
 					end = (int)spvarsetarg.End.GetIntValue(exm);
 					if (end < 0 || end > charaNum)
-						throw new CodeEE("命令CVARSETの第５引数(" + end.ToString() + ")がキャラクタの範囲外です");
+						throw new CodeEE("命令CVARSETの第５argument(" + end.ToString() + ")がキャラクタの範囲外です");
 				}
 				else
 					end = charaNum;
@@ -1332,9 +1332,9 @@ namespace MinorShift.Emuera.GameProc.Function
 		private static int toUInt32inArg(Int64 value, string funcName, int argnum)
 		{
 			if (value < 0)
-				throw new CodeEE(funcName + "の第" + argnum.ToString() + "引数に負の値(" + value.ToString() + ")が指定されました");
+				throw new CodeEE(funcName + "の第" + argnum.ToString() + "argumentに負の値(" + value.ToString() + ")が指定されました");
 			else if (value > Int32.MaxValue)
-				throw new CodeEE(funcName + "の第" + argnum.ToString() + "引数の値(" + value.ToString() + ")が大きすぎます");
+				throw new CodeEE(funcName + "の第" + argnum.ToString() + "argumentの値(" + value.ToString() + ")が大きすぎます");
 
 			return (int)value;
 		}
@@ -1360,7 +1360,7 @@ namespace MinorShift.Emuera.GameProc.Function
 					Int64 v = terms[i + 2].GetIntValue(exm);
 					savCharaList[i] = FunctionIdentifier.toUInt32inArg(v, "SAVECHARA", i + 3);
 					if (savCharaList[i] >= charanum)
-						throw new CodeEE("SAVECHARAの第" + (i + 3).ToString() + "引数の値がキャラ登録番号の範囲を超えています");
+						throw new CodeEE("SAVECHARAの第" + (i + 3).ToString() + "argumentの値がキャラ登録番号の範囲を超えています");
 					for (int j = 0; j < i; j++)
 					{
 						if (savCharaList[i] == savCharaList[j])
@@ -1496,7 +1496,7 @@ namespace MinorShift.Emuera.GameProc.Function
 				{
 					UserDefinedRefMethod srcRef = arg.SrcRefMethodToken;
 					CalledFunction call = arg.SrcCalledFunction;
-					if (str != null)//REFBYNAMEかつ第二引数が定数でない
+					if (str != null)//REFBYNAMEかつ第二argumentが定数でない
 					{
 						srcRef = GlobalStatic.IdentifierDictionary.GetRefMethod(str);
 						if (srcRef == null)
@@ -1511,7 +1511,7 @@ namespace MinorShift.Emuera.GameProc.Function
 						}
 					}
 					else if (srcRef != null)
-						call = srcRef.CalledFunction;//第二引数が関数参照。callがnullならエラー
+						call = srcRef.CalledFunction;//第二argumentが関数参照。callがnullならError
 					if (call == null || !arg.RefMethodToken.MatchType(call))
 					{
 						arg.RefMethodToken.SetReference(null);
@@ -1562,9 +1562,9 @@ namespace MinorShift.Emuera.GameProc.Function
 				long foreColor = arg.X.GetIntValue(exm);
 				long backColor = arg.Y.GetIntValue(exm);
 				if (foreColor < 0 || foreColor > 0xFFFFFF)
-					throw new CodeEE("第１引数が色を表す整数の範囲外です");
+					throw new CodeEE("第１argumentが色を表す整数の範囲外です");
 				if (backColor < 0 || backColor > 0xFFFFFF)
-					throw new CodeEE("第２引数が色を表す整数の範囲外です");
+					throw new CodeEE("第２argumentが色を表す整数の範囲外です");
 				Color fc = Color.FromArgb((int)foreColor >>16, (int)foreColor>>8 &0xFF,(int)foreColor &0xFF);
 				Color bc = Color.FromArgb((int)backColor >>16, (int)backColor>>8 &0xFF,(int)backColor &0xFF);
 				exm.Console.SetToolTipColor(fc, bc);
@@ -1588,7 +1588,7 @@ namespace MinorShift.Emuera.GameProc.Function
 				else
 					delay = arg.Term.GetIntValue(exm);
 				if (delay < 0 || delay > int.MaxValue)
-					throw new CodeEE("引数の値が適切な範囲外です");
+					throw new CodeEE("argumentの値が適切な範囲外です");
 				exm.Console.SetToolTipDelay((int)delay);
 				return;
 			}
@@ -1610,7 +1610,7 @@ namespace MinorShift.Emuera.GameProc.Function
                 else
                     duration = arg.Term.GetIntValue(exm);
                 if (duration < 0 || duration > int.MaxValue)
-                    throw new CodeEE("引数の値が適切な範囲外です");
+                    throw new CodeEE("argumentの値が適切な範囲外です");
                 if (duration > short.MaxValue)
                     duration = short.MaxValue;
                 exm.Console.SetToolTipDuration((int)duration);
@@ -1863,9 +1863,9 @@ namespace MinorShift.Emuera.GameProc.Function
 					//ExpressionArgument expArg = (ExpressionArgument)(line.Argument);
 					//チェック済み
 					//if (expArg == null)
-					//	throw new ExeEE("IFチェック中。引数が解析されていない。", func.IfCaseList[i].Position);
+					//	throw new ExeEE("IFチェック中。argumentが解析されていない。", func.IfCaseList[i].Position);
 
-					//1730 ELSEIFが出したエラーがIFのエラーとして検出されていた
+					//1730 ELSEIFが出したErrorがIFのErrorとして検出されていた
 					state.CurrentLine = line;
 					Int64 value = ((ExpressionArgument)(line.Argument)).Term.GetIntValue(exm);
 					if (value != 0)//式が真
@@ -1917,7 +1917,7 @@ namespace MinorShift.Emuera.GameProc.Function
 					CaseArgument caseArg = (CaseArgument)(line.Argument);
 					//チェック済み
 					//if (caseArg == null)
-					//	throw new ExeEE("CASEチェック中。引数が解析されていない。", func.IfCaseList[i].Position);
+					//	throw new ExeEE("CASEチェック中。argumentが解析されていない。", func.IfCaseList[i].Position);
 
 					state.CurrentLine = line;
 					if (selectValue.IsInteger)
@@ -2118,7 +2118,7 @@ namespace MinorShift.Emuera.GameProc.Function
 				}
 				if (jumpTo.FunctionCode == FunctionCode.DO)
 				{
-					//こいつだけはCONTINUEよりも後ろに判定行があるため、判定行にエラーがあった場合に問題がある
+					//こいつだけはCONTINUEよりも後ろに判定行があるため、判定行にErrorがあった場合に問題がある
 					InstructionLine tFunc = (InstructionLine)((InstructionLine)func.JumpTo).JumpTo;//LOOP
 					if (tFunc.IsError)
 						throw new CodeEE(tFunc.ErrMes, tFunc.Position);

@@ -20,7 +20,7 @@ namespace MinorShift.Emuera.GameProc
 			string token = LexicalAnalyzer.ReadSingleIdentifier(st);//#～自体にはマクロ非適用
 			if (Config.ICFunction)
 				token = token.ToUpper();
-            //#行として不正な行でもAnalyzeに行って引っかかることがあるので、先に存在しない#～は弾いてしまう
+            //#行としてInvalid 行でもAnalyzeに行って引っかかることがあるので、先に存在しない#～は弾いてしまう
             if (token == null || (token != "SINGLE" && token != "LATER" && token != "PRI" && token != "ONLY" && token != "FUNCTION" && token != "FUNCTIONS" 
                 && token != "LOCALSIZE" && token != "LOCALSSIZE" && token != "DIM" && token != "DIMS"))
             {
@@ -315,7 +315,7 @@ namespace MinorShift.Emuera.GameProc
 				if (!isFunction)//$ならこの時点で終了
 				{
 					if (!wc.EOL)
-						ParserMediator.Warn("$で始まるラベルに引数が設定されています", position, 1);
+						ParserMediator.Warn("$で始まるラベルにargumentが設定されています", position, 1);
 					return new GotoLabelLine(position, labelName);
 				}
 
@@ -336,7 +336,7 @@ namespace MinorShift.Emuera.GameProc
 				//{
 				//    LexicalAnalyzer.SkipWhiteSpace(stream);
 				//    if (!stream.EOS)
-				//        ParserMediator.Warn("$で始まるラベルに引数が設定されています", position, 1);
+				//        ParserMediator.Warn("$で始まるラベルにargumentが設定されています", position, 1);
 				//    return new GotoLabelLine(position, labelName);
 				//}
 
@@ -422,7 +422,7 @@ namespace MinorShift.Emuera.GameProc
 					//命令文
 					if (func != null)//関数文
 					{
-						if (stream.EOS) //引数の無い関数
+						if (stream.EOS) //argumentの無い関数
 							return new InstructionLine(position, func, stream);
 						if ((stream.Current != ';') && (stream.Current != ' ') && (stream.Current != '\t') && (!Config.SystemAllowFullSpace || (stream.Current != '　')))
 						{

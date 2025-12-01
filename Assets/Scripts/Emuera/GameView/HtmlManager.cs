@@ -73,10 +73,10 @@ namespace MinorShift.Emuera.GameView
 			public bool LineHead = true;//行頭フラグ。一度もテキストが出てきてない状態
 			public FontStyle FontStyle = FontStyle.Regular;
 			public List<HtmlAnalzeStateFontTag> FonttagList = new List<HtmlAnalzeStateFontTag>();
-			public bool FlagNobr = false;//falseの時に</nobr>するとエラー
-			public bool FlagP = false;//falseの時に</p>するとエラー
-			public bool FlagNobrClosed = false;//trueの時に</nobr>するとエラー
-			public bool FlagPClosed = false;//trueの時に</p>するとエラー
+			public bool FlagNobr = false;//falseの時に</nobr>するとError
+			public bool FlagP = false;//falseの時に</p>するとError
+			public bool FlagNobrClosed = false;//trueの時に</nobr>するとError
+			public bool FlagPClosed = false;//trueの時に</p>するとError
 			public DisplayLineAlignment Alignment = DisplayLineAlignment.LEFT;
 
 			/// <summary>
@@ -591,7 +591,7 @@ namespace MinorShift.Emuera.GameView
 				if (found < 0)
 				{
 					st.CurrentPosition = st.RowString.Length;
-					return null;//戻り先でエラーを出す
+					return null;//戻り先でErrorを出す
 				}
 				tag = st.Substring(st.CurrentPosition, found).Trim();
 				st.CurrentPosition += found;
@@ -998,7 +998,7 @@ namespace MinorShift.Emuera.GameView
 
 
 		error:
-			throw new CodeEE("html文字列\"" + st.RowString + "\"のタグ解析中にエラーが発生しました");
+			throw new CodeEE("html文字列\"" + st.RowString + "\"のタグ解析中にErrorが発生しました");
 		}
 
 		private static int stringToColorInt32(string str)
@@ -1023,7 +1023,7 @@ namespace MinorShift.Emuera.GameView
 			else
 			{
 				Color color = Color.FromName(str);
-				if (color.A == 0)//色名として解釈失敗 エラー確定
+				if (color.A == 0)//色名として解釈失敗 Error確定
 				{
 					if(str.Equals("transparent", StringComparison.OrdinalIgnoreCase))
 						throw new CodeEE("無色透明(Transparent)は色として指定できません");

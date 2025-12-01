@@ -9,7 +9,7 @@ using MinorShift.Emuera.GameData.Variable;
 namespace MinorShift.Emuera.GameData.Expression
 {
 	/// <summary>
-	/// 引数のチェック、戻り値の型チェック等は全て呼び出し元が責任を負うこと。
+	/// argumentのチェック、戻り値の型チェック等は全て呼び出し元が責任を負うこと。
 	/// </summary>
 	internal abstract class OperatorMethod : FunctionMethod
 	{

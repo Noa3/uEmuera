@@ -8,7 +8,7 @@ using uEmuera.Drawing;
 
 namespace MinorShift.Emuera.GameView
 {
-	//難読化用属性。enum.ToString()やenum.Parse()を行うなら(Exclude=true)にすること。
+	//Obfuscation attribute. Set (Exclude=true) when using enum.ToString() or enum.Parse().
 	[global::System.Reflection.Obfuscation(Exclude=false)]
 	internal enum DisplayLineLastState
 	{
@@ -18,7 +18,7 @@ namespace MinorShift.Emuera.GameView
 		BackLog = 3,
 	}
 	
-	//難読化用属性。enum.ToString()やenum.Parse()を行うなら(Exclude=true)にすること。
+	//Obfuscation attribute. Set (Exclude=true) when using enum.ToString() or enum.Parse().
 	[global::System.Reflection.Obfuscation(Exclude=false)]
 	internal enum DisplayLineAlignment
 	{

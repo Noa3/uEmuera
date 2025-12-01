@@ -11,7 +11,7 @@ namespace MinorShift.Emuera.GameProc
 	//1756 インナークラス解除して一般に開放
 
 
-	//難読化用属性。enum.ToString()やenum.Parse()を行うなら(Exclude=true)にすること。
+	//Obfuscation attribute. Set (Exclude=true) when using enum.ToString() or enum.Parse().
 	[global::System.Reflection.Obfuscation(Exclude = false)]
 	internal enum SystemStateCode
 	{
@@ -73,10 +73,10 @@ namespace MinorShift.Emuera.GameProc
 		System_Reloaderb = 0x230,
 		First_Begin = 0x240,
 
-		Normal = 0xFFFF | __CAN_BEGIN__ | __CAN_SAVE__,//特に何でもないとき。ScriptEndに達したらエラー
+		Normal = 0xFFFF | __CAN_BEGIN__ | __CAN_SAVE__,//特に何でもないとき。ScriptEndに達したらError
 	}
 
-	//難読化用属性。enum.ToString()やenum.Parse()を行うなら(Exclude=true)にすること。
+	//Obfuscation attribute. Set (Exclude=true) when using enum.ToString() or enum.Parse().
 	[global::System.Reflection.Obfuscation(Exclude = false)]
 	internal enum BeginType
 	{
@@ -456,12 +456,12 @@ namespace MinorShift.Emuera.GameProc
 			}
             if (srcArgs != null)
             {
-                //引数の値を確定させる
+                //argumentの値を確定させる
                 srcArgs.SetTransporter(exm);
                 //プライベート変数更新
                 if (call.TopLabel.hasPrivDynamicVar)
                     call.TopLabel.In();
-                //更新した変数へ引数を代入
+                //更新した変数へargumentを代入
                 for (int i = 0; i < call.TopLabel.Arg.Length; i++)
                 {
                     if (srcArgs.Arguments[i] != null)
@@ -475,7 +475,7 @@ namespace MinorShift.Emuera.GameProc
                     }
                 }
             }
-            else//こっちに来るのはシステムからの呼び出し=引数は存在しない関数のみ ifネストの外に出していい気もしないでもないがはてさて
+            else//こっちに来るのはシステムからの呼び出し=argumentは存在しない関数のみ ifネストの外に出していい気もしないでもないがはてさて
             {
                 //プライベート変数更新
                 if (call.TopLabel.hasPrivDynamicVar)

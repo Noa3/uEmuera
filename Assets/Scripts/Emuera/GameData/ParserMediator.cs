@@ -12,7 +12,7 @@ using System.Text.RegularExpressions;
 namespace MinorShift.Emuera
 {
 	//1756 新設。ParserやLexicalAnalyzerなどが知りたい情報をまとめる
-	//本当は引数として渡すべきなのかもしれないが全てのParserの引数を書きなおすのが面倒なのでstatic
+	//本当はargumentとして渡すべきなのかもしれないが全てのParserのargumentを書きなおすのが面倒なのでstatic
 	internal static class ParserMediator
 	{
 		/// <summary>

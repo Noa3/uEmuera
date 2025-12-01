@@ -8,7 +8,7 @@ using MinorShift.Emuera.GameData.Expression;
 namespace MinorShift.Emuera.GameData.Variable
 {
 	//IndexOutOfRangeException, ArgumentOutOfRangeExceptionを投げることがある。VariableTermの方で処理すること。
-	//引数は整数しか受け付けない。*.csvを利用した置換はVariableTermの方で処理すること
+	//argumentは整数しか受け付けない。*.csvを利用した置換はVariableTermの方で処理すること
 	internal abstract class VariableToken
 	{
 		protected VariableToken(VariableCode varCode, VariableData varData)
@@ -275,11 +275,11 @@ namespace MinorShift.Emuera.GameData.Variable
 		public override void CheckElement(Int64[] arguments, bool[] doCheck)
 		{
 			if (doCheck[0] && ((arguments[0] < 0) || (arguments[0] >= varData.CharacterList.Count)))
-				throw new CodeEE("キャラクタ配列変数" + varName + "の第１引数(" + arguments[0].ToString() + ")はキャラ登録番号の範囲外です");
+				throw new CodeEE("キャラクタ配列変数" + varName + "の第１argument(" + arguments[0].ToString() + ")はキャラ登録番号の範囲外です");
 			if (doCheck.Length > 1 && sizes.Length > 0 && doCheck[1] && ((arguments[1] < 0) || (arguments[1] >= sizes[0])))
-				throw new CodeEE("キャラクタ配列変数" + varName + "の第２引数(" + arguments[1].ToString() + ")は配列の範囲外です");
+				throw new CodeEE("キャラクタ配列変数" + varName + "の第２argument(" + arguments[1].ToString() + ")は配列の範囲外です");
 			if (doCheck.Length > 2 && sizes.Length > 1 && doCheck[2] && ((arguments[2] < 0) || (arguments[2] >= sizes[1])))
-				throw new CodeEE("キャラクタ配列変数" + varName + "の第３引数(" + arguments[2].ToString() + ")は配列の範囲外です");
+				throw new CodeEE("キャラクタ配列変数" + varName + "の第３argument(" + arguments[2].ToString() + ")は配列の範囲外です");
 		}
 
 		public override void IsArrayRangeValid(Int64[] arguments, Int64 index1, Int64 index2, string funcName, Int64 i1, Int64 i2)
@@ -287,9 +287,9 @@ namespace MinorShift.Emuera.GameData.Variable
 			CheckElement(arguments);
 			//CharacterData chara = varData.CharacterList[(int)arguments[0]];
 			if ((index1 < 0) || (index1 > sizes[0]))
-				throw new CodeEE(funcName + "命令の第" + i1.ToString() + "引数(" + index1.ToString() + ")は配列" + varName + "の範囲外です");
+				throw new CodeEE(funcName + "命令の第" + i1.ToString() + "argument(" + index1.ToString() + ")は配列" + varName + "の範囲外です");
 			if ((index2 < 0) || (index2 > sizes[0]))
-				throw new CodeEE(funcName + "命令の第" + i2.ToString() + "引数(" + index2.ToString() + ")は配列" + varName + "の範囲外です");
+				throw new CodeEE(funcName + "命令の第" + i2.ToString() + "argument(" + index2.ToString() + ")は配列" + varName + "の範囲外です");
 		}
 	}
 
@@ -345,19 +345,19 @@ namespace MinorShift.Emuera.GameData.Variable
 			//	throw new ExeEE("プライベート変数" + varName + "の配列が用意されていない");
 
 			if (doCheck[0] && ((arguments[0] < 0) || (arguments[0] >= sizes[0])))
-				throw new CodeEE("配列型変数" + varName + "の第１引数(" + arguments[0].ToString() + ")は配列の範囲外です");
+				throw new CodeEE("配列型変数" + varName + "の第１argument(" + arguments[0].ToString() + ")は配列の範囲外です");
 			if (sizes.Length >= 2 && ((arguments[1] < 0) || (arguments[1] >= sizes[1])))
-				throw new CodeEE("配列型変数" + varName + "の第２引数(" + arguments[1].ToString() + ")は配列の範囲外です");
+				throw new CodeEE("配列型変数" + varName + "の第２argument(" + arguments[1].ToString() + ")は配列の範囲外です");
 			if (sizes.Length >= 3 && ((arguments[2] < 0) || (arguments[2] >= sizes[2])))
-				throw new CodeEE("配列型変数" + varName + "の第３引数(" + arguments[2].ToString() + ")は配列の範囲外です");
+				throw new CodeEE("配列型変数" + varName + "の第３argument(" + arguments[2].ToString() + ")は配列の範囲外です");
 		}
 		public override void IsArrayRangeValid(Int64[] arguments, Int64 index1, Int64 index2, string funcName, Int64 i1, Int64 i2)
 		{
 			CheckElement(arguments);
 			if ((index1 < 0) || (index1 > sizes[Dimension - 1]))
-				throw new CodeEE(funcName + "命令の第" + i1.ToString() + "引数(" + index1.ToString() + ")は配列" + varName + "の範囲外です");
+				throw new CodeEE(funcName + "命令の第" + i1.ToString() + "argument(" + index1.ToString() + ")は配列" + varName + "の範囲外です");
 			if ((index2 < 0) || (index2 > sizes[Dimension - 1]))
-				throw new CodeEE(funcName + "命令の第" + i2.ToString() + "引数(" + index2.ToString() + ")は配列" + varName + "の範囲外です");
+				throw new CodeEE(funcName + "命令の第" + i2.ToString() + "argument(" + index2.ToString() + ")は配列" + varName + "の範囲外です");
 		}
 		public abstract void In();
 		public abstract void Out();
@@ -443,19 +443,19 @@ namespace MinorShift.Emuera.GameData.Variable
 			if (array == null)
 				throw new CodeEE("参照型変数" + varName + "は何も参照していません");
 			if (doCheck[0] && ((arguments[0] < 0) || (arguments[0] >= array.GetLength(0))))
-				throw new CodeEE("配列型変数" + varName + "の第１引数(" + arguments[0].ToString() + ")は配列の範囲外です");
+				throw new CodeEE("配列型変数" + varName + "の第１argument(" + arguments[0].ToString() + ")は配列の範囲外です");
 			if (Dimension >= 2 && ((arguments[1] < 0) || (arguments[1] >= array.GetLength(1))))
-				throw new CodeEE("配列型変数" + varName + "の第２引数(" + arguments[1].ToString() + ")は配列の範囲外です");
+				throw new CodeEE("配列型変数" + varName + "の第２argument(" + arguments[1].ToString() + ")は配列の範囲外です");
 			if (Dimension >= 3 && ((arguments[2] < 0) || (arguments[2] >= array.GetLength(2))))
-				throw new CodeEE("配列型変数" + varName + "の第３引数(" + arguments[2].ToString() + ")は配列の範囲外です");
+				throw new CodeEE("配列型変数" + varName + "の第３argument(" + arguments[2].ToString() + ")は配列の範囲外です");
 		}
 		public override void IsArrayRangeValid(Int64[] arguments, Int64 index1, Int64 index2, string funcName, Int64 i1, Int64 i2)
 		{
 			CheckElement(arguments);
 			if ((index1 < 0) || (index1 > array.GetLength(Dimension - 1)))
-				throw new CodeEE(funcName + "命令の第" + i1.ToString() + "引数(" + index1.ToString() + ")は配列" + varName + "の範囲外です");
+				throw new CodeEE(funcName + "命令の第" + i1.ToString() + "argument(" + index1.ToString() + ")は配列" + varName + "の範囲外です");
 			if ((index2 < 0) || (index2 > array.GetLength(Dimension - 1)))
-				throw new CodeEE(funcName + "命令の第" + i2.ToString() + "引数(" + index2.ToString() + ")は配列" + varName + "の範囲外です");
+				throw new CodeEE(funcName + "命令の第" + i2.ToString() + "argument(" + index2.ToString() + ")は配列" + varName + "の範囲外です");
 		}
 
 		int counter = 0;
@@ -552,15 +552,15 @@ namespace MinorShift.Emuera.GameData.Variable
 			//if (array == null)
 			//	throw new ExeEE("プライベート変数" + varName + "の配列が用意されていない");
 			if (doCheck[0] && ((arguments[0] < 0) || (arguments[0] >= size)))
-				throw new CodeEE("配列変数" + varName + "の第１引数(" + arguments[0].ToString() + ")は配列の範囲外です");
+				throw new CodeEE("配列変数" + varName + "の第１argument(" + arguments[0].ToString() + ")は配列の範囲外です");
 		}
 		public override void IsArrayRangeValid(Int64[] arguments, Int64 index1, Int64 index2, string funcName, Int64 i1, Int64 i2)
 		{
 			CheckElement(arguments);
 			if ((index1 < 0) || (index1 > size))
-				throw new CodeEE(funcName + "命令の第" + i1.ToString() + "引数(" + index1.ToString() + ")は配列" + varName + "の範囲外です");
+				throw new CodeEE(funcName + "命令の第" + i1.ToString() + "argument(" + index1.ToString() + ")は配列" + varName + "の範囲外です");
 			if ((index2 < 0) || (index2 > size))
-				throw new CodeEE(funcName + "命令の第" + i2.ToString() + "引数(" + index2.ToString() + ")は配列" + varName + "の範囲外です");
+				throw new CodeEE(funcName + "命令の第" + i2.ToString() + "argument(" + index2.ToString() + ")は配列" + varName + "の範囲外です");
 		}
 	}
 
@@ -653,15 +653,15 @@ namespace MinorShift.Emuera.GameData.Variable
 			public override void CheckElement(Int64[] arguments, bool[] doCheck)
 			{
 				if (doCheck[0] && ((arguments[0] < 0) || (arguments[0] >= array.Length)))
-					throw new CodeEE("配列変数" + varName + "の第１引数(" + arguments[0].ToString() + ")は配列の範囲外です");
+					throw new CodeEE("配列変数" + varName + "の第１argument(" + arguments[0].ToString() + ")は配列の範囲外です");
 			}
 			public override void IsArrayRangeValid(Int64[] arguments, Int64 index1, Int64 index2, string funcName, Int64 i1, Int64 i2)
 			{
 				CheckElement(arguments);
 				if ((index1 < 0) || (index1 > array.Length))
-					throw new CodeEE(funcName + "命令の第" + i1.ToString() + "引数(" + index1.ToString() + ")は配列" + varName + "の範囲外です");
+					throw new CodeEE(funcName + "命令の第" + i1.ToString() + "argument(" + index1.ToString() + ")は配列" + varName + "の範囲外です");
 				if ((index2 < 0) || (index2 > array.Length))
-					throw new CodeEE(funcName + "命令の第" + i2.ToString() + "引数(" + index2.ToString() + ")は配列" + varName + "の範囲外です");
+					throw new CodeEE(funcName + "命令の第" + i2.ToString() + "argument(" + index2.ToString() + ")は配列" + varName + "の範囲外です");
 			}
 		}
 
@@ -719,17 +719,17 @@ namespace MinorShift.Emuera.GameData.Variable
 			public override void CheckElement(Int64[] arguments, bool[] doCheck)
 			{
 				if (doCheck[0] && ((arguments[0] < 0) || (arguments[0] >= array.GetLength(0))))
-					throw new CodeEE("二次元配列" + varName + "の第１引数(" + arguments[0].ToString() + ")は配列の範囲外です");
+					throw new CodeEE("二次元配列" + varName + "の第１argument(" + arguments[0].ToString() + ")は配列の範囲外です");
 				if (doCheck[1] && ((arguments[1] < 0) || (arguments[1] >= array.GetLength(1))))
-					throw new CodeEE("二次元配列" + varName + "の第２引数(" + arguments[1].ToString() + ")は配列の範囲外です");
+					throw new CodeEE("二次元配列" + varName + "の第２argument(" + arguments[1].ToString() + ")は配列の範囲外です");
 			}
 			public override void IsArrayRangeValid(Int64[] arguments, Int64 index1, Int64 index2, string funcName, Int64 i1, Int64 i2)
 			{
 				CheckElement(arguments);
 				if ((index1 < 0) || (index1 > array.GetLength(1)))
-					throw new CodeEE(funcName + "命令の第" + i1.ToString() + "引数(" + index1.ToString() + ")は配列" + varName + "の範囲外です");
+					throw new CodeEE(funcName + "命令の第" + i1.ToString() + "argument(" + index1.ToString() + ")は配列" + varName + "の範囲外です");
 				if ((index2 < 0) || (index2 > array.GetLength(1)))
-					throw new CodeEE(funcName + "命令の第" + i2.ToString() + "引数(" + index2.ToString() + ")は配列" + varName + "の範囲外です");
+					throw new CodeEE(funcName + "命令の第" + i2.ToString() + "argument(" + index2.ToString() + ")は配列" + varName + "の範囲外です");
 			}
 		}
 
@@ -789,19 +789,19 @@ namespace MinorShift.Emuera.GameData.Variable
 			public override void CheckElement(Int64[] arguments, bool[] doCheck)
 			{
 				if (doCheck[0] && ((arguments[0] < 0) || (arguments[0] >= array.GetLength(0))))
-					throw new CodeEE("三次元配列" + varName + "の第１引数(" + arguments[0].ToString() + ")は配列の範囲外です");
+					throw new CodeEE("三次元配列" + varName + "の第１argument(" + arguments[0].ToString() + ")は配列の範囲外です");
 				if (doCheck[1] && ((arguments[1] < 0) || (arguments[1] >= array.GetLength(1))))
-					throw new CodeEE("三次元配列" + varName + "の第２引数(" + arguments[1].ToString() + ")は配列の範囲外です");
+					throw new CodeEE("三次元配列" + varName + "の第２argument(" + arguments[1].ToString() + ")は配列の範囲外です");
 				if (doCheck[2] && ((arguments[2] < 0) || (arguments[2] >= array.GetLength(2))))
-					throw new CodeEE("三次元配列" + varName + "の第３引数(" + arguments[2].ToString() + ")は配列の範囲外です");
+					throw new CodeEE("三次元配列" + varName + "の第３argument(" + arguments[2].ToString() + ")は配列の範囲外です");
 			}
 			public override void IsArrayRangeValid(Int64[] arguments, Int64 index1, Int64 index2, string funcName, Int64 i1, Int64 i2)
 			{
 				CheckElement(arguments);
 				if ((index1 < 0) || (index1 > array.GetLength(2)))
-					throw new CodeEE(funcName + "命令の第" + i1.ToString() + "引数(" + index1.ToString() + ")は配列" + varName + "の範囲外です");
+					throw new CodeEE(funcName + "命令の第" + i1.ToString() + "argument(" + index1.ToString() + ")は配列" + varName + "の範囲外です");
 				if ((index2 < 0) || (index2 > array.GetLength(2)))
-					throw new CodeEE(funcName + "命令の第" + i2.ToString() + "引数(" + index2.ToString() + ")は配列" + varName + "の範囲外です");
+					throw new CodeEE(funcName + "命令の第" + i2.ToString() + "argument(" + index2.ToString() + ")は配列" + varName + "の範囲外です");
 			}
 		}
 
@@ -876,15 +876,15 @@ namespace MinorShift.Emuera.GameData.Variable
 			public override void CheckElement(Int64[] arguments, bool[] doCheck)
 			{
 				if (doCheck[0] && ((arguments[0] < 0) || (arguments[0] >= array.Length)))
-					throw new CodeEE("配列変数" + varName + "の第１引数(" + arguments[0].ToString() + ")は配列の範囲外です");
+					throw new CodeEE("配列変数" + varName + "の第１argument(" + arguments[0].ToString() + ")は配列の範囲外です");
 			}
 			public override void IsArrayRangeValid(Int64[] arguments, Int64 index1, Int64 index2, string funcName, Int64 i1, Int64 i2)
 			{
 				CheckElement(arguments);
 				if ((index1 < 0) || (index1 > array.Length))
-					throw new CodeEE(funcName + "命令の第" + i1.ToString() + "引数(" + index1.ToString() + ")は配列" + varName + "の範囲外です");
+					throw new CodeEE(funcName + "命令の第" + i1.ToString() + "argument(" + index1.ToString() + ")は配列" + varName + "の範囲外です");
 				if ((index2 < 0) || (index2 > array.Length))
-					throw new CodeEE(funcName + "命令の第" + i2.ToString() + "引数(" + index2.ToString() + ")は配列" + varName + "の範囲外です");
+					throw new CodeEE(funcName + "命令の第" + i2.ToString() + "argument(" + index2.ToString() + ")は配列" + varName + "の範囲外です");
 			}
 		}
 
@@ -936,17 +936,17 @@ namespace MinorShift.Emuera.GameData.Variable
 			public override void CheckElement(Int64[] arguments, bool[] doCheck)
 			{
 				if (doCheck[0] && ((arguments[0] < 0) || (arguments[0] >= array.GetLength(0))))
-					throw new CodeEE("二次元配列" + varName + "の第１引数(" + arguments[0].ToString() + ")は配列の範囲外です");
+					throw new CodeEE("二次元配列" + varName + "の第１argument(" + arguments[0].ToString() + ")は配列の範囲外です");
 				if (doCheck[1] && ((arguments[1] < 0) || (arguments[1] >= array.GetLength(1))))
-					throw new CodeEE("二次元配列" + varName + "の第２引数(" + arguments[1].ToString() + ")は配列の範囲外です");
+					throw new CodeEE("二次元配列" + varName + "の第２argument(" + arguments[1].ToString() + ")は配列の範囲外です");
 			}
 			public override void IsArrayRangeValid(Int64[] arguments, Int64 index1, Int64 index2, string funcName, Int64 i1, Int64 i2)
 			{
 				CheckElement(arguments);
 				if ((index1 < 0) || (index1 > array.GetLength(1)))
-					throw new CodeEE(funcName + "命令の第" + i1.ToString() + "引数(" + index1.ToString() + ")は配列" + varName + "の範囲外です");
+					throw new CodeEE(funcName + "命令の第" + i1.ToString() + "argument(" + index1.ToString() + ")は配列" + varName + "の範囲外です");
 				if ((index2 < 0) || (index2 > array.GetLength(1)))
-					throw new CodeEE(funcName + "命令の第" + i2.ToString() + "引数(" + index2.ToString() + ")は配列" + varName + "の範囲外です");
+					throw new CodeEE(funcName + "命令の第" + i2.ToString() + "argument(" + index2.ToString() + ")は配列" + varName + "の範囲外です");
 			}
 		}
 
@@ -1000,19 +1000,19 @@ namespace MinorShift.Emuera.GameData.Variable
 			public override void CheckElement(Int64[] arguments, bool[] doCheck)
 			{
 				if (doCheck[0] && ((arguments[0] < 0) || (arguments[0] >= array.GetLength(0))))
-					throw new CodeEE("三次元配列" + varName + "の第１引数(" + arguments[0].ToString() + ")は配列の範囲外です");
+					throw new CodeEE("三次元配列" + varName + "の第１argument(" + arguments[0].ToString() + ")は配列の範囲外です");
 				if (doCheck[1] && ((arguments[1] < 0) || (arguments[1] >= array.GetLength(1))))
-					throw new CodeEE("三次元配列" + varName + "の第２引数(" + arguments[1].ToString() + ")は配列の範囲外です");
+					throw new CodeEE("三次元配列" + varName + "の第２argument(" + arguments[1].ToString() + ")は配列の範囲外です");
 				if (doCheck[2] && ((arguments[2] < 0) || (arguments[2] >= array.GetLength(2))))
-					throw new CodeEE("三次元配列" + varName + "の第３引数(" + arguments[2].ToString() + ")は配列の範囲外です");
+					throw new CodeEE("三次元配列" + varName + "の第３argument(" + arguments[2].ToString() + ")は配列の範囲外です");
 			}
 			public override void IsArrayRangeValid(Int64[] arguments, Int64 index1, Int64 index2, string funcName, Int64 i1, Int64 i2)
 			{
 				CheckElement(arguments);
 				if ((index1 < 0) || (index1 > array.GetLength(2)))
-					throw new CodeEE(funcName + "命令の第" + i1.ToString() + "引数(" + index1.ToString() + ")は配列" + varName + "の範囲外です");
+					throw new CodeEE(funcName + "命令の第" + i1.ToString() + "argument(" + index1.ToString() + ")は配列" + varName + "の範囲外です");
 				if ((index2 < 0) || (index2 > array.GetLength(2)))
-					throw new CodeEE(funcName + "命令の第" + i2.ToString() + "引数(" + index2.ToString() + ")は配列" + varName + "の範囲外です");
+					throw new CodeEE(funcName + "命令の第" + i2.ToString() + "argument(" + index2.ToString() + ")は配列" + varName + "の範囲外です");
 			}
 		}
 
@@ -1362,15 +1362,15 @@ namespace MinorShift.Emuera.GameData.Variable
 			public override void CheckElement(Int64[] arguments, bool[] doCheck)
 			{
 				if (doCheck[0] && ((arguments[0] < 0) || (arguments[0] >= array.Length)))
-					throw new CodeEE("配列変数" + varName + "の第１引数(" + arguments[0].ToString() + ")は配列の範囲外です");
+					throw new CodeEE("配列変数" + varName + "の第１argument(" + arguments[0].ToString() + ")は配列の範囲外です");
 			}
 			public override void IsArrayRangeValid(Int64[] arguments, Int64 index1, Int64 index2, string funcName, Int64 i1, Int64 i2)
 			{
 				CheckElement(arguments);
 				if ((index1 < 0) || (index1 > array.Length))
-					throw new CodeEE(funcName + "命令の第" + i1.ToString() + "引数(" + index1.ToString() + ")は配列" + varName + "の範囲外です");
+					throw new CodeEE(funcName + "命令の第" + i1.ToString() + "argument(" + index1.ToString() + ")は配列" + varName + "の範囲外です");
 				if ((index2 < 0) || (index2 > array.Length))
-					throw new CodeEE(funcName + "命令の第" + i2.ToString() + "引数(" + index2.ToString() + ")は配列" + varName + "の範囲外です");
+					throw new CodeEE(funcName + "命令の第" + i2.ToString() + "argument(" + index2.ToString() + ")は配列" + varName + "の範囲外です");
 			}
 		}
 
@@ -1407,15 +1407,15 @@ namespace MinorShift.Emuera.GameData.Variable
 			public override void CheckElement(Int64[] arguments, bool[] doCheck)
 			{
 				if (doCheck[0] && ((arguments[0] < 0) || (arguments[0] >= array.Length)))
-					throw new CodeEE("配列変数" + varName + "の第１引数(" + arguments[0].ToString() + ")は配列の範囲外です");
+					throw new CodeEE("配列変数" + varName + "の第１argument(" + arguments[0].ToString() + ")は配列の範囲外です");
 			}
 			public override void IsArrayRangeValid(Int64[] arguments, Int64 index1, Int64 index2, string funcName, Int64 i1, Int64 i2)
 			{
 				CheckElement(arguments);
 				if ((index1 < 0) || (index1 > array.Length))
-					throw new CodeEE(funcName + "命令の第" + i1.ToString() + "引数(" + index1.ToString() + ")は配列" + varName + "の範囲外です");
+					throw new CodeEE(funcName + "命令の第" + i1.ToString() + "argument(" + index1.ToString() + ")は配列" + varName + "の範囲外です");
 				if ((index2 < 0) || (index2 > array.Length))
-					throw new CodeEE(funcName + "命令の第" + i2.ToString() + "引数(" + index2.ToString() + ")は配列" + varName + "の範囲外です");
+					throw new CodeEE(funcName + "命令の第" + i2.ToString() + "argument(" + index2.ToString() + ")は配列" + varName + "の範囲外です");
 			}
 		}
 
@@ -1458,7 +1458,7 @@ namespace MinorShift.Emuera.GameData.Variable
 			{
 				Int64 i = arguments[0];
 				if (i <= 0)
-					throw new CodeEE("RANDの引数に0以下の値(" + i.ToString() + ")が指定されました");
+					throw new CodeEE("RANDのargumentに0以下の値(" + i.ToString() + ")が指定されました");
 				return exm.VEvaluator.GetNextRand(i);
 			}
 		}
@@ -1475,7 +1475,7 @@ namespace MinorShift.Emuera.GameData.Variable
 					return 0L;
 				else if (i < 0)
 					i = -i;
-				return exm.VEvaluator.GetNextRand(32768) % i;//0-32767の乱数を引数で除算した余り
+				return exm.VEvaluator.GetNextRand(32768) % i;//0-32767の乱数をargumentで除算した余り
 			}
 		}
 

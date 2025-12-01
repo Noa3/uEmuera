@@ -69,11 +69,11 @@ namespace MinorShift.Emuera.GameProc
 			if (ret.Name == null)
 				throw new CodeEE(keyword + "の後に有効な識別子が指定されていません", sc);
 			if (wc.EOL || wc.Current.Type != '(')
-				throw new CodeEE("識別子の後に引数定義がありません", sc);
+				throw new CodeEE("識別子の後にargument定義がありません", sc);
 			string errMes = "";
 			int errLevel = -1;
 			GlobalStatic.IdentifierDictionary.CheckUserLabelName(ref errMes, ref errLevel, true, ret.Name);
-			if (errLevel == 0)//関数と変数の両方からチェック エラーメッセージが微妙だがひとまず気にしない
+			if (errLevel == 0)//関数と変数の両方からチェック Errorメッセージが微妙だがひとまず気にしない
 				GlobalStatic.IdentifierDictionary.CheckUserVarName(ref errMes, ref errLevel, ret.Name);
 			if (errLevel >= 0)
 			{
@@ -100,7 +100,7 @@ namespace MinorShift.Emuera.GameProc
 						if (state == 4 || state == 5)
 						{
 							if ((int)(argType & UserDifinedFunctionDataArgType.__Dimention) == 0)
-								throw new CodeEE("REF引数は配列変数でなければなりません", sc);
+								throw new CodeEE("REFargumentは配列変数でなければなりません", sc);
 							//state = 2;
 							argList.Add(argType);
 							goto argend;
@@ -120,7 +120,7 @@ namespace MinorShift.Emuera.GameProc
 						{
 							state = 5;
 							argType++; if ((int)(argType & UserDifinedFunctionDataArgType.__Dimention) > 3)
-								throw new CodeEE("REF引数は4次元以上の配列にできません", sc);
+								throw new CodeEE("REFargumentは4次元以上の配列にできません", sc);
 							continue;
 						}
 						goto argerr;
@@ -133,7 +133,7 @@ namespace MinorShift.Emuera.GameProc
 						if (state == 4 || state == 5)
 						{
 							if ((int)(argType & UserDifinedFunctionDataArgType.__Dimention) == 0)
-								throw new CodeEE("REF引数は配列変数でなければなりません", sc);
+								throw new CodeEE("REFargumentは配列変数でなければなりません", sc);
 							state = 2;
 							argList.Add(argType);
 							continue;
@@ -189,8 +189,8 @@ namespace MinorShift.Emuera.GameProc
 			return ret;
 		argerr:
 			if (!wc.EOL)
-				throw new CodeEE("引数の解析中に予期しないトークン" + wc.Current.ToString() + "を発見しました", sc);
-			throw new CodeEE("引数の解析中にエラーが発生しました", sc);
+				throw new CodeEE("argumentの解析中に予期しないトークン" + wc.Current.ToString() + "を発見しました", sc);
+			throw new CodeEE("argumentの解析中にErrorが発生しました", sc);
 		}
 
 	}

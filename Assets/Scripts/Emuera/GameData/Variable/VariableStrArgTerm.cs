@@ -8,7 +8,7 @@ using MinorShift.Emuera.GameData.Expression;
 namespace MinorShift.Emuera.GameData.Variable
 {
 	
-	//変数の引数のうち文字列型のもの。
+	//変数のargumentのうち文字列型のもの。
 	internal sealed class VariableStrArgTerm : IOperandTerm
 	{
 		public VariableStrArgTerm(VariableCode code, IOperandTerm strTerm, int index)

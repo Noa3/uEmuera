@@ -570,7 +570,7 @@ namespace MinorShift.Emuera
 		{
 			if (Config.ICFunction)
 				codeStr = codeStr.ToUpper();
-			if (arguments == null)//引数なし、名前のみの探索
+			if (arguments == null)//argumentなし、名前のみの探索
 			{
                 UserDefinedRefMethod ref_method = null;
 				if (refmethodDic.TryGetValue(codeStr, out ref_method))
@@ -631,7 +631,7 @@ namespace MinorShift.Emuera
 				switch (type)
 				{
 					case DefinedNameType.Reserved:
-						throw new CodeEE("Emueraの予約語\"" + str + "\"が不正な使われ方をしています");
+						throw new CodeEE("Emueraの予約語\"" + str + "\"がInvalid 使われ方をしています");
 					case DefinedNameType.SystemVariable:
 					case DefinedNameType.UserGlobalVariable:
 						if (isFunc)

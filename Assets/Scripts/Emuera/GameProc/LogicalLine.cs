@@ -190,7 +190,7 @@ namespace MinorShift.Emuera.GameProc
 	internal sealed class NullLine : LogicalLine { }
 	
 	/// <summary>
-	/// ラベルがエラーになっている関数行専用のクラス
+	/// ラベルがErrorになっている関数行専用のクラス
 	/// </summary>
 	internal sealed class InvalidLabelLine : FunctionLabelLine
 	{
@@ -301,7 +301,7 @@ namespace MinorShift.Emuera.GameProc
 		}
 
 		/// <summary>
-		/// 引数の値の確定後、引数の代入より前に呼ぶこと
+		/// argumentの値の確定後、argumentの代入より前に呼ぶこと
 		/// </summary>
 		internal void In()
 		{
