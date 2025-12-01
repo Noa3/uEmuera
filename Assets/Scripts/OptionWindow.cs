@@ -4,6 +4,9 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
+/// <summary>
+/// Manages the option window UI including menus, buttons, and settings dialogs.
+/// </summary>
 public class OptionWindow : MonoBehaviour
 {
 	// Use this for initialization
@@ -469,24 +472,91 @@ public class OptionWindow : MonoBehaviour
         EmueraContent.instance.SetIntentBox(0, 0);
     }
 
+    #region UI References
+    
+    /// <summary>
+    /// Container for game-related buttons.
+    /// </summary>
+    [Header("Game Buttons")]
+    [Tooltip("Container for game-related buttons")]
     public GameObject game_button;
+    
+    /// <summary>
+    /// Button to toggle quick buttons panel.
+    /// </summary>
+    [Tooltip("Button to toggle quick buttons panel")]
     public Button quick_button;
+    
+    /// <summary>
+    /// Button to toggle input pad.
+    /// </summary>
+    [Tooltip("Button to toggle input pad")]
     public Button input_button;
+    
+    /// <summary>
+    /// Button to toggle scale/magnifier pad.
+    /// </summary>
+    [Tooltip("Button to toggle scale/magnifier pad")]
     public Button magnifier_button;
+    
+    /// <summary>
+    /// Button to show options menu.
+    /// </summary>
+    [Tooltip("Button to show options menu")]
     public Button option_button;
 
+    /// <summary>
+    /// Button to toggle screen orientation lock.
+    /// </summary>
+    [Header("Orientation")]
+    [Tooltip("Button to toggle screen orientation lock")]
     public Button orientation_lock_button;
     Image orientation_lock_image;
+    
+    /// <summary>
+    /// Sprite shown when orientation is locked.
+    /// </summary>
+    [Tooltip("Sprite shown when orientation is locked")]
     public Sprite lock_sprite;
+    
+    /// <summary>
+    /// Sprite shown when orientation is unlocked.
+    /// </summary>
+    [Tooltip("Sprite shown when orientation is unlocked")]
     public Sprite unlock_sprite;
 
+    /// <summary>
+    /// Loading/progress indicator.
+    /// </summary>
+    [Header("Progress")]
+    [Tooltip("Loading/progress indicator")]
     public GameObject inprogress;
     List<Shadow> button_shadows;
 
+    /// <summary>
+    /// Quick buttons panel component.
+    /// </summary>
+    [Header("Panels")]
+    [Tooltip("Quick buttons panel component")]
     public QuickButtons quick_buttons;
+    
+    /// <summary>
+    /// Input pad panel component.
+    /// </summary>
+    [Tooltip("Input pad panel component")]
     public Inputpad input_pad;
+    
+    /// <summary>
+    /// Scale pad panel component.
+    /// </summary>
+    [Tooltip("Scale pad panel component")]
     public Scalepad scale_pad;
 
+    /// <summary>
+    /// Message box container.
+    /// </summary>
+    [Header("Message Box")]
+    [Tooltip("Message box container")]
     public GameObject msg_box;
     public Text msg_title;
     public Text msg_content;
@@ -495,6 +565,7 @@ public class OptionWindow : MonoBehaviour
     System.Action msg_confirm_callback;
     System.Action msg_cancel_callback;
 
+    [Header("Menu 1")]
     public GameObject menu_pad;
     public GameObject menu_1;
     public GameObject menu_1_resolution;
@@ -502,6 +573,7 @@ public class OptionWindow : MonoBehaviour
     public GameObject menu_1_github;
     public GameObject menu_1_exit;
 
+    [Header("Menu 2")]
     public GameObject menu_2;
     public GameObject menu_2_back;
     public GameObject menu_2_restart;
@@ -510,6 +582,7 @@ public class OptionWindow : MonoBehaviour
     public GameObject menu_2_intent;
     public GameObject menu_2_exit;
 
+    [Header("Resolution Settings")]
     public GameObject resolution_pad;
     public GameObject resolution_1080p;
     public GameObject resolution_1080p_icon;
@@ -520,11 +593,13 @@ public class OptionWindow : MonoBehaviour
     public GameObject resolution_540p;
     public GameObject resolution_540p_icon;
 
+    [Header("Language Settings")]
     public GameObject language_box;
     public GameObject language_zhcn;
     public GameObject language_jp;
     public GameObject language_enus;
 
+    [Header("Intent Box")]
     public GameObject intentbox;
     public GameObject intentbox_L_left;
     public GameObject intentbox_L_right;
@@ -534,7 +609,12 @@ public class OptionWindow : MonoBehaviour
     public GameObject intentbox_reset;
     public Text intentbox_L_text;
     public Text intentbox_R_text;
+    
+    #endregion
 
+    /// <summary>
+    /// Gets whether auto-rotation is enabled.
+    /// </summary>
     bool auto_rotation
     {
         get

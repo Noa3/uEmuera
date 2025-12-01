@@ -5,14 +5,27 @@ using UnityEngine;
 using UnityEngine.UI;
 using MinorShift._Library;
 
+/// <summary>
+/// First window displayed on application startup.
+/// Shows a list of available ERA games to select from.
+/// </summary>
 public class FirstWindow : MonoBehaviour
 {
+    /// <summary>
+    /// Shows the first window by loading it from resources.
+    /// </summary>
     public static void Show()
     {
         var obj = Resources.Load<GameObject>("Prefab/FirstWindow");
         obj = GameObject.Instantiate(obj);
         obj.name = "FirstWindow";
     }
+    
+    /// <summary>
+    /// Runs the selected ERA game.
+    /// </summary>
+    /// <param name="workspace">The workspace directory path.</param>
+    /// <param name="era">The ERA game folder name.</param>
     static System.Collections.IEnumerator Run(string workspace, string era)
     {
         var async = Resources.UnloadUnusedAssets();
@@ -82,6 +95,11 @@ public class FirstWindow : MonoBehaviour
         ow.ShowMenu();
     }
 
+    /// <summary>
+    /// Adds a game item to the list.
+    /// </summary>
+    /// <param name="folder">The folder name.</param>
+    /// <param name="workspace">The workspace path.</param>
     void AddItem(string folder, string workspace)
     {
         var rrt = item_.transform as UnityEngine.RectTransform;
@@ -96,7 +114,7 @@ public class FirstWindow : MonoBehaviour
             scroll_rect_ = null;
             item_ = null;
             GameObject.Destroy(gameObject);
-            //Start Game
+            // Start Game
             GenericUtils.StartCoroutine(Run(workspace, folder));
         });
 
@@ -120,6 +138,10 @@ public class FirstWindow : MonoBehaviour
         obj.SetActive(true);
     }
 
+    /// <summary>
+    /// Gets the list of ERA games from a workspace directory.
+    /// </summary>
+    /// <param name="workspace">The workspace path to scan.</param>
     void GetList(string workspace)
     {
         workspace = uEmuera.Utils.NormalizePath(workspace);
@@ -139,7 +161,12 @@ public class FirstWindow : MonoBehaviour
         { }
     }
 
+    /// <summary>
+    /// Title bar text component.
+    /// </summary>
+    [Tooltip("Title bar text component")]
     public Text titlebar = null;
+    
     ScrollRect scroll_rect_ = null;
     GameObject item_ = null;
     GameObject setting_ = null;
