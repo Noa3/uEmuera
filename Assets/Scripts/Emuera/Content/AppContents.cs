@@ -86,7 +86,7 @@ namespace MinorShift.Emuera.Content
 				return true;
 			try
 			{
-				//resourcesフォルダ内の全てのcsvファイルを探索する
+				//Search all csv files in the resources folder
 				List<string> csvFiles = new List<string>(Directory.GetFiles(Program.ContentDir, "*.csv", SearchOption.TopDirectoryOnly));
 #if(UNITY_ANDROID || UNITY_IOS) && !UNITY_EDITOR
                 csvFiles.AddRange(Directory.GetFiles(Program.ContentDir, "*.CSV", SearchOption.TopDirectoryOnly));
@@ -122,7 +122,7 @@ namespace MinorShift.Emuera.Content
 								imageDictionary.Add(item.Name, item);
 							else
 							{
-								ParserMediator.Warn("同名のリソースがすでに作成されています:"+item.Name, sp, 0);
+								ParserMediator.Warn("A resource with the same name has already been created:" + item.Name, sp, 0);
 								item.Dispose();
 							}
 						}
@@ -132,7 +132,7 @@ namespace MinorShift.Emuera.Content
 			catch(Exception )
 			{
 				return false;
-				//throw new CodeEE("リソースファイルのロード中にエラーが発生しました");
+				//throw new CodeEE("An error occurred while loading the resource file");
 			}
 			return true;
 		}
@@ -149,7 +149,7 @@ namespace MinorShift.Emuera.Content
 			gList.Clear();
 		}
 
-		//タイトルに戻る時用（コードの変更はないので、動的に作られた分だけ削除）
+		//For returning to title (no code changes, only delete dynamically created items)
 		static public void UnloadGraphicList()
 		{
 			foreach (var graph in gList.Values)
@@ -158,7 +158,7 @@ namespace MinorShift.Emuera.Content
 		}
 
 		/// <summary>
-		/// resourcesフォルダ中のcsvの1行を読んで新しいリソースを作る(or既存のアニメーションスプライトに1フレーム追加する)
+		/// Reads a line from csv in resources folder and creates a new resource (or adds a frame to existing animation sprite)
 		/// </summary>
 		/// <param name="tokens"></param>
 		/// <param name="dir"></param>
@@ -170,15 +170,15 @@ namespace MinorShift.Emuera.Content
 			if(tokens.Length < 2)
 				return null;
 			string name = tokens[0].Trim().ToUpper();//
-			string arg2 = tokens[1].ToUpper();//画像ファイル名
+		string arg2 = tokens[1].ToUpper();//Image file name
 			if (name.Length == 0 || arg2.Length == 0)
 				return null;
-			//アニメーションスプライト宣言
+			//Animation sprite declaration
 			if (arg2 == "ANIME")
 			{
 				if (tokens.Length < 4)
 				{
-					ParserMediator.Warn("アニメーションスプライトのサイズが宣言されていません", sp, 1);
+					ParserMediator.Warn("Animation sprite size has not been declared", sp, 1);
 					return null;
 				}
 				//w,h
@@ -188,50 +188,50 @@ namespace MinorShift.Emuera.Content
 					sccs &= int.TryParse(tokens[i + 2], out sizeValue[i]);
 				if (!sccs || sizeValue[0] <= 0 || sizeValue[1] <= 0 || sizeValue[0] > AbstractImage.MAX_IMAGESIZE || sizeValue[1] > AbstractImage.MAX_IMAGESIZE)
 				{
-					ParserMediator.Warn("アニメーションスプライトのサイズの指定が適切ではありません", sp, 1);
+					ParserMediator.Warn("Animation sprite size specification is not appropriate", sp, 1);
 					return null;
 				}
 				SpriteAnime anime = new SpriteAnime(name, new Size(sizeValue[0],sizeValue[1]));
 
 				return anime;
 			}
-			//アニメ宣言以外（アニメ用フレーム含む
+			//Other than animation declaration (including animation frames)
 
 			if(arg2.IndexOf('.') < 0)
 			{
-				ParserMediator.Warn("第二引数に拡張子がありません:" + arg2, sp, 1);
+				ParserMediator.Warn("Second argument has no file extension:" + arg2, sp, 1);
 				return null;
 			}
 			string parentName = dir + arg2;
 
-			//親画像のロードConstImage
+			//Load parent image ConstImage
 			if (!resourceDic.ContainsKey(parentName))
 			{
 				string filepath = parentName;
 				if (!File.Exists(filepath))
 				{
-					ParserMediator.Warn("指定された画像ファイルが見つかりませんでした:" + arg2, sp, 1);
+					ParserMediator.Warn("Specified image file was not found:" + arg2, sp, 1);
 					return null;
 				}
 				Bitmap bmp = new Bitmap(filepath);
 				if (bmp == null)
 				{
-					ParserMediator.Warn("指定されたファイルの読み込みに失敗しました:" + arg2, sp, 1);
+					ParserMediator.Warn("Failed to load the specified file:" + arg2, sp, 1);
 					return null;
 				}
                 bmp.name = name;
 				if (bmp.Width > AbstractImage.MAX_IMAGESIZE || bmp.Height > AbstractImage.MAX_IMAGESIZE)
 				{
-					//1824-2 すでに8192以上の幅を持つ画像を利用したバリアントが存在してしまっていたため、警告しつつ許容するように変更
+					//1824-2 Variants using images with width over 8192 already existed, so changed to warn but allow
 					//	bmp.Dispose();
-					ParserMediator.Warn("指定された画像ファイルの大きさが大きすぎます(幅及び高さを"+ AbstractImage.MAX_IMAGESIZE.ToString()+ "以下にすることを強く推奨します):" + arg2, sp, 1);
+					ParserMediator.Warn("Specified image file is too large (strongly recommended to keep width and height to " + AbstractImage.MAX_IMAGESIZE.ToString() + " or less):" + arg2, sp, 1);
 					//return null;
 				}
 				ConstImage img = new ConstImage(parentName);
 				img.CreateFrom(bmp, Config.TextDrawingMode == TextDrawingMode.WINAPI);
 				if (!img.IsCreated)
 				{
-					ParserMediator.Warn("画像リソースの作成に失敗しました:" + arg2, sp, 1);
+					ParserMediator.Warn("Failed to create image resource:" + arg2, sp, 1);
 					return null;
 				}
 				resourceDic.Add(parentName, img);
@@ -239,7 +239,7 @@ namespace MinorShift.Emuera.Content
 			ConstImage parentImage = resourceDic[parentName] as ConstImage;
 			if (parentImage == null || !parentImage.IsCreated)
 			{
-				ParserMediator.Warn("作成に失敗したリソースを元にスプライトを作成しようとしました:" + arg2, sp, 1);
+				ParserMediator.Warn("Attempted to create sprite from a resource that failed to create:" + arg2, sp, 1);
 				return null;
 			}
 			Rectangle rect = new Rectangle(new Point(0, 0), parentImage.Bitmap.Size);
@@ -259,13 +259,13 @@ namespace MinorShift.Emuera.Content
 
                     if (rect.Width <= 0 || rect.Height <= 0)
 					{
-						ParserMediator.Warn("スプライトの高さ又は幅には正の値のみ指定できます:" + name, sp, 1);
+						ParserMediator.Warn("Sprite height or width can only be specified as positive values:" + name, sp, 1);
 						return null;
 					}
-                    //uEmuera在此时尚未获取图片尺寸
+                    //uEmuera has not yet obtained image size at this point
 					//if (!rect.IntersectsWith(new Rectangle(0,0,parentImage.Bitmap.Width, parentImage.Bitmap.Height)))
 					//{
-					//	ParserMediator.Warn("親画像の範囲外を参照しています:" + name, sp, 1);
+					//	ParserMediator.Warn("Referencing outside the parent image bounds:" + name, sp, 1);
 					//	return null;
 					//}
 				}
@@ -281,24 +281,24 @@ namespace MinorShift.Emuera.Content
 						sccs = int.TryParse(tokens[8], out delay);
 						if (sccs && delay <= 0)
 						{
-							ParserMediator.Warn("フレーム表示時間には正の値のみ指定できます:" + name, sp, 1);
+							ParserMediator.Warn("Frame display time can only be specified as positive values:" + name, sp, 1);
 							return null;
 						}
 					}
 				}
 			}
-			//既存のスプライトに対するフレーム追加
+			//Add frame to existing sprite
 			if (currentAnime != null && currentAnime.Name == name)
 			{
 				if(!currentAnime.AddFrame(parentImage, rect, pos, delay))
 				{
-					ParserMediator.Warn("アニメーションスプライトのフレームの追加に失敗しました:" + arg2, sp, 1);
+					ParserMediator.Warn("Failed to add frame to animation sprite:" + arg2, sp, 1);
 					return null;
 				}
 				return null;
 			}
 
-			//新規スプライト定義
+			//New sprite definition
 			ASprite image = new SpriteF(name, parentImage, rect, pos);
 			return image;
 		}

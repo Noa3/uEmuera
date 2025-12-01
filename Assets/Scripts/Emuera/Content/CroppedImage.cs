@@ -29,12 +29,12 @@ namespace MinorShift.Emuera.Content
 		public abstract Color SpriteGetColor(int x, int y);
         public abstract Bitmap Bitmap { get; }
         /// <summary>
-        /// 出力される標準のサイズ。正の値のみ。
+        /// Standard output size. Positive values only.
         /// </summary>
         public readonly Size DestBaseSize;
 
 		/// <summary>
-		/// 出力時の位置調整。拡大縮小して出力する場合には同じ比率で調整する。
+		/// Position adjustment for output. When scaling output, adjust at the same ratio.
 		/// </summary>
 		public Point DestBasePosition;
 
@@ -63,7 +63,7 @@ namespace MinorShift.Emuera.Content
 		public AbstractImage BaseImage;
 
 		/// <summary>
-		/// ソース画像上の位置を指定する四角形。Width, Heightは負の値をとり得る
+		/// Rectangle specifying position on source image. Width and Height can be negative values.
 		/// </summary>
 		public readonly Rectangle SrcRectangle;
 		public override Bitmap Bitmap
@@ -120,14 +120,14 @@ namespace MinorShift.Emuera.Content
 				destRect.X = destRect.X + DestBasePosition.X * destRect.Width / SrcRectangle.Width;
 				destRect.Y = destRect.Y + DestBasePosition.Y * destRect.Height / SrcRectangle.Height;
 			}
-			//g.DrawImage(Bitmap, destRect, SrcRectangle, GraphicsUnit.Pixel, attr);←このパターンがない
+			//g.DrawImage(Bitmap, destRect, SrcRectangle, GraphicsUnit.Pixel, attr); -- This overload does not exist
 			g.DrawImage(Bitmap, destRect, SrcRectangle.X, SrcRectangle.Y, SrcRectangle.Width, SrcRectangle.Height, GraphicsUnit.Pixel, attr);
 		}
 
 	}
 
 	/// <summary>
-	/// ERB中で作るGを元にしたSprite。GDI非対応
+	/// Sprite based on G created in ERB. GDI not supported.
 	/// </summary>
 	internal sealed class SpriteG : ASpriteSingle
 	{
@@ -139,7 +139,7 @@ namespace MinorShift.Emuera.Content
 	}
 
 	/// <summary>
-	/// ConstImage(csvから作るファイル占有型ベースイメージ)をもとにしたSprite
+	/// Sprite based on ConstImage (file-exclusive base image created from CSV)
 	/// </summary>
 	internal sealed class SpriteF : ASpriteSingle
 	{
@@ -151,7 +151,7 @@ namespace MinorShift.Emuera.Content
 	}
 
 	/// <summary>
-	/// AnimeするSprite。中身はほぼSprite
+	/// Animated Sprite. Contents are mostly the same as Sprite.
 	/// </summary>
 	internal sealed class SpriteAnime : ASprite
 	{
@@ -206,7 +206,7 @@ namespace MinorShift.Emuera.Content
 		}
 		
 		/// <summary>
-		/// アニメの経過時間を削除して最初からやり直す
+		/// Clears animation elapsed time and restarts from the beginning
 		/// </summary>
 		internal void ResetTime()
 		{
@@ -216,7 +216,7 @@ namespace MinorShift.Emuera.Content
 		}
 
 		/// <summary>
-		/// 開始時間調整用の値。ミリ秒でUInt32の範囲まで想定。
+		/// Value for adjusting start time. Assumes up to UInt32 range in milliseconds.
 		/// </summary>
 		Int64 StartTime = -1;
 		uint lastFrameTime = 0;
@@ -227,23 +227,23 @@ namespace MinorShift.Emuera.Content
 				return null;
 #if DEBUG
 			if (FrameList.Count == 0)
-				throw new ExeEE("totaltime > 0なのにFrameListが空");
+				throw new ExeEE("FrameList is empty even though totaltime > 0");
 			if (lastFrame >= FrameList.Count)
-				throw new ExeEE("SpriteAnime:最終フレームが範囲外");
+				throw new ExeEE("SpriteAnime: last frame is out of range");
 #endif
-			//一度もフレーム取得したことがない場合は現在時間を記録して最初のフレームを返す。
+			//If no frame has been retrieved before, record current time and return first frame.
 			if (StartTime < 0)
 			{
 				StartTime = MinorShift._Library.WinmmTimer.CurrentFrameTime;
 				lastFrame = 0;
 				return FrameList[0];
 			}
-			//時間経過なしに複数回呼ばれた場合はさっき返したフレームをもう一度返す。
+			//If called multiple times without time elapsing, return the same frame as last time.
 			if (MinorShift._Library.WinmmTimer.CurrentFrameTime == lastFrameTime && lastFrame >= 0)
 				return FrameList[lastFrame];
-			//StartTimeからの経過時間をtotaltimeで剰余計算
+			//Calculate elapsed time from StartTime using modulo with totaltime
 			Int64 time = (MinorShift._Library.WinmmTimer.CurrentFrameTime - StartTime) % totaltime;
-			//winmmtimerは一周して0になることがあり得るのでその場合の対策。C#の剰余の結果の符号は左辺値の符号に等しい。
+			//winmmtimer can wrap around to 0, so this handles that case. In C#, the sign of the modulo result equals the sign of the left operand.
 			if (time < 0)
 				time += totaltime;
 			foreach(AnimeFrame frame in FrameList)
@@ -255,8 +255,8 @@ namespace MinorShift.Emuera.Content
 					return frame;
 				}
 			}
-			//ここまでこないはず
-			throw new ExeEE("SpriteAnime:時間外参照");
+			//Should not reach here
+			throw new ExeEE("SpriteAnime: out of time range reference");
 		}
 
 		public override bool IsCreated
@@ -332,7 +332,7 @@ namespace MinorShift.Emuera.Content
 			destRect.Y = destRect.Y + (DestBasePosition.Y + frame.Offset.Y) * destRect.Height / DestBaseSize.Height;
 			destRect.Width = frame.SrcRectangle.Width * destRect.Width / DestBaseSize.Width;
 			destRect.Height = frame.SrcRectangle.Height * destRect.Height / DestBaseSize.Height;
-			//g.DrawImage(frame.BaseImage.Bitmap, destRect, SrcRectangle, GraphicsUnit.Pixel, attr);←このパターンがない
+			//g.DrawImage(frame.BaseImage.Bitmap, destRect, SrcRectangle, GraphicsUnit.Pixel, attr); -- This overload does not exist
 			g.DrawImage(frame.BaseImage.Bitmap, destRect, frame.SrcRectangle.X, frame.SrcRectangle.Y, frame.SrcRectangle.Width, frame.SrcRectangle.Height, GraphicsUnit.Pixel, attr);
 		}
 

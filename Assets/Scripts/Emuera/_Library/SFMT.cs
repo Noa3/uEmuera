@@ -1,12 +1,10 @@
 ﻿/*
-このファイルはSFMTアルゴリズムによって擬似乱数を作成するためのクラスライブラリです。
-このファイルはRei HOBARAさんが
+This file is a class library for generating pseudo-random numbers using the SFMT algorithm.
+This file is a modified version of the C# SFMT library published by Rei HOBARA at:
 http://www.rei.to/random.html
-において公開しているC#向けのSFMTライブラリを改変したものです。
 
-さらに大元のSFMTアルゴリズムについては
+For more information about the original SFMT algorithm, please refer to:
 http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/SFMT/
-を参照してください。
 
 2009/7/2 MinorShift
 */
@@ -35,17 +33,17 @@ using System;
 namespace MinorShift._Library{
 
     /// <summary>
-    /// SFMTの擬似乱数ジェネレータークラス。
+    /// SFMT pseudo-random number generator class.
     /// </summary>
     public sealed class MTRandom {
 
         /// <summary>
-        /// 現在時刻を種とした、(2^19937-1)周期のSFMT擬似乱数ジェネレーターを初期化します。
+        /// Initializes an SFMT pseudo-random number generator with (2^19937-1) period using the current time as seed.
         /// </summary>
         public MTRandom() : this(Environment.TickCount) { }
 
         /// <summary>
-        /// seedを種とした、(2^MEXP-1)周期の擬似乱数ジェネレーターを初期化します。
+        /// Initializes a pseudo-random number generator with (2^MEXP-1) period using seed as the seed value.
         /// </summary>
 		public MTRandom(Int64 seed)
         {
@@ -56,7 +54,7 @@ namespace MinorShift._Library{
         }
         
         
-        //maxが2^nでない大きい値であると値が偏る。
+        //Values may be biased if max is a large value that is not 2^n.
         public Int64 NextInt64(Int64 max)
         {
 			if(max <= 0)
@@ -77,7 +75,7 @@ namespace MinorShift._Library{
 		}
         
         /// <summary>
-		/// [0,1) 範囲で乱数生成 ←0は含む,1は含まないの意味
+		/// Generates a random number in the range [0,1) (0 is included, 1 is excluded)
 		/// </summary>
 		/// <returns></returns>
 		public double NextDouble()
@@ -269,16 +267,16 @@ namespace MinorShift._Library{
         private const int SR2_ix8 = 64 - SR2 * 8;
         
         /// <summary>
-        /// 内部状態ベクトル。
+        /// Internal state vector.
         /// </summary>
         private UInt32[] sfmt;
         /// <summary>
-        /// 内部状態ベクトルのうち、次に乱数として使用するインデックス。
+        /// Index of the next random number to be used from the internal state vector.
         /// </summary>
 		private int idx;
         
         /// <summary>
-        /// 符号なし32bitの擬似乱数を取得します。
+        /// Gets an unsigned 32-bit pseudo-random number.
         /// </summary>
 		private UInt32 NextUInt32()
 		{
@@ -290,26 +288,26 @@ namespace MinorShift._Library{
         }
 
         /// <summary>
-        /// ジェネレーターを初期化します。
+        /// Initializes the generator.
         /// </summary>
         /// <param name="seed"></param>
 		private void init_gen_rand(UInt32 seed)
 		{
             int i;
-            //内部状態配列確保
+            //Allocate internal state array
             sfmt = new UInt32[N32];
-            //内部状態配列初期化
+            //Initialize internal state array
             sfmt[0] = seed;
             for (i = 1; i < N32; i++)
                 sfmt[i] = (UInt32)(1812433253 * (sfmt[i - 1] ^ (sfmt[i - 1] >> 30)) + i);
-            //確認
+            //Verify
             period_certification();
-            //初期位置設定
+            //Set initial position
             idx = N32;
         }
 
         /// <summary>
-        /// 内部状態ベクトルが適切か確認し、必要であれば調節します。
+        /// Verifies if the internal state vector is appropriate and adjusts if necessary.
         /// </summary>
 		private void period_certification()
 		{
@@ -337,7 +335,7 @@ namespace MinorShift._Library{
         }
 
         /// <summary>
-        /// 内部状態ベクトルを更新します。
+        /// Updates the internal state vector.
         /// </summary>
 		private void gen_rand_all()
 		{
@@ -375,7 +373,7 @@ namespace MinorShift._Library{
 		}
 
         /// <summary>
-        /// gen_rand_allの(2^19937-1)周期用。
+        /// gen_rand_all for (2^19937-1) period.
         /// </summary>
 		private void gen_rand_all_19937()
 		{
