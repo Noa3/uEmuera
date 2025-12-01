@@ -363,11 +363,13 @@ namespace MinorShift.Emuera.GameProc.Function
 		TRYCALLF,//TRY pattern for CALLF
 		TRYCALLFORMF,//TRY pattern for CALLFORMF
 
-		// Sound commands (stubs for compatibility)
+		// Sound commands
 		PLAYSOUND,//サウンドファイルを再生
 		STOPSOUND,//サウンド再生を停止
 		PLAYBGM,//BGMを再生
 		STOPBGM,//BGM再生を停止
+		SETSOUNDVOLUME,//効果音の音量を設定
+		SETBGMVOLUME,//BGMの音量を設定
 
 		// Extended graphics commands
 		GDRAWTEXT,//テキストを描画

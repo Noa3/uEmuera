@@ -1793,7 +1793,7 @@ namespace MinorShift.Emuera.GameProc.Function
 			}
 		}
 
-		// Emuera EM/EE Extensions - Sound commands (stubs for compatibility)
+		// Emuera EM/EE Extensions - Sound commands
 		private sealed class PLAYSOUND_Instruction : AbstractInstruction
 		{
 			public PLAYSOUND_Instruction()
@@ -1804,14 +1804,13 @@ namespace MinorShift.Emuera.GameProc.Function
 
 			public override void DoInstruction(ExpressionMediator exm, InstructionLine func, ProcessState state)
 			{
-				// Stub implementation - sound not supported in Unity version
-				// Just consume the argument without error
 				string filename;
 				if (func.Argument.IsConst)
 					filename = func.Argument.ConstStr;
 				else
 					filename = ((ExpressionArgument)func.Argument).Term.GetStrValue(exm);
-				// No-op: sound not implemented in uEmuera
+				
+				Content.AudioManager.Instance.PlaySound(filename);
 			}
 		}
 
@@ -1825,8 +1824,7 @@ namespace MinorShift.Emuera.GameProc.Function
 
 			public override void DoInstruction(ExpressionMediator exm, InstructionLine func, ProcessState state)
 			{
-				// Stub implementation - sound not supported in Unity version
-				// No-op: sound not implemented in uEmuera
+				Content.AudioManager.Instance.StopSound();
 			}
 		}
 
@@ -1840,14 +1838,13 @@ namespace MinorShift.Emuera.GameProc.Function
 
 			public override void DoInstruction(ExpressionMediator exm, InstructionLine func, ProcessState state)
 			{
-				// Stub implementation - BGM not supported in Unity version
-				// Just consume the argument without error
 				string filename;
 				if (func.Argument.IsConst)
 					filename = func.Argument.ConstStr;
 				else
 					filename = ((ExpressionArgument)func.Argument).Term.GetStrValue(exm);
-				// No-op: BGM not implemented in uEmuera
+				
+				Content.AudioManager.Instance.PlayBGM(filename);
 			}
 		}
 
@@ -1861,8 +1858,39 @@ namespace MinorShift.Emuera.GameProc.Function
 
 			public override void DoInstruction(ExpressionMediator exm, InstructionLine func, ProcessState state)
 			{
-				// Stub implementation - BGM not supported in Unity version
-				// No-op: BGM not implemented in uEmuera
+				Content.AudioManager.Instance.StopBGM();
+			}
+		}
+
+		private sealed class SETSOUNDVOLUME_Instruction : AbstractInstruction
+		{
+			public SETSOUNDVOLUME_Instruction()
+			{
+				ArgBuilder = ArgumentParser.GetArgumentBuilder(FunctionArgType.INT_EXPRESSION);
+				flag = METHOD_SAFE | EXTENDED;
+			}
+
+			public override void DoInstruction(ExpressionMediator exm, InstructionLine func, ProcessState state)
+			{
+				ExpressionArgument arg = (ExpressionArgument)func.Argument;
+				int volume = (int)arg.Term.GetIntValue(exm);
+				Content.AudioManager.Instance.SetSoundVolume(volume);
+			}
+		}
+
+		private sealed class SETBGMVOLUME_Instruction : AbstractInstruction
+		{
+			public SETBGMVOLUME_Instruction()
+			{
+				ArgBuilder = ArgumentParser.GetArgumentBuilder(FunctionArgType.INT_EXPRESSION);
+				flag = METHOD_SAFE | EXTENDED;
+			}
+
+			public override void DoInstruction(ExpressionMediator exm, InstructionLine func, ProcessState state)
+			{
+				ExpressionArgument arg = (ExpressionArgument)func.Argument;
+				int volume = (int)arg.Term.GetIntValue(exm);
+				Content.AudioManager.Instance.SetBGMVolume(volume);
 			}
 		}
         #endregion

@@ -389,6 +389,8 @@ namespace MinorShift.Emuera.GameProc.Function
 			addFunction(FunctionCode.STOPSOUND, new STOPSOUND_Instruction());
 			addFunction(FunctionCode.PLAYBGM, new PLAYBGM_Instruction());
 			addFunction(FunctionCode.STOPBGM, new STOPBGM_Instruction());
+			addFunction(FunctionCode.SETSOUNDVOLUME, new SETSOUNDVOLUME_Instruction());
+			addFunction(FunctionCode.SETBGMVOLUME, new SETBGMVOLUME_Instruction());
 
 			#region 式中関数のargument違い
 			addFunction(FunctionCode.VARSIZE, argb[FunctionArgType.SP_VAR], METHOD_SAFE | EXTENDED);//動作が違うのでMETHOD化できない

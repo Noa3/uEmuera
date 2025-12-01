@@ -4369,8 +4369,8 @@ namespace MinorShift.Emuera.GameData.Function
 		}
 
 		/// <summary>
-		/// EXISTSOUND method - checks if a sound file exists (stub - always returns 0)
-		/// Returns: 0 (sound not supported in uEmuera)
+		/// EXISTSOUND method - checks if a sound file exists
+		/// Returns: 1 if file exists, 0 otherwise
 		/// </summary>
 		private sealed class ExistSoundMethod : FunctionMethod
 		{
@@ -4378,15 +4378,13 @@ namespace MinorShift.Emuera.GameData.Function
 			{
 				ReturnType = typeof(Int64);
 				argumentTypeArray = new Type[] { typeof(string) };
-				CanRestructure = true;
+				CanRestructure = false;
 			}
 
 			public override Int64 GetIntValue(ExpressionMediator exm, IOperandTerm[] arguments)
 			{
-				// Stub implementation - sound not supported in Unity version
-				// Just consume the argument and return 0 (file not found)
 				string filename = arguments[0].GetStrValue(exm);
-				return 0;
+				return MinorShift.Emuera.Content.AudioManager.Instance.ExistSound(filename);
 			}
 		}
 
