@@ -15,7 +15,7 @@ namespace MinorShift.Emuera.GameProc.Function
 	}
 
 	/// <summary>
-	/// 一般的な引数。複数の文字列式及び数式
+	/// 一般的なargument。複数の文字列式及び数式
 	/// </summary>
 	internal sealed class ExpressionsArgument : Argument
 	{
@@ -25,7 +25,7 @@ namespace MinorShift.Emuera.GameProc.Function
 			ArgumentArray = terms;
 		}
 		/// <summary>
-		/// 引数の型(ArgumentArrayよりもLengthが大きい可能性があるので見るのはArgumentArrayにすること)
+		/// argumentの型(ArgumentArrayよりもLengthが大きい可能性があるので見るのはArgumentArrayにすること)
 		/// </summary>
 		readonly public Type[] ArgumentTypeArray;
 		readonly public IOperandTerm[] ArgumentArray;
@@ -153,7 +153,7 @@ namespace MinorShift.Emuera.GameProc.Function
         readonly public IOperandTerm Timeout;
 	}
 
-	//難読化用属性。enum.ToString()やenum.Parse()を行うなら(Exclude=true)にすること。
+	//Obfuscation attribute. Set (Exclude=true) when using enum.ToString() or enum.Parse().
 	[global::System.Reflection.Obfuscation(Exclude = false)]
 	internal enum SortOrder
 	{

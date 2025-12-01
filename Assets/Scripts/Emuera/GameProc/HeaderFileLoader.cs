@@ -52,10 +52,10 @@ namespace MinorShift.Emuera.GameProc
 						break;
 					//System.Windows.Forms.//Application.DoEvents();
 				}
-				//エラーが起きてる場合でも読み込めてる分だけはチェックする
+				//Errorが起きてる場合でも読み込めてる分だけはチェックする
 				if (dimlines.Count > 0)
 				{
-					//&=でないと、ここで起きたエラーをキャッチできない
+					//&=でないと、ここで起きたErrorをキャッチできない
 					noError &= analyzeSharpDimLines();
 				}
 
@@ -170,7 +170,7 @@ namespace MinorShift.Emuera.GameProc
                 }
             }
             
-            bool hasArg = st.Current == '(';//引数を指定する場合には直後に(が続いていなければならない。ホワイトスペースも禁止。
+            bool hasArg = st.Current == '(';//argumentを指定する場合には直後に(が続いていなければならない。ホワイトスペースも禁止。
 			//1808a3 代入演算子許可（関数宣言用）
 			WordCollection wc = LexicalAnalyzer.Analyse(st, LexEndWith.EoL, LexAnalyzeFlag.AllowAssignment);
 			if (wc.EOL)
@@ -183,20 +183,20 @@ namespace MinorShift.Emuera.GameProc
 			}
 
 			List<string> argID = new List<string>();
-			if (hasArg)//関数型マクロの引数解析
+			if (hasArg)//関数型マクロのargument解析
 			{
 				wc.ShiftNext();//'('を読み飛ばす
 				if (wc.Current.Type == ')')
-					throw new CodeEE("関数型マクロの引数を0個にすることはできません", position);
+					throw new CodeEE("関数型マクロのargumentを0個にすることはできません", position);
 				while (!wc.EOL)
 				{
 					IdentifierWord word = wc.Current as IdentifierWord;
 					if (word == null)
-						throw new CodeEE("置換元の引数指定の書式が間違っています", position);
+						throw new CodeEE("置換元のargument指定の書式が間違っています", position);
 					word.SetIsMacro();
 					string id = word.Code;
 					if (argID.Contains(id))
-						throw new CodeEE("置換元の引数に同じ文字が2回以上使われています", position);
+						throw new CodeEE("置換元のargumentに同じ文字が2回以上使われています", position);
 					argID.Add(id);
 					wc.ShiftNext();
 					if (wc.Current.Type == ',')
@@ -206,7 +206,7 @@ namespace MinorShift.Emuera.GameProc
 					}
 					if (wc.Current.Type == ')')
 						break;
-					throw new CodeEE("置換元の引数指定の書式が間違っています", position);
+					throw new CodeEE("置換元のargument指定の書式が間違っています", position);
 				}
 				if (wc.EOL)
 					throw new CodeEE("')'が閉じられていません", position);
@@ -221,7 +221,7 @@ namespace MinorShift.Emuera.GameProc
 				destWc.Add(wc.Current);
 				wc.ShiftNext();
 			}
-			if (hasArg)//関数型マクロの引数セット
+			if (hasArg)//関数型マクロのargumentセット
 			{
 				while (!destWc.EOL)
 				{

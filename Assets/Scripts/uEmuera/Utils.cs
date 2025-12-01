@@ -4,41 +4,89 @@ using System.Collections.Generic;
 
 namespace uEmuera
 {
+    /// <summary>
+    /// Logging utility class.
+    /// </summary>
     public static class Logger
     {
+        /// <summary>
+        /// Logs an informational message.
+        /// </summary>
+        /// <param name="content">The content to log.</param>
         public static void Info(object content)
         {
             if(info == null)
                 return;
             info(content);
         }
+        
+        /// <summary>
+        /// Logs a warning message.
+        /// </summary>
+        /// <param name="content">The content to log.</param>
         public static void Warn(object content)
         {
             if(warn == null)
                 return;
             warn(content);
         }
+        
+        /// <summary>
+        /// Logs an error message.
+        /// </summary>
+        /// <param name="content">The content to log.</param>
         public static void Error(object content)
         {
             if(error == null)
                 return;
             error(content);
         }
+        
+        /// <summary>
+        /// Action delegate for info logging.
+        /// </summary>
         public static System.Action<object> info;
+        
+        /// <summary>
+        /// Action delegate for warning logging.
+        /// </summary>
         public static System.Action<object> warn;
+        
+        /// <summary>
+        /// Action delegate for error logging.
+        /// </summary>
         public static System.Action<object> error;
     }
 
+    /// <summary>
+    /// Utility class for Emuera operations.
+    /// </summary>
     public static class Utils
     {
+        /// <summary>
+        /// Sets the SHIFT-JIS to UTF-8 conversion dictionary.
+        /// </summary>
+        /// <param name="dict">The conversion dictionary.</param>
         public static void SetSHIFTJIS_to_UTF8Dict(Dictionary<string, string> dict)
         {
             shiftjis_to_utf8 = dict;
         }
+        
+        /// <summary>
+        /// Sets the UTF-8 Chinese to UTF-8 conversion dictionary.
+        /// </summary>
+        /// <param name="dict">The conversion dictionary.</param>
         public static void SetUTF8ZHCN_to_UTF8Dict(Dictionary<string, string> dict)
         {
             utf8zhcn_to_utf8 = dict;
         }
+        
+        /// <summary>
+        /// Converts SHIFT-JIS text to UTF-8 using the conversion dictionary.
+        /// </summary>
+        /// <param name="text">The text to convert.</param>
+        /// <param name="md5">The MD5 hash of the text.</param>
+        /// <returns>The converted text or null if not found.</returns>
         public static string SHIFTJIS_to_UTF8(string text, string md5)
         {
             if(shiftjis_to_utf8 == null)
@@ -53,10 +101,11 @@ namespace uEmuera
         static Dictionary<string, string> utf8zhcn_to_utf8;
 
         /// <summary>
-        /// 标准化目录
+        /// Normalizes a file path by splitting on directory separators,
+        /// removing empty segments, and joining with forward slashes.
         /// </summary>
-        /// <param name="path"></param>
-        /// <returns></returns>
+        /// <param name="path">The path to normalize.</param>
+        /// <returns>The normalized path with forward slashes.</returns>
         public static string NormalizePath(string path)
         {
             var ps = path.Split('/', '\\');
@@ -75,6 +124,11 @@ namespace uEmuera
             return "";
         }
 
+        /// <summary>
+        /// Gets the file extension from a filename.
+        /// </summary>
+        /// <param name="filename">The filename.</param>
+        /// <returns>The file extension.</returns>
         public static string GetSuffix(string filename)
         {
             int last_slash = filename.LastIndexOf('.');
@@ -82,25 +136,39 @@ namespace uEmuera
                 return filename.Substring(last_slash + 1);
             return filename;
         }
+        
         /// <summary>
-        /// 获取文本长
+        /// Gets the display length of a string.
         /// </summary>
-        /// <param name="s"></param>
-        /// <param name="font"></param>
-        /// <returns></returns>
+        /// <param name="s">The string to measure.</param>
+        /// <param name="font">The font to use for measurement.</param>
+        /// <returns>The display length in pixels.</returns>
         public static int GetDisplayLength(string s, uEmuera.Drawing.Font font)
         {
             return GetDisplayLength(s, font.Size);
         }
 
+        /// <summary>
+        /// Set of characters that are full-width.
+        /// </summary>
         public static readonly HashSet<char> fullsize = new HashSet<char>
         {
             '´',
         };
+        
+        /// <summary>
+        /// Checks if a character is full-width.
+        /// </summary>
+        /// <param name="c">The character to check.</param>
+        /// <returns>True if the character is full-width.</returns>
         public static bool CheckFullSize(char c)
         {
             return fullsize.Contains(c);
         }
+        
+        /// <summary>
+        /// Set of characters that are half-width.
+        /// </summary>
         public static readonly HashSet<char> halfsize = new HashSet<char>
         {
             '▀','▁','▂','▃','▄','▅',
@@ -112,16 +180,23 @@ namespace uEmuera
             '▤','▥','▦', '▧', '▨', '▩',
             '▪', '▫','~', '´', 'ﾄ', '｡', '･',
         };
+        
+        /// <summary>
+        /// Checks if a character is half-width.
+        /// </summary>
+        /// <param name="c">The character to check.</param>
+        /// <returns>True if the character is half-width.</returns>
         public static bool CheckHalfSize(char c)
         {
             return c < 0x127 || halfsize.Contains(c);
         }
+        
         /// <summary>
-        /// 获取文本长
+        /// Gets the display length of a string.
         /// </summary>
-        /// <param name="s"></param>
-        /// <param name="font"></param>
-        /// <returns></returns>
+        /// <param name="s">The string to measure.</param>
+        /// <param name="fontsize">The font size in pixels.</param>
+        /// <returns>The display length in pixels.</returns>
         public static int GetDisplayLength(string s, float fontsize)
         {
             float xsize = 0;

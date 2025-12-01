@@ -82,7 +82,7 @@ namespace MinorShift.Emuera.GameData
 		/// GAMEBASE読み込み。GAMEBASE.csvの存在は必須ではないので読み込み失敗したらなかったことにする。
 		/// </summary>
 		/// <param name="basePath"></param>
-		/// <returns>読み込み続行するなら真、エラー終了なら偽</returns>
+		/// <returns>読み込み続行するなら真、Error終了なら偽</returns>
 		public bool LoadGameBaseCsv(string basePath)
 		{
             if (!File.Exists(basePath))
@@ -163,7 +163,7 @@ namespace MinorShift.Emuera.GameData
 			}
 			catch
 			{
-                ParserMediator.Warn("GAMEBASE.CSVの読み込み中にエラーが発生したため、読みこみを中断します", pos, 1);
+                ParserMediator.Warn("GAMEBASE.CSVの読み込み中にErrorが発生したため、読みこみを中断します", pos, 1);
 				return true;
 			}
 			finally

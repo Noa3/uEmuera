@@ -15,7 +15,7 @@ namespace MinorShift.Emuera.Sub
 		Question,//三項演算子?により終了。\@～～?～～#～～\@
 		Percent,//%により終了。%～～%
 		RightCurlyBrace,//}により終了。{～～}
-		Comma,//,により終了。TIMES第一引数
+		Comma,//,により終了。TIMES第一argument
 		//Single,//Identifier一つで終了//1807 Single削除
 		GreaterThan,//'>'により終了。Htmlタグ解析
 	}
@@ -28,7 +28,7 @@ namespace MinorShift.Emuera.Sub
 		DoubleQuotation,//"で終了。@"～～"
 		Sharp,//#で終了。\@～～?～～#～～\@　の一つ目
 		YenAt,//\@で終了。\@～～?～～#～～\@　の二つ目
-		Comma,//,により終了。ANY_FORM引数
+		Comma,//,により終了。ANY_FORMargument
 		LeftParenthesis_Bracket_Comma_Semicolon,//[または(または,または;により終了。CALLFORM系の関数名部分。
 	}
 
@@ -46,8 +46,8 @@ namespace MinorShift.Emuera.Sub
 	enum LexAnalyzeFlag
 	{
 		None = 0,
-		AnalyzePrintV = 1,//PRINTVの引数で'に続けて文字列を書くと数式ではないが文字列として表示される
-		AllowAssignment = 2,//代入演算子が使用できる場面であるFlag。このFlagなしで=が途中に出てきたらエラー
+		AnalyzePrintV = 1,//PRINTVのargumentで'に続けて文字列を書くと数式ではないが文字列として表示される
+		AllowAssignment = 2,//代入演算子が使用できる場面であるFlag。このFlagなしで=が途中に出てきたらError
 		AllowSingleQuotationStr = 4,//HTML_PRINT解析用。''で囲まれた文字列を許可する。
 	}
 
@@ -261,15 +261,15 @@ namespace MinorShift.Emuera.Sub
 		}
 
 		/// <summary>
-		/// TIMES第二引数のみが使用する。
-		/// Convertクラスが発行する例外をそのまま投げるので適切に処理すること。
+		/// TIMES第二argumentのみが使用する。
+		/// Convertクラスが発行するExceptionをそのまま投げるので適切に処理すること。
 		/// </summary>
 		/// <param name="st"></param>
 		/// <returns></returns>
 		public static double ReadDouble(StringStream st)
 		{
 			int start = st.CurrentPosition;
-			//大雑把に読み込んでエラー処理はConvertクラスに任せる。
+			//大雑把に読み込んでError処理はConvertクラスに任せる。
 			//仮数小数部
 
 			if ((st.Current == '-') || (st.Current == '+'))
@@ -317,7 +317,7 @@ namespace MinorShift.Emuera.Sub
 			//int startpos = st.CurrentPosition;
 			string str = ReadSingleIdentifier(st);
 			if (string.IsNullOrEmpty(str))
-				throw new CodeEE("不正な文字で行が始まっています");
+				throw new CodeEE("Invalid 文字で行が始まっています");
 			//1808a3 先頭1単語の展開をやめる。－命令の置換を禁止。
 			//if (UseMacro)
 			//{
@@ -915,7 +915,7 @@ namespace MinorShift.Emuera.Sub
 									throw new CodeEE("対応する\"]]\"のない\"[[\"です");
 							}
 							string key = st.Substring(start, find + 2);
-							//1810 ここまでで置換できなかったものは強制エラーにする
+							//1810 ここまでで置換できなかったものは強制Errorにする
 							//行連結前に置換不能で行連結より置換することができるようになったものまで置換されていたため
 							throw new CodeEE("字句解析中に置換(rename)できない符号" + key + "を発見しました");
 							//string value = null;
@@ -1075,10 +1075,10 @@ namespace MinorShift.Emuera.Sub
 			wc.ShiftNext();
 			SymbolWord symbol = wc.Current as SymbolWord;
 			if (symbol == null || symbol.Type != '(')
-				throw new CodeEE("関数形式のマクロ" + macro.Keyword + "に引数がありません");
+				throw new CodeEE("関数形式のマクロ" + macro.Keyword + "にargumentがありません");
 			WordCollection macroWC = macro.Statement.Clone();
 			WordCollection[] args = new WordCollection[macro.ArgCount];
-			//引数部読み取りループ
+			//argument部読み取りループ
 			for (int i = 0; i < macro.ArgCount; i++)
 			{
 				int macroNestBracketS = 0;
@@ -1104,7 +1104,7 @@ namespace MinorShift.Emuera.Sub
 								break;
 							}
 							if (i != macro.ArgCount - 1)
-								throw new CodeEE("関数形式のマクロ" + macro.Keyword + "の引数の数が正しくありません");
+								throw new CodeEE("関数形式のマクロ" + macro.Keyword + "のargumentの数が正しくありません");
 							goto exitfor;
 						case ',':
 							if (macroNestBracketS == 0)
@@ -1115,10 +1115,10 @@ namespace MinorShift.Emuera.Sub
 				}
 			exitwhile:
 				if (args[i].Collection.Count == 0)
-					throw new CodeEE("関数形式のマクロ" + macro.Keyword + "の引数を省略することはできません");
+					throw new CodeEE("関数形式のマクロ" + macro.Keyword + "のargumentを省略することはできません");
 				continue;
 			}
-		//引数部読み取りループ終端
+		//argument部読み取りループ終端
 		exitfor:
 			symbol = wc.Current as SymbolWord;
 			if (symbol == null || symbol.Type != ')')

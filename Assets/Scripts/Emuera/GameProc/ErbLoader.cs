@@ -92,7 +92,7 @@ namespace MinorShift.Emuera.GameProc
 			{
 				ParserMediator.FlushWarningList();
 				uEmuera.Media.SystemSounds.Hand.Play();
-				output.PrintError("予期しないエラーが発生しました:" + Program.ExeName);
+				output.PrintError("予期しないErrorが発生しました:" + Program.ExeName);
 				output.PrintError(e.GetType().ToString() + ":" + e.Message);
 				return false;
 			}
@@ -156,7 +156,7 @@ namespace MinorShift.Emuera.GameProc
 					case "SKIPSTART":
 						if (!string.IsNullOrEmpty(token2))
 						{
-							ParserMediator.Warn(token + "に余分な引数があります", position, 1);
+							ParserMediator.Warn(token + "に余分なargumentがあります", position, 1);
 							break;
 						}
 						if (skip)
@@ -174,7 +174,7 @@ namespace MinorShift.Emuera.GameProc
 					case "IF_DEBUG":
 						if (!string.IsNullOrEmpty(token2))
 						{
-							ParserMediator.Warn(token + "に余分な引数があります", position, 1);
+							ParserMediator.Warn(token + "に余分なargumentがあります", position, 1);
 							break;
 						}
 						ppMatch.Push("ELSEIF");
@@ -186,7 +186,7 @@ namespace MinorShift.Emuera.GameProc
 					case "IF_NDEBUG":
 						if (!string.IsNullOrEmpty(token2))
 						{
-							ParserMediator.Warn(token + "に余分な引数があります", position, 1);
+							ParserMediator.Warn(token + "に余分なargumentがあります", position, 1);
 							break;
 						}
 						ppMatch.Push("ELSEIF");
@@ -198,7 +198,7 @@ namespace MinorShift.Emuera.GameProc
 					case "IF":
 						if (string.IsNullOrEmpty(token2))
 						{
-							ParserMediator.Warn(token + "に引数がありません", position, 1);
+							ParserMediator.Warn(token + "にargumentがありません", position, 1);
 							break;
 						}
 						ppMatch.Push("ELSEIF");
@@ -210,7 +210,7 @@ namespace MinorShift.Emuera.GameProc
 					case "ELSEIF":
 						if (string.IsNullOrEmpty(token2))
 						{
-							ParserMediator.Warn(token + "に引数がありません", position, 1);
+							ParserMediator.Warn(token + "にargumentがありません", position, 1);
 							break;
 						}
 						if (ppMatch.Count == 0 || ppMatch.Pop() != "ELSEIF")
@@ -225,7 +225,7 @@ namespace MinorShift.Emuera.GameProc
 					case "ELSE":
 						if (!string.IsNullOrEmpty(token2))
 						{
-							ParserMediator.Warn(token + "に余分な引数があります", position, 1);
+							ParserMediator.Warn(token + "に余分なargumentがあります", position, 1);
 							break;
 						}
 						if (ppMatch.Count == 0 || ppMatch.Pop() != "ELSEIF")
@@ -242,7 +242,7 @@ namespace MinorShift.Emuera.GameProc
 						{
 							if (!string.IsNullOrEmpty(token2))
 							{
-								ParserMediator.Warn(token + "に余分な引数があります", position, 1);
+								ParserMediator.Warn(token + "に余分なargumentがあります", position, 1);
 								break;
 							}
 							string match = ppMatch.Count == 0 ? "" : ppMatch.Pop();
@@ -260,7 +260,7 @@ namespace MinorShift.Emuera.GameProc
 						{
 							if (!string.IsNullOrEmpty(token2))
 							{
-								ParserMediator.Warn(token + "に余分な引数があります", position, 1);
+								ParserMediator.Warn(token + "に余分なargumentがあります", position, 1);
 								break;
 							}
 							string match = ppMatch.Count == 0 ? "" : ppMatch.Pop();
@@ -323,7 +323,7 @@ namespace MinorShift.Emuera.GameProc
 				{
 					position = new ScriptPosition(eReader.Filename, eReader.LineNo);
 					//rename処理をEraStreamReaderに移管
-					//変換できなかった[[～～]]についてはLexAnalyzerがエラーを投げる
+					//変換できなかった[[～～]]についてはLexAnalyzerがErrorを投げる
 					if (st.Current == '[' && st.Next != '[')
 					{
 						st.ShiftNext();
@@ -472,7 +472,7 @@ namespace MinorShift.Emuera.GameProc
 					string errmes = exc.Message;
 					if (!(exc is EmueraException))
 						errmes = exc.GetType().ToString() + ":" + errmes;
-					ParserMediator.Warn("関数@" + label.LabelName + " の引数のエラー:" + errmes, label, 2, true, false);
+					ParserMediator.Warn("関数@" + label.LabelName + " のargumentのError:" + errmes, label, 2, true, false);
 					label.ErrMes = "ロード時に解析に失敗した関数が呼び出されました";
                     label.IsError = true;
 				}
@@ -493,11 +493,11 @@ namespace MinorShift.Emuera.GameProc
 			SingleTerm[] defs = new SingleTerm[0];
 			int maxArg = -1;
 			int maxArgs = -1;
-			//1807 非イベント関数のシステム関数については警告レベル低下＆エラー解除＆引数を設定するように。
+			//1807 非イベント関数のシステム関数については警告レベル低下＆Error解除＆argumentを設定するように。
 			if (label.IsEvent)
 			{
 				if (!wc.EOL)
-					ParserMediator.Warn("イベント関数@" + label.LabelName + " に引数は設定できません", label, 2, true, false);
+					ParserMediator.Warn("イベント関数@" + label.LabelName + " にargumentは設定できません", label, 2, true, false);
 				//label.SubNames = subNames;
 				label.Arg = args;
 				label.Def = defs;
@@ -509,29 +509,29 @@ namespace MinorShift.Emuera.GameProc
 			if (!wc.EOL)
 			{
 				if (label.IsSystem)
-					ParserMediator.Warn("システム関数@" + label.LabelName + " に引数が設定されています", label, 1, false, false);
+					ParserMediator.Warn("システム関数@" + label.LabelName + " にargumentが設定されています", label, 1, false, false);
 				SymbolWord symbol = wc.Current as SymbolWord;
 				wc.ShiftNext();
                 if (symbol == null)
-				{ errMes = "引数の書式が間違っています"; goto err; }
+				{ errMes = "argumentの書式が間違っています"; goto err; }
 				if (symbol.Type == '[')//TODO:subNames 結局実装しないかも
 				{
 					IOperandTerm[] subNamesRow = ExpressionParser.ReduceArguments(wc, ArgsEndWith.RightBracket, false);
 					if (subNamesRow.Length == 0)
-					{ errMes = "関数定義の[]内の引数は空にできません"; goto err; }
+					{ errMes = "関数定義の[]内のargumentは空にできません"; goto err; }
 					subNames = new SingleTerm[subNamesRow.Length];
 					for (int i = 0; i < subNamesRow.Length; i++)
 					{
 						if (subNamesRow[i] == null)
-						{ errMes = "関数定義の引数は省略できません"; goto err; }
+						{ errMes = "関数定義のargumentは省略できません"; goto err; }
 						IOperandTerm term = subNamesRow[i].Restructure(exm);
 						subNames[i] = term as SingleTerm;
 						if (subNames[i] == null)
-						{ errMes = "関数定義の[]内の引数は定数のみ指定できます"; goto err; }
+						{ errMes = "関数定義の[]内のargumentは定数のみ指定できます"; goto err; }
 					}
 					symbol = wc.Current as SymbolWord;
 					if ((!wc.EOL) && (symbol == null))
-					{ errMes = "引数の書式が間違っています"; goto err; }
+					{ errMes = "argumentの書式が間違っています"; goto err; }
 					wc.ShiftNext();
 				}
 				if (!wc.EOL)
@@ -542,7 +542,7 @@ namespace MinorShift.Emuera.GameProc
 					else if (symbol.Type == '(')
 						argsRow = ExpressionParser.ReduceArguments(wc, ArgsEndWith.RightParenthesis, true);
 					else
-					{ errMes = "引数の書式が間違っています"; goto err; }
+					{ errMes = "argumentの書式が間違っています"; goto err; }
 					int length = argsRow.Length / 2;
 					args = new VariableTerm[length];
                     defs = new SingleTerm[length];
@@ -550,22 +550,22 @@ namespace MinorShift.Emuera.GameProc
 					{
 						SingleTerm def = null;
 						IOperandTerm term = argsRow[i * 2];
-                        //引数読み取り時点で判別されないといけない
+                        //argument読み取り時点で判別されないといけない
                         //if (term == null)
-                        //{ errMes = "関数定義の引数は省略できません"; goto err; }
+                        //{ errMes = "関数定義のargumentは省略できません"; goto err; }
                         if ((!(term.Restructure(exm) is VariableTerm vTerm)) || (vTerm.Identifier.IsConst))
-                        { errMes = "関数定義の引数には代入可能な変数を指定してください"; goto err; }
+                        { errMes = "関数定義のargumentには代入可能な変数を指定してください"; goto err; }
                         else if (!vTerm.Identifier.IsReference)//参照型なら添え字不要
                         {
                             if (vTerm is VariableNoArgTerm)
-                            { errMes = "関数定義の参照型でない引数\"" + vTerm.Identifier.Name + "\"に添え字が指定されていません"; goto err; }
+                            { errMes = "関数定義の参照型でないargument\"" + vTerm.Identifier.Name + "\"に添え字が指定されていません"; goto err; }
                             if (!vTerm.isAllConst)
-                            { errMes = "関数定義の引数の添え字には定数を指定してください"; goto err; }
+                            { errMes = "関数定義のargumentの添え字には定数を指定してください"; goto err; }
                         }
                         for (int j = 0; j < i; j++)
                         {
                             if (vTerm.checkSameTerm(args[j]))
-                                ParserMediator.Warn("第" +  Strings.StrConv((i + 1).ToString(), VbStrConv.Wide, Config.Language) + "引数\"" + vTerm.GetFullString() + "\"はすでに第" + Strings.StrConv((j + 1).ToString(), VbStrConv.Wide, Config.Language) + "引数として宣言されています", label, 1, false, false);
+                                ParserMediator.Warn("第" +  Strings.StrConv((i + 1).ToString(), VbStrConv.Wide, Config.Language) + "argument\"" + vTerm.GetFullString() + "\"はすでに第" + Strings.StrConv((j + 1).ToString(), VbStrConv.Wide, Config.Language) + "argumentとして宣言されています", label, 1, false, false);
                         }
 						if (vTerm.Identifier.Code == VariableCode.ARG)
 						{
@@ -593,13 +593,13 @@ namespace MinorShift.Emuera.GameProc
 						{
 							def = term.Restructure(exm) as SingleTerm;
 							if (def == null)
-							{ errMes = "引数の初期値には定数のみを指定できます"; goto err; }
+							{ errMes = "argumentの初期値には定数のみを指定できます"; goto err; }
 							if (!canDef)
-							{ errMes = "引数の初期値を定義できるのは\"ARG\"、\"ARGS\"またはプライベート変数のみです"; goto err; }
+							{ errMes = "argumentの初期値を定義できるのは\"ARG\"、\"ARGS\"またはプライベート変数のみです"; goto err; }
 							else if (vTerm.Identifier.IsReference)
-							{ errMes = "参照渡しの引数に初期値は定義できません"; goto err; }
+							{ errMes = "参照渡しのargumentに初期値は定義できません"; goto err; }
 							if (vTerm.GetOperandType() != def.GetOperandType())
-							{ errMes = "引数の型と初期値の型が一致していません"; goto err; }
+							{ errMes = "argumentの型と初期値の型が一致していません"; goto err; }
 						}
 						args[i] = vTerm;
 						defs[i] = def;
@@ -608,7 +608,7 @@ namespace MinorShift.Emuera.GameProc
 				}
 			}
 			if (!wc.EOL)
-			{ errMes = "引数の書式が間違っています"; goto err; }
+			{ errMes = "argumentの書式が間違っています"; goto err; }
 
             //label.SubNames = subNames;
 			label.Arg = args;
@@ -617,7 +617,7 @@ namespace MinorShift.Emuera.GameProc
 			label.ArgsLength = maxArgs;
 			return;
 		err:
-			ParserMediator.Warn("関数@" + label.LabelName + " の引数のエラー:" + errMes, label, 2, true, false);
+			ParserMediator.Warn("関数@" + label.LabelName + " のargumentのError:" + errMes, label, 2, true, false);
 			return;
 		}
 
@@ -825,7 +825,7 @@ namespace MinorShift.Emuera.GameProc
 		}
 
 		private void checkFunctionWithCatch(FunctionLabelLine label)
-		{//ここでエラーを捕まえることは本来はないはず。ExeEE相当。
+		{//ここでErrorを捕まえることは本来はないはず。ExeEE相当。
 			try
 			{
 				//System.Windows.Forms.//Application.DoEvents();
@@ -837,9 +837,9 @@ namespace MinorShift.Emuera.GameProc
 			catch (Exception exc)
 			{
 				uEmuera.Media.SystemSounds.Hand.Play();
-                //1756beta2+v6.1 修正の効率化のために何かパース関係でハンドリングできてないエラーが出た場合はスタックトレースを投げるようにした
+                //1756beta2+v6.1 修正の効率化のために何かパース関係でハンドリングできてないErrorが出た場合はスタックトレースを投げるようにした
                 string errmes = (exc is EmueraException) ? exc.Message : exc.GetType().ToString() + ":" + exc.Message;
-                ParserMediator.Warn("@" + label.LabelName + " の解析中にエラー:" + errmes, label, 2, true, false, !(exc is EmueraException) ? exc.StackTrace : null);
+                ParserMediator.Warn("@" + label.LabelName + " の解析中にError:" + errmes, label, 2, true, false, !(exc is EmueraException) ? exc.StackTrace : null);
                 label.ErrMes = "ロード時に解析に失敗した関数が呼び出されました";
 			}
 			finally
@@ -852,7 +852,7 @@ namespace MinorShift.Emuera.GameProc
 		private void setArgument(FunctionLabelLine label)
 		{
 			//1周目/3周
-			//引数の解析とか
+			//argumentの解析とか
 			LogicalLine nextLine = label;
 			bool inMethod = label.IsMethod;
 			while (true)
@@ -996,11 +996,11 @@ namespace MinorShift.Emuera.GameProc
                         SelectcaseStack.Push(func);
 						break;
 					case FunctionCode.FOR:
-                        //ネストエラーチェックのためにコストはかかるが、ここでチェックする
+                        //ネストErrorチェックのためにコストはかかるが、ここでチェックする
                         if (func.Argument == null)
                             ArgumentParser.SetArgumentTo(func);
-                        //上で引数解析がなされていることは保証されているので、
-                        //それでこれがfalseになるのは、引数解析でエラーが起きた場合のみ
+                        //上でargument解析がなされていることは保証されているので、
+                        //それでこれがfalseになるのは、argument解析でErrorが起きた場合のみ
                         if (func.Argument != null)
                         {
                             VariableTerm Cnt = ((SpForNextArgment)func.Argument).Cnt;
@@ -1148,7 +1148,7 @@ namespace MinorShift.Emuera.GameProc
 							IOperandTerm term = ((ExpressionArgument)selectLine.Argument).Term;
 							if (term == null)
 							{
-								ParserMediator.Warn("SELECTCASEの引数がありません", selectLine, 2, true, false);
+								ParserMediator.Warn("SELECTCASEのargumentがありません", selectLine, 2, true, false);
 								break;
 							}
 							foreach (InstructionLine caseLine in selectLine.IfCaseList)
@@ -1160,12 +1160,12 @@ namespace MinorShift.Emuera.GameProc
 									continue;
 								CaseExpression[] caseExps = ((CaseArgument)caseLine.Argument).CaseExps;
 								if (caseExps.Length == 0)
-									ParserMediator.Warn("CASEの引数がありません", caseLine, 2, true, false);
+									ParserMediator.Warn("CASEのargumentがありません", caseLine, 2, true, false);
 
 								foreach (CaseExpression exp in caseExps)
 								{
 									if (exp.GetOperandType() != term.GetOperandType())
-										ParserMediator.Warn("CASEの引数の型がSELECTCASEと一致しません", caseLine, 2, true, false);
+										ParserMediator.Warn("CASEのargumentの型がSELECTCASEと一致しません", caseLine, 2, true, false);
 								}
 
 							}
@@ -1365,7 +1365,7 @@ namespace MinorShift.Emuera.GameProc
 								}
 								if (((SpCallArgment)func.Argument).RowArgs.Length != 0)
 								{
-									ParserMediator.Warn("TRYGOTOLISTの呼び出し対象に引数が設定されています", func, 2, true, false);
+									ParserMediator.Warn("TRYGOTOLISTの呼び出し対象にargumentが設定されています", func, 2, true, false);
 									break;
 								}
 							}
@@ -1404,7 +1404,7 @@ namespace MinorShift.Emuera.GameProc
 							ParserMediator.Warn("対応するNOSKIP系命令のない" + func.Function.Name + "です", func, 2, true, false);
 							break;
 						}
-						//エラーハンドリング用
+						//Errorハンドリング用
 						pfunc.JumpTo = func;
 						func.JumpTo = pfunc;
 						nestStack.Pop();
@@ -1421,7 +1421,7 @@ namespace MinorShift.Emuera.GameProc
 				if (func != null)
 					ParserMediator.Warn(funcName + "に対応する" + funcMatch + "が見つかりません", func, 2, true, false);
 				else
-					ParserMediator.Warn("ディフォルトエラー（Emuera設定漏れ）", func, 2, true, false);
+					ParserMediator.Warn("ディフォルトError（Emuera設定漏れ）", func, 2, true, false);
 			}
             //使ったスタックをクリア
             SelectcaseStack.Clear();

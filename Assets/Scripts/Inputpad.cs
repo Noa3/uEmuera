@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+/// <summary>
+/// Input pad component for text and number input.
+/// </summary>
 public class Inputpad : MonoBehaviour
 {
 	void Start ()

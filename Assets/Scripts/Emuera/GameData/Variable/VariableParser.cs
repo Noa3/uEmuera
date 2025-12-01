@@ -63,7 +63,7 @@ namespace MinorShift.Emuera.GameData.Variable
 				if (wc.Current.Type != ':')
 					break;
 				if (i >= 3)
-					throw new CodeEE(id.Code.ToString() + "の引数が多すぎます");
+					throw new CodeEE(id.Code.ToString() + "のargumentが多すぎます");
 				wc.ShiftNext();
 
 				operand = ExpressionParser.ReduceVariableArgument(wc, id.Code);
@@ -87,7 +87,7 @@ namespace MinorShift.Emuera.GameData.Variable
 			IOperandTerm op1 = p1;
 			IOperandTerm op2 = p2;
 			IOperandTerm op3 = p3;
-			//引数の推測
+			//argumentの推測
 			if (id.IsCharacterData)
 			{
 				if (id.IsArray2D)
@@ -95,7 +95,7 @@ namespace MinorShift.Emuera.GameData.Variable
 					if ((op1 == null) && (op2 == null) && (op3 == null))
 						return new VariableNoArgTerm(id);
 					if ((op1 == null) || (op2 == null) || (op3 == null))
-						throw new CodeEE("キャラクタ二次元配列変数" + id.Name + "の引数は省略できません");
+						throw new CodeEE("キャラクタ二次元配列変数" + id.Name + "のargumentは省略できません");
 					terms = new IOperandTerm[3];
 					terms[0] = op1;
 					terms[1] = op2;
@@ -104,13 +104,13 @@ namespace MinorShift.Emuera.GameData.Variable
 				else if (id.IsArray1D)
 				{
 					if (op3 != null)
-						throw new CodeEE("キャラクタ変数" + id.Name + "の引数が多すぎます");
+						throw new CodeEE("キャラクタ変数" + id.Name + "のargumentが多すぎます");
 					if ((op1 == null) && (op2 == null) && (op3 == null) && Config.SystemNoTarget)
 						return new VariableNoArgTerm(id);
 					if (op2 == null)
 					{
 						if (Config.SystemNoTarget)
-							throw new CodeEE("キャラクタ配列変数" + id.Name + "の引数は省略できません(コンフィグにより禁止が選択されています)");
+							throw new CodeEE("キャラクタ配列変数" + id.Name + "のargumentは省略できません(コンフィグにより禁止が選択されています)");
 						if (op1 == null)
 							op2 = ZeroTerm;
 						else
@@ -124,13 +124,13 @@ namespace MinorShift.Emuera.GameData.Variable
 				else
 				{
 					if (op2 != null)
-						throw new CodeEE("キャラクタ変数" + id.Name + "の引数が多すぎます");
+						throw new CodeEE("キャラクタ変数" + id.Name + "のargumentが多すぎます");
 					if ((op1 == null) && (op2 == null) && (op3 == null) && Config.SystemNoTarget)
 						return new VariableNoArgTerm(id);
 					if (op1 == null)
 					{
 						if (Config.SystemNoTarget)
-							throw new CodeEE("キャラクタ変数" + id.Name + "の引数は省略できません(コンフィグにより禁止が選択されています)");
+							throw new CodeEE("キャラクタ変数" + id.Name + "のargumentは省略できません(コンフィグにより禁止が選択されています)");
 						op1 = TARGET;
 					}
 					terms = new IOperandTerm[1];
@@ -142,7 +142,7 @@ namespace MinorShift.Emuera.GameData.Variable
 				if ((op1 == null) && (op2 == null) && (op3 == null))
 					return new VariableNoArgTerm(id);
 				if ((op1 == null) || (op2 == null) || (op3 == null))
-					throw new CodeEE("三次元配列変数" + id.Name + "の引数は省略できません");
+					throw new CodeEE("三次元配列変数" + id.Name + "のargumentは省略できません");
 				terms = new IOperandTerm[3];
 				terms[0] = op1;
 				terms[1] = op2;
@@ -153,9 +153,9 @@ namespace MinorShift.Emuera.GameData.Variable
 				if ((op1 == null) && (op2 == null) && (op3 == null))
 					return new VariableNoArgTerm(id);
 				if ((op1 == null) || (op2 == null))
-					throw new CodeEE("二次元配列変数" + id.Name + "の引数は省略できません");
+					throw new CodeEE("二次元配列変数" + id.Name + "のargumentは省略できません");
 				if (op3 != null)
-					throw new CodeEE("二次元配列" + id.Name + "の引数が多すぎます");
+					throw new CodeEE("二次元配列" + id.Name + "のargumentが多すぎます");
 				terms = new IOperandTerm[2];
 				terms[0] = op1;
 				terms[1] = op2;
@@ -163,26 +163,26 @@ namespace MinorShift.Emuera.GameData.Variable
 			else if (id.IsArray1D)
 			{
 				if (op2 != null)
-					throw new CodeEE("一次元配列変数" + id.Name + "の引数が多すぎます");
+					throw new CodeEE("一次元配列変数" + id.Name + "のargumentが多すぎます");
                 if (op1 == null)
                 {
                     op1 = ZeroTerm;
                     if (!Config.CompatiRAND && id.Code == VariableCode.RAND)
                     {
-                        throw new CodeEE("RANDの引数が省略されています");
+                        throw new CodeEE("RANDのargumentが省略されています");
                     }
                 }
                 if (!Config.CompatiRAND && op1 is SingleTerm && id.Code == VariableCode.RAND)
                 {
                     if (((SingleTerm)op1).Int == 0)
-                        throw new CodeEE("RANDの引数に0が与えられています");
+                        throw new CodeEE("RANDのargumentに0が与えられています");
                 }
 				terms = new IOperandTerm[1];
 				terms[0] = op1;
 			}
 			else if (op1 != null)
 			{
-				throw new CodeEE("配列でない変数" + id.Name + "を引数付きで呼び出しています");
+				throw new CodeEE("配列でない変数" + id.Name + "をargument付きで呼び出しています");
 			}
 			else
 				terms = new IOperandTerm[0];

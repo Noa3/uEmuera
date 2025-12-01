@@ -165,7 +165,7 @@ namespace MinorShift.Emuera.GameData.Variable
 				else
 					indexNum = constant.KeywordToInteger(identifier.Code, index.Str, 1);
                 if (indexNum < 0 || indexNum >= ((long[])(identifier.GetArrayChara(0))).Length)
-					throw new CodeEE("キャラクタ配列変数" + identifier.Name + "の第２引数(" + indexNum.ToString() + ")は配列の範囲外です");
+					throw new CodeEE("キャラクタ配列変数" + identifier.Name + "の第２argument(" + indexNum.ToString() + ")は配列の範囲外です");
 			}
 
             long[] arguments = new long[] { -1, indexNum };
@@ -206,7 +206,7 @@ namespace MinorShift.Emuera.GameData.Variable
 				else
 					indexNum = constant.KeywordToInteger(identifier.Code, index.Str, 1);
                 if (indexNum < 0 || indexNum >= ((string[])(identifier.GetArrayChara(0))).Length)
-					throw new CodeEE("キャラクタ配列変数" + identifier.Name + "の第２引数(" + indexNum.ToString() + ")は配列の範囲外です");
+					throw new CodeEE("キャラクタ配列変数" + identifier.Name + "の第２argument(" + indexNum.ToString() + ")は配列の範囲外です");
 			}
 
             long[] arguments = new long[] { -1, indexNum };
@@ -649,7 +649,7 @@ namespace MinorShift.Emuera.GameData.Variable
 				array = (Int64[])identifier.GetArray();
 
 			if (start >= array.Length)
-				throw new CodeEE("命令ARRAYSHIFTの第４引数(" + start.ToString() + ")が配列" + p.Identifier.Name + "の範囲を超えています");
+				throw new CodeEE("命令ARRAYSHIFTの第４argument(" + start.ToString() + ")が配列" + p.Identifier.Name + "の範囲を超えています");
 
 			if (num == -1)
 				num = array.Length - start;
@@ -723,7 +723,7 @@ namespace MinorShift.Emuera.GameData.Variable
 				arrays = (string[])identifier.GetArray();
 
 			if (start >= arrays.Length)
-				throw new CodeEE("命令ARRAYSHIFTの第４引数(" + start.ToString() + ")が配列" + p.Identifier.Name + "の範囲を超えています");
+				throw new CodeEE("命令ARRAYSHIFTの第４argument(" + start.ToString() + ")が配列" + p.Identifier.Name + "の範囲を超えています");
 
 			//for (int i = 0; i < arrays.Length; i++)
 			//    arrays[i] = "";
@@ -798,7 +798,7 @@ namespace MinorShift.Emuera.GameData.Variable
 					array = (Int64[])identifier.GetArray();
 
                 if (start >= array.Length)
-					throw new CodeEE("命令ARRAYREMOVEの第２引数(" + start.ToString() + ")が配列" + p.Identifier.Name + "の範囲を超えています");
+					throw new CodeEE("命令ARRAYREMOVEの第２argument(" + start.ToString() + ")が配列" + p.Identifier.Name + "の範囲を超えています");
 				if (num <= 0)
 					num = array.Length;
 				Int64[] temp = new Int64[array.Length];
@@ -851,7 +851,7 @@ namespace MinorShift.Emuera.GameData.Variable
 					array = (Int64[])identifier.GetArray();
 
                 if (start >= array.Length)
-					throw new CodeEE("命令ARRAYSORTの第３引数(" + start.ToString() + ")が配列" + identifier.Name + "の範囲を超えています");
+					throw new CodeEE("命令ARRAYSORTの第３argument(" + start.ToString() + ")が配列" + identifier.Name + "の範囲を超えています");
 				if (num <= 0)
 					num = array.Length - start;
 				Int64[] temp = new Int64[num];
@@ -872,7 +872,7 @@ namespace MinorShift.Emuera.GameData.Variable
 					array = (string[])identifier.GetArray();
 
                 if (start >= array.Length)
-					throw new CodeEE("命令ARRAYSORTの第３引数(" + start.ToString() + ")が配列" + identifier.Name + "の範囲を超えています");
+					throw new CodeEE("命令ARRAYSORTの第３argument(" + start.ToString() + ")が配列" + identifier.Name + "の範囲を超えています");
 				if (num <= 0)
 					num = array.Length - start;
 				string[] temp = new string[num];
@@ -1333,7 +1333,7 @@ namespace MinorShift.Emuera.GameData.Variable
 				varData.CharacterList.Sort(CharacterData.AscCharacterComparison);
 			else// if (sortorder == SortOrder.DESENDING)
 				varData.CharacterList.Sort(CharacterData.DescCharacterComparison);
-			//引数解析でチェック済み
+			//argument解析でチェック済み
 			//else
 			//    throw new ExeEE("ソート順序不明");
 
@@ -1761,7 +1761,7 @@ namespace MinorShift.Emuera.GameData.Variable
 		private void setDefaultStain(CharacterData chara)
 		{
 			long[] array = chara.DataIntegerArray[(int)(VariableCode.STAIN & VariableCode.__LOWERCASE__)];
-			//STAINの配列要素数 < _REPLACE.CSVのSTAIN初期値の指定数の時エラーになるのを対処
+			//STAINの配列要素数 < _REPLACE.CSVのSTAIN初期値の指定数の時Errorになるのを対処
 			if (array.Length >= Config.StainDefault.Count)
 			{
 				Config.StainDefault.CopyTo(array);
@@ -1879,7 +1879,7 @@ namespace MinorShift.Emuera.GameData.Variable
 		private string getSaveDataPathC(string s) { return Program.DatDir + "chara_" + s + ".dat"; }
 
 		/// <summary>
-		/// DatFolderが存在せず、かつ作成に失敗したらエラーを投げる
+		/// DatFolderが存在せず、かつ作成に失敗したらErrorを投げる
 		/// </summary>
 		/// <returns></returns>
 		public void CreateDatFolder()
@@ -1926,13 +1926,13 @@ namespace MinorShift.Emuera.GameData.Variable
 		/// 文字列がファイル名の一部として適切かどうか調べる
 		/// </summary>
 		/// <param name="datfilename"></param>
-		/// <returns>適切ならnull、不適切ならエラーメッセージ</returns>
+		/// <returns>適切ならnull、不適切ならErrorメッセージ</returns>
 		public string CheckDatFilename(string datfilename)
 		{
 			if (string.IsNullOrEmpty(datfilename))
 				return "ファイル名が指定されていません";
 			if (datfilename.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0)
-				return "ファイル名に不正な文字が含まれています";
+				return "ファイル名にInvalid 文字が含まれています";
 			return null;
 		}
 
@@ -2042,7 +2042,7 @@ namespace MinorShift.Emuera.GameData.Variable
 			catch (Exception)
 			{
 				result.State = EraDataState.ETC_ERROR;
-				result.DataMes = "読み込み中にエラーが発生しました";
+				result.DataMes = "読み込み中にErrorが発生しました";
 			}
 			finally
 			{
@@ -2096,7 +2096,7 @@ namespace MinorShift.Emuera.GameData.Variable
 		//    catch (Exception)
 		//    {
 		//        result.State = EraDataState.ETC_ERROR;
-		//        result.DataMes = "読み込み中にエラーが発生しました";
+		//        result.DataMes = "読み込み中にErrorが発生しました";
 		//    }
 		//    finally
 		//    {
@@ -2134,7 +2134,7 @@ namespace MinorShift.Emuera.GameData.Variable
 			}
 			//catch (Exception)
 			//{
-			//	throw new CodeEE("セーブ中にエラーが発生しました");
+			//	throw new CodeEE("セーブ中にErrorが発生しました");
 			//}
 			finally
 			{
@@ -2219,7 +2219,7 @@ namespace MinorShift.Emuera.GameData.Variable
 			}
 			//catch (Exception)
 			//{
-			//	throw new CodeEE("セーブ中にエラーが発生しました");
+			//	throw new CodeEE("セーブ中にErrorが発生しました");
 			//}
 			finally
 			{
@@ -2363,7 +2363,7 @@ namespace MinorShift.Emuera.GameData.Variable
 			}
 			catch (SystemException)
 			{
-				throw new CodeEE("グローバルデータの保存中にエラーが発生しました");
+				throw new CodeEE("グローバルデータの保存中にErrorが発生しました");
 				//console.PrintError(
 				//console.NewLine();
 				//return false;

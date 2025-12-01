@@ -5,22 +5,43 @@ using UnityEngine;
 using MinorShift.Emuera;
 using MinorShift.Emuera.GameView;
 
+/// <summary>
+/// Abstract base class for Emuera UI components.
+/// </summary>
 public abstract class EmueraBehaviour : MonoBehaviour
 {
+    /// <summary>
+    /// Initializes the behaviour with current config settings.
+    /// </summary>
     public static void Ready()
     {
         FontSize = Config.FontSize;
         FontColor = GenericUtils.ToUnityColor(Config.ForeColor);
     }
+    
+    /// <summary>
+    /// Gets the current font size.
+    /// </summary>
     public static int FontSize { get; private set; }
+    
+    /// <summary>
+    /// Gets the current font color.
+    /// </summary>
     public static Color FontColor { get; private set; }
 
+    /// <summary>
+    /// Text alignment options.
+    /// </summary>
     public enum Align
     {
         LEFT = 0,
         CENTER = 1,
         RIGHT = 2,
     }
+    
+    /// <summary>
+    /// Describes a display unit with text, formatting, and button properties.
+    /// </summary>
     public class UnitDesc
     {
         //Text

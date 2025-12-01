@@ -37,7 +37,7 @@ namespace MinorShift.Emuera
 		public static LabelDictionary LabelDictionary;
 
 
-		//ERBloaderに引数解析の結果を渡すための橋渡し変数
+		//ERBloaderにargument解析の結果を渡すための橋渡し変数
 		//1756 Processから移動。Program.AnalysisMode用
 		public static Dictionary<string, Int64> tempDic = new Dictionary<string, long>();
 #if UEMUERA_DEBUG

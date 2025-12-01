@@ -4,7 +4,7 @@ namespace MinorShift.Emuera.GameProc.Function
 	/// <summary>
 	/// 命令コード
 	/// </summary>
-	//難読化用属性。enum.ToString()やenum.Parse()を行うなら(Exclude=true)にすること。
+	//Obfuscation attribute. Set (Exclude=true) when using enum.ToString() or enum.Parse().
 	[global::System.Reflection.Obfuscation(Exclude = true)]
 	enum FunctionCode
 	{//数値不要
@@ -61,7 +61,7 @@ namespace MinorShift.Emuera.GameProc.Function
 		BARL,//改行付き。
 		TIMES,//小数計算。TIMES (変数) , (小数値)という形で使う。
 
-		PRINT_ABL,//能力。引数は登録番号
+		PRINT_ABL,//能力。argumentは登録番号
 		PRINT_TALENT,//素質
 		PRINT_MARK,//刻印
 		PRINT_EXP,//経験
@@ -193,7 +193,7 @@ namespace MinorShift.Emuera.GameProc.Function
 		WHILE,
 		WEND,
 
-		POWER,//引数が違うのでMETHOD化できない。
+		POWER,//argumentが違うのでMETHOD化できない。
 		SAVEGLOBAL,
 		LOADGLOBAL,
 		SWAP,
@@ -226,7 +226,7 @@ namespace MinorShift.Emuera.GameProc.Function
 		ENDLIST,
 		STRDATA,
 
-		PRINTCPERLINE,//よく考えたら引数の仕様違うや
+		PRINTCPERLINE,//よく考えたらargumentの仕様違うや
 
 
 		SETBIT,
@@ -240,7 +240,7 @@ namespace MinorShift.Emuera.GameProc.Function
 
 		RESET_STAIN,
 
-		SAVENOS,//引数の仕様が違うので(ry
+		SAVENOS,//argumentの仕様が違うので(ry
 
 		FORCEKANA,
 

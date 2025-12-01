@@ -4,8 +4,14 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
+/// <summary>
+/// Displays quick action buttons for the game.
+/// </summary>
 public class QuickButtons : MonoBehaviour
 {
+    /// <summary>
+    /// Internal class for individual quick button behavior.
+    /// </summary>
     class QuickButton : MonoBehaviour
     {
         void Awake()
@@ -28,6 +34,10 @@ public class QuickButtons : MonoBehaviour
 
     static readonly int kMaxContentButtonCountShow = 4;
 
+    /// <summary>
+    /// Template button for creating new quick buttons.
+    /// </summary>
+    [Tooltip("Template button for creating new quick buttons")]
     public Button template_button;
 
     RectTransform parent
@@ -116,7 +126,7 @@ public class QuickButtons : MonoBehaviour
     {
         if(content_width > display_width)
         {
-            //左右移动
+            // Horizontal scrolling
             if(local.x < 0)
                 local.x = 0;
             else if(local.x > content_width - display_width)

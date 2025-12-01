@@ -20,7 +20,7 @@ namespace MinorShift.Emuera.GameProc.Function
 			if (line.IsError)
 				return false;
 			if (!Program.DebugMode && line.Function.IsDebug())
-			{//非DebugモードでのDebug系命令。何もしないので引数解析も不要
+			{//非DebugモードでのDebug系命令。何もしないのでargument解析も不要
 				line.Argument = null;
 				return true;
 			}
@@ -40,7 +40,7 @@ namespace MinorShift.Emuera.GameProc.Function
 			{
 				if (!line.IsError)
 				{
-					errmes = "命令の引数解析中に特定できないエラーが発生";
+					errmes = "命令のargument解析中に特定できないErrorが発生";
 					goto error;
 				}
 				return false;

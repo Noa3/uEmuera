@@ -6,7 +6,7 @@ using System.IO;
 namespace MinorShift.Emuera.Sub
 {
 
-	//難読化用属性。enum.ToString()やenum.Parse()を行うなら(Exclude=true)にすること。
+	//Obfuscation attribute. Set (Exclude=true) when using enum.ToString() or enum.Parse().
 	[global::System.Reflection.Obfuscation(Exclude = false)]
 	internal enum EraDataState
 	{
@@ -14,7 +14,7 @@ namespace MinorShift.Emuera.Sub
 		FILENOTFOUND = 1,//ファイルが存在せず
 		GAME_ERROR = 2,//ゲームが違う
 		VIRSION_ERROR = 3,//バージョンが違う
-		ETC_ERROR = 4,//その他のエラー
+		ETC_ERROR = 4,//その他のError
 
 	}
 

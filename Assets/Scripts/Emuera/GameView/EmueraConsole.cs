@@ -21,7 +21,7 @@ using uEmuera.Window;
 namespace MinorShift.Emuera.GameView
 {
 	//入出力待ちの状況。
-	//難読化用属性。enum.ToString()やenum.Parse()を行うなら(Exclude=true)にすること。
+	//Obfuscation attribute. Set (Exclude=true) when using enum.ToString() or enum.Parse().
 	[global::System.Reflection.Obfuscation(Exclude=false)]
 	internal enum ConsoleState
 	{
@@ -50,7 +50,7 @@ namespace MinorShift.Emuera.GameView
 
     }
 
-	//難読化用属性。enum.ToString()やenum.Parse()を行うなら(Exclude=true)にすること。
+	//Obfuscation attribute. Set (Exclude=true) when using enum.ToString() or enum.Parse().
 	[global::System.Reflection.Obfuscation(Exclude=false)]
 	internal enum ConsoleRedraw
 	{
@@ -788,7 +788,7 @@ namespace MinorShift.Emuera.GameView
 			if (state == ConsoleState.Running)
 			{//RunningならProcessは処理を継続するべき
 				state = ConsoleState.Error;
-                PrintError("emueraのエラー：プログラムの状態を特定できません");
+                PrintError("emueraのError：プログラムの状態を特定できません");
 			}
 			if (state == ConsoleState.Error && !noOutputLog)
 				OutputLog(Program.ExeDir + "emuera.log");
@@ -1203,7 +1203,7 @@ namespace MinorShift.Emuera.GameView
 			{
 				if (!Program.DebugMode)
 				{
-					PrintError("デバッグウインドウは-Debug引数付きで起動したときのみ使えます");
+					PrintError("デバッグウインドウは-Debugargument付きで起動したときのみ使えます");
 					RefreshStrings(true);
 					return;
 				}
@@ -1338,7 +1338,7 @@ namespace MinorShift.Emuera.GameView
 
 		//	int bottomLineNo = window.ScrollBar.Value - 1;
 		//	if (displayLineList.Count - 1 < bottomLineNo)
-		//		bottomLineNo = displayLineList.Count - 1;//1820 この処理不要な気がするけどエラー報告があったので入れとく
+		//		bottomLineNo = displayLineList.Count - 1;//1820 この処理不要な気がするけどError報告があったので入れとく
 		//	int topLineNo = bottomLineNo - (pointY / Config.LineHeight + 1);
 		//	if (topLineNo < 0)
 		//		topLineNo = 0;
@@ -1704,7 +1704,7 @@ namespace MinorShift.Emuera.GameView
 
 		//	int bottomLineNo = window.ScrollBar.Value - 1;
 		//	if (displayLineList.Count - 1 < bottomLineNo)
-		//		bottomLineNo = displayLineList.Count - 1;//1820 この処理不要な気がするけどエラー報告があったので入れとく
+		//		bottomLineNo = displayLineList.Count - 1;//1820 この処理不要な気がするけどError報告があったので入れとく
 		//	int topLineNo = bottomLineNo - (window.MainPicBox.Height/ Config.LineHeight);
 		//	if (topLineNo < 0)
 		//		topLineNo = 0;
@@ -1811,7 +1811,7 @@ namespace MinorShift.Emuera.GameView
 		{
 			//if (state == ConsoleState.Error)
 			//{
-			//    MessageBox.Show("エラー発生時はこの機能は使えません");
+			//    MessageBox.Show("Error発生時はこの機能は使えません");
 			//}
             forceStopTimer();
 			ClearDisplay();
@@ -1834,7 +1834,7 @@ namespace MinorShift.Emuera.GameView
 		{
 			if (state == ConsoleState.Error)
 			{
-				MessageBox.Show("エラー発生時はこの機能は使えません");
+				MessageBox.Show("Error発生時はこの機能は使えません");
 				return;
 			}
 			if (state == ConsoleState.Initializing)
@@ -1884,7 +1884,7 @@ namespace MinorShift.Emuera.GameView
 		{
 			if (state == ConsoleState.Error)
 			{
-				MessageBox.Show("エラー発生時はこの機能は使えません");
+				MessageBox.Show("Error発生時はこの機能は使えません");
 				return;
 			}
 			if (state == ConsoleState.Initializing)
@@ -1922,7 +1922,7 @@ namespace MinorShift.Emuera.GameView
 		{
             if (state == ConsoleState.Error)
 			{
-				MessageBox.Show("エラー発生時はこの機能は使えません");
+				MessageBox.Show("Error発生時はこの機能は使えません");
 				return;
 			}
 			if (state == ConsoleState.Initializing)

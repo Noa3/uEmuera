@@ -97,7 +97,7 @@ namespace MinorShift.Emuera.Sub
 
 		internal void Replace(int start, int count, string src)
 		{
-			//引数に正しい数字が送られてくること前提
+			//argumentに正しい数字が送られてくること前提
 			source = (source.Remove(start, count)).Insert(start, src);
 			pointer = start;
 		}

@@ -6,18 +6,64 @@ using UnityEngine.UI;
 using MinorShift.Emuera;
 using MinorShift.Emuera.GameView;
 
+/// <summary>
+/// Main content display manager for the Emuera console.
+/// Handles text and image rendering, scrolling, and user input.
+/// </summary>
 public class EmueraContent : MonoBehaviour
 {
+    /// <summary>
+    /// Gets the singleton instance of EmueraContent.
+    /// </summary>
     public static EmueraContent instance { get { return instance_; } }
     static EmueraContent instance_ = null;
 
+    /// <summary>
+    /// Default font name used for text rendering.
+    /// </summary>
+    [Tooltip("Default font name for text rendering")]
     public string default_fontname;
+    
+    /// <summary>
+    /// Template text component for creating new text lines.
+    /// </summary>
+    [Tooltip("Template text component for creating new text lines")]
     public Text template_text;
+    
+    /// <summary>
+    /// Template image component for block elements.
+    /// </summary>
+    [Tooltip("Template image component for block elements")]
     public Image template_block;
+    
+    /// <summary>
+    /// Template RectTransform for image containers.
+    /// </summary>
+    [Tooltip("Template for image containers")]
     public RectTransform template_images;
+    
+    /// <summary>
+    /// Container for displaying images.
+    /// </summary>
+    [Tooltip("Container for displaying images")]
     public RectTransform image_content;
+    
+    /// <summary>
+    /// Container for displaying text content.
+    /// </summary>
+    [Tooltip("Container for displaying text content")]
     public RectTransform text_content;
+    
+    /// <summary>
+    /// Container for cached images.
+    /// </summary>
+    [Tooltip("Container for cached images")]
     public RectTransform cache_images;
+    
+    /// <summary>
+    /// Reference to the option window.
+    /// </summary>
+    [Tooltip("Reference to the option window")]
     public OptionWindow option_window;
 
     Camera main_camere;
@@ -290,12 +336,15 @@ public class EmueraContent : MonoBehaviour
             index += delta;
         }
     }
+    /// <summary>
+    /// Limits the scroll position within valid bounds.
+    /// </summary>
     Vector2 GetLimitPosition(Vector2 local,
         float display_width, float display_height)
     {
         if(content_width > display_width)
         {
-            //左右移动
+            // Horizontal scrolling
             if(local.x > 0)
                 local.x = 0;
             else if(local.x < display_width - content_width)
@@ -322,6 +371,9 @@ public class EmueraContent : MonoBehaviour
 
         return local;
     }
+    /// <summary>
+    /// Marks the content as needing update.
+    /// </summary>
     public void SetDirty()
     {
         dirty = true;
@@ -433,6 +485,11 @@ public class EmueraContent : MonoBehaviour
         drag_delta = Vector2.zero;
         dirty = true;
     }
+    /// <summary>
+    /// Adds a new line to the console display.
+    /// </summary>
+    /// <param name="line">The line object to add.</param>
+    /// <param name="roll_to_bottom">Whether to scroll to bottom after adding.</param>
     public void AddLine(object line, bool roll_to_bottom = false)
     {
         if(line == null)
@@ -447,14 +504,14 @@ public class EmueraContent : MonoBehaviour
         console_lines_[max_index % max_log_count] = ld;
         if(invalid_count > 0)
             invalid_count -= 1;
-        //添加偏移高
+        // Add offset height when log is full
         if(valid_count >= max_log_count)
             offset_height += Config.LineHeight;
         max_index += 1;
 
         ld.Update();
         
-        //添加容器高
+        // Add content height
         content_height += Config.LineHeight;
         if(roll_to_bottom)
         {
@@ -467,26 +524,44 @@ public class EmueraContent : MonoBehaviour
         }
         dirty = true;
     }
+    /// <summary>
+    /// Gets a line by index.
+    /// </summary>
+    /// <param name="index">The line index.</param>
+    /// <returns>The line object or null if not found.</returns>
     public object GetLine(int index)
     {
         if(index < begin_index || index >= end_index)
             return null;
         return console_lines_[index % max_log_count].console_line;
     }
+    /// <summary>
+    /// Gets the total count of lines.
+    /// </summary>
     public int GetLineCount()
     {
         return valid_count;
     }
+    /// <summary>
+    /// Gets the minimum line number.
+    /// </summary>
     public int GetMinLineNo()
     {
         return begin_index;
     }
+    /// <summary>
+    /// Gets the maximum line number.
+    /// </summary>
     public int GetMaxLineNo()
     {
         if(valid_count == 0)
             return -1;
         return max_index;
     }
+    /// <summary>
+    /// Removes lines from the display.
+    /// </summary>
+    /// <param name="count">Number of lines to remove.</param>
     public void RemoveLine(int count)
     {
         if(!ready_)
@@ -644,6 +719,9 @@ public class EmueraContent : MonoBehaviour
             return max_log_count - invalid_count;
         }
     }
+    /// <summary>
+    /// Maximum number of log lines to keep.
+    /// </summary>
     public int max_log_count { get { return MinorShift.Emuera.Config.MaxLog; } }
     List<EmueraBehaviour.LineDesc> console_lines_;
 
@@ -669,28 +747,28 @@ public class EmueraContent : MonoBehaviour
     float DISPLAY_HEIGHT { get { return rect_transform.rect.height; } }
 
     /// <summary>
-    /// 偏移高
+    /// Offset height for scrolling.
     /// </summary>
     float offset_height = 0;
     /// <summary>
-    /// 内容宽
+    /// Content width.
     /// </summary>
     float content_width = 0;
     /// <summary>
-    /// 内容高
+    /// Content height.
     /// </summary>
     float content_height = 0;
     /// <summary>
-    /// 当前移动点
+    /// Current scroll position.
     /// </summary>
     Vector2 local_position = Vector2.zero;
 
     List<EmueraLine> display_lines_ = new List<EmueraLine>();
     Dictionary<int, EmueraImage> display_images_ = new Dictionary<int, EmueraImage>();
     /// <summary>
-    /// 获取文本显示控件
+    /// Gets a text display control from the pool.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>An EmueraLine instance.</returns>
     EmueraLine PullLine()
     {
         EmueraLine line = null;
@@ -710,9 +788,9 @@ public class EmueraContent : MonoBehaviour
         return line;
     }
     /// <summary>
-    /// 交还文本显示控件
+    /// Returns a text display control to the pool.
     /// </summary>
-    /// <param name="line"></param>
+    /// <param name="line">The line to return.</param>
     void PushLine(EmueraLine line)
     {
         line.Clear();
@@ -732,9 +810,9 @@ public class EmueraContent : MonoBehaviour
     Queue<EmueraLine> cache_lines_ = new Queue<EmueraLine>();
 
     /// <summary>
-    /// 获取图片显示控件
+    /// Gets an image display control from the pool.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>An EmueraImage instance.</returns>
     EmueraImage PullImageContainer()
     {
         EmueraImage image = null;
@@ -751,9 +829,9 @@ public class EmueraContent : MonoBehaviour
         return image;
     }
     /// <summary>
-    /// 交还图片显示控件
+    /// Returns an image display control to the pool.
     /// </summary>
-    /// <param name="image"></param>
+    /// <param name="image">The image to return.</param>
     void PushImageContainer(EmueraImage image)
     {
         image.Clear();
@@ -766,6 +844,10 @@ public class EmueraContent : MonoBehaviour
     }
     Stack<EmueraImage> cache_image_containers_ = new Stack<EmueraImage>();
 
+    /// <summary>
+    /// Gets an image from the pool.
+    /// </summary>
+    /// <returns>An Image component.</returns>
     public Image PullImage()
     {
         Image image = null;
@@ -785,6 +867,10 @@ public class EmueraContent : MonoBehaviour
         image.gameObject.SetActive(true);
         return image;
     }
+    /// <summary>
+    /// Returns an image to the pool.
+    /// </summary>
+    /// <param name="image">The image to return.</param>
     public void PushImage(Image image)
     {
         image.gameObject.SetActive(false);

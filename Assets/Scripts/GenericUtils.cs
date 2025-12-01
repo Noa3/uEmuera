@@ -6,23 +6,46 @@ using System.Text;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
+/// <summary>
+/// Static utility class with helper methods for Unity operations.
+/// </summary>
 public static class GenericUtils
 {
+    /// <summary>
+    /// Logs an info message to the console.
+    /// </summary>
+    /// <param name="content">The content to log.</param>
     public static void Info(object content)
     {
         UnityEngine.Debug.Log(content);
     }
+    
+    /// <summary>
+    /// Logs a warning message to the console.
+    /// </summary>
+    /// <param name="content">The content to log.</param>
     public static void Warn(object content)
     {
         UnityEngine.Debug.LogWarning(content);
     }
+    
+    /// <summary>
+    /// Logs an error message to the console.
+    /// </summary>
+    /// <param name="content">The content to log.</param>
     public static void Error(object content)
     {
         UnityEngine.Debug.LogError(content);
     }
+    
     /// <summary>
-    /// 获得子对象
+    /// Finds a child component by name.
     /// </summary>
+    /// <param name="type">The type of component to find.</param>
+    /// <param name="obj">The parent GameObject.</param>
+    /// <param name="childname">The name of the child to find.</param>
+    /// <param name="includeInactive">Whether to include inactive children.</param>
+    /// <returns>The found component or null.</returns>
     public static Component FindChildByName(System.Type type, GameObject obj,
                                             string childname, bool includeInactive = false)
     {
@@ -38,9 +61,14 @@ public static class GenericUtils
         }
         return null;
     }
+    
     /// <summary>
-    /// 获取子对象列表
+    /// Gets a list of child components of the specified type.
     /// </summary>
+    /// <typeparam name="T">The type of component to find.</typeparam>
+    /// <param name="obj">The parent GameObject.</param>
+    /// <param name="includeInactive">Whether to include inactive children.</param>
+    /// <returns>A list of found components.</returns>
     public static List<T> FindChildren<T>(GameObject obj, bool includeInactive = false)
         where T : Component
     {
@@ -60,9 +88,15 @@ public static class GenericUtils
 
         return result_list;
     }
+    
     /// <summary>
-    /// 获得子对象
+    /// Finds a child component by name.
     /// </summary>
+    /// <typeparam name="T">The type of component to find.</typeparam>
+    /// <param name="obj">The parent GameObject.</param>
+    /// <param name="childname">The name of the child to find.</param>
+    /// <param name="includeInactive">Whether to include inactive children.</param>
+    /// <returns>The found component or null.</returns>
     public static T FindChildByName<T>(GameObject obj, string childname, bool includeInactive = false) where T : Component
     {
         if(!obj)
@@ -78,8 +112,12 @@ public static class GenericUtils
         return null;
     }
     /// <summary>
-    /// 获得子对象
+    /// Finds a child GameObject by name.
     /// </summary>
+    /// <param name="obj">The parent GameObject.</param>
+    /// <param name="childname">The name of the child to find.</param>
+    /// <param name="includeInactive">Whether to include inactive children.</param>
+    /// <returns>The found GameObject or null.</returns>
     public static GameObject FindChildByName(GameObject obj, string childname, bool includeInactive = false)
     {
         if(!obj)
@@ -94,6 +132,12 @@ public static class GenericUtils
         }
         return null;
     }
+    
+    /// <summary>
+    /// Gets a Transform by path (e.g., "Root.Child.GrandChild").
+    /// </summary>
+    /// <param name="path">The dot-separated path to the object.</param>
+    /// <returns>The found Transform or null.</returns>
     public static Transform Get(string path)
     {
         var str = path.Split('.');
@@ -135,12 +179,13 @@ public static class GenericUtils
         }
         return t;
     }
+    
     /// <summary>
-    /// 获得文件名
-    /// ex. FolderA/FolderB/Filename -> Filename
+    /// Gets the filename from a full path.
+    /// Example: FolderA/FolderB/Filename returns Filename.
     /// </summary>
-    /// <param name="fullname"></param>
-    /// <returns></returns>
+    /// <param name="fullname">The full path.</param>
+    /// <returns>The filename portion of the path.</returns>
     public static string GetFilename(string fullname)
     {
         int last_slash = fullname.LastIndexOf('/');
@@ -149,14 +194,31 @@ public static class GenericUtils
         return fullname;
     }
 
+    /// <summary>
+    /// Converts a uEmuera color to a Unity color.
+    /// </summary>
+    /// <param name="color">The uEmuera color.</param>
+    /// <returns>The equivalent Unity color.</returns>
     public static UnityEngine.Color ToUnityColor(this uEmuera.Drawing.Color color)
     {
         return new UnityEngine.Color(color.r, color.g, color.b, color.a);
     }
+    
+    /// <summary>
+    /// Gets the hex color code for a Unity color.
+    /// </summary>
+    /// <param name="color">The Unity color.</param>
+    /// <returns>The hex color code string.</returns>
     public static string GetColorCode(UnityEngine.Color color)
     {
         return GetColorCode(new uEmuera.Drawing.Color(color.r, color.g, color.b, color.a));
     }
+    
+    /// <summary>
+    /// Gets the hex color code for a uEmuera color.
+    /// </summary>
+    /// <param name="color">The uEmuera color.</param>
+    /// <returns>The hex color code string.</returns>
     public static string GetColorCode(uEmuera.Drawing.Color color)
     {
         return string.Format("{0:x8}", color.ToRGBA());
@@ -444,11 +506,12 @@ public static class GenericUtils
             return;
         l.callbacks.Clear();
     }
+    
     /// <summary>
-    /// 设置OnEndDrag回调
+    /// Sets an OnEndDrag callback on a GameObject.
     /// </summary>
-    /// <param name="obj">设置回调的目标UI</param>
-    /// <param name="callback">回调函数</param>
+    /// <param name="obj">The target UI GameObject.</param>
+    /// <param name="callback">The callback function.</param>
     public static void SetListenerOnEndDrag(GameObject obj, Action<PointerEventData> callback)
     {
         if(!obj || callback == null)
@@ -477,6 +540,9 @@ public static class GenericUtils
         l.callbacks.Clear();
     }
 
+    /// <summary>
+    /// Calculates MD5 hash for a portion of data.
+    /// </summary>
     static string CalcMd5(byte[] data, int offset, int count)
     {
         using (var md5 = new MD5CryptoServiceProvider())
@@ -487,6 +553,9 @@ public static class GenericUtils
         }
     }
 
+    /// <summary>
+    /// Converts MD5 hash bytes to a hex string.
+    /// </summary>
     static string ToMd5String(byte[] data)
     {
         StringBuilder sb = new StringBuilder();
@@ -496,11 +565,12 @@ public static class GenericUtils
         }
         return sb.ToString();
     }
+    
     /// <summary>
-    /// 
+    /// Calculates MD5 hashes for each line in the data.
     /// </summary>
-    /// <param name="data"></param>
-    /// <returns></returns>
+    /// <param name="data">The byte array to process.</param>
+    /// <returns>A list of MD5 hash strings.</returns>
     public static List<string> CalcMd5List(byte[] data)
     {
         var md5s = new List<string>();

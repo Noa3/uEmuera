@@ -236,7 +236,7 @@ namespace MinorShift.Emuera.GameData.Variable
 				}
 				else
 				{
-					//キャラクターデータの第1引数はこの時点でチェックしても意味がないのと
+					//キャラクターデータの第1argumentはこの時点でチェックしても意味がないのと
 					//ARG系は限界超えてても必要な数に拡張されるのでチェックしなくていい
 					if ((i == 0 && Identifier.IsCharacterData) || Identifier.Name == "ARG" || Identifier.Name == "ARGS")
 						canCheck[i] = false;
@@ -401,7 +401,7 @@ namespace MinorShift.Emuera.GameData.Variable
 
 
 	/// <summary>
-	/// 引数がない変数。値を参照、代入できない
+	/// argumentがない変数。値を参照、代入できない
 	/// </summary>
 	internal sealed class VariableNoArgTerm : VariableTerm
 	{
@@ -412,27 +412,27 @@ namespace MinorShift.Emuera.GameData.Variable
 			this.allArgIsConst = true;
 		}
 		public override Int64 GetIntValue(ExpressionMediator exm)
-		{ throw new CodeEE("変数" + Identifier.Name + "に必要な引数が不足しています"); }
+		{ throw new CodeEE("変数" + Identifier.Name + "に必要なargumentが不足しています"); }
 		public override string GetStrValue(ExpressionMediator exm)
-		{ throw new CodeEE("変数" + Identifier.Name + "に必要な引数が不足しています"); }
+		{ throw new CodeEE("変数" + Identifier.Name + "に必要なargumentが不足しています"); }
 		public override void SetValue(Int64 value, ExpressionMediator exm)
-		{ throw new CodeEE("変数" + Identifier.Name + "に必要な引数が不足しています"); }
+		{ throw new CodeEE("変数" + Identifier.Name + "に必要なargumentが不足しています"); }
 		public override void SetValue(string value, ExpressionMediator exm)
-		{ throw new CodeEE("変数" + Identifier.Name + "に必要な引数が不足しています"); }
+		{ throw new CodeEE("変数" + Identifier.Name + "に必要なargumentが不足しています"); }
 		public override void SetValue(Int64[] array, ExpressionMediator exm)
-		{ throw new CodeEE("変数" + Identifier.Name + "に必要な引数が不足しています"); }
+		{ throw new CodeEE("変数" + Identifier.Name + "に必要なargumentが不足しています"); }
 		public override void SetValue(string[] array, ExpressionMediator exm)
-		{ throw new CodeEE("変数" + Identifier.Name + "に必要な引数が不足しています"); }
+		{ throw new CodeEE("変数" + Identifier.Name + "に必要なargumentが不足しています"); }
 		public override Int64 PlusValue(Int64 value, ExpressionMediator exm)
-		{ throw new CodeEE("変数" + Identifier.Name + "に必要な引数が不足しています"); }
+		{ throw new CodeEE("変数" + Identifier.Name + "に必要なargumentが不足しています"); }
 		public override SingleTerm GetValue(ExpressionMediator exm)
-		{ throw new CodeEE("変数" + Identifier.Name + "に必要な引数が不足しています"); }
+		{ throw new CodeEE("変数" + Identifier.Name + "に必要なargumentが不足しています"); }
 		public override void SetValue(SingleTerm value, ExpressionMediator exm)
-		{ throw new CodeEE("変数" + Identifier.Name + "に必要な引数が不足しています"); }
+		{ throw new CodeEE("変数" + Identifier.Name + "に必要なargumentが不足しています"); }
 		public override void SetValue(IOperandTerm value, ExpressionMediator exm)
-		{ throw new CodeEE("変数" + Identifier.Name + "に必要な引数が不足しています"); }
+		{ throw new CodeEE("変数" + Identifier.Name + "に必要なargumentが不足しています"); }
 		public override FixedVariableTerm GetFixedVariableTerm(ExpressionMediator exm)
-		{ throw new CodeEE("変数" + Identifier.Name + "に必要な引数が不足しています"); }
+		{ throw new CodeEE("変数" + Identifier.Name + "に必要なargumentが不足しています"); }
 
 		public override IOperandTerm Restructure(ExpressionMediator exm)
 		{

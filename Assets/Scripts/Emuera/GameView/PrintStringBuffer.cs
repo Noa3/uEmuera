@@ -324,7 +324,7 @@ namespace MinorShift.Emuera.GameView
 		}
 
 		/// <summary>
-		/// 物理行をボタン単位に分割。引数のcssListの内容は変更される場合がある。
+		/// 物理行をボタン単位に分割。argumentのcssListの内容は変更される場合がある。
 		/// </summary>
 		/// <returns></returns>
 		private ConsoleButtonString[] createButtons(List<AConsoleDisplayPart> cssList)

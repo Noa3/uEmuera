@@ -36,7 +36,7 @@ namespace MinorShift.Emuera.GameData.Expression
 	{
 		#region public Reduce
 		/// <summary>
-		/// カンマで区切られた引数を一括して取得。
+		/// カンマで区切られたargumentを一括して取得。
 		/// return時にはendWithの次の文字がCurrentになっているはず。終端の適切さの検証はExpressionParserがが行う。
 		/// 呼び出し元はCodeEEを適切に処理すること
 		/// </summary>
@@ -92,7 +92,7 @@ namespace MinorShift.Emuera.GameData.Expression
 				{
 					terms.Add(ReduceExpressionTerm(wc, termEndWith_Assignment));
                     if (terms[terms.Count - 1] == null)
-                        throw new CodeEE("関数定義の引数は省略できません");
+                        throw new CodeEE("関数定義のargumentは省略できません");
 					if (wc.Current is OperatorWord)
 					{//=がある
 						wc.ShiftNext();
@@ -122,7 +122,7 @@ namespace MinorShift.Emuera.GameData.Expression
 
 
 		/// <summary>
-		/// 数式または文字列式。CALLの引数などを扱う。nullを返すことがある。
+		/// 数式または文字列式。CALLのargumentなどを扱う。nullを返すことがある。
 		/// return時にはendWithの文字がCurrentになっているはず。終端の適切さの検証は呼び出し元が行う。
 		/// </summary>
 		/// <param name="st"></param>
@@ -172,7 +172,7 @@ namespace MinorShift.Emuera.GameData.Expression
 		}
 
 		/// <summary>
-		/// カンマで区切られたCASEの引数を一括して取得。行端で終わる。
+		/// カンマで区切られたCASEのargumentを一括して取得。行端で終わる。
 		/// </summary>
 		/// <param name="st"></param>
 		/// <returns></returns>
@@ -193,7 +193,7 @@ namespace MinorShift.Emuera.GameData.Expression
 		{
 			IOperandTerm ret = reduceTerm(wc, false, TermEndWith.EoL, varCode);
 			if(ret == null)
-                throw new CodeEE("変数の:の後に引数がありません");
+                throw new CodeEE("変数の:の後にargumentがありません");
 			return ret;
 		}
 
@@ -218,7 +218,7 @@ namespace MinorShift.Emuera.GameData.Expression
 		/// </summary>
 		/// <param name="wc"></param>
 		/// <param name="idStr">識別子文字列</param>
-		/// <param name="varCode">変数の引数の場合はその変数のCode。連想配列的につかう</param>
+		/// <param name="varCode">変数のargumentの場合はその変数のCode。連想配列的につかう</param>
 		/// <returns></returns>
 		private static IOperandTerm reduceIdentifier(WordCollection wc, string idStr, VariableCode varCode)
 		{
@@ -233,7 +233,7 @@ namespace MinorShift.Emuera.GameData.Expression
 				wc.ShiftNext();
 				if (symbol.Type == '[')//1810 多分永久に実装されない
 					throw new CodeEE("[]を使った機能はまだ実装されていません");
-				//引数を処理
+				//argumentを処理
 				IOperandTerm[] args = ReduceArguments(wc, ArgsEndWith.RightParenthesis, false);
 				IOperandTerm mToken = GlobalStatic.IdentifierDictionary.GetFunctionMethod(GlobalStatic.LabelDictionary, idStr, args, false);
 				if (mToken == null)
@@ -257,20 +257,20 @@ namespace MinorShift.Emuera.GameData.Expression
 				VariableToken id = ReduceVariableIdentifier(wc, idStr);
 				if (id != null)//idStrが変数名の場合、
 				{
-					if (varCode != VariableCode.__NULL__)//変数の引数が引数を持つことはない
+					if (varCode != VariableCode.__NULL__)//変数のargumentがargumentを持つことはない
 						return VariableParser.ReduceVariable(id, null, null, null);
 					else
 						return VariableParser.ReduceVariable(id, wc);
 				}
 				//idStrが変数名でない場合、
 				IOperandTerm refToken = GlobalStatic.IdentifierDictionary.GetFunctionMethod(GlobalStatic.LabelDictionary, idStr, null, false);
-				if (refToken != null)//関数参照と名前が一致したらそれを返す。実際に使うとエラー
+				if (refToken != null)//関数参照と名前が一致したらそれを返す。実際に使うとError
 					return refToken;
 				if (varCode != VariableCode.__NULL__ && GlobalStatic.ConstantData.isDefined(varCode, idStr))//連想配列的な可能性アリ
 					return new SingleTerm(idStr);
 				GlobalStatic.IdentifierDictionary.ThrowException(idStr, false);
 			}
-			throw new ExeEE("エラー投げ損ねた");//ここまででthrowかreturnのどちらかをするはず。
+			throw new ExeEE("Error投げ損ねた");//ここまででthrowかreturnのどちらかをするはず。
 		}
 
 		#endregion
@@ -301,7 +301,7 @@ namespace MinorShift.Emuera.GameData.Expression
 			}
 			ret.LeftTerm = reduceTerm(wc, true, TermEndWith.Comma, VariableCode.__NULL__);
 			if (ret.LeftTerm == null)
-				throw new CodeEE("CASEの引数は省略できません");
+				throw new CodeEE("CASEのargumentは省略できません");
 			id = wc.Current as IdentifierWord;
 			if ((id != null) && (id.Code.Equals("TO", Config.SCVariable)))
 			{
@@ -371,7 +371,7 @@ namespace MinorShift.Emuera.GameData.Expression
 					case '='://OperatorWT
 						{
 							if (varArg)
-								throw new CodeEE("変数の引数の読み取り中に予期しない演算子を発見しました");
+								throw new CodeEE("変数のargumentの読み取り中に予期しない演算子を発見しました");
 							OperatorCode op = ((OperatorWord)token).Code;
 							if (op == OperatorCode.Assignment)
 							{
@@ -568,7 +568,7 @@ namespace MinorShift.Emuera.GameData.Expression
             private void reduceUnary()
             {
                 //if (stack.Count < 2)
-                //    throw new ExeEE("不正な時期の呼び出し");
+                //    throw new ExeEE("Invalid 時期の呼び出し");
                 IOperandTerm operand = (IOperandTerm)stack.Pop();
                 OperatorCode op = (OperatorCode)stack.Pop();
                 IOperandTerm newTerm = OperatorMethodManager.ReduceUnaryTerm(op, operand);
@@ -578,7 +578,7 @@ namespace MinorShift.Emuera.GameData.Expression
             private void reduceUnaryAfter()
             {
                 //if (stack.Count < 2)
-                //    throw new ExeEE("不正な時期の呼び出し");
+                //    throw new ExeEE("Invalid 時期の呼び出し");
                 OperatorCode op = (OperatorCode)stack.Pop();
                 IOperandTerm operand = (IOperandTerm)stack.Pop();
                 
@@ -589,7 +589,7 @@ namespace MinorShift.Emuera.GameData.Expression
             private void reduceLastThree()
             {
                 //if (stack.Count < 2)
-                //    throw new ExeEE("不正な時期の呼び出し");
+                //    throw new ExeEE("Invalid 時期の呼び出し");
                 IOperandTerm right = (IOperandTerm)stack.Pop();//後から入れたほうが右側
                 OperatorCode op = (OperatorCode)stack.Pop();
                 IOperandTerm left = (IOperandTerm)stack.Pop();

@@ -55,11 +55,11 @@ namespace MinorShift.Emuera.Content
         //	//locked = false;
         //}
 
-        #region Bitmap書き込み・作成
+        #region Bitmap writing and creation
 
         /// <summary>
         /// GCREATE(int ID, int width, int height)
-        /// Graphicsの基礎となるBitmapを作成する。エラーチェックは呼び出し元でのみ行う
+        /// Creates the Bitmap underlying Graphics. Error checking is done by caller only.
         /// </summary>
         public void GCreate(int x, int y, bool useGDI)
         {
@@ -88,7 +88,7 @@ namespace MinorShift.Emuera.Content
 
         /// <summary>
         /// GCLEAR(int ID, int cARGB)
-        /// エラーチェックは呼び出し元でのみ行う
+        /// Error checking is done by caller only.
         /// </summary>
         public void GClear(uEmuera.Drawing.Color c)
         {
@@ -99,7 +99,7 @@ namespace MinorShift.Emuera.Content
 
         /// <summary>
         /// GDRAWTEXTGDRAWTEXT int ID, str text, int x, int y
-        /// エラーチェックは呼び出し元でのみ行う
+        /// Error checking is done by caller only.
         /// </summary>
         //public void GDrawString(string text, int x, int y)
         //{
@@ -120,7 +120,7 @@ namespace MinorShift.Emuera.Content
         //}
         /// <summary>
         /// GDRAWTEXTGDRAWTEXT int ID, str text, int x, int y, int width, int height
-        /// エラーチェックは呼び出し元でのみ行う
+        /// Error checking is done by caller only.
         /// </summary>
         //public void GDrawString(string text, int x, int y, int width, int height)
         //{
@@ -142,7 +142,7 @@ namespace MinorShift.Emuera.Content
 
         /// <summary>
         /// GDRAWRECTANGLE(int ID, int x, int y, int width, int height)
-        /// エラーチェックは呼び出し元でのみ行う
+        /// Error checking is done by caller only.
         /// </summary>
         //public void GDrawRectangle(Rectangle rect)
         //{
@@ -161,7 +161,7 @@ namespace MinorShift.Emuera.Content
 
         /// <summary>
         /// GFILLRECTANGLE(int ID, int x, int y, int width, int height)
-        /// エラーチェックは呼び出し元でのみ行う
+        /// Error checking is done by caller only.
         /// </summary>
         public void GFillRectangle(Rectangle rect)
         {
@@ -180,7 +180,7 @@ namespace MinorShift.Emuera.Content
 
 		/// <summary>
 		/// GDRAWCIMG(int ID, str imgName, int destX, int destY, int destWidth, int destHeight)
-		/// エラーチェックは呼び出し元でのみ行う
+		/// Error checking is done by caller only.
 		/// </summary>
 		public void GDrawCImg(ASprite img, Rectangle destRect)
 		{
@@ -191,7 +191,7 @@ namespace MinorShift.Emuera.Content
 
 		/// <summary>
 		/// GDRAWCIMG(int ID, str imgName, int destX, int destY, int destWidth, int destHeight, float[][] cm)
-		/// エラーチェックは呼び出し元でのみ行う
+		/// Error checking is done by caller only.
 		/// </summary>
 		public void GDrawCImg(ASprite img, Rectangle destRect, float[][] cm)
 		{
@@ -206,7 +206,7 @@ namespace MinorShift.Emuera.Content
 
         /// <summary>
         /// GDRAWG(int ID, int srcID, int destX, int destY, int destWidth, int destHeight, int srcX, int srcY, int srcWidth, int srcHeight)
-        /// エラーチェックは呼び出し元でのみ行う
+        /// Error checking is done by caller only.
         /// </summary>
         public void GDrawG(GraphicsImage srcGra, Rectangle destRect, Rectangle srcRect)
         {
@@ -219,7 +219,7 @@ namespace MinorShift.Emuera.Content
 
         /// <summary>
         /// GDRAWG(int ID, int srcID, int destX, int destY, int destWidth, int destHeight, int srcX, int srcY, int srcWidth, int srcHeight, float[][] cm)
-        /// エラーチェックは呼び出し元でのみ行う
+        /// Error checking is done by caller only.
         /// </summary>
         public void GDrawG(GraphicsImage srcGra, Rectangle destRect, Rectangle srcRect, float[][] cm)
         {
@@ -229,7 +229,7 @@ namespace MinorShift.Emuera.Content
         //	ImageAttributes imageAttributes = new ImageAttributes();
         //	ColorMatrix colorMatrix = new ColorMatrix(cm);
         //	imageAttributes.SetColorMatrix(colorMatrix, ColorMatrixFlag.Default,ColorAdjustType.Bitmap);
-        //	//g.DrawImage(img.Bitmap, destRect, srcRect, GraphicsUnit.Pixel, imageAttributes);なんでこのパターンないのさ
+        //	//g.DrawImage(img.Bitmap, destRect, srcRect, GraphicsUnit.Pixel, imageAttributes); Why doesn't this overload exist?
         //	g.DrawImage(src, destRect, srcRect.X, srcRect.Y, srcRect.Width, srcRect.Height, GraphicsUnit.Pixel, imageAttributes);
 
         }
@@ -237,7 +237,7 @@ namespace MinorShift.Emuera.Content
 
         /// <summary>
         /// GDRAWGWITHMASK(int ID, int srcID, int maskID, int destX, int destY)
-        /// エラーチェックは呼び出し元でのみ行う
+        /// Error checking is done by caller only.
         /// </summary>
         public void GDrawGWithMask(GraphicsImage srcGra, GraphicsImage maskGra, Point destPoint)
         {
@@ -266,19 +266,19 @@ namespace MinorShift.Emuera.Content
         //			int srcIndex = ((0 + y) * srcGra.Width + 0) * 4;
         //			for (int x = 0; x < srcGra.Width; x++)
         //			{
-        //				if (srcMaskBytes[srcIndex] == 255)//完全不透明
+        //				if (srcMaskBytes[srcIndex] == 255)//Fully opaque
         //				{
         //					pixels[destIndex++] = srcBytes[srcIndex++];
         //					pixels[destIndex++] = srcBytes[srcIndex++];
         //					pixels[destIndex++] = srcBytes[srcIndex++];
         //					pixels[destIndex++] = srcBytes[srcIndex++];
         //				}
-        //				else if (srcMaskBytes[srcIndex] == 0)//完全透明
+        //				else if (srcMaskBytes[srcIndex] == 0)//Fully transparent
         //				{
         //					destIndex += 4;
         //					srcIndex += 4;
         //				}
-        //				else//半透明 alpha/255ではなく（alpha+1）/256で計算しているがたぶん誤差
+        //				else//Semi-transparent. Using (alpha+1)/256 instead of alpha/255, but probably negligible error
         //				{
         //					int mask = srcMaskBytes[srcIndex]; mask++;
         //					pixels[destIndex] = (byte)((srcBytes[srcIndex] * mask + pixels[destIndex] * (256 - mask)) >> 8); srcIndex++; destIndex++;
@@ -289,7 +289,7 @@ namespace MinorShift.Emuera.Content
         //			}
         //		}
 
-        //		// Bitmapへコピー
+        //		// Copy to Bitmap
         //		System.Runtime.InteropServices.Marshal.Copy(pixels, 0, ptr, pixels.Length);
         //	}
         //	finally
@@ -320,11 +320,11 @@ namespace MinorShift.Emuera.Content
         //{
         //	BitmapData bmpData = bmp.LockBits(
         //	  new Rectangle(0, 0, bmp.Width, bmp.Height),
-        //	  ImageLockMode.ReadOnly,  // 書き込むときはReadAndWriteで
+        //	  ImageLockMode.ReadOnly,  // Use ReadAndWrite when writing
         //	  PixelFormat.Format32bppArgb
         //	);
         //	if (bmpData.Stride < 0)
-        //		throw new Exception();//変な形式のが送られてくることはありえないはずだが一応
+        //		throw new Exception();//Unusual format should not be sent, but just in case
         //	byte[] pixels = new byte[bmpData.Stride * bmp.Height];
         //	try
         //	{ 
@@ -341,7 +341,7 @@ namespace MinorShift.Emuera.Content
 
         /// <summary>
         /// GTOARRAY int ID, var array
-        /// エラーチェックは呼び出し元でのみ行う
+        /// Error checking is done by caller only.
         /// <returns></returns>
         //public bool GBitmapToInt64Array(Int64[,] array, int xstart, int ystart)
         //{
@@ -377,7 +377,7 @@ namespace MinorShift.Emuera.Content
 
         /// <summary>
         /// GFROMARRAY int ID, var array
-        /// エラーチェックは呼び出し元でのみ行う
+        /// Error checking is done by caller only.
         /// <returns></returns>
         //public bool GByteArrayToBitmap(Int64[,] array, int xstart, int ystart)
         //{
@@ -411,9 +411,9 @@ namespace MinorShift.Emuera.Content
         //	return true;
         //}
         #endregion
-        #region Bitmap読み込み・削除
+        #region Bitmap loading and deletion
         /// <summary>
-        /// 未作成ならエラー
+        /// Error if not created
         /// </summary>
         //public Bitmap GetBitmap()
         //{
@@ -424,7 +424,7 @@ namespace MinorShift.Emuera.Content
         //}
         /// <summary>
         /// GSETCOLOR(int ID, int cARGB, int x, int y)
-        /// エラーチェックは呼び出し元でのみ行う
+        /// Error checking is done by caller only.
         /// </summary>
         public void GSetColor(uEmuera.Drawing.Color c, int x, int y)
         {
@@ -436,7 +436,7 @@ namespace MinorShift.Emuera.Content
 
         /// <summary>
         /// GGETCOLOR(int ID, int x, int y)
-        /// エラーチェックは呼び出し元でのみ行う。特に画像範囲内であるかどうかチェックすること
+        /// Error checking is done by caller only. Be sure to check if coordinates are within image bounds.
         /// </summary>
         public uEmuera.Drawing.Color GGetColor(int x, int y)
         {
@@ -499,7 +499,7 @@ namespace MinorShift.Emuera.Content
         }
         #endregion
 
-//#region 状態判定（Bitmap読み書きを伴わない）
+//#region State determination (without Bitmap read/write)
         //public override bool IsCreated { get { return g != null; } }
         public override bool IsCreated { get { return is_created; } }
         bool is_created = false;

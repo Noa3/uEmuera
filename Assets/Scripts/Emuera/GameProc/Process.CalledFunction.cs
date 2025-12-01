@@ -42,7 +42,7 @@ namespace MinorShift.Emuera.GameProc
 					{
 						Int64 charaNo = vTerm.GetElementInt(0, exm);
 						if ((charaNo < 0) || (charaNo >= GlobalStatic.VariableData.CharacterList.Count))
-							throw new CodeEE("キャラクタ配列変数" + vTerm.Identifier.Name + "の第１引数(" + charaNo.ToString() + ")はキャラ登録番号の範囲外です");
+							throw new CodeEE("キャラクタ配列変数" + vTerm.Identifier.Name + "の第１argument(" + charaNo.ToString() + ")はキャラ登録番号の範囲外です");
 						TransporterRef[i] = (Array)vTerm.Identifier.GetArrayChara((int)charaNo);
 					}
 					else
@@ -110,7 +110,7 @@ namespace MinorShift.Emuera.GameProc
 			{
 				if (parent.LabelDictionary.GetEventLabels(label) != null)
 				{
-					throw new CodeEE("イベント関数@" + label + "に対し通常のCALLが行われました(このエラーは互換性オプション「" + Config.GetConfigName(ConfigCode.CompatiCallEvent) + "」により無視できます)");
+					throw new CodeEE("イベント関数@" + label + "に対し通常のCALLが行われました(このErrorは互換性オプション「" + Config.GetConfigName(ConfigCode.CompatiCallEvent) + "」により無視できます)");
 				}
 				return null;
 			}
@@ -138,8 +138,8 @@ namespace MinorShift.Emuera.GameProc
 		
 		static FunctionMethod tostrMethod = null;
 		/// <summary>
-		/// 1803beta005 予め引数の数を合わせて規定値を代入しておく
-        /// 1806+v6.99 式中関数の引数に無効な#DIM変数を与えている場合に例外になるのを修正
+		/// 1803beta005 予めargumentの数を合わせて規定値を代入しておく
+        /// 1806+v6.99 式中関数のargumentに無効な#DIM変数を与えている場合にExceptionになるのを修正
 		/// 1808beta009 REF型に対応
 		/// </summary>
 		public UserDefinedFunctionArgument ConvertArg(IOperandTerm[] srcArgs, out string errMes)
@@ -154,7 +154,7 @@ namespace MinorShift.Emuera.GameProc
             IOperandTerm[] convertedArg = new IOperandTerm[func.Arg.Length];
 			if(convertedArg.Length < srcArgs.Length)
 			{
-				errMes = "引数の数が関数\"@" + func.LabelName + "\"に設定された数を超えています";
+				errMes = "argumentの数が関数\"@" + func.LabelName + "\"に設定された数を超えています";
 				return null;
 			}
 			IOperandTerm term;
@@ -169,31 +169,31 @@ namespace MinorShift.Emuera.GameProc
 				{
 					if (term == null)
 					{
-						errMes = "\"@" + func.LabelName + "\"の" + (i + 1).ToString() + "番目の引数は参照渡しのため省略できません";
+						errMes = "\"@" + func.LabelName + "\"の" + (i + 1).ToString() + "番目のargumentは参照渡しのため省略できません";
 						return null;
 					}
 					VariableTerm vTerm = term as VariableTerm;
 					if (vTerm == null || vTerm.Identifier.Dimension == 0)
 					{
-						errMes = "\"@" + func.LabelName + "\"の" + (i + 1).ToString() + "番目の引数は参照渡しのための配列変数でなければなりません";
+						errMes = "\"@" + func.LabelName + "\"の" + (i + 1).ToString() + "番目のargumentは参照渡しのための配列変数でなければなりません";
 						return null;
 					}
 					//TODO 1810alpha007 キャラ型を認めるかどうかはっきりしたい 今のところ認めない方向
 					//型チェック
 					if (!((ReferenceToken)destArg.Identifier).MatchType(vTerm.Identifier, false, out errMes))
 					{
-						errMes = "\"@" + func.LabelName + "\"の" + (i + 1).ToString() + "番目の引数:" + errMes;
+						errMes = "\"@" + func.LabelName + "\"の" + (i + 1).ToString() + "番目のargument:" + errMes;
 						return null;
 					}
 				}
-				else if (term == null)//引数が省略されたとき
+				else if (term == null)//argumentが省略されたとき
 				{
 					term = func.Def[i];//デフォルト値を代入
-					//1808beta001 デフォルト値がない場合はエラーにする
+					//1808beta001 デフォルト値がない場合はErrorにする
 					//一応逃がす
 					if (term == null && !Config.CompatiFuncArgOptional)
 					{
-						errMes = "\"@" + func.LabelName + "\"の" + (i + 1).ToString() + "番目の引数は省略できません(この警告は互換性オプション「" + Config.GetConfigName(ConfigCode.CompatiFuncArgOptional) + "」により無視できます)";
+						errMes = "\"@" + func.LabelName + "\"の" + (i + 1).ToString() + "番目のargumentは省略できません(この警告は互換性オプション「" + Config.GetConfigName(ConfigCode.CompatiFuncArgOptional) + "」により無視できます)";
 						return null;
 					}
 				}
@@ -201,14 +201,14 @@ namespace MinorShift.Emuera.GameProc
 				{
 					if (term.GetOperandType() == typeof(string))
 					{
-						errMes = "\"@" + func.LabelName + "\"の" + (i + 1).ToString() + "番目の引数を文字列型から整数型に変換できません";
+						errMes = "\"@" + func.LabelName + "\"の" + (i + 1).ToString() + "番目のargumentを文字列型から整数型に変換できません";
 						return null;
 					}
 					else
 					{
 						if (!Config.CompatiFuncArgAutoConvert)
 						{
-							errMes = "\"@" + func.LabelName + "\"の" + (i + 1).ToString() + "番目の引数を整数型から文字列型に変換できません(この警告は互換性オプション「" + Config.GetConfigName(ConfigCode.CompatiFuncArgAutoConvert) + "」により無視できます)";
+							errMes = "\"@" + func.LabelName + "\"の" + (i + 1).ToString() + "番目のargumentを整数型から文字列型に変換できません(この警告は互換性オプション「" + Config.GetConfigName(ConfigCode.CompatiFuncArgAutoConvert) + "」により無視できます)";
 							return null;
 						}
 						if (tostrMethod == null)

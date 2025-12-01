@@ -85,7 +85,7 @@ namespace MinorShift.Emuera.GameProc
 		{
 			//スクリプト実行中にここには来ないはず
 			//if (!state.ScriptEnd)
-			//    throw new ExeEE("不正な呼び出し");
+			//    throw new ExeEE("Invalid 呼び出し");
 
 			//ない物を渡す処理は現状ない
 			//if (systemProcessDictionary.ContainsKey(state.SystemState))
@@ -659,7 +659,7 @@ namespace MinorShift.Emuera.GameProc
 			{
 				if (!vEvaluator.SaveTo(saveTarget, vEvaluator.SAVEDATA_TEXT))
 				{
-					console.PrintError("オートセーブ中に予期しないエラーが発生しました");
+					console.PrintError("オートセーブ中に予期しないErrorが発生しました");
 					console.PrintError("オートセーブをスキップします");
 					console.ReadAnyKey();
 				}
@@ -927,7 +927,7 @@ namespace MinorShift.Emuera.GameProc
 		{
 			if (!vEvaluator.SaveTo(saveTarget, vEvaluator.SAVEDATA_TEXT))
 			{
-				console.PrintError("セーブ中に予期しないエラーが発生しました");
+				console.PrintError("セーブ中に予期しないErrorが発生しました");
 				console.ReadAnyKey();
 			}
 			loadPrevState();
@@ -984,7 +984,7 @@ namespace MinorShift.Emuera.GameProc
 			}
 
 			if (!vEvaluator.LoadFrom((int)systemResult))
-				throw new ExeEE("ファイルのロード中に予期しないエラーが発生しました");
+				throw new ExeEE("ファイルのロード中に予期しないErrorが発生しました");
 			deletePrevState();
 			beginDataLoaded();
 		}

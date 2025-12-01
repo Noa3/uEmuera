@@ -12,9 +12,9 @@ namespace MinorShift.Emuera.GameData.Function
 		protected Type[] argumentTypeArray;
 		protected string Name { get; private set; }
 
-		//引数の数・型が一致するかどうかのテスト
-		//正しくない場合はエラーメッセージを返す。
-		//引数の数が不定である場合や引数の省略を許す場合にはoverrideすること。
+		//argumentの数・型が一致するかどうかのテスト
+		//正しくない場合はErrorメッセージを返す。
+		//argumentの数が不定である場合やargumentの省略を許す場合にはoverrideすること。
 		public virtual string CheckArgumentType(string name, IOperandTerm[] arguments)
 		{
 			if (arguments.Length != argumentTypeArray.Length)

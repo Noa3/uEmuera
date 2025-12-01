@@ -74,7 +74,7 @@ namespace MinorShift.Emuera
 			if (!Directory.Exists(ContentDir)){
 				ContentDir = ExeDir + "RESOURCES/";
 			}
-			//エラー出力用
+			//Error出力用
 			//1815 .exeが東方板のNGワードに引っかかるそうなので除去
 			//ExeName = Path.GetFileNameWithoutExtension(Sys.ExeName);
 

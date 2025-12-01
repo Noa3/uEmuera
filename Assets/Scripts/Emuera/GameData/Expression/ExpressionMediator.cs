@@ -37,7 +37,7 @@ namespace MinorShift.Emuera.GameData.Expression
 		public void ForceKana(Int64 flag)
 		{
 			if (flag < 0 || flag > 3)
-				throw new CodeEE("命令FORCEKANAの引数が指定可能な範囲(0～3)を超えています");
+				throw new CodeEE("命令FORCEKANAのargumentが指定可能な範囲(0～3)を超えています");
 			forceKatakana = (flag == 1) ? true : false;
 			forceHiragana = (flag > 1) ? true : false;
 			halftoFull = (flag == 3) ? true : false;
