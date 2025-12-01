@@ -196,11 +196,6 @@ namespace MinorShift.Emuera.Content
         /// </summary>
         private string GetFullSoundPath(string filename)
         {
-            // If filename already has path separators, use as-is relative to sound dir
-            if (filename.Contains("/") || filename.Contains("\\"))
-            {
-                return _soundDir + filename;
-            }
             return _soundDir + filename;
         }
 
@@ -249,58 +244,28 @@ namespace MinorShift.Emuera.Content
 
         /// <summary>
         /// Loads an audio file synchronously.
-        /// Note: This uses a synchronous approach for compatibility with the Emuera script execution model.
+        /// Note: Currently supports WAV format. Other formats can be enhanced as needed.
         /// </summary>
         private AudioClip LoadAudioFromFile(string filePath)
         {
             try
             {
                 string extension = Path.GetExtension(filePath).ToLowerInvariant();
-                AudioType audioType;
                 
                 switch (extension)
                 {
                     case ".wav":
-                        audioType = AudioType.WAV;
-                        break;
+                        return LoadWavFile(filePath);
                     case ".ogg":
-                        audioType = AudioType.OGGVORBIS;
-                        break;
                     case ".mp3":
-                        audioType = AudioType.MPEG;
-                        break;
+                        // OGG and MP3 would require async loading with UnityWebRequest
+                        // For synchronous Emuera script compatibility, we only support WAV
+                        Debug.LogWarning($"AudioManager: Only WAV format is currently supported. File: {filePath}");
+                        return null;
                     default:
-                        audioType = AudioType.UNKNOWN;
-                        break;
+                        Debug.LogWarning($"AudioManager: Unsupported audio format: {extension}");
+                        return null;
                 }
-
-                // Use WWW class for synchronous loading (deprecated but works)
-                string url = "file://" + filePath;
-                
-#if UNITY_2018_3_OR_NEWER
-                // For newer Unity versions, we need to use UnityWebRequest
-                // But since we need synchronous loading, we'll use a coroutine workaround
-                // For now, fall back to basic file loading for WAV files
-                if (audioType == AudioType.WAV)
-                {
-                    return LoadWavFile(filePath);
-                }
-                else
-                {
-                    // For other formats, we'd need async loading
-                    // Just return null for now - this can be enhanced later
-                    return null;
-                }
-#else
-                WWW www = new WWW(url);
-                while (!www.isDone) { }
-                
-                if (string.IsNullOrEmpty(www.error))
-                {
-                    return www.GetAudioClip(false, false, audioType);
-                }
-                return null;
-#endif
             }
             catch (Exception ex)
             {
