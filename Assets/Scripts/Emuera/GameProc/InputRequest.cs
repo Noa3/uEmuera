@@ -15,6 +15,9 @@ namespace MinorShift.Emuera.GameProc
 		//1823
 		PrimitiveMouseKey = 11,
 
+		// Emuera EM/EE Extensions - BINPUT types (button-only input)
+		BIntValue = 21,//ボタンのみ整数値入力
+		BStrValue = 22,//ボタンのみ文字列入力
 	}
 	
 
@@ -35,7 +38,8 @@ namespace MinorShift.Emuera.GameProc
 			get 
 			{ 
 				return (InputType == InputType.IntValue || InputType == InputType.StrValue
-					|| InputType == InputType.PrimitiveMouseKey); 
+					|| InputType == InputType.PrimitiveMouseKey
+					|| InputType == InputType.BIntValue || InputType == InputType.BStrValue); 
 			} 
 		}
 		public bool OneInput = false;
