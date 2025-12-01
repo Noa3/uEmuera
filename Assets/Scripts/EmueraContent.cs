@@ -246,7 +246,7 @@ public class EmueraContent : MonoBehaviour
             UpdateLine(pos, display_height, index, +1);
         }
         if(display_lines_.Count == 0 &&
-            console_lines_ != null && console_lines_.Count > 0)
+            console_lines_ != null && valid_count > 0)
         {
             index = GetLineNoIndexForPosY(pos.y);
             UpdateLine(pos, display_height, index, -1);
@@ -259,6 +259,11 @@ public class EmueraContent : MonoBehaviour
         while(zero <= index && index < end_index)
         {
             var l = console_lines_[index % max_log_count];
+            if(l == null || l.units == null)
+            {
+                index += delta;
+                continue;
+            }
             if(l.position_y > local.y + display_height ||
                 l.position_y + l.height < local.y)
                 break;
@@ -601,7 +606,7 @@ public class EmueraContent : MonoBehaviour
             for(int i = end_index - 1; i >= begin_index; --i)
             {
                 var cl = console_lines_[i%max_log_count];
-                if(cl.units == null)
+                if(cl == null || cl.units == null)
                     continue;
                 var bl = 0;
                 for(int j = 0; j < cl.units.Count; ++j)
