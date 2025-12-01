@@ -73,9 +73,10 @@ namespace uEmuera
         }
         
         /// <summary>
-        /// Sets the UTF-8 Simplified Chinese to UTF-8 conversion dictionary.
+        /// Sets the character mapping dictionary for converting Chinese text variants.
+        /// Used for compatibility with different Chinese text encodings.
         /// </summary>
-        /// <param name="dict">The dictionary to use for conversion.</param>
+        /// <param name="dict">The dictionary to use for text mapping.</param>
         public static void SetUTF8ZHCN_to_UTF8Dict(Dictionary<string, string> dict)
         {
             utf8zhcn_to_utf8 = dict;

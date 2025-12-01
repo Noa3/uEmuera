@@ -155,7 +155,8 @@ public static class GenericUtils
     }
     /// <summary>
     /// Gets the filename from a full path.
-    /// ex. FolderA/FolderB/Filename -> Filename
+    /// Handles both forward and backward slashes.
+    /// Example: "FolderA/FolderB/Filename" or "FolderA\FolderB\Filename" returns "Filename"
     /// </summary>
     /// <param name="fullname">The full path to extract the filename from.</param>
     /// <returns>The filename without the path.</returns>
