@@ -101,10 +101,11 @@ namespace uEmuera
         static Dictionary<string, string> utf8zhcn_to_utf8;
 
         /// <summary>
-        /// Normalizes a file path by replacing backslashes with forward slashes.
+        /// Normalizes a file path by splitting on directory separators,
+        /// removing empty segments, and joining with forward slashes.
         /// </summary>
         /// <param name="path">The path to normalize.</param>
-        /// <returns>The normalized path.</returns>
+        /// <returns>The normalized path with forward slashes.</returns>
         public static string NormalizePath(string path)
         {
             var ps = path.Split('/', '\\');
