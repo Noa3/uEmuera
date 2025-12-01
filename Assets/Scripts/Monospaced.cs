@@ -2,10 +2,20 @@
 
 namespace UnityEngine.UI
 {
+    /// <summary>
+    /// A mesh effect that forces text to render with monospaced (fixed-width) character spacing.
+    /// This is essential for proper alignment of ERA game console output.
+    /// </summary>
     public class Monospaced : BaseMeshEffect
     {
         static readonly char[] _index_any = new char[] { '<', '\n' };
 
+        /// <summary>
+        /// Gets the next valid character index, skipping rich text tags.
+        /// </summary>
+        /// <param name="content">The text content.</param>
+        /// <param name="i">The current index.</param>
+        /// <returns>The next valid index after any rich text tags.</returns>
         int GetNextValidIndex(string content, int i)
         {
             if (i >= content.Length)
