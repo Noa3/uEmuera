@@ -673,11 +673,11 @@ public class EmueraContent : MonoBehaviour
     /// </summary>
     float offset_height = 0;
     /// <summary>
-    /// 内容宽
+    /// in容宽
     /// </summary>
     float content_width = 0;
     /// <summary>
-    /// 内容高
+    /// in容高
     /// </summary>
     float content_height = 0;
     /// <summary>

@@ -71,7 +71,7 @@ public class EmueraLine : EmueraBehaviour
 #endif
 
     /// <summary>
-    /// 更新内容
+    /// 更新in容
     /// </summary>
     public override void UpdateContent()
     {

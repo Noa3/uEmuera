@@ -12,11 +12,11 @@ namespace MinorShift.Emuera.GameView
 	 * ConsoleStyledString = string + StringStyle
 	 * ConsoleButtonString = (ConsoleStyledString) * n + ButtonValue
 	 * ConsoleDisplayLine = (ConsoleButtonString) * n
-	 * PrintStringBufferはERBのPRINT命令からConsoleDisplayLineを作る
+	 * PrintStringBufferはERBのPRINT命令fromConsoleDisplayLineを作る
 	*/
 
 	/// <summary>
-	/// PRINT命令を貯める＆最終的に解決するクラス
+	/// PRINT命令を貯める＆最終的に解決doclass
 	/// </summary>
 	internal sealed class PrintStringBuffer
 	{
@@ -76,7 +76,7 @@ namespace MinorShift.Emuera.GameView
 				if (builder.Length > 2000)
 					return;
 				if (builder.Length + str.Length > 2000)
-					str = str.Substring(0, 2000 - builder.Length) + "※※※バッファーの文字数が2000字(全角1000字)を超えています。これ以降は表示できません※※※";
+					str = str.Substring(0, 2000 - builder.Length) + "※※※バッファーの文字数が2000字(全角1000字)を超えています.これ以降はdisplayできません※※※";
 				builder.Append(str);
 				lastStringStyle = style;
 			}
@@ -192,7 +192,7 @@ namespace MinorShift.Emuera.GameView
 			for (int i = 0; i < buttonList.Count; i++)
 			{
 				if (buttonList[i] == null)
-				{//強制改行フラグ
+				{//強制改lineフラグ
 					lineList.Add(m_buttonsToDisplayLine(lineButtonList, firstLine, temporary));
 					firstLine = false;
 					buttonList.RemoveAt(i);
@@ -200,18 +200,18 @@ namespace MinorShift.Emuera.GameView
 					continue;
 				}
 				if (nobr || ((buttonList[i].PointX + buttonList[i].Width <= windowWidth)))
-				{//改行不要モードであるか表示可能領域に収まるならそのままでよい
+				{//改line不要モードでexistかdisplaypossible領域に収まるならそのまuntilよい
 					lineButtonList.Add(buttonList[i]);
 					continue;
 				}
-				//新しい表示行を作る
+				//新しいdisplaylineを作る
 
-				//ボタンを分割するか？
-				//「ボタンの途中で行を折りかえさない」がfalseなら分割する
-				//このボタンが単体で表示可能領域を上回るなら分割必須
-				//クリック可能なボタンでないなら分割する。ただし「ver1739以前の非ボタン折り返しを再現する」ならクリックの可否を区別しない
+				//buttonを分割doか？
+				//"buttonの途insideでlineを折りかえさnot"がfalseなら分割do
+				//このbuttonが単体でdisplaypossible領域をabove回るなら分割必須
+				//クリックpossibleなbuttonでnotなら分割do.ただし"ver1739以previous 非button折り返しを再現do"ならクリックの可否を区別しnot
 				if ((!Config.ButtonWrap) || (lineButtonList.Count == 0) || (!buttonList[i].IsButton && !Config.CompatiLinefeedAs1739))
-				{//ボタン分割する
+				{//button分割do
 					int divIndex = getDivideIndex(buttonList[i], stringMeasure);
 					if (divIndex > 0)
 					{
@@ -222,9 +222,9 @@ namespace MinorShift.Emuera.GameView
 						i++;
 					}
 					else if (divIndex == 0 && (lineButtonList.Count > 0))
-					{//まるごと次の行に送る
+					{//まるごとnext lineに送る
 					}
-					else//分割できない要素のみで構成されたボタンは分割できない
+					else//分割できnot要素のみで構成されたbuttonは分割できnot
 					{
 						lineButtonList.Add(buttonList[i]);
 						continue;
@@ -237,12 +237,12 @@ namespace MinorShift.Emuera.GameView
 				int pointX = 0;
 				for (int j = i; j < buttonList.Count; j++)
 				{
-					if (buttonList[j] == null)//強制改行を挟んだ後は調整無用
+					if (buttonList[j] == null)//強制改lineを挟んだafterは調整無for
 						break;
 					buttonList[j].CalcPointX(pointX);
 					pointX += buttonList[j].Width;
 				}
-				i--;//buttonList[i]は新しい行に含めないので次の行のために再検討する必要がある(直後のi++と相殺)
+				i--;//buttonList[i]は新しいlineに含めnotのでnext lineのbecauseに再検討do必要がexist(直afterのi++と相殺)
 			}
 			if (lineButtonList.Count > 0)
 			{
@@ -254,7 +254,7 @@ namespace MinorShift.Emuera.GameView
 		}
 
 		/// <summary>
-		/// 1810beta003新規 マークアップ用 Append とFlushを同時にやる
+		/// 1810beta003新規 マークアップfor Append とFlushを同whenにやる
 		/// </summary>
 		/// <param name="str"></param>
 		/// <param name="stringMeasure"></param>
@@ -264,7 +264,7 @@ namespace MinorShift.Emuera.GameView
 			throw new NotImplementedException();
 		}
 
-		#region Flush用privateメソッド
+		#region Flushforprivatemethod
 
 		private void clearBuffer()
 		{
@@ -274,8 +274,8 @@ namespace MinorShift.Emuera.GameView
 		}
 
 		/// <summary>
-		/// cssListをbuttonに変換し、buttonListに追加。
-		/// この時点ではWidthなどは考えない。
+		/// cssListをbuttonにconvertし,buttonListにadd.
+		/// このwhen点ではWidthetcは考えnot.
 		/// </summary>
 		private void fromCssToButton()
 		{
@@ -291,7 +291,7 @@ namespace MinorShift.Emuera.GameView
 		}
 
 		/// <summary>
-		/// 物理行を１つのボタンへ。
+		/// 物理lineを１つのbuttonto.
 		/// </summary>
 		/// <returns></returns>
 		private ConsoleButtonString createButton(List<AConsoleDisplayPart> cssList, string input)
@@ -324,7 +324,7 @@ namespace MinorShift.Emuera.GameView
 		}
 
 		/// <summary>
-		/// 物理行をボタン単位に分割。argumentのcssListの内容は変更される場合がある。
+		/// 物理lineをbutton単位に分割.argumentのcssListのin容は変更be donecaseがexist.
 		/// </summary>
 		/// <returns></returns>
 		private ConsoleButtonString[] createButtons(List<AConsoleDisplayPart> cssList)
@@ -361,10 +361,10 @@ namespace MinorShift.Emuera.GameView
 						break;
 					AConsoleDisplayPart css = cssList[cssIndex];
 					if (cssStartCharIndex + css.Str.Length >= buttonEndCharIndex)
-					{//ボタンの終端を発見
+					{//buttonの終端を発見
 						int used = buttonEndCharIndex - cssStartCharIndex;
 						if (used > 0 && css.CanDivide)
-						{//cssの区切りの途中でボタンの区切りがある。
+						{//cssの区切りの途insideでbuttonの区切りがexist.
 							
 							ConsoleStyledString newCss = ((ConsoleStyledString)css).DivideAt(used);
 							if (newCss != null)
@@ -378,7 +378,7 @@ namespace MinorShift.Emuera.GameView
 						cssIndex++;
 						break;
 					}
-					//ボタンの終端はまだ先。
+					//buttonの終端はまだahead.
 					buttonCssList.Add(css);
 					cssStartCharIndex += css.Str.Length;
 					cssIndex++;
@@ -396,18 +396,18 @@ namespace MinorShift.Emuera.GameView
 		}
 
 
-		//stringListにPointX、Widthを追加
+		//stringListにPointX,Widthをadd
 		private static void setWidthToButtonList(List<ConsoleButtonString> buttonList, StringMeasure stringMeasure, bool nobr)
 		{
 			int pointX = 0;
 			//int count = buttonList.Count;
-			//1.824 修正。サブピクセルの初期値を0から0.5fにすることで端数処理吸収
+			//1.824 修正.サブピクセルのinitialvalueを0from0.5fにdothisで端数process吸収
 			float subPixel = 0.5f;
 			for (int i = 0; i < buttonList.Count; i++)
 			{
 				ConsoleButtonString button = buttonList[i];
 				if (button == null)
-				{//改行フラグ
+				{//改lineフラグ
 					pointX = 0;
 					continue;
 				}
@@ -424,13 +424,13 @@ namespace MinorShift.Emuera.GameView
 			
 			//1815 バグバグなのでコメントアウト Width測定の省略はいずれやりたい
 			////1815 alignLeft, nobrを前提にした新方式
-			////PointXの直接指定を可能にし、Width測定を一部省略
+			////PointXの直接指定をpossibleにし,Width測定をpart省略
 			//ConsoleStyledString lastCss = null;
 			//for (int i = 0; i < buttonList.Count; i++)
 			//{
 			//    ConsoleButtonString button = buttonList[i];
 			//    if (button == null)
-			//    {//改行フラグ
+			//    {//改lineフラグ
 			//        pointX = 0;
 			//        lastCss = null;
 			//        continue;
@@ -439,7 +439,7 @@ namespace MinorShift.Emuera.GameView
 			//    {
 			//        ConsoleStyledString css = button.StrArray[j];
 			//        if (css.PointXisLocked)//位置固定フラグ
-			//        {//位置固定なら前のcssのWidth測定を省略
+			//        {//位置固定ならprevious cssのWidth測定を省略
 			//            pointX = css.PointX;
 			//            if (lastCss != null)
 			//            {
@@ -459,7 +459,7 @@ namespace MinorShift.Emuera.GameView
 			//        }
 			//    }
 			//}
-			////ConsoleButtonStringの位置・幅を決定（クリック可能域の決定のために必要）
+			////ConsoleButtonStringの位置-幅を決定(クリックpossible域の決定のbecauseに必要)
 			//for (int i = 0; i < buttonList.Count; i++)
 			//{
 			//    ConsoleButtonString button = buttonList[i];
@@ -469,12 +469,12 @@ namespace MinorShift.Emuera.GameView
 			//    lastCss = button.StrArray[button.StrArray.Length - 1];
 			//    if (lastCss.Width >= 0)
 			//        button.Width = lastCss.PointX - button.PointX + lastCss.Width;
-			//    else if (i >= buttonList.Count - 1 || buttonList[i+1] == null || buttonList[i+1].StrArray.Length == 0)//行末
-			//        button.Width = Config.WindowX;//右端のボタンについては右側全部をボタン領域にしてしまう
+			//    else if (i >= buttonList.Count - 1 || buttonList[i+1] == null || buttonList[i+1].StrArray.Length == 0)//line末
+			//        button.Width = Config.WindowX;//右端のbuttonについては右側全部をbutton領域にしてしまう
 			//    else
 			//        button.Width = buttonList[i+1].StrArray[0].PointX - button.PointX;
 			//    if (button.Width < 0)
-			//        button.Width = 0;//pos指定次第ではクリック不可能なボタンができてしまう。まあ仕方ない
+			//        button.Width = 0;//pos指定次第ではクリック不possibleなbuttonができてしまう.まあ仕方not
 			//}
 		}
 
@@ -520,25 +520,25 @@ namespace MinorShift.Emuera.GameView
 			int widthLimit = Config.DrawableWidth - css.PointX;
 			string str = css.Str;
 			Font font = css.Font;
-            int highLength = str.Length;//widthLimitを超える最低の文字index(文字数-1)。
-			int lowLength = 0;//超えない最大の文字index。
+            int highLength = str.Length;//widthLimitを超える最低の文字index(文字数-1).
+			int lowLength = 0;//超えnot最大の文字index.
 			//int i = (int)(widthLimit / fontDisplaySize);//およその文字数を推定
-			//if (i > str.Length - 1)//配列の外を参照しないように。
+			//if (i > str.Length - 1)//arrayのoutを参照しnotように.
 			//	i = str.Length - 1;
 			int i = lowLength;//およその文字数を推定←やめた
 
 			int point;
 			string test = null;
-			while ((highLength - lowLength) > 1)//差が一文字以下になるまで繰り返す。
+			while ((highLength - lowLength) > 1)//差が一文字以belowになるuntil繰り返す.
 			{
 				test = str.Substring(0, i);
 				point = sm.GetDisplayLength(test, font);
-				if (point <= widthLimit)//サイズ内ならlowLengthを更新。文字数を増やす。
+				if (point <= widthLimit)//サイズinならlowLengthをupdate.文字数を増やす.
 				{
 					lowLength = i;
 					i++;
 				}
-				else//サイズ外ならhighLengthを更新。文字数を減らす。
+				else//サイズoutならhighLengthをupdate.文字数を減らす.
 				{
 					highLength = i;
 					i--;

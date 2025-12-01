@@ -42,7 +42,7 @@ namespace MinorShift.Emuera.GameView
 					else if (paramPixel.Length == 4)
 					{
 						rectF = new RectangleF(paramPixel[0], paramPixel[1], paramPixel[2], paramPixel[3]);
-						//1820a12 サイズ上限撤廃
+						//1820a12 サイズabove限撤廃
 						if (rectF.X >= 0 && rectF.Width > 0 && rectF.Height > 0)
 						//	rectF.Y >= 0 && (rectF.Y + rectF.Height) <= lineHeight)
 						{

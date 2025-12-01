@@ -27,11 +27,11 @@ namespace MinorShift.Emuera.Sub
 
 		public bool Open(string path, string name)
 		{
-			//そんなお行儀の悪いことはしていない
+			//そんなおline儀の悪いthisはしていnot
 			//if (disposed)
-			//    throw new ExeEE("破棄したオブジェクトを再利用しようとした");
+			//    throw new ExeEE("破棄したobjectを再利forしようとした");
 			//if ((reader != null) || (stream != null) || (filepath != null))
-			//    throw new ExeEE("使用中のオブジェクトを別用途に再利用しようとした");
+			//    throw new ExeEE("useinsideのobjectを別for途に再利forしようとした");
 			filepath = path;
 			filename = name;
 			nextNo = 0;
@@ -57,7 +57,7 @@ namespace MinorShift.Emuera.Sub
 		}
 
 		/// <summary>
-		/// 次の有効な行を読む。LexicalAnalyzer経由でConfigを参照するのでConfig完成までつかわないこと。
+		/// next 有効なlineを読む.LexicalAnalyzer経由でConfigを参照doのでConfig完成untilつかわnotthis.
 		/// </summary>
 		public StringStream ReadEnabledLine(bool disabled = false)
 		{
@@ -83,21 +83,21 @@ namespace MinorShift.Emuera.Sub
 				LexicalAnalyzer.SkipWhiteSpace(st);
 				if (st.EOS)
 					continue;
-				//[SKIPSTART]～[SKIPEND]中にここが誤爆するので無効化
+				//[SKIPSTART]～[SKIPEND]during ここが誤爆doので無効化
 				if (!disabled)
 				{
 					if (st.Current == '}')
-						throw new CodeEE("予期しない行連結終端記号'}'が見つかりました", new ScriptPosition(filename, curNo));
+						throw new CodeEE("予期しnotline連結終端記号'}'が見つかりました", new ScriptPosition(filename, curNo));
 					if (st.Current == '{')
 					{
 						if (line.Trim() != "{")
-							throw new CodeEE("行連結始端記号'{'の行に'{'以外の文字を含めることはできません", new ScriptPosition(filename, curNo));
+							throw new CodeEE("line連結始端記号'{'のlineに'{'以outの文字を含めるcannot be", new ScriptPosition(filename, curNo));
 						break;
 					}
 				}
 				return st;
 			}
-			//curNoはこの後加算しない(始端記号の行を行番号とする)
+			//curNoはこのafter加算しnot(始端記号のlineをline番号とdo)
 			StringBuilder b = new StringBuilder();
 			while (true)
 			{
@@ -105,7 +105,7 @@ namespace MinorShift.Emuera.Sub
 				nextNo++;
 				if (line == null)
 				{
-					throw new CodeEE("行連結始端記号'{'が使われましたが終端記号'}'が見つかりません", new ScriptPosition(filename, curNo));
+					throw new CodeEE("line連結始端記号'{'が使われましたが終端記号'}'not found", new ScriptPosition(filename, curNo));
 				}
 
 				if (useRename && (line.IndexOf("[[") >= 0) && (line.IndexOf("]]") >= 0))
@@ -119,15 +119,15 @@ namespace MinorShift.Emuera.Sub
 					if (test[0] == '}')
 					{
 						if (test.Trim() != "}")
-							throw new CodeEE("行連結終端記号'}'の行に'}'以外の文字を含めることはできません", new ScriptPosition(filename, nextNo));
+							throw new CodeEE("line連結終端記号'}'のlineに'}'以outの文字を含めるcannot be", new ScriptPosition(filename, nextNo));
 						break;
 					}
-                    //行連結文字なら1字でないとおかしい、というか、こうしないとFORMの数値変数処理が誤爆する。
+                    //line連結文字なら1字でnotとおかしい,called か,こうしnotとFORMのnumericvariableprocessが誤爆do.
                     //{
                     //A}
-                    //みたいなどうしようもないコードは知ったこっちゃない
+                    //みたいetcうしようもnotコードは知ったこっちゃnot
 					if (test[0] == '{' && test.Length == 1)
-						throw new CodeEE("予期しない行連結始端記号'{'が見つかりました", new ScriptPosition(filename, nextNo));
+						throw new CodeEE("予期しnotline連結始端記号'{'が見つかりました", new ScriptPosition(filename, nextNo));
 				}
 				b.Append(line);
 				b.Append(" ");
@@ -138,7 +138,7 @@ namespace MinorShift.Emuera.Sub
 		}
 
 		/// <summary>
-		/// 直前に読んだ行の行番号
+		/// 直before 読んだlineのline番号
 		/// </summary>
 		public int LineNo
 		{ get { return curNo; } }

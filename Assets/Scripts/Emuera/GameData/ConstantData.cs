@@ -188,12 +188,12 @@ namespace MinorShift.Emuera.GameData
 			EraStreamReader eReader = new EraStreamReader(false);
 			if (!eReader.Open(csvPath))
 			{
-				output.PrintError(eReader.Filename + "のオープンに失敗しました");
+				output.PrintError(eReader.Filename + "のオープンにfailedしました");
 				return;
 			}
 			ScriptPosition position = null;
 			if (disp)
-				output.PrintSystemLine(eReader.Filename + "読み込み中・・・");
+				output.PrintSystemLine(eReader.Filename + "Loading---");
 			try
 			{
 				StringStream st = null;
@@ -208,9 +208,9 @@ namespace MinorShift.Emuera.GameData
 			{
 				uEmuera.Media.SystemSounds.Hand.Play();
 				if (position != null)
-					ParserMediator.Warn("予期しないErrorが発生しました", position, 3);
+					ParserMediator.Warn("予期しnotErroroccurred", position, 3);
 				else
-					output.PrintError("予期しないErrorが発生しました");
+					output.PrintError("予期しnotErroroccurred");
 				return;
 			}
 			finally
@@ -233,12 +233,12 @@ namespace MinorShift.Emuera.GameData
 			VariableIdentifier id = VariableIdentifier.GetVariableId(idtoken);
 			if (id == null)
 			{
-				ParserMediator.Warn("一つ目の値を変数名として認識できません", position, 1);
+				ParserMediator.Warn("一つ目のvalueをvariable名as認識できません", position, 1);
 				return;
 			}
 			if ((!id.IsArray1D) && (!id.IsArray2D) && (!id.IsArray3D))
 			{
-				ParserMediator.Warn("配列変数でない変数" + id.ToString() + "のサイズを変更できません", position, 1);
+				ParserMediator.Warn("arrayvariableでnotvariable" + id.ToString() + "のサイズを変更できません", position, 1);
 				return;
 			}
 			if ((id.IsCalc) || (id.Code == VariableCode.RANDDATA))
@@ -250,25 +250,25 @@ namespace MinorShift.Emuera.GameData
             int length3 = 0;
 			if (!int.TryParse(tokens[1], out int length))
 			{
-				ParserMediator.Warn("二つ目の値を整数値として認識できません", position, 1);
+				ParserMediator.Warn("二つ目のvalueをintegervalueas認識できません", position, 1);
 				return;
 			}
-            //1820a16 変数禁止指定 負の値を指定する
+            //1820a16 variableprohibited指定 負のvalueを指定do
 			if (length <= 0)
 			{
 				if (length == 0)
 				{
-					ParserMediator.Warn("配列長に0は指定できません（変数を使用禁止にするには配列長に負の値を指定してください）", position, 2);
+					ParserMediator.Warn("array長に0は指定できません(variableをuseprohibitedにdoにはarray長に負のvalueを指定してください)", position, 2);
 					return;
 				}
 				if(!id.CanForbid)
 				{
-					ParserMediator.Warn("使用禁止にできない変数に対して負の配列長が指定されています", position, 2);
+					ParserMediator.Warn("useprohibitedにできnotvariableに対して負のarray長が指定されています", position, 2);
 					return;
 				}
                 if (tokens.Length > 2 && tokens[2].Length > 0 && tokens[2].Trim().Length > 0 && char.IsDigit((tokens[2].Trim())[0]))
                 {
-                    ParserMediator.Warn("一次元配列のサイズ指定に不必要なデータは無視されます", position, 0);
+                    ParserMediator.Warn("一次originalarrayのサイズ指定に不必要なdataはwill be ignored", position, 0);
                 }
 				length = 0;
 				goto check1break;
@@ -277,21 +277,21 @@ namespace MinorShift.Emuera.GameData
 			{
                 if (tokens.Length > 2 && tokens[2].Length > 0 && tokens[2].Trim().Length > 0 && char.IsDigit((tokens[2].Trim())[0]))
                 {
-                    ParserMediator.Warn("一次元配列のサイズ指定に不必要なデータは無視されます", position, 0);
+                    ParserMediator.Warn("一次originalarrayのサイズ指定に不必要なdataはwill be ignored", position, 0);
                 }
 				if (id.IsLocal && length < 1)
 				{
-					ParserMediator.Warn("ローカル変数のサイズを1未満にはできません", position, 1);
+					ParserMediator.Warn("ローカルvariableのサイズを1未満にはできません", position, 1);
 					return;
 				}
 				if (!id.IsLocal && length < 100)
 				{
-					ParserMediator.Warn("ローカル変数でない一次元配列のサイズを100未満にはできません", position, 1);
+					ParserMediator.Warn("ローカルvariableでnot一次originalarrayのサイズを100未満にはできません", position, 1);
 					return;
 				}
 				if (length > 1000000)
 				{
-					ParserMediator.Warn("一次元配列のサイズを1000000より大きくすることはできません", position, 1);
+					ParserMediator.Warn("一次originalarrayのサイズを1000000than大きくdocannot be", position, 1);
 					return;
 				}
 			}
@@ -299,31 +299,31 @@ namespace MinorShift.Emuera.GameData
 			{
 				if (tokens.Length < 3)
 				{
-					ParserMediator.Warn("二次元配列のサイズ指定には2つの数値が必要です", position, 1);
+					ParserMediator.Warn("二次originalarrayのサイズ指定には2つのnumericが必要です", position, 1);
 					return;
 				}
                 if (tokens.Length > 3 && tokens[3].Length > 0 && tokens[3].Trim().Length > 0 && char.IsDigit((tokens[3].Trim())[0]))
                 {
-                    ParserMediator.Warn("二次元配列のサイズ指定に不必要なデータは無視されます", position, 0);
+                    ParserMediator.Warn("二次originalarrayのサイズ指定に不必要なdataはwill be ignored", position, 0);
                 }
                 if (!int.TryParse(tokens[2], out length2))
 				{
-					ParserMediator.Warn("三つ目の値を整数値として認識できません", position, 1);
+					ParserMediator.Warn("三つ目のvalueをintegervalueas認識できません", position, 1);
 					return;
 				}
 				if ((length < 1) || (length2 < 1))
 				{
-					ParserMediator.Warn("配列サイズを1未満にはできません", position, 1);
+					ParserMediator.Warn("arrayサイズを1未満にはできません", position, 1);
 					return;
 				}
 				if ((length > 1000000) || (length2 > 1000000))
 				{
-					ParserMediator.Warn("配列サイズを1000000より大きくすることはできません", position, 1);
+					ParserMediator.Warn("arrayサイズを1000000than大きくdocannot be", position, 1);
 					return;
 				}
 				if (length * length2 > 1000000)
 				{
-					ParserMediator.Warn("二次元配列の要素数は最大で100万個までです", position, 1);
+					ParserMediator.Warn("二次originalarrayの要素数は最大で100万個untilです", position, 1);
 					return;
 				}
 			}
@@ -331,45 +331,45 @@ namespace MinorShift.Emuera.GameData
 			{
 				if (tokens.Length < 4)
 				{
-					ParserMediator.Warn("三次元配列のサイズ指定には3つの数値が必要です", position, 1);
+					ParserMediator.Warn("三次originalarrayのサイズ指定には3つのnumericが必要です", position, 1);
 					return;
 				}
                 if (tokens.Length > 4 && tokens[4].Length > 0 && tokens[4].Trim().Length > 0 && char.IsDigit((tokens[4].Trim())[0]))
                 {
-                    ParserMediator.Warn("三次元配列のサイズ指定に不必要なデータは無視されます", position, 0);
+                    ParserMediator.Warn("三次originalarrayのサイズ指定に不必要なdataはwill be ignored", position, 0);
                 }
                 if (!int.TryParse(tokens[2], out length2))
 				{
-					ParserMediator.Warn("三つ目の値を整数値として認識できません", position, 1);
+					ParserMediator.Warn("三つ目のvalueをintegervalueas認識できません", position, 1);
 					return;
 				}
 				if (!int.TryParse(tokens[3], out length3))
 				{
-					ParserMediator.Warn("四つ目の値を整数値として認識できません", position, 1);
+					ParserMediator.Warn("四つ目のvalueをintegervalueas認識できません", position, 1);
 					return;
 				}
 				if ((length < 1) || (length2 < 1) || (length3 < 1))
 				{
-					ParserMediator.Warn("配列サイズを1未満にはできません", position, 1);
+					ParserMediator.Warn("arrayサイズを1未満にはできません", position, 1);
 					return;
 				}
-				//1802 サイズ保存の都合上、2^20超えるとバグる
+				//1802 サイズ保存の都合above,2^20超えるとバグる
 				if ((length > 1000000) || (length2 > 1000000) || (length3 > 1000000))
 				{
-					ParserMediator.Warn("配列サイズを1000000より大きくすることはできません", position, 1);
+					ParserMediator.Warn("arrayサイズを1000000than大きくdocannot be", position, 1);
 					return;
 				}
 				if (length * length2 * length3 > 10000000)
 				{
-					ParserMediator.Warn("三次元配列の要素数は最大で1000万個までです", position, 1);
+					ParserMediator.Warn("三次originalarrayの要素数は最大で1000万個untilです", position, 1);
 					return;
 				}
 			}
 check1break:
 			switch (id.Code)
 			{
-				//1753a PALAMだけ仕様が違うのはかえって問題なので、変数と要素文字列配列数の同期は全部バックアウト
-				//基本的には旧来の処理に戻しただけ
+				//1753a PALAMだけ仕様がdifferentのはかえって問題なので,variableと要素stringarray数の同期は全部バックアウト
+				//基本的には旧来のprocessに戻しただけ
 				case VariableCode.ITEMNAME:
 				case VariableCode.ITEMPRICE:
 					VariableIntArrayLength[(int)(VariableCode.__LOWERCASE__ & VariableCode.ITEMPRICE)] = length;
@@ -452,9 +452,9 @@ check1break:
 					}
 					break;
 			}
-			//1803beta004 二重定義を警告対象に
+			//1803beta004 二重definitionをwarning対象に
 			if (!changedCode.Add(id.Code))
-				ParserMediator.Warn(id.Code.ToString() + "の要素数は既に定義されています（上書きします）", position, 1);
+				ParserMediator.Warn(id.Code.ToString() + "の要素数は既にdefinitionされています(above書きします)", position, 1);
 		}
 
 		private void _decideActualArraySize_sub(VariableCode mainCode, VariableCode nameCode, int[] arraylength, ScriptPosition position)
@@ -468,11 +468,11 @@ check1break:
 					int i = Math.Max(MaxDataList[nameIndex], arraylength[mainLengthIndex]);
 					arraylength[mainLengthIndex] = i;
 					MaxDataList[nameIndex] = i;
-					//1803beta004 不適切な指定として警告Lv1の対象にする
+					//1803beta004 不適切な指定aswarningLv1の対象にdo
 					if (MaxDataList[nameIndex] == 0 || arraylength[mainLengthIndex] == 0)
-						ParserMediator.Warn(mainCode.ToString() +"と" + nameCode.ToString() + "の禁止設定が異なります（使用禁止を解除します）", position, 1);
+						ParserMediator.Warn(mainCode.ToString() +"と" + nameCode.ToString() + "のprohibitedsettingが異なります(useprohibitedを解除します)", position, 1);
 					else
-						ParserMediator.Warn(mainCode.ToString() +"と" + nameCode.ToString() + "の要素数が異なります（大きい方に合わせます）", position, 1);
+						ParserMediator.Warn(mainCode.ToString() +"と" + nameCode.ToString() + "の要素数が異なります(大きい方に合わせます)", position, 1);
 				}
 			}
 			else if (changedCode.Contains(nameCode) && !changedCode.Contains(mainCode))
@@ -511,7 +511,7 @@ check1break:
 			{
 				int palamJuelMax = Math.Max(CharacterIntArrayLength[(int)(VariableCode.__LOWERCASE__ & VariableCode.PALAM)]
 						, CharacterIntArrayLength[(int)(VariableCode.__LOWERCASE__ & VariableCode.JUEL)]);
-				//PALAMNAMEが変わっているなら、それと比較して大きい方を採用
+				//PALAMNAMEが変わっているなら,それと比較して大きい方を採for
 				if(changedCode.Contains(VariableCode.PALAMNAME))
 				{
 					if (MaxDataList[paramIndex] != palamJuelMax)
@@ -522,27 +522,27 @@ check1break:
 							CharacterIntArrayLength[(int)(VariableCode.__LOWERCASE__ & VariableCode.PALAM)] = i;
 						if(CharacterIntArrayLength[(int)(VariableCode.__LOWERCASE__ & VariableCode.JUEL)] == palamJuelMax)
 							CharacterIntArrayLength[(int)(VariableCode.__LOWERCASE__ & VariableCode.JUEL)] = i;
-						//1803beta004 不適切な指定として警告Lv1の対象にする
+						//1803beta004 不適切な指定aswarningLv1の対象にdo
 						ParserMediator.Warn("PALAMとJUELとPALAMNAMEの要素数が不適切です", position, 1);
 					}
 				}
-				else//PALAMNAMEの指定がないなら大きい方にPALAMNAMEをあわせる
+				else//PALAMNAMEの指定がnotなら大きい方にPALAMNAMEをあわせる
 					MaxDataList[paramIndex] = palamJuelMax;
 			}
-			//PALAMとJUEL不変でPALAMNAMEが変わっている場合
+			//PALAMとJUEL不変でPALAMNAMEが変わっているcase
 			else if (changedCode.Contains(VariableCode.PALAMNAME))
 			{
 				//PALAMを指定のPALAMNAMEにあわせる
 				CharacterIntArrayLength[(int)(VariableCode.__LOWERCASE__ & VariableCode.PALAM)] = MaxDataList[paramIndex];
-				//指定のPALAMNAMEがJUELより小さければ警告出してJUELにあわせる
+				//指定のPALAMNAMEがJUELthan小さければwarning出してJUELにあわせる
 				if (MaxDataList[paramIndex] < CharacterIntArrayLength[(int)(VariableCode.__LOWERCASE__ & VariableCode.JUEL)])
 				{
-					ParserMediator.Warn("PALAMNAMEの要素数がJUELより少なくなっています（JUELに合わせます）", position, 1);
+					ParserMediator.Warn("PALAMNAMEの要素数がJUELthan少なくなっています(JUELに合わせます)", position, 1);
 					MaxDataList[paramIndex] = CharacterIntArrayLength[(int)(VariableCode.__LOWERCASE__ & VariableCode.JUEL)];
 				}
 			}
 			//CDFLAG
-			//一部変更されたら双方変更されたと扱う
+			//part変更されたら双方変更されたと扱う
 			bool cdflagNameLengthChanged = changedCode.Contains(VariableCode.CDFLAGNAME1) || changedCode.Contains(VariableCode.CDFLAGNAME2);
 			int mainLengthIndex = (int)(VariableCode.__LOWERCASE__ & VariableCode.CDFLAG);
 			Int64 length64 = CharacterIntArray2DLength[mainLengthIndex];
@@ -561,7 +561,7 @@ check1break:
 				if (length1 * length2 > 1000000)
 				{
 					//調整が面倒なので投げる
-					throw new CodeEE("CDFLAGの要素数が多すぎます（CDFLAGNAME1とCDFLAGNAME2の要素数の積が100万を超えています）", position);
+					throw new CodeEE("CDFLAGの要素数が多すぎます(CDFLAGNAME1とCDFLAGNAME2の要素数の積が100万を超えています)", position);
 				}
 				CharacterIntArray2DLength[mainLengthIndex] = (((Int64)length1) << 32) + ((Int64)length2);
 			}
@@ -570,7 +570,7 @@ check1break:
 				MaxDataList[cdflag1Index] = length1;
 				MaxDataList[cdflag2Index] = length2;
 			}
-			//もう使わないのでデータ破棄
+			//もう使わnotのでdata破棄
 			changedCode.Clear();
 		}
 
@@ -612,10 +612,10 @@ check1break:
 			loadDataTo(csvDir + "SAVESTR.CSV", savestrnameIndex, null, disp);
 			loadDataTo(csvDir + "GLOBAL.CSV", globalIndex, null, disp);
 			loadDataTo(csvDir + "GLOBALS.CSV", globalsIndex, null, disp);
-			//逆引き辞書を作成
+			//逆引き辞書をcreate
 			for (int i = 0; i < names.Length; i++)
 			{
-				if (i == 10)//Strは逆引き無用
+				if (i == 10)//Strは逆引き無for
 					continue;
 				string[] nameArray = names[i];
 				for (int j = 0; j < nameArray.Length; j++)
@@ -627,7 +627,7 @@ check1break:
 			//if (!Program.AnalysisMode)
 			loadCharacterData(csvDir, disp);
 
-			//逆引き辞書を作成2 (RELATION)
+			//逆引き辞書をcreate2 (RELATION)
 			for (int i = 0; i < CharacterTmplList.Count; i++)
 			{
 				CharacterTemplate tmpl = CharacterTmplList[i];
@@ -680,14 +680,14 @@ check1break:
 		public int KeywordToInteger(VariableCode code, string key, int index)
 		{
 			if (string.IsNullOrEmpty(key))
-				throw new CodeEE("キーワードを空には出来ません");
+				throw new CodeEE("keyワードを空には出来ません");
             Dictionary<string, int> dic = GetKeywordDictionary(out string errPos, code, index);
             if (dic.TryGetValue(key, out int ret))
                 return ret;
             if (errPos == null)
-				throw new CodeEE("配列変数" + code.ToString() + "の要素を文字列で指定することはできません");
+				throw new CodeEE("arrayvariable" + code.ToString() + "の要素をstringで指定docannot be");
 			else
-				throw new CodeEE(errPos + "の中に\"" + key + "\"の定義がありません");
+				throw new CodeEE(errPos + "のduring \"" + key + "\"のdefinitionがdoes not exist");
 		}
 
 		public Dictionary<string, int> GetKeywordDictionary(out string errPos, VariableCode code, int index)
@@ -834,9 +834,9 @@ check1break:
 						errPos = "cdflag2.csv";
 					}
 					else if (index >= 0)
-						throw new CodeEE("配列変数" + code.ToString() + "の" + (index + 1).ToString() + "番目の要素を文字列で指定することはできません");
+						throw new CodeEE("arrayvariable" + code.ToString() + "の" + (index + 1).ToString() + "番目の要素をstringで指定docannot be");
 					else
-						throw new CodeEE("CDFLAGの要素の取得にはCDFLAGNAME1又はCDFLAGNAME2を使用します");
+						throw new CodeEE("CDFLAGの要素の取得にはCDFLAGNAME1又はCDFLAGNAME2をuseします");
 					return ret;
 				}
 				case VariableCode.STR:
@@ -879,12 +879,12 @@ check1break:
 			if (index < 0)
 				return ret;
 			if (ret == null)
-				throw new CodeEE("配列変数" + code.ToString() + "の要素を文字列で指定することはできません");
+				throw new CodeEE("arrayvariable" + code.ToString() + "の要素をstringで指定docannot be");
 			if ((index != allowIndex))
 			{
-				if (allowIndex < 0)//GETNUM専用
-					throw new CodeEE("配列変数" + code.ToString() + "の要素を文字列で指定することはできません");
-				throw new CodeEE("配列変数" + code.ToString() + "の" + (index + 1).ToString() + "番目の要素を文字列で指定することはできません");
+				if (allowIndex < 0)//GETNUM専for
+					throw new CodeEE("arrayvariable" + code.ToString() + "の要素をstringで指定docannot be");
+				throw new CodeEE("arrayvariable" + code.ToString() + "の" + (index + 1).ToString() + "番目の要素をstringで指定docannot be");
 			}
 			return ret;
 		}
@@ -1054,9 +1054,9 @@ check1break:
                 if (targetList.TryGetValue(tmpl.No, out ct))
 				{
 					if (!Config.CompatiSPChara && (tmpl.IsSpchara!= ct.IsSpchara))
-						ParserMediator.Warn("番号" + tmpl.No.ToString() + "のキャラが複数回定義されています(SPキャラとして定義するには互換性オプション「SPキャラを使用する」をONにしてください)", null, 1);
+						ParserMediator.Warn("番号" + tmpl.No.ToString() + "のキャラが複数回definitionされています(SPキャラasdefinitiondoには互換性option"SPキャラをusedo"をONにしてください)", null, 1);
 					else
-						ParserMediator.Warn("番号" + tmpl.No.ToString() + "のキャラが複数回定義されています", null, 1);
+						ParserMediator.Warn("番号" + tmpl.No.ToString() + "のキャラが複数回definitionされています", null, 1);
 				}
 				else
 					targetList.Add(tmpl.No, tmpl);
@@ -1069,12 +1069,12 @@ check1break:
 			EraStreamReader eReader = new EraStreamReader(false);
 			if (!eReader.Open(csvPath, csvName))
 			{
-				output.PrintError(eReader.Filename + "のオープンに失敗しました");
+				output.PrintError(eReader.Filename + "のオープンにfailedしました");
 				return;
 			}
 			ScriptPosition position = null;
 			if (disp)
-				output.PrintSystemLine(eReader.Filename + "読み込み中・・・");
+				output.PrintSystemLine(eReader.Filename + "Loading---");
 			try
 			{
 				Int64 index = -1;
@@ -1098,12 +1098,12 @@ check1break:
 					{
 						if (tmpl != null)
 						{
-							ParserMediator.Warn("番号が二重に定義されました", position, 1);
+							ParserMediator.Warn("番号が二重にdefinitionされました", position, 1);
 							continue;
 						}
 						if (!Int64.TryParse(tokens[1].TrimEnd(), out index))
 						{
-							ParserMediator.Warn(tokens[1] + "を整数値に変換できません", position, 1);
+							ParserMediator.Warn(tokens[1] + "をintegervalueにconvertできません", position, 1);
 							continue;
 						}
 						tmpl = new CharacterTemplate(index, this);
@@ -1126,7 +1126,7 @@ check1break:
 					}
 					if (tmpl == null)
 					{
-						ParserMediator.Warn("番号が定義される前に他のデータが始まりました", position, 1);
+						ParserMediator.Warn("番号がdefinitionbe donebefore 他のdataが始まりました", position, 1);
 						continue;
 					}
 					toCharacterTemplate(position, tmpl, tokens);
@@ -1136,9 +1136,9 @@ check1break:
 			{
 				uEmuera.Media.SystemSounds.Hand.Play();
 				if (position != null)
-					ParserMediator.Warn("予期しないErrorが発生しました", position, 3);
+					ParserMediator.Warn("予期しnotErroroccurred", position, 3);
 				else
-					output.PrintError("予期しないErrorが発生しました");
+					output.PrintError("予期しnotErroroccurred");
 				return;
 			}
 			finally
@@ -1169,7 +1169,7 @@ check1break:
 				sign = -1;
 				st.ShiftNext();
 			}
-			//1803beta005 char.IsDigitは全角数字とかまでひろってしまうので･･･
+			//1803beta005 char.IsDigitは全角数字とかuntilひろってしまうので･･･
 			//if (!char.IsDigit(st.Current))
 			// return false;
 			switch (st.Current)
@@ -1214,7 +1214,7 @@ check1break:
 			switch (varname)
 			{
 				case "NAME":
-				case "名前":
+				case "name":
 					chara.Name = tokens[1];
 					return;
 				case "CALLNAME":
@@ -1298,7 +1298,7 @@ check1break:
 					errPos = "cstr.csv";
 					break;
 				default:
-					ParserMediator.Warn("\"" + tokens[0] + "\"は解釈できない識別子です", position, 1);
+					ParserMediator.Warn("\"" + tokens[0] + "\"は解釈できnot識別子です", position, 1);
 					return;
 			}
 			if (length < 0)
@@ -1308,13 +1308,13 @@ check1break:
 			}
 			if (length == 0)
 			{
-				ParserMediator.Warn(varname + "は禁止設定された変数です", position, 2);
+				ParserMediator.Warn(varname + "はprohibitedsettingされたvariableです", position, 2);
 				return;
 			}
 			bool p1isNumeric = tryToInt64(tokens[1].TrimEnd(), out long p1);
 			if (p1isNumeric && ((p1 < 0) || (p1 >= length)))
 			{
-				ParserMediator.Warn(p1.ToString() + "は配列の範囲外です", position, 1);
+				ParserMediator.Warn(p1.ToString() + "はarrayの範囲outです", position, 1);
 				return;
 			}
 			int index = (int)p1;
@@ -1322,13 +1322,13 @@ check1break:
 			{
 				if (!namearray.TryGetValue(tokens[1], out index))
 				{
-					ParserMediator.Warn(errPos + "に\"" + tokens[1] + "\"の定義がありません", position, 1);
-					//ParserMediator.Warn("\"" + tokens[1] + "\"は解釈できない識別子です", position, 1);
+					ParserMediator.Warn(errPos + "に\"" + tokens[1] + "\"のdefinitionがdoes not exist", position, 1);
+					//ParserMediator.Warn("\"" + tokens[1] + "\"は解釈できnot識別子です", position, 1);
 					return;
 				}
 				else if (index >= length)
 				{
-					ParserMediator.Warn("\"" + tokens[1] + "\"は配列の範囲外です", position, 1);
+					ParserMediator.Warn("\"" + tokens[1] + "\"はarrayの範囲outです", position, 1);
 					return;
 				}
 			}
@@ -1336,19 +1336,19 @@ check1break:
 			if ((index < 0) || (index >= length))
 			{
 				if (p1isNumeric)
-					ParserMediator.Warn(index.ToString() + "は配列の範囲外です", position, 1);
+					ParserMediator.Warn(index.ToString() + "はarrayの範囲outです", position, 1);
 				else if (tokens[1].Length == 0)
-					ParserMediator.Warn("二つ目の識別子がありません", position, 1);
+					ParserMediator.Warn("二つ目の識別子がdoes not exist", position, 1);
 				else
-					ParserMediator.Warn("\"" + tokens[1] + "\"は解釈できない識別子です", position, 1);
+					ParserMediator.Warn("\"" + tokens[1] + "\"は解釈できnot識別子です", position, 1);
 				return;
 			}
 			if (strArray != null)
 			{
 				if (tokens.Length < 3)
-					ParserMediator.Warn("三つ目の識別子がありません", position, 1);
+					ParserMediator.Warn("三つ目の識別子がdoes not exist", position, 1);
 				if (strArray.ContainsKey(index))
-					ParserMediator.Warn(varname + "の" + index.ToString() + "番目の要素は既に定義されています(上書きします)", position, 1);
+					ParserMediator.Warn(varname + "の" + index.ToString() + "番目の要素は既にdefinitionされています(above書きします)", position, 1);
 				strArray[index] = tokens[2];
 			}
 			else
@@ -1356,7 +1356,7 @@ check1break:
 				if ((tokens.Length < 3) || !tryToInt64(tokens[2], out long p2))
 					p2 = 1;
 				if (intArray.ContainsKey(index))
-					ParserMediator.Warn(varname + "の" + index.ToString() + "番目の要素は既に定義されています(上書きします)", position, 1);
+					ParserMediator.Warn(varname + "の" + index.ToString() + "番目の要素は既にdefinitionされています(above書きします)", position, 1);
 				intArray[index] = p2;
 			}
 		}
@@ -1372,13 +1372,13 @@ check1break:
 			EraStreamReader eReader = new EraStreamReader(false);
 			if (!eReader.Open(csvPath))
 			{
-				output.PrintError(eReader.Filename + "のオープンに失敗しました");
+				output.PrintError(eReader.Filename + "のオープンにfailedしました");
 				return;
 			}
 			ScriptPosition position = null;
 
 			if (disp || Program.AnalysisMode)
-				output.PrintSystemLine(eReader.Filename + "読み込み中・・・");
+				output.PrintSystemLine(eReader.Filename + "Loading---");
 			try
 			{
 				StringStream st = null;
@@ -1393,21 +1393,21 @@ check1break:
 					}
                     if (!Int32.TryParse(tokens[0], out int index))
                     {
-                        ParserMediator.Warn("一つ目の値を整数値に変換できません", position, 1);
+                        ParserMediator.Warn("一つ目のvalueをintegervalueにconvertできません", position, 1);
                         continue;
                     }
                     if (target.Length == 0)
 					{
-						ParserMediator.Warn("禁止設定された名前配列です", position, 2);
+						ParserMediator.Warn("prohibitedsettingされたnamearrayです", position, 2);
 						break;
 					}
 					if ((index < 0) || (target.Length <= index))
 					{
-						ParserMediator.Warn(index.ToString() + "は配列の範囲外です", position, 1);
+						ParserMediator.Warn(index.ToString() + "はarrayの範囲outです", position, 1);
 						continue;
 					}
                     if (!defined.Add(index))
-                        ParserMediator.Warn(index.ToString() + "番目の要素はすでに定義されています（新しい値で上書きします）", position, 1);
+                        ParserMediator.Warn(index.ToString() + "番目の要素はすでにdefinitionされています(新しいvalueでabove書きします)", position, 1);
 					target[index] = tokens[1];
 					if ((targetI != null) && (tokens.Length >= 3))
 					{
@@ -1426,9 +1426,9 @@ check1break:
 			{
 				uEmuera.Media.SystemSounds.Hand.Play();
 				if (position != null)
-					ParserMediator.Warn("予期しないErrorが発生しました", position, 3);
+					ParserMediator.Warn("予期しnotErroroccurred", position, 3);
 				else
-					output.PrintError("予期しないErrorが発生しました");
+					output.PrintError("予期しnotErroroccurred");
 				return;
 			}
 			finally
@@ -1476,7 +1476,7 @@ check1break:
 				case CharacterStrData.CSTR:
 					return cstrSize;
 				default:
-					throw new CodeEE("存在しないキーを参照しました");
+					throw new CodeEE("does not existkeyを参照しました");
 			}
 		}
 
@@ -1507,7 +1507,7 @@ check1break:
 				case CharacterIntData.JUEL:
 					return arraySize[(int)(VariableCode.__LOWERCASE__ & VariableCode.JUEL)];
 				default:
-					throw new CodeEE("存在しないキーを参照しました");
+					throw new CodeEE("does not existkeyを参照しました");
 			}
 		}
 

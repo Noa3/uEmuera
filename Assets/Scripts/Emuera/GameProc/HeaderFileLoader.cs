@@ -46,16 +46,16 @@ namespace MinorShift.Emuera.GameProc
 					string filename = headerFiles[i].Key;
 					string file = headerFiles[i].Value;
 					if (displayReport)
-						output.PrintSystemLine(filename + "読み込み中・・・");
+						output.PrintSystemLine(filename + "Loading---");
 					noError = loadHeaderFile(file, filename);
 					if (!noError)
 						break;
 					//System.Windows.Forms.//Application.DoEvents();
 				}
-				//Errorが起きてる場合でも読み込めてる分だけはチェックする
+				//Errorが起きてるcaseでも読み込めてる分だけはチェックdo
 				if (dimlines.Count > 0)
 				{
-					//&=でないと、ここで起きたErrorをキャッチできない
+					//&=でnotと,ここで起きたErrorをキャッチできnot
 					noError &= analyzeSharpDimLines();
 				}
 
@@ -74,13 +74,13 @@ namespace MinorShift.Emuera.GameProc
 			StringStream st;
 			ScriptPosition position = null;
 			//EraStreamReader eReader = new EraStreamReader(false);
-			//1815修正 _rename.csvの適用
-			//eramakerEXの仕様的には.ERHに適用するのはおかしいけど、もうEmueraの仕様になっちゃってるのでしかたないか
+			//1815修正 _rename.csvの適for
+			//eramakerEXの仕様的には.ERHに適fordoのはおかしいけど,もうEmueraの仕様になっちゃってるのでしかたnotか
 			EraStreamReader eReader = new EraStreamReader(true);
 
 			if (!eReader.Open(filepath, filename))
 			{
-				throw new CodeEE(eReader.Filename + "のオープンに失敗しました");
+				throw new CodeEE(eReader.Filename + "のオープンにfailedしました");
 				//return false;
 			}
 			try
@@ -92,12 +92,12 @@ namespace MinorShift.Emuera.GameProc
 					position = new ScriptPosition(filename, eReader.LineNo);
 					LexicalAnalyzer.SkipWhiteSpace(st);
 					if (st.Current != '#')
-						throw new CodeEE("ヘッダーの中に#で始まらない行があります", position);
+						throw new CodeEE("ヘッダーのduring #で始まらnotlineがあります", position);
 					st.ShiftNext();
 					string sharpID = LexicalAnalyzer.ReadSingleIdentifier(st);
 					if (sharpID == null)
 					{
-						ParserMediator.Warn("解釈できない#行です", position, 1);
+						ParserMediator.Warn("解釈できnot#lineです", position, 1);
 						return false;
 					}
 					if (Config.ICFunction)
@@ -114,7 +114,7 @@ namespace MinorShift.Emuera.GameProc
 							break;
 						case "DIM":
 						case "DIMS":
-							//1822 #DIMは保留しておいて後でまとめてやる
+							//1822 #DIMは保留しておいてafterでまとめてやる
 							{
 								WordCollection wc = LexicalAnalyzer.Analyse(st, LexEndWith.EoL, LexAnalyzeFlag.AllowAssignment);
 								dimlines.Enqueue(new DimLineWC(wc, sharpID == "DIMS", false, position));
@@ -122,7 +122,7 @@ namespace MinorShift.Emuera.GameProc
 							//analyzeSharpDim(st, position, sharpID == "DIMS");
 							break;
 						default:
-							throw new CodeEE("#" + sharpID + "は解釈できないプリプロセッサです", position);
+							throw new CodeEE("#" + sharpID + "は解釈できnotプリプロセッサです", position);
 					}
 				}
 			}
@@ -149,14 +149,14 @@ namespace MinorShift.Emuera.GameProc
 
 		private void analyzeSharpDefine(StringStream st, ScriptPosition position)
 		{
-			//LexicalAnalyzer.SkipWhiteSpace(st);呼び出し前に行う。
+			//LexicalAnalyzer.SkipWhiteSpace(st);callbefore lineう.
 			string srcID = LexicalAnalyzer.ReadSingleIdentifier(st);
 			if (srcID == null)
-				throw new CodeEE("置換元の識別子がありません", position);
+				throw new CodeEE("置換originalの識別子がdoes not exist", position);
 			if (Config.ICVariable)
 				srcID = srcID.ToUpper();
 
-            //ここで名称重複判定しないと、大変なことになる
+            //ここで名称重複判定しnotと,大変なthisになる
             string errMes = "";
             int errLevel = -1;
             idDic.CheckUserMacroName(ref errMes, ref errLevel, srcID);
@@ -170,33 +170,33 @@ namespace MinorShift.Emuera.GameProc
                 }
             }
             
-            bool hasArg = st.Current == '(';//argumentを指定する場合には直後に(が続いていなければならない。ホワイトスペースも禁止。
-			//1808a3 代入演算子許可（関数宣言用）
+            bool hasArg = st.Current == '(';//argumentを指定docaseには直after (が続いていなければならnot.ホワイトスペースもprohibited.
+			//1808a3 代入演算子allow(function宣言for)
 			WordCollection wc = LexicalAnalyzer.Analyse(st, LexEndWith.EoL, LexAnalyzeFlag.AllowAssignment);
 			if (wc.EOL)
 			{
-				//throw new CodeEE("置換先の式がありません", position);
-				//1808a3 空マクロの許可
+				//throw new CodeEE("置換aheadの式がdoes not exist", position);
+				//1808a3 空マクロのallow
 				DefineMacro nullmac = new DefineMacro(srcID, new WordCollection(), 0);
 				idDic.AddMacro(nullmac);
 				return;
 			}
 
 			List<string> argID = new List<string>();
-			if (hasArg)//関数型マクロのargument解析
+			if (hasArg)//functiontypeマクロのargumentparse
 			{
 				wc.ShiftNext();//'('を読み飛ばす
 				if (wc.Current.Type == ')')
-					throw new CodeEE("関数型マクロのargumentを0個にすることはできません", position);
+					throw new CodeEE("functiontypeマクロのargumentを0個にdocannot be", position);
 				while (!wc.EOL)
 				{
 					IdentifierWord word = wc.Current as IdentifierWord;
 					if (word == null)
-						throw new CodeEE("置換元のargument指定の書式が間違っています", position);
+						throw new CodeEE("置換originalのargument指定の書式が間違っています", position);
 					word.SetIsMacro();
 					string id = word.Code;
 					if (argID.Contains(id))
-						throw new CodeEE("置換元のargumentに同じ文字が2回以上使われています", position);
+						throw new CodeEE("置換originalのargumentにsame文字が2回以above使われています", position);
 					argID.Add(id);
 					wc.ShiftNext();
 					if (wc.Current.Type == ',')
@@ -206,7 +206,7 @@ namespace MinorShift.Emuera.GameProc
 					}
 					if (wc.Current.Type == ')')
 						break;
-					throw new CodeEE("置換元のargument指定の書式が間違っています", position);
+					throw new CodeEE("置換originalのargument指定の書式が間違っています", position);
 				}
 				if (wc.EOL)
 					throw new CodeEE("')'が閉じられていません", position);
@@ -214,14 +214,14 @@ namespace MinorShift.Emuera.GameProc
 				wc.ShiftNext();
 			}
 			if (wc.EOL)
-				throw new CodeEE("置換先の式がありません", position);
+				throw new CodeEE("置換aheadの式がdoes not exist", position);
 			WordCollection destWc = new WordCollection();
 			while (!wc.EOL)
 			{
 				destWc.Add(wc.Current);
 				wc.ShiftNext();
 			}
-			if (hasArg)//関数型マクロのargumentセット
+			if (hasArg)//functiontypeマクロのargumentセット
 			{
 				while (!destWc.EOL)
 				{
@@ -244,8 +244,8 @@ namespace MinorShift.Emuera.GameProc
 				}
 				destWc.Pointer = 0;
 			}
-			if (hasArg)//1808a3 関数型マクロの封印
-				throw new CodeEE("関数型マクロは宣言できません", position);
+			if (hasArg)//1808a3 functiontypeマクロの封印
+				throw new CodeEE("functiontypeマクロは宣言できません", position);
 			DefineMacro mac = new DefineMacro(srcID, destWc, argID.Count);
 			idDic.AddMacro(mac);
 		}
@@ -264,7 +264,7 @@ namespace MinorShift.Emuera.GameProc
 		//	//idDic.AddUseDefinedVariable(var);
 		//}
 
-		//1822 #DIMだけまとめておいて後で処理
+		//1822 #DIMだけまとめておいてafterでprocess
 		private bool analyzeSharpDimLines()
 		{
 			bool noError = true;
@@ -289,7 +289,7 @@ namespace MinorShift.Emuera.GameProc
 					}
 					catch (IdentifierNotFoundCodeEE e)
 					{
-						//繰り返すことで解決する見込みがあるならキューの最後に追加
+						//繰り返すthisで解決do見込みがexistならキューの最after add
 						if (tryAgain)
 						{
 							dimline.WC.Pointer = 0;

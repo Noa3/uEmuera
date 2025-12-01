@@ -535,7 +535,7 @@ public static class GenericUtils
         return md5s;
     }
     /// <summary>
-    /// 处理中间的‘：’
+    /// 处理inside间的‘:’
     /// </summary>
     /// <param name="data"></param>
     /// <returns></returns>
@@ -608,7 +608,7 @@ public static class GenericUtils
         }
     }
     /// <summary>
-    /// 开启协程，方便在非MonoBehaviour对象中使用协程
+    /// 开启协程，方便在非MonoBehaviour对象inside使for协程
     /// </summary>
     public static Coroutine StartCoroutine(System.Collections.IEnumerator e)
     {

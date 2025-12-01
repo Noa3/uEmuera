@@ -7,33 +7,33 @@ namespace MinorShift.Emuera.GameProc.Function
 	//Obfuscation attribute. Set (Exclude=true) when using enum.ToString() or enum.Parse().
 	[global::System.Reflection.Obfuscation(Exclude = true)]
 	enum FunctionCode
-	{//数値不要
-		//FunctionCodeを定義したらstatic FunctionIdentifier()内でaddFunctionすること。
-		//その際に適切なFunctionArgとフラグを選ぶ。
+	{//numeric不要
+		//FunctionCodeをdefinitionしたらstatic FunctionIdentifier()inでaddFunctiondothis.
+		//その際に適切なFunctionArgとフラグを選ぶ.
 
-		//FunctionMethod(式中関数)を定義した場合には自動で拾うので何もしなくてよい。
-		//ただし、式中関数バージョンと命令バージョンで動作が違うなら追加する必要がある。
+		//FunctionMethod(式insidefunction)をdefinitionしたcaseには自動で拾うので何もしなくてよい.
+		//ただし,式insidefunctionバージョンと命令バージョンで動作がdifferentならadddo必要がexist.
 
 		__NULL__ = 0x0000,
-		SET,//数値代入文 or 文字列代入文
-		//SETS,//文字列代入文
-		PRINT,//文字を表示する
-		PRINTL,//改行
-		PRINTW,//入力待ち(実質改行)
+		SET,//numeric代入文 or string代入文
+		//SETS,//string代入文
+		PRINT,//文字をdisplaydo
+		PRINTL,//改line
+		PRINTW,//input待ち(実質改line)
 
-		PRINTV,//変数の内容
+		PRINTV,//variableのin容
 		PRINTVL,
 		PRINTVW,
 
-		PRINTS,//文字列変数の内容
+		PRINTS,//stringvariableのin容
 		PRINTSL,
 		PRINTSW,
 
-		PRINTFORM,//{数式}、%文字列変数%などの書式が使える。
+		PRINTFORM,//{数式},%stringvariable%etcの書式が使える.
 		PRINTFORML,
 		PRINTFORMW,
 
-		PRINTFORMS,//文字列変数の内容を変換して表示。
+		PRINTFORMS,//stringvariableのin容をconvertしてdisplay.
 		PRINTFORMSL,
 		PRINTFORMSW,
 
@@ -42,26 +42,26 @@ namespace MinorShift.Emuera.GameProc.Function
 		CLEARLINE,
 		REUSELASTLINE,
 
-		WAIT,//改行待ち。
-		INPUT,//整数入力。入力はRESULTへ。
-		INPUTS,//文字列入力。入力はRESULTSへ。
+		WAIT,//改line待ち.
+		INPUT,//integerinput.inputはRESULTto.
+		INPUTS,//stringinput.inputはRESULTSto.
 		TINPUT,
 		TINPUTS,
 		TWAIT,
 		WAITANYKEY,
-		FORCEWAIT,//スキップで省略できないWAIT、強制TWAITと違い、スキップを打ち切る
+		FORCEWAIT,//スキップで省略できnotWAIT,強制TWAITと違い,スキップを打ち切る
 		ONEINPUT,
 		ONEINPUTS,
 		TONEINPUT,
 		TONEINPUTS,
-		AWAIT,//入力不可 DoEvents
+		AWAIT,//input不可 DoEvents
 
-		DRAWLINE,//画面の左端から右端まで----と線を引く。
-		BAR,//[*****....]のようなグラフを書く。BAR (変数) , (最大値), (長さ)
-		BARL,//改行付き。
-		TIMES,//小数計算。TIMES (変数) , (小数値)という形で使う。
+		DRAWLINE,//画面の左端from右端until----と線を引く.
+		BAR,//[*****....]のようなグラフを書く.BAR (variable) , (最大value), (長さ)
+		BARL,//改line付き.
+		TIMES,//小数calculate.TIMES (variable) , (小numeric)called 形で使う.
 
-		PRINT_ABL,//能力。argumentは登録番号
+		PRINT_ABL,//能力.argumentは登録番号
 		PRINT_TALENT,//素質
 		PRINT_MARK,//刻印
 		PRINT_EXP,//経験
@@ -71,41 +71,41 @@ namespace MinorShift.Emuera.GameProc.Function
 
 		UPCHECK,//パラメータの変動
 		CUPCHECK,
-		ADDCHARA,//(キャラ番号)のキャラクタを追加
-		ADDSPCHARA,//(キャラ番号)のSPキャラクタを追加（フラグ0を1にして作成）
+		ADDCHARA,//(キャラ番号)のcharacterをadd
+		ADDSPCHARA,//(キャラ番号)のSPcharacterをadd(フラグ0を1にしてcreate)
 		ADDDEFCHARA,
-		ADDVOIDCHARA,//変数に何の設定のないキャラを作成
-		DELCHARA,//(キャラ登録番号)のキャラクタを削除。
+		ADDVOIDCHARA,//variableに何のsettingのnotキャラをcreate
+		DELCHARA,//(キャラ登録番号)のcharacterをdelete.
 
-		PUTFORM,//@SAVEINFO関数でのみ使用可能。PRINTFORMと同様の書式でセーブデータに概要をつける。
-		QUIT,//ゲームを終了
+		PUTFORM,//@SAVEINFOfunctionでのみusepossible.PRINTFORMと同様の書式でsavedataに概要をつける.
+		QUIT,//ゲームをend
 		OUTPUTLOG,
 
-		BEGIN,//システム関数の実行。実行するとCALLの呼び出し元などを忘れてしまう。
+		BEGIN,//systemfunctionの実line.実linedoとCALLのcalloriginaletcを忘れてしまう.
 
-		SAVEGAME,//セーブ画面を呼ぶ。ショップのみ。
+		SAVEGAME,//save画面を呼ぶ.ショップのみ.
 		LOADGAME,//
 
-		SIF,//一行のみIF
+		SIF,//一lineのみIF
 		IF,
 		ELSE,
 		ELSEIF,
 		ENDIF,
 
-		REPEAT,//RENDまで繰り返し。繰り返した回数がCOUNTへ。ネスト不可。
+		REPEAT,//RENDuntil繰り返し.繰り返した回数がCOUNTto.ネスト不可.
 		REND,
 		CONTINUE,//REPEATに戻る
-		BREAK,//RENDの次の行まで
+		BREAK,//RENDのnext lineuntil
 
-		GOTO,//$ラベルへジャンプ
+		GOTO,//$ラベルtoジャンプ
 
-		JUMP,//関数に移動
-		CALL,//関数に移動。移動元を記憶し、RETURNで帰る。
+		JUMP,//functionにmove
+		CALL,//functionにmove.moveoriginalを記憶し,RETURNで帰る.
 		CALLEVENT,
-		RETURN,//__INT_EXPRESSION__,//関数の終了。RESULTに整数を格納可能。省略した場合、０。(次の@～～がRETURNと見なされる。)  
-		RETURNFORM,//__FORM_STR__,//関数の終了。RESULTに整数を格納可能。省略した場合、０。(次の@～～がRETURNと見なされる。)  
+		RETURN,//__INT_EXPRESSION__,//functionのend.RESULTにintegerを格納possible.省略したcase,０.(next @～～がRETURNと見なbe done.)  
+		RETURNFORM,//__FORM_STR__,//functionのend.RESULTにintegerを格納possible.省略したcase,０.(next @～～がRETURNと見なbe done.)  
 		RETURNF,
-		RESTART,//関数の再開。関数の最初に戻る。
+		RESTART,//functionの再開.functionの最初に戻る.
 
 
 		STRLEN,
@@ -122,7 +122,7 @@ namespace MinorShift.Emuera.GameProc.Function
 		SWAPCHARA,
 		COPYCHARA,
 		ADDCOPYCHARA,
-		VARSIZE,//動作が違うので__METHOD__化できない
+		VARSIZE,//動作がdifferentので__METHOD__化できnot
 		SPLIT,
 
 		PRINTSINGLE,
@@ -141,7 +141,7 @@ namespace MinorShift.Emuera.GameProc.Function
 		SAVEDATA,
 		LOADDATA,
 		DELDATA,
-		GETTIME,//2つに代入する必要があるので__METHOD__化できない
+		GETTIME,//2つに代入do必要がexistので__METHOD__化できnot
 
 		TRYJUMP,
 		TRYCALL,
@@ -193,7 +193,7 @@ namespace MinorShift.Emuera.GameProc.Function
 		WHILE,
 		WEND,
 
-		POWER,//argumentが違うのでMETHOD化できない。
+		POWER,//argumentがdifferentのでMETHOD化できnot.
 		SAVEGLOBAL,
 		LOADGLOBAL,
 		SWAP,
@@ -226,7 +226,7 @@ namespace MinorShift.Emuera.GameProc.Function
 		ENDLIST,
 		STRDATA,
 
-		PRINTCPERLINE,//よく考えたらargumentの仕様違うや
+		PRINTCPERLINE,//よく考えたらargumentの仕様differentや
 
 
 		SETBIT,
@@ -240,7 +240,7 @@ namespace MinorShift.Emuera.GameProc.Function
 
 		RESET_STAIN,
 
-		SAVENOS,//argumentの仕様が違うので(ry
+		SAVENOS,//argumentの仕様がdifferentので(ry
 
 		FORCEKANA,
 
@@ -277,19 +277,19 @@ namespace MinorShift.Emuera.GameProc.Function
 		PRINTKL,
 		PRINTKW,
 
-		PRINTVK,//変数の内容
+		PRINTVK,//variableのin容
 		PRINTVKL,
 		PRINTVKW,
 
-		PRINTSK,//文字列変数の内容
+		PRINTSK,//stringvariableのin容
 		PRINTSKL,
 		PRINTSKW,
 
-		PRINTFORMK,//{数式}、%文字列変数%などの書式が使える。
+		PRINTFORMK,//{数式},%stringvariable%etcの書式が使える.
 		PRINTFORMKL,
 		PRINTFORMKW,
 
-		PRINTFORMSK,//文字列変数の内容を変換して表示。
+		PRINTFORMSK,//stringvariableのin容をconvertしてdisplay.
 		PRINTFORMSKL,
 		PRINTFORMSKW,
 
@@ -308,23 +308,23 @@ namespace MinorShift.Emuera.GameProc.Function
 		PRINTDATAKL,
 		PRINTDATAKW,
 
-		PRINTD,//文字を表示する
-		PRINTDL,//改行
-		PRINTDW,//入力待ち(実質改行)
+		PRINTD,//文字をdisplaydo
+		PRINTDL,//改line
+		PRINTDW,//input待ち(実質改line)
 
-		PRINTVD,//変数の内容
+		PRINTVD,//variableのin容
 		PRINTVDL,
 		PRINTVDW,
 
-		PRINTSD,//文字列変数の内容
+		PRINTSD,//stringvariableのin容
 		PRINTSDL,
 		PRINTSDW,
 
-		PRINTFORMD,//{数式}、%文字列変数%などの書式が使える。
+		PRINTFORMD,//{数式},%stringvariable%etcの書式が使える.
 		PRINTFORMDL,
 		PRINTFORMDW,
 
-		PRINTFORMSD,//文字列変数の内容を変換して表示。
+		PRINTFORMSD,//stringvariableのin容をconvertしてdisplay.
 		PRINTFORMSDL,
 		PRINTFORMSDW,
 

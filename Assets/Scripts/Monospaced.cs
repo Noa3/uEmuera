@@ -117,7 +117,7 @@ namespace UnityEngine.UI
                 d = v2.position.x - v1.position.x;
                 if (d > b)
                     //字形大小超过文本尺寸时
-                    //可能使用<size>富文本标记
+                    //可能使for<size>富文本标记
                     si = d;
                 else if (uEmuera.Utils.CheckFullSize(c))
                     si = size;

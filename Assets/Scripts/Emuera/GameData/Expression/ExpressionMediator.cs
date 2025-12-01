@@ -13,9 +13,9 @@ using uEmuera.VisualBasic;
 
 namespace MinorShift.Emuera.GameData.Expression
 {
-	//1756 元ExpressionEvaluator。GetValueの仕事はなくなったので改名。
-	//IOperandTerm間での通信や共通の処理に使う。
-	//変数が絡む仕事はVariableEvaluatorへ。
+	//1756 originalExpressionEvaluator.GetValueの仕事はなくなったので改名.
+	//IOperandTerm間での通信や共通のprocessに使う.
+	//variableが絡む仕事はVariableEvaluatorto.
 	internal sealed class ExpressionMediator
 	{
 		public ExpressionMediator(Process proc, VariableEvaluator vev, EmueraConsole console)
@@ -37,7 +37,7 @@ namespace MinorShift.Emuera.GameData.Expression
 		public void ForceKana(Int64 flag)
 		{
 			if (flag < 0 || flag > 3)
-				throw new CodeEE("命令FORCEKANAのargumentが指定可能な範囲(0～3)を超えています");
+				throw new CodeEE("命令FORCEKANAのargumentが指定possibleな範囲(0～3)を超えています");
 			forceKatakana = (flag == 1) ? true : false;
 			forceHiragana = (flag > 1) ? true : false;
 			halftoFull = (flag == 3) ? true : false;
@@ -88,7 +88,7 @@ namespace MinorShift.Emuera.GameData.Expression
 
 			while (!st.EOS)
 			{
-				//エスケープ文字の使用
+				//エスケープ文字のuse
 				if (st.Current == '\\')
 				{
 					st.ShiftNext();
@@ -122,10 +122,10 @@ namespace MinorShift.Emuera.GameData.Expression
 		public string CreateBar(Int64 var, Int64 max, Int64 length)
 		{
 			if (max <= 0)
-				throw new CodeEE("BARの最大値が正の値ではありません");
+				throw new CodeEE("BARの最大valueが正のvalueではdoes not exist");
 			if (length <= 0)
-				throw new CodeEE("BARの長さが正の値ではありません");
-			if (length >= 100)//暴走を防ぐため。
+				throw new CodeEE("BARの長さが正のvalueではdoes not exist");
+			if (length >= 100)//暴走を防ぐbecause.
 				throw new CodeEE("BARが長すぎます");
 			StringBuilder builder = new StringBuilder();
 			builder.Append('[');

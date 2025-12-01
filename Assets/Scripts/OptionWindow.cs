@@ -219,7 +219,7 @@ public class OptionWindow : MonoBehaviour
         bool result = MinorShift.Emuera.GlobalStatic.Console.OutputLog(path);
 
         ShowMessageBox(MultiLanguage.GetText("[SaveLog]"), 
-            result ? string.Format("{1}：\n{0}", path, MultiLanguage.GetText("[SavePath]")) : MultiLanguage.GetText("[Failure]"));
+            result ? string.Format("{1}:\n{0}", path, MultiLanguage.GetText("[SavePath]")) : MultiLanguage.GetText("[Failure]"));
         HideMenu();
     }
     void OnMenuResolution()

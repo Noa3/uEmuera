@@ -8,9 +8,9 @@ using MinorShift.Emuera.GameData.Variable;
 
 namespace MinorShift.Emuera.GameProc
 {
-	//1.713 LogicalLine.csから分割
+	//1.713 LogicalLine.csfrom分割
 	/// <summary>
-	/// ラベルのジャンプ先の辞書。Erbファイル読み込み時に作成
+	/// ラベルのジャンプaheadの辞書.Erbfileloadingwhenにcreate
 	/// </summary>
 	internal sealed class LabelDictionary
 	{
@@ -19,7 +19,7 @@ namespace MinorShift.Emuera.GameProc
 			Initialized = false;
 		}
 		/// <summary>
-		/// 本体。全てのFunctionLabelLineを記録
+		/// 本体.allのFunctionLabelLineを記録
 		/// </summary>
 		Dictionary<string, List<FunctionLabelLine>> labelAtDic = new Dictionary<string, List<FunctionLabelLine>>();
 		List<FunctionLabelLine> invalidList = new List<FunctionLabelLine>();
@@ -33,11 +33,11 @@ namespace MinorShift.Emuera.GameProc
 		public int Count { get { return count; } }
 
 		/// <summary>
-		/// これがfalseである間は式中関数は呼べない
-		/// （つまり関数宣言の初期値として式中関数は使えない）
+		/// これがfalseでexist間は式insidefunctionは呼べnot
+		/// (つまりfunction宣言のinitialvalueas式insidefunctionは使えnot)
 		/// </summary>
 		public bool Initialized { get; set; }
-		#region Initialized 前用
+		#region Initialized 前for
 		public FunctionLabelLine GetSameNameLabel(FunctionLabelLine point)
 		{
 			string id = point.LabelName;
@@ -75,8 +75,8 @@ namespace MinorShift.Emuera.GameProc
                     GlobalStatic.IdentifierDictionary.resizeLocalVars("ARGS", list[0].LabelName, list[0].ArgsLength);
 					continue;
 				}
-				//1810alpha010 オプションによりイベント関数をイベント関数でないかのように呼び出すことを許可
-				//eramaker仕様 - #PRI #LATER #SINGLE等を無視し、最先に定義された関数1つのみを呼び出す
+				//1810alpha010 optionにthaneventfunctionをeventfunctionでnotかのように呼び出すthisをallow
+				//eramaker仕様 - #PRI #LATER #SINGLE等ignore し,最aheadにdefinitionされたfunction1つのみを呼び出す
 				if (Config.CompatiCallEvent)
 					noneventLabelDic.Add(key, list[0]);
 				List<FunctionLabelLine>[] eventLabels = new List<FunctionLabelLine>[4];
@@ -97,7 +97,7 @@ namespace MinorShift.Emuera.GameProc
 					if (list[i].IsPri)
 						prilist.Add(list[i]);
 					if (list[i].IsLater)
-						laterlist.Add(list[i]);//#PRIかつ#LATERなら二重に登録する。eramakerの仕様
+						laterlist.Add(list[i]);//#PRIかつ#LATERなら二重に登録do.eramakerの仕様
 					if ((!list[i].IsPri) && (!list[i].IsLater))
 						normallist.Add(list[i]);
 				}

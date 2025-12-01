@@ -16,29 +16,29 @@ namespace MinorShift.Emuera
 	public static class Program
 	{
 		/*
-		コードの開始地点。
-		ここでMainWindowを作り、
-		MainWindowがProcessを作り、
-		ProcessがGameBase・ConstantData・Variableを作る。
+		コードのstart地点.
+		ここでMainWindowを作り,
+		MainWindowがProcessを作り,
+		ProcessがGameBase-ConstantData-Variableを作る.
 		
 		
-		*.ERBの読み込み、実行、その他の処理をProcessが、
-		入出力をMainWindowが、
-		定数の保存をConstantDataが、
-		変数の管理をVariableが行う。
+		*.ERBのloading,実line,その他のprocessing Processが,
+		入outputをMainWindowが,
+		定数の保存をConstantDataが,
+		variableの管理をVariableがlineう.
 		 
-		と言う予定だったが改変するうちに境界が曖昧になってしまった。
+		と言う予定だったが改変doうちに境界が曖昧になってしまった.
 		 
-		後にEmueraConsoleを追加し、それに入出力を担当させることに。
+		after EmueraConsoleをaddし,それに入outputを担当させるthisに.
         
-        1750 DebugConsole追加
-         Debugを全て切り離すことはできないので一部EmueraConsoleにも担当させる
+        1750 DebugConsoleadd
+         Debugをall切り離すthisはできnotのでpartEmueraConsoleにも担当させる
 		
-		TODO: 1819 MainWindow & Consoleの入力・表示組とProcess&Dataのデータ処理組だけでも分離したい
+		TODO: 1819 MainWindow & Consoleのinput-display組とProcess&Dataのdataprocess組だけでも分離したい
 
 		*/
 		/// <summary>
-		/// アプリケーションのメイン エントリ ポイントです。
+		/// アプリケーションのメイン エントリ ポイントです.
 		/// </summary>
 		//[STAThread]
 		public static void Main(string[] args)
@@ -48,9 +48,9 @@ namespace MinorShift.Emuera
 #if UEMUERA_DEBUG
 			//debugMode = true;
 
-			//ExeDirにバリアントのパスを代入することでテスト実行するためのコード。
-			//ローカルパスの末尾には\必須。
-			//ローカルパスを記載した場合は頒布前に削除すること。
+			//ExeDirにバリアントのpathを代入dothisでテスト実linebecauseのコード.
+			//ローカルpathの末尾には\必須.
+			//ローカルpathを記載したcaseは頒布before deletedothis.
 			ExeDir = @"";
 			
 #endif
@@ -74,33 +74,33 @@ namespace MinorShift.Emuera
 			if (!Directory.Exists(ContentDir)){
 				ContentDir = ExeDir + "RESOURCES/";
 			}
-			//Error出力用
+			//Erroroutputfor
 			//1815 .exeが東方板のNGワードに引っかかるそうなので除去
 			//ExeName = Path.GetFileNameWithoutExtension(Sys.ExeName);
 
 			Application.EnableVisualStyles();
 			Application.SetCompatibleTextRenderingDefault(false);
 			ConfigData.Instance.LoadConfig();
-            //二重起動の禁止かつ二重起動
+            //二重起動のprohibitedかつ二重起動
 			//if ((!Config.AllowMultipleInstances) && (Sys.PrevInstance()))
 			//{
-			//	MessageBox.Show("多重起動を許可する場合、emuera.configを書き換えて下さい", "既に起動しています");
+			//	MessageBox.Show("多重起動をallowdocase,emuera.configを書き換えてbelowさい", "既に起動しています");
 			//	return;
 			//}
 			if (!Directory.Exists(CsvDir))
 			{
-				MessageBox.Show("\"" + CsvDir + "\" csvフォルダが見つかりません", "フォルダなし");
+				MessageBox.Show("\"" + CsvDir + "\" csvfoldernot found", "folderなし");
 				return;
 			}
 			if (!Directory.Exists(ErbDir))
 			{
-				MessageBox.Show("\"" + ErbDir + "\" erbフォルダが見つかりません", "フォルダなし");
+				MessageBox.Show("\"" + ErbDir + "\" erbfoldernot found", "folderなし");
 				return;
 			}
             int argsStart = 0;
             if ((args.Length > 0)&&(args[0].Equals("-DEBUG", StringComparison.CurrentCultureIgnoreCase)))
             {
-                argsStart = 1;//デバッグモードかつ解析モード時に最初の1っこ(-DEBUG)を飛ばす
+                argsStart = 1;//debugモードかつparseモードwhenにfirst 1っこ(-DEBUG)を飛ばす
 				debugMode = true;
             }
 			if(debugMode)
@@ -114,7 +114,7 @@ namespace MinorShift.Emuera
 					}
 					catch
 					{
-						MessageBox.Show("debugフォルダの作成に失敗しました", "フォルダなし");
+						MessageBox.Show("debugfolderのcreateにfailedしました", "folderなし");
 						return;
 					}
 				}
@@ -126,7 +126,7 @@ namespace MinorShift.Emuera
                 {
                     if (!File.Exists(args[i]) && !Directory.Exists(args[i]))
                     {
-                        MessageBox.Show("与えられたファイル・フォルダは存在しません");
+                        MessageBox.Show("与えられたfile-folderは存在しません");
                         return;
                     }
                     if ((File.GetAttributes(args[i]) & FileAttributes.Directory) == FileAttributes.Directory)
@@ -144,7 +144,7 @@ namespace MinorShift.Emuera
                     {
                         if (Path.GetExtension(args[i]).ToUpper() != ".ERB")
                         {
-                            MessageBox.Show("ドロップ可能なファイルはERBファイルのみです");
+                            MessageBox.Show("ドロップpossibleなfileはERBfileのみです");
                             return;
                         }
                         AnalysisFiles.Add(args[i]);
@@ -178,7 +178,7 @@ namespace MinorShift.Emuera
 				//		RebootLocation = new Point();
 				//	}
 				//}
-				////条件次第ではParserMediatorが空でない状態で再起動になる場合がある
+				////条件次第ではParserMediatorが空でnot状態で再起動になるcaseがexist
 				//ParserMediator.ClearWarningList();
 				//ParserMediator.Initialize(null);
 				//GlobalStatic.Reset();
@@ -189,7 +189,7 @@ namespace MinorShift.Emuera
 		}
 
 		/// <summary>
-		/// 実行ファイルのディレクトリ。最後に\を付けたstring
+		/// 実linefileのdirectory.最after \を付けたstring
 		/// </summary>
 		public static string ExeDir { get; private set; }
 		public static string CsvDir { get; private set; }

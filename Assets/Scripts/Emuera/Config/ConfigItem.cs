@@ -145,7 +145,7 @@ namespace MinorShift.Emuera
 				if (ret)
 					((ConfigItem<Int32>)(AConfigItem)this).Value = i;
                 else
-                    throw new CodeEE("数字でない文字が含まれています");
+                    throw new CodeEE("数字でnot文字が含まれています");
             }
 			else if (this is ConfigItem<Int64>)
 			{
@@ -154,7 +154,7 @@ namespace MinorShift.Emuera
                 if (ret)
                     ((ConfigItem<Int64>)(AConfigItem)this).Value = i;
                 else
-                    throw new CodeEE("数字でない文字が含まれています");
+                    throw new CodeEE("数字でnot文字が含まれています");
 			}
             else if (this is ConfigItem<List<Int64>>)
             {
@@ -168,7 +168,7 @@ namespace MinorShift.Emuera
                         ((ConfigItem<List<Int64>>)(AConfigItem)this).Value.Add(i);
                     else
                     {
-                        throw new CodeEE("数字でない文字が含まれています");
+                        throw new CodeEE("数字でnot文字が含まれています");
                     }
                 }
             }
@@ -261,7 +261,7 @@ namespace MinorShift.Emuera
 			}
 			if (str.Equals("NO", StringComparison.CurrentCultureIgnoreCase)
 				|| str.Equals("FALSE", StringComparison.CurrentCultureIgnoreCase)
-				|| str.Equals("後", StringComparison.CurrentCultureIgnoreCase))//For "Unit position"
+				|| str.Equals("after", StringComparison.CurrentCultureIgnoreCase))//For "Unit position"
 			{
 				p = false;
 				return true;

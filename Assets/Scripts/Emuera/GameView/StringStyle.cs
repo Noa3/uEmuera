@@ -7,7 +7,7 @@ using uEmuera.Drawing;
 namespace MinorShift.Emuera.GameView
 {
 	/// <summary>
-	/// 装飾付文字列(ConsoleStyledString)用のスタイル構造体
+	/// 装飾付string(ConsoleStyledString)forのスタイル構造体
 	/// </summary>
 	internal struct StringStyle
 	{
@@ -15,7 +15,7 @@ namespace MinorShift.Emuera.GameView
 		{
 			this.Color = color;
 			this.ButtonColor = Config.FocusColor;
-			this.ColorChanged = false;//こっちのパターンでは色変更を後で検知
+			this.ColorChanged = false;//こっちのパターンでは色変更をafterで検知
 			this.FontStyle = fontStyle;
 			if (string.IsNullOrEmpty(fontname))
 				Fontname = Config.FontName;
@@ -24,7 +24,7 @@ namespace MinorShift.Emuera.GameView
 		}
 
 		/// <summary>
-		/// HTML用。ColorChangedを固定する。
+		/// HTMLfor.ColorChangedを固定do.
 		/// </summary>
 		public StringStyle(Color color, bool colorChanged, Color buttonColor, FontStyle fontStyle, string fontname)
 		{

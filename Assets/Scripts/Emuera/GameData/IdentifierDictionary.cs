@@ -15,8 +15,8 @@ using MinorShift._Library;
 
 namespace MinorShift.Emuera
 {
-	//1756 新設。
-	//また、使用されている名前を記憶し衝突を検出する。
+	//1756 新設.
+	//また,useされているnameを記憶し衝突を検出do.
 	internal sealed class IdentifierDictionary
 	{
 		private enum DefinedNameType
@@ -127,8 +127,8 @@ namespace MinorShift.Emuera
 		{
 			this.varData = varData;
 			nameDic.Clear();
-			//予約語を登録。式中に登場すると構文解析が崩壊する名前群。
-			//ただしeramaker用スクリプトなら特に気にすることはない。式中に出てこない単語も同様。
+			//予約語を登録.式during 登場doと構文parseが崩壊doname群.
+			//ただしeramakerforscriptなら特に気にdothisはnot.式during 出てこnot単語も同様.
 			nameDic.Add("IS", DefinedNameType.Reserved);
 			nameDic.Add("TO", DefinedNameType.Reserved);
 			nameDic.Add("INT", DefinedNameType.Reserved);
@@ -139,7 +139,7 @@ namespace MinorShift.Emuera
 			nameDic.Add("GLOBAL", DefinedNameType.Reserved);
 			nameDic.Add("PRIVATE", DefinedNameType.Reserved);
 			nameDic.Add("SAVEDATA", DefinedNameType.Reserved);
-			nameDic.Add("CHARADATA", DefinedNameType.Reserved);//CHARDATAから変更
+			nameDic.Add("CHARADATA", DefinedNameType.Reserved);//CHARDATAfrom変更
 			nameDic.Add("REF", DefinedNameType.Reserved);
 			nameDic.Add("__DEBUG__", DefinedNameType.Reserved);
 			nameDic.Add("__SKIP__", DefinedNameType.Reserved);
@@ -159,7 +159,7 @@ namespace MinorShift.Emuera
 			foreach (KeyValuePair<string, VariableToken> pair in varTokenDic)
 			{
 				//RANDが衝突している
-				//1808a3 GLOBAL、PRIVATEも
+				//1808a3 GLOBAL,PRIVATEも
 				//1808beta009 REFも
 				if (!nameDic.ContainsKey(pair.Key)) 
 					nameDic.Add(pair.Key, DefinedNameType.SystemVariable);
@@ -187,20 +187,20 @@ namespace MinorShift.Emuera
 		{
 			if (labelName.Length == 0)
 			{
-				errMes = "ラベル名がありません";
+				errMes = "ラベル名がdoes not exist";
 				warnLevel = 2;
 				return;
 			}
-			//1.721 記号をサポートしない方向に変更
+			//1.721 記号をサポートしnot方向に変更
 			if (labelName.IndexOfAny(badSymbolAsIdentifier) >= 0)
 			{
-				errMes = "ラベル名" + labelName + "に\"_\"以外の記号が含まれています";
+				errMes = "ラベル名" + labelName + "に\"_\"以outの記号が含まれています";
 				warnLevel = 1;
 				return;
 			}
 			if (char.IsDigit(labelName[0]) && (labelName[0].ToString()).Length == LangManager.GetStrlenLang(labelName[0].ToString()))
 			{
-                errMes = "ラベル名" + labelName + "が半角数字から始まっています";
+                errMes = "ラベル名" + labelName + "が半角数字from始まっています";
 				warnLevel = 0;
 				return;
 			}
@@ -217,42 +217,42 @@ namespace MinorShift.Emuera
 					case DefinedNameType.Reserved:
 						if (Config.AllowFunctionOverloading)
 						{
-							errMes = "関数名" + labelName + "はEmueraの予約語と衝突しています。Emuera専用構文の構文解析に支障をきたす恐れがあります";
+							errMes = "function名" + labelName + "はEmueraの予約語と衝突しています.Emuera専for構文の構文parseに支障をきたす恐れがあります";
 							warnLevel = 1;
 						}
 						else
 						{
-							errMes = "関数名" + labelName + "はEmueraの予約語です";
+							errMes = "function名" + labelName + "はEmueraの予約語です";
 							warnLevel = 2;
 						}
 						break;
 					case DefinedNameType.SystemMethod:
 						if (Config.AllowFunctionOverloading)
 						{
-							errMes = "関数名" + labelName + "はEmueraの式中関数を上書きします";
+							errMes = "function名" + labelName + "はEmueraの式insidefunctionをabove書きします";
 							warnLevel = 1;
 						}
 						else
 						{
-							errMes = "関数名" + labelName + "はEmueraの式中関数名として使われています";
+							errMes = "function名" + labelName + "はEmueraの式insidefunction名as使われています";
 							warnLevel = 2;
 						}
 						break;
 					case DefinedNameType.SystemVariable:
-						errMes = "関数名" + labelName + "はEmueraの変数で使われています";
+						errMes = "function名" + labelName + "はEmueraのvariableで使われています";
 						warnLevel = 1;
 						break;
 					case DefinedNameType.SystemInstrument:
-						errMes = "関数名" + labelName + "はEmueraの変数もしくは命令で使われています";
+						errMes = "function名" + labelName + "はEmueraのvariableもしくは命令で使われています";
 						warnLevel = 1;
 						break;
 					case DefinedNameType.UserMacro:
-						//字句解析がうまくいっていれば本来あり得ないはず
-						errMes = "関数名" + labelName + "はマクロに使用されています";
+						//字句parseがうまくいっていれば本来あり得notはず
+						errMes = "function名" + labelName + "はマクロにuseされています";
 						warnLevel = 2;
 						break;
 					case DefinedNameType.UserRefMethod:
-						errMes = "関数名" + labelName + "は参照型関数の名称に使用されています";
+						errMes = "function名" + labelName + "は参照typefunctionの名称にuseされています";
 						warnLevel = 2;
 						break;
 				}
@@ -263,20 +263,20 @@ namespace MinorShift.Emuera
 		{
 			//if (varName.Length == 0)
 			//{
-			//    errMes = "変数名がありません";
+			//    errMes = "variable名がdoes not exist";
 			//    warnLevel = 2;
 			//    return;
 			//}
-			//1.721 記号をサポートしない方向に変更
+			//1.721 記号をサポートしnot方向に変更
 			if (varName.IndexOfAny(badSymbolAsIdentifier) >= 0)
 			{
-				errMes = "変数名" + varName + "に\"_\"以外の記号が含まれています";
+				errMes = "variable名" + varName + "に\"_\"以outの記号が含まれています";
 				warnLevel = 2;
 				return;
 			}
             //if (char.IsDigit(varName[0]))
             //{
-            //    errMes = "変数名" + varName + "が半角数字から始まっています";
+            //    errMes = "variable名" + varName + "が半角数字from始まっています";
             //    warnLevel = 2;
             //    return;
             //}
@@ -287,29 +287,29 @@ namespace MinorShift.Emuera
 				switch (nametype)
 				{
 					case DefinedNameType.Reserved:
-						errMes = "変数名" + varName + "はEmueraの予約語です";
+						errMes = "variable名" + varName + "はEmueraの予約語です";
 						warnLevel = 2;
 						break;
 					case DefinedNameType.SystemInstrument:
 					case DefinedNameType.SystemMethod:
-						//代入文が使えなくなるために命令名との衝突は致命的。
-						errMes = "変数名" + varName + "はEmueraの命令名として使われています";
+						//代入文が使えなくなるbecauseに命令名との衝突は致命的.
+						errMes = "variable名" + varName + "はEmueraの命令名as使われています";
 						warnLevel = 2;
 						break;
 					case DefinedNameType.SystemVariable:
-						errMes = "変数名" + varName + "はEmueraの変数名として使われています";
+						errMes = "variable名" + varName + "はEmueraのvariable名as使われています";
 						warnLevel = 2;
 						break;
 					case DefinedNameType.UserMacro:
-						errMes = "変数名" + varName + "は既にマクロ名に使用されています";
+						errMes = "variable名" + varName + "は既にマクロ名にuseされています";
 						warnLevel = 2;
 						break;
 					case DefinedNameType.UserGlobalVariable:
-						errMes = "変数名" + varName + "はユーザー定義の広域変数名に使用されています";
+						errMes = "variable名" + varName + "はユーザーdefinitionの広域variable名にuseされています";
 						warnLevel = 2;
 						break;
 					case DefinedNameType.UserRefMethod:
-						errMes = "変数名" + varName + "は参照型関数の名称に使用されています";
+						errMes = "variable名" + varName + "は参照typefunctionの名称にuseされています";
 						warnLevel = 2;
 						break;
 				}
@@ -320,7 +320,7 @@ namespace MinorShift.Emuera
 		{
 			if (macroName.IndexOfAny(badSymbolAsIdentifier) >= 0)
 			{
-				errMes = "マクロ名" + macroName + "に\"_\"以外の記号が含まれています";
+				errMes = "マクロ名" + macroName + "に\"_\"以outの記号が含まれています";
 				warnLevel = 2;
 				return;
 			}
@@ -335,25 +335,25 @@ namespace MinorShift.Emuera
 						break;
 					case DefinedNameType.SystemInstrument:
 					case DefinedNameType.SystemMethod:
-						//命令名を上書きした時が面倒なのでとりあえず許可しない
-						errMes = "マクロ名" + macroName + "はEmueraの命令名として使われています";
+						//命令名をabove書きしたwhenが面倒なのでとりあえずallowしnot
+						errMes = "マクロ名" + macroName + "はEmueraの命令名as使われています";
 						warnLevel = 2;
 						break;
 					case DefinedNameType.SystemVariable:
-						//別に上書きしてもいいがとりあえず許可しないでおく。いずれ解放するかもしれない
-						errMes = "マクロ名" + macroName + "はEmueraの変数名として使われています";
+						//別にabove書きしてもいいがとりあえずallowしnotでおく.いずれ解放doかもしれnot
+						errMes = "マクロ名" + macroName + "はEmueraのvariable名as使われています";
 						warnLevel = 2;
 						break;
 					case DefinedNameType.UserMacro:
-						errMes = "マクロ名" + macroName + "は既にマクロ名に使用されています";
+						errMes = "マクロ名" + macroName + "は既にマクロ名にuseされています";
 						warnLevel = 2;
 						break;
 					case DefinedNameType.UserGlobalVariable:
-						errMes = "マクロ名" + macroName + "はユーザー定義の広域変数名に使用されています";
+						errMes = "マクロ名" + macroName + "はユーザーdefinitionの広域variable名にuseされています";
 						warnLevel = 2;
 						break;
 					case DefinedNameType.UserRefMethod:
-						errMes = "マクロ名" + macroName + "は参照型関数の名称に使用されています";
+						errMes = "マクロ名" + macroName + "は参照typefunctionの名称にuseされています";
 						warnLevel = 2;
 						break;
 				}
@@ -364,20 +364,20 @@ namespace MinorShift.Emuera
 		{
 			if (varName.Length == 0)
 			{
-				errMes = "変数名がありません";
+				errMes = "variable名がdoes not exist";
 				warnLevel = 2;
 				return;
 			}
-			//1.721 記号をサポートしない方向に変更
+			//1.721 記号をサポートしnot方向に変更
 			if (varName.IndexOfAny(badSymbolAsIdentifier) >= 0)
 			{
-				errMes = "変数名" + varName + "に\"_\"以外の記号が含まれています";
+				errMes = "variable名" + varName + "に\"_\"以outの記号が含まれています";
 				warnLevel = 2;
 				return;
 			}
 			if (char.IsDigit(varName[0]))
 			{
-				errMes = "変数名" + varName + "が半角数字から始まっています";
+				errMes = "variable名" + varName + "が半角数字from始まっています";
 				warnLevel = 2;
 				return;
 			}
@@ -387,32 +387,32 @@ namespace MinorShift.Emuera
 				switch(nametype)
 				{
 					case DefinedNameType.Reserved:
-						errMes = "変数名" + varName + "はEmueraの予約語です";
+						errMes = "variable名" + varName + "はEmueraの予約語です";
 						warnLevel = 2;
 						return;
 					case DefinedNameType.SystemInstrument:
 					case DefinedNameType.SystemMethod:
-						//代入文が使えなくなるために命令名との衝突は致命的。
-						errMes = "変数名" + varName + "はEmueraの命令名として使われています";
+						//代入文が使えなくなるbecauseに命令名との衝突は致命的.
+						errMes = "variable名" + varName + "はEmueraの命令名as使われています";
 						warnLevel = 2;
 						return;
 					case DefinedNameType.SystemVariable:
-						//システム変数の上書きは不可
-                        errMes = "変数名" + varName + "はEmueraの変数名として使われています";
+						//systemvariableのabove書きは不可
+                        errMes = "variable名" + varName + "はEmueraのvariable名as使われています";
                         warnLevel = 2;
 						break;
 					case DefinedNameType.UserMacro:
-						//字句解析がうまくいっていれば本来あり得ないはず
-						errMes = "変数名" + varName + "はマクロに使用されています";
+						//字句parseがうまくいっていれば本来あり得notはず
+						errMes = "variable名" + varName + "はマクロにuseされています";
 						warnLevel = 2;
 						break;
 					case DefinedNameType.UserGlobalVariable:
-						//広域変数の上書きは禁止しておく
-						errMes = "変数名" + varName + "はユーザー定義の広域変数名に使用されています";
+						//広域variableのabove書きはprohibitedしておく
+						errMes = "variable名" + varName + "はユーザーdefinitionの広域variable名にuseされています";
 						warnLevel = 2;
 						break;
 					case DefinedNameType.UserRefMethod:
-						errMes = "変数名" + varName + "は参照型関数の名称に使用されています";
+						errMes = "variable名" + varName + "は参照typefunctionの名称にuseされています";
 						warnLevel = 2;
 						break;
                 }
@@ -422,7 +422,7 @@ namespace MinorShift.Emuera
 		#endregion
 
 		#region header.erb
-		//1807 ErbLoaderに移動
+		//1807 ErbLoaderにmove
 		Dictionary<string, DefineMacro> macroDic = new Dictionary<string, DefineMacro>();
 
 		internal void AddUseDefinedVariable(VariableToken var)
@@ -477,7 +477,7 @@ namespace MinorShift.Emuera
 					if(ret != null)
 					{
 						if (subKey != null)
-							throw new CodeEE("プライベート変数" + key + "に対して@が使われました");
+							throw new CodeEE("プライベートvariable" + key + "に対して@が使われました");
 						return ret;
 					}
 				}
@@ -487,19 +487,19 @@ namespace MinorShift.Emuera
 			{
 				if (vl.IsForbid)
                 {
-					throw new CodeEE("呼び出された変数\"" + key + "\"は設定により使用が禁止されています");
+					throw new CodeEE("呼び出されたvariable\"" + key + "\"はsettingにthanuseがprohibitedされています");
                 }
 				LogicalLine line = GlobalStatic.Process.GetScaningLine();
 				if (string.IsNullOrEmpty(subKey))
 				{
-					//システムの入力待ち中にデバッグコマンドからLOCALを呼んだとき。
+					//systemのinput待ちduring debugcommandfromLOCALを呼んだとき.
 					if ((line == null) || (line.ParentLabelLine == null))
-						throw new CodeEE("実行中の関数が存在しないため" + key + "を取得又は変更できませんでした");
+						throw new CodeEE("実lineinsideのfunctionがdoes not existbecause" + key + "を取得又は変更できませんでした");
 					subKey = line.ParentLabelLine.LabelName;
 				}
 				else
 				{
-					ParserMediator.Warn("コード中でローカル変数を@付きで呼ぶことは推奨されません(代わりに*.ERHファイルの利用を検討してください)", line, 1, false, false);
+					ParserMediator.Warn("コードinsideでローカルvariableを@付きで呼ぶthisは推奨されません(代わりに*.ERHfileの利forを検討してください)", line, 1, false, false);
 					if (Config.ICFunction)
 						subKey = subKey.ToUpper();
 				}
@@ -510,17 +510,17 @@ namespace MinorShift.Emuera
 			}
 			if (varTokenDic.TryGetValue(key, out ret))
 			{
-                //一文字変数の禁止オプションを考えた名残
+                //一文字variableのprohibitedoptionを考えた名残
                 //if (Config.ForbidOneCodeVariable && ret.CanForbid)
-                //    throw new CodeEE("設定によりシステム一文字数値変数の使用が禁止されています(呼び出された変数：" + ret.Name +")");
+                //    throw new CodeEE("settingにthansystem一文字numericvariableのuseがprohibitedされています(呼び出されたvariable:" + ret.Name +")");
                 if (ret.IsForbid)
                 {
 					if(!ret.CanForbid)
-						throw new ExeEE("CanForbidでない変数\"" + ret.Name +"\"にIsForbidがついている");
-                    throw new CodeEE("呼び出された変数\"" + ret.Name +"\"は設定により使用が禁止されています");
+						throw new ExeEE("CanForbidでnotvariable\"" + ret.Name +"\"にIsForbidがついている");
+                    throw new CodeEE("呼び出されたvariable\"" + ret.Name +"\"はsettingにthanuseがprohibitedされています");
                 }
 				if (subKey != null)
-					throw new CodeEE("ローカル変数でない変数" + key + "に対して@が使われました");
+					throw new CodeEE("ローカルvariableでnotvariable" + key + "に対して@が使われました");
                 return ret;
             }
 			if (subKey != null)
@@ -570,7 +570,7 @@ namespace MinorShift.Emuera
 		{
 			if (Config.ICFunction)
 				codeStr = codeStr.ToUpper();
-			if (arguments == null)//argumentなし、名前のみの探索
+			if (arguments == null)//argumentなし,nameのみの探索
 			{
                 UserDefinedRefMethod ref_method = null;
 				if (refmethodDic.TryGetValue(codeStr, out ref_method))
@@ -587,7 +587,7 @@ namespace MinorShift.Emuera
 				{
 					if (userDefinedOnly && !func.IsMethod)
 					{
-						throw new CodeEE("#FUNCTIONが指定されていない関数\"@" + func.LabelName + "\"をCALLF系命令で呼び出そうとしました");
+						throw new CodeEE("#FUNCTIONが指定されていnotfunction\"@" + func.LabelName + "\"をCALLF系命令で呼び出そうとしました");
 					}
 					if (func.IsMethod)
 					{
@@ -597,9 +597,9 @@ namespace MinorShift.Emuera
 							throw new CodeEE(errMes);
 						return ret;
 					}
-					//1.721 #FUNCTIONが定義されていない関数は組み込み関数を上書きしない方向に。 PANCTION.ERBのRANDとか。
+					//1.721 #FUNCTIONがdefinitionされていnotfunctionは組み込みfunctionをabove書きしnot方向に. PANCTION.ERBのRANDとか.
 					if (!methodDic.ContainsKey(codeStr))
-						throw new CodeEE("#FUNCTIONが定義されていない関数(" + func.Position.Filename + ":" + func.Position.LineNo + "行目)を式中で呼び出そうとしました");
+						throw new CodeEE("#FUNCTIONがdefinitionされていnotfunction(" + func.Position.Filename + ":" + func.Position.LineNo + "line )を式insideで呼び出そうとしました");
 				}
 			}
 			if (userDefinedOnly)
@@ -613,18 +613,18 @@ namespace MinorShift.Emuera
 			return new FunctionMethodTerm(method, arguments);
 		}
 
-		//1756 作成中途
-		//名前リストを元に何がやりたかったのかを推定してCodeEEを投げる
-		//1822 DIMリストの解決中にIdentifierNotFoundCodeEEが飛んだ場合にはやり直しの可能性がある
+		//1756 createinside途
+		//nameリストをoriginalに何がやりたかったのかを推定してCodeEEを投げる
+		//1822 DIMリストの解決during IdentifierNotFoundCodeEEが飛んだcaseにはやり直しのpossible性がexist
 		public void ThrowException(string str, bool isFunc)
 		{
 			string idStr = str;
-			if(Config.ICFunction || Config.ICVariable) //片方だけなのは互換性用オプションなのでレアケースのはず。対応しない。
+			if(Config.ICFunction || Config.ICVariable) //片方だけなのは互換性foroptionなのでレアケースのはず.対応しnot.
 				idStr = idStr.ToUpper();
 			if (disableList.Contains(idStr))
 				throw new CodeEE("\"" + str + "\"は#DISABLEが宣言されています");
 			if (!isFunc && privateDimList.Contains(idStr))
-				throw new IdentifierNotFoundCodeEE("変数\"" + str + "\"はこの関数中では定義されていません");
+				throw new IdentifierNotFoundCodeEE("variable\"" + str + "\"はこのfunctioninsideではdefinitionされていません");
             DefinedNameType type = DefinedNameType.None;
             if (nameDic.TryGetValue(idStr, out type))
 			{
@@ -635,24 +635,24 @@ namespace MinorShift.Emuera
 					case DefinedNameType.SystemVariable:
 					case DefinedNameType.UserGlobalVariable:
 						if (isFunc)
-							throw new CodeEE("変数名\"" + str + "\"が関数のように使われています");
+							throw new CodeEE("variable名\"" + str + "\"がfunctionのように使われています");
 						break;
 					case DefinedNameType.SystemMethod:
 					case DefinedNameType.UserRefMethod:
 						if (!isFunc)
-							throw new CodeEE("関数名\"" + str + "\"が変数のように使われています");
+							throw new CodeEE("function名\"" + str + "\"がvariableのように使われています");
 						break;
 					case DefinedNameType.UserMacro:
-						throw new CodeEE("予期しないマクロ名\"" + str + "\"です");
+						throw new CodeEE("予期しnotマクロ名\"" + str + "\"です");
 					case DefinedNameType.SystemInstrument:
 						if (isFunc)
-							throw new CodeEE("命令名\"" + str + "\"が関数のように使われています");
+							throw new CodeEE("命令名\"" + str + "\"がfunctionのように使われています");
 						else
-							throw new CodeEE("命令名\"" + str + "\"が変数のように使われています");
+							throw new CodeEE("命令名\"" + str + "\"がvariableのように使われています");
 			
 				}
 			}
-			throw new IdentifierNotFoundCodeEE("\"" + idStr + "\"は解釈できない識別子です");
+			throw new IdentifierNotFoundCodeEE("\"" + idStr + "\"は解釈できnot識別子です");
 		}
 		#endregion
 

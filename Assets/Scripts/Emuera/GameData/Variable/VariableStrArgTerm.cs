@@ -8,7 +8,7 @@ using MinorShift.Emuera.GameData.Expression;
 namespace MinorShift.Emuera.GameData.Variable
 {
 	
-	//変数のargumentのうち文字列型のもの。
+	//variableのargumentのうちstringtypeのthing.
 	internal sealed class VariableStrArgTerm : IOperandTerm
 	{
 		public VariableStrArgTerm(VariableCode code, IOperandTerm strTerm, int index)
@@ -30,13 +30,13 @@ namespace MinorShift.Emuera.GameData.Variable
 				dic = exm.VEvaluator.Constant.GetKeywordDictionary(out errPos, parentCode, index);
 			string key = strTerm.GetStrValue(exm);
 			if (key == "")
-				throw new CodeEE("キーワードを空には出来ません");
+				throw new CodeEE("keyワードを空には出来ません");
             if (!dic.TryGetValue(key, out int i))
             {
                 if (errPos == null)
-                    throw new CodeEE("配列変数" + parentCode.ToString() + "の要素を文字列で指定することはできません");
+                    throw new CodeEE("arrayvariable" + parentCode.ToString() + "の要素をstringで指定docannot be");
                 else
-                    throw new CodeEE(errPos + "の中に\"" + key + "\"の定義がありません");
+                    throw new CodeEE(errPos + "のduring \"" + key + "\"のdefinitionがdoes not exist");
             }
             return i;
         }

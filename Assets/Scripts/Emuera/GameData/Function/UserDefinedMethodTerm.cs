@@ -47,7 +47,7 @@ namespace MinorShift.Emuera.GameData.Function
 	{
 		
 		/// <summary>
-		/// Errorならnullを返す。
+		/// Errorならnullを返す.
 		/// </summary>
 		public static UserDefinedMethodTerm Create(FunctionLabelLine targetLabel, IOperandTerm[] srcArgs, out string errMes)
 		{
@@ -93,7 +93,7 @@ namespace MinorShift.Emuera.GameData.Function
 			get
 			{
 				if (reffunc.CalledFunction == null)
-					throw new CodeEE("何も参照していない関数参照" + reffunc.Name + "を呼び出しました");
+					throw new CodeEE("何も参照していnotfunction参照" + reffunc.Name + "をcallました");
 				string errMes;
 				UserDefinedFunctionArgument arg = reffunc.CalledFunction.ConvertArg(srcArgs, out errMes);
 				if (arg == null)
@@ -106,7 +106,7 @@ namespace MinorShift.Emuera.GameData.Function
 			get
 			{
 				if (reffunc.CalledFunction == null)
-					throw new CodeEE("何も参照していない関数参照" + reffunc .Name+ "を呼び出しました");
+					throw new CodeEE("何も参照していnotfunction参照" + reffunc .Name+ "をcallました");
 				return reffunc.CalledFunction;
 			}
 		}
@@ -135,9 +135,9 @@ namespace MinorShift.Emuera.GameData.Function
 		}
 		readonly UserDefinedRefMethod reffunc = null;
 		public override UserDefinedFunctionArgument Argument
-		{ get { throw new CodeEE("argumentのない関数参照" + reffunc.Name + "を呼び出しました"); } }
+		{ get { throw new CodeEE("argumentのnotfunction参照" + reffunc.Name + "をcallました"); } }
 		public override CalledFunction Call
-		{ get { throw new CodeEE("argumentのない関数参照" + reffunc.Name + "を呼び出しました"); } }
+		{ get { throw new CodeEE("argumentのnotfunction参照" + reffunc.Name + "をcallました"); } }
 		public string GetRefName()
 		{
 			if (reffunc.CalledFunction == null)
@@ -145,11 +145,11 @@ namespace MinorShift.Emuera.GameData.Function
 			return reffunc.CalledFunction.TopLabel.LabelName;
 		}
 		public override long GetIntValue(ExpressionMediator exm)
-		{ throw new CodeEE("argumentのない関数参照" + reffunc.Name + "を呼び出しました"); }
+		{ throw new CodeEE("argumentのnotfunction参照" + reffunc.Name + "をcallました"); }
 		public override string GetStrValue(ExpressionMediator exm)
-		{ throw new CodeEE("argumentのない関数参照" + reffunc.Name + "を呼び出しました"); }
+		{ throw new CodeEE("argumentのnotfunction参照" + reffunc.Name + "をcallました"); }
 		public override SingleTerm GetValue(ExpressionMediator exm)
-		{ throw new CodeEE("argumentのない関数参照" + reffunc.Name + "を呼び出しました"); }
+		{ throw new CodeEE("argumentのnotfunction参照" + reffunc.Name + "をcallました"); }
 		public override IOperandTerm Restructure(ExpressionMediator exm)
 		{
 			return this;

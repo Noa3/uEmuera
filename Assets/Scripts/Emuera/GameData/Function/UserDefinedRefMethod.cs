@@ -26,7 +26,7 @@ namespace MinorShift.Emuera.GameData.Function
 		}
 
 		/// <summary>
-		/// 戻り値とargumentの数・型の完全一致が必要
+		/// 戻りvalueとargumentの数-typeの完全一致が必要
 		/// </summary>
 		/// <param name="call"></param>
 		/// <returns>一致ならtrue</returns>
@@ -65,7 +65,7 @@ namespace MinorShift.Emuera.GameData.Function
 		}
 
 		/// <summary>
-		/// 戻り値とargumentの数・型の完全一致が必要
+		/// 戻りvalueとargumentの数-typeの完全一致が必要
 		/// </summary>
 		/// <param name="rother"></param>
 		/// <returns>一致ならtrue</returns>

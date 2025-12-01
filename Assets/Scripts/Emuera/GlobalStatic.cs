@@ -10,17 +10,17 @@ using uEmuera.Window;
 
 namespace MinorShift.Emuera
 {
-	/* 1756 作成
-	 * できるだけデータはprivateにして必要なものだけが参照するようにしようという設計だったのは今は昔。
-	 * 改変のたびにProcess.Instance.XXXなんかがどんどん増えていく。
-	 * まあ、増えるのは仕方ないと諦める事にして、行儀の悪い参照の仕方をするものたちをせめて一箇所に集めて管理しようという計画である。
-	 * これからはInstanceを public static に解放することはやめ、ここから参照する。
-	 * しかし、できるならここからの参照は減らしたい。
+	/* 1756 create
+	 * canだけdataはprivateにして必要なthingだけが参照doようにしようcalled 設計だったのは今は昔.
+	 * 改変のたびにProcess.Instance.XXXなんかがどんどん増えていく.
+	 * まあ,増えるのは仕方notと諦める事にして,line儀の悪い参照の仕方をdothingたちをせめて一箇所に集めて管理しようcalled 計画でexist.
+	 * これfromはInstanceを public static に解放dothisはやめ,ここfrom参照do.
+	 * しかし,canならここfromの参照は減らしたい.
 	 */
 	internal static class GlobalStatic
 	{
-		//これは生成される順序で並んでいる。
-		//下から上を参照した場合、nullを返されることがある。
+		//これは生成be done順序で並んでいる.
+		//belowfromaboveを参照したcase,nullを返be donethisがexist.
 		//Config Replace
 		public static MainWindow MainWindow;
 		public static EmueraConsole Console;
@@ -37,8 +37,8 @@ namespace MinorShift.Emuera
 		public static LabelDictionary LabelDictionary;
 
 
-		//ERBloaderにargument解析の結果を渡すための橋渡し変数
-		//1756 Processから移動。Program.AnalysisMode用
+		//ERBloaderにargumentparseの結果を渡すbecauseの橋渡しvariable
+		//1756 Processfrommove.Program.AnalysisModefor
 		public static Dictionary<string, Int64> tempDic = new Dictionary<string, long>();
 #if UEMUERA_DEBUG
 		public static List<FunctionLabelLine> StackList = new List<FunctionLabelLine>();

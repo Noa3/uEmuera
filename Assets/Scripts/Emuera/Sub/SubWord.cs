@@ -1,7 +1,7 @@
 ﻿namespace MinorShift.Emuera.Sub
 {
 	/// <summary>
-	/// FormattedStringWTの中身用のトークン
+	/// FormattedStringWTのinside身forのトークン
 	/// </summary>
 	internal abstract class SubWord
 	{

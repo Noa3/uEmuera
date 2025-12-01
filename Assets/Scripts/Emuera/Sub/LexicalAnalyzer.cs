@@ -8,52 +8,52 @@ namespace MinorShift.Emuera.Sub
 {
 	enum LexEndWith
 	{
-		//いずれにせよEoLで強制終了
+		//いずれにせよEoLでforce quit
 		None = 0,
-		EoL,//常に最後まで解析
-		Operator,//演算子を見つけたら終了。代入式の左辺
-		Question,//三項演算子?により終了。\@～～?～～#～～\@
-		Percent,//%により終了。%～～%
-		RightCurlyBrace,//}により終了。{～～}
-		Comma,//,により終了。TIMES第一argument
-		//Single,//Identifier一つで終了//1807 Single削除
-		GreaterThan,//'>'により終了。Htmlタグ解析
+		EoL,//常に最afteruntilparse
+		Operator,//演算子を見つけたらend.代入式の左辺
+		Question,//三項演算子?にthanend.\@～～?～～#～～\@
+		Percent,//%にthanend.%～～%
+		RightCurlyBrace,//}にthanend.{～～}
+		Comma,//,にthanend.TIMES第一argument
+		//Single,//Identifier一つでend//1807 Singledelete
+		GreaterThan,//'>'にthanend.Htmlタグparse
 	}
 
 	enum FormStrEndWith
 	{
-		//いずれにせよEoLで強制終了
+		//いずれにせよEoLでforce quit
 		None = 0,
-		EoL,//常に最後まで解析
-		DoubleQuotation,//"で終了。@"～～"
-		Sharp,//#で終了。\@～～?～～#～～\@　の一つ目
-		YenAt,//\@で終了。\@～～?～～#～～\@　の二つ目
-		Comma,//,により終了。ANY_FORMargument
-		LeftParenthesis_Bracket_Comma_Semicolon,//[または(または,または;により終了。CALLFORM系の関数名部分。
+		EoL,//常に最afteruntilparse
+		DoubleQuotation,//"でend.@"～～"
+		Sharp,//#でend.\@～～?～～#～～\@　の一つ目
+		YenAt,//\@でend.\@～～?～～#～～\@　の二つ目
+		Comma,//,にthanend.ANY_FORMargument
+		LeftParenthesis_Bracket_Comma_Semicolon,//[or(or,or;にthanend.CALLFORM系のfunction名部分.
 	}
 
 	enum StrEndWith
 	{
-		//いずれにせよEoLで強制終了
+		//いずれにせよEoLでforce quit
 		None = 0,
-		EoL,//常に最後まで解析
-		SingleQuotation,//"で終了。'～～'
-		DoubleQuotation,//"で終了。"～～"
-		Comma,//,により終了。PRINTV'～～,
-		LeftParenthesis_Bracket_Comma_Semicolon,//[または(または,または;により終了。関数名部分。
+		EoL,//常に最afteruntilparse
+		SingleQuotation,//"でend.'～～'
+		DoubleQuotation,//"でend."～～"
+		Comma,//,にthanend.PRINTV'～～,
+		LeftParenthesis_Bracket_Comma_Semicolon,//[or(or,or;にthanend.function名部分.
 	}
 
 	enum LexAnalyzeFlag
 	{
 		None = 0,
-		AnalyzePrintV = 1,//PRINTVのargumentで'に続けて文字列を書くと数式ではないが文字列として表示される
-		AllowAssignment = 2,//代入演算子が使用できる場面であるFlag。このFlagなしで=が途中に出てきたらError
-		AllowSingleQuotationStr = 4,//HTML_PRINT解析用。''で囲まれた文字列を許可する。
+		AnalyzePrintV = 1,//PRINTVのargumentで'に続けてstringを書くと数式ではnotがstringasdisplaybe done
+		AllowAssignment = 2,//代入演算子がusecan場面でexistFlag.このFlagなしで=が途during 出てきたらError
+		AllowSingleQuotationStr = 4,//HTML_PRINTparsefor.''で囲まれたstringをallowdo.
 	}
 
 	/// <summary>
-	/// 1756 TokenReaderより改名
-	/// Lexicalといいつつ構文解析を含む
+	/// 1756 TokenReaderthan改名
+	/// Lexicalといいつつ構文parseを含む
 	/// </summary>
 	internal static class LexicalAnalyzer
 	{
@@ -69,7 +69,7 @@ namespace MinorShift.Emuera.Sub
 		//readonly static IList<char> decimalDigits = new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', };
 		readonly static IList<char> hexadecimalDigits = new char[] { 'a', 'b', 'c', 'd', 'e', 'f', 'A', 'B', 'C', 'D', 'E', 'F' };
 
-	//1819 正規表現使うとやや遅い。いずれdoubleにも対応させたい。そのうち考える
+	//1819 正規表現使うとやや遅い.いずれdoubleにも対応させたい.そのうち考える
 		//readonly static Regex DigitsReg = new Regex("" +
 		//	"(" +
 		//	"((?<simple>[-]?[0-9]+)([^.xXbBeEpP]|$))" +
@@ -121,7 +121,7 @@ namespace MinorShift.Emuera.Sub
 		//		}
 		//		return ((Int64)(d + 0.49));
 		//	}
-		//	throw new CodeEE("数字で始まるトークンが適切でありません");
+		//	throw new CodeEE("数字で始まるトークンが適切でdoes not exist");
 		//}
 
 
@@ -151,7 +151,7 @@ namespace MinorShift.Emuera.Sub
 					st.ShiftNext();
 					st.ShiftNext();
 				}
-				//8進法は互換性の問題から採用しない。
+				//8進法は互換性の問題from採forしnot.
 				//else if (dchar.IsDigit(c))
 				//{
 				//    fromBase = 8;
@@ -181,7 +181,7 @@ namespace MinorShift.Emuera.Sub
 
 				double d = significand * Math.Pow(expBase, exponent);
 				if ((double.IsNaN(d)) || (double.IsInfinity(d)) || (d > Int64.MaxValue) || (d < Int64.MinValue))
-					throw new CodeEE("\"" + st.Substring(stStartPos, stEndPos) + "\"は64ビット符号付整数の範囲を超えています");
+					throw new CodeEE("\"" + st.Substring(stStartPos, stEndPos) + "\"は64ビット符号付integerの範囲を超えています");
 				significand = (Int64)d;
 			}
 			return significand;
@@ -232,7 +232,7 @@ namespace MinorShift.Emuera.Sub
 					if (char.IsDigit(c))
 					{
 						if ((c != '0') && (c != '1'))
-							throw new CodeEE("二進法表記の中で使用できない文字が使われています");
+							throw new CodeEE("二進法表記のinsideでuseできnot文字が使われています");
 						st.ShiftNext();
 						continue;
 					}
@@ -246,30 +246,30 @@ namespace MinorShift.Emuera.Sub
 			}
 			catch (FormatException)
 			{
-				throw new CodeEE("\"" + strInt + "\"は整数値に変換できません");
+				throw new CodeEE("\"" + strInt + "\"はintegervalueにconvertできません");
 			}
 			catch (OverflowException)
 			{
-				throw new CodeEE("\"" + strInt + "\"は64ビット符号付き整数の範囲を超えています");
+				throw new CodeEE("\"" + strInt + "\"は64ビット符号付きintegerの範囲を超えています");
 			}
 			catch (ArgumentOutOfRangeException)
 			{
 				if (string.IsNullOrEmpty(strInt))
-					throw new CodeEE("数値として認識できる文字が必要です");
-				throw new CodeEE("文字列\"" + strInt + "\"は数値として認識できません");
+					throw new CodeEE("numericas認識can文字が必要です");
+				throw new CodeEE("string\"" + strInt + "\"はnumericas認識できません");
 			}
 		}
 
 		/// <summary>
-		/// TIMES第二argumentのみが使用する。
-		/// Convertクラスが発行するExceptionをそのまま投げるので適切に処理すること。
+		/// TIMES第二argumentのみがusedo.
+		/// Convertclassが発linedoExceptionをそのまま投げるので適切にprocessdothis.
 		/// </summary>
 		/// <param name="st"></param>
 		/// <returns></returns>
 		public static double ReadDouble(StringStream st)
 		{
 			int start = st.CurrentPosition;
-			//大雑把に読み込んでError処理はConvertクラスに任せる。
+			//大雑把に読み込んでErrorprocessはConvertclassに任せる.
 			//仮数小数部
 
 			if ((st.Current == '-') || (st.Current == '+'))
@@ -308,7 +308,7 @@ namespace MinorShift.Emuera.Sub
 		}
 
 		/// <summary>
-		/// 行頭の単語の取得。マクロ展開あり。ただし単語でないマクロ展開はしない。
+		/// line頭の単語の取得.マクロ展開あり.ただし単語でnotマクロ展開はしnot.
 		/// </summary>
 		/// <param name="st"></param>
 		/// <returns></returns>
@@ -317,8 +317,8 @@ namespace MinorShift.Emuera.Sub
 			//int startpos = st.CurrentPosition;
 			string str = ReadSingleIdentifier(st);
 			if (string.IsNullOrEmpty(str))
-				throw new CodeEE("Invalid 文字で行が始まっています");
-			//1808a3 先頭1単語の展開をやめる。－命令の置換を禁止。
+				throw new CodeEE("Invalid 文字でlineが始まっています");
+			//1808a3 ahead頭1単語の展開をやめる.－命令の置換をprohibited.
 			//if (UseMacro)
 			//{
 			//    int i = 0;
@@ -327,14 +327,14 @@ namespace MinorShift.Emuera.Sub
 			//        DefineMacro macro = GlobalStatic.IdentifierDictionary.GetMacro(str);
 			//        i++;
 			//        if (i > MAX_EXPAND_MACRO)
-			//            throw new CodeEE("マクロの展開数が1文あたりの上限を超えました(自己参照・循環参照のおそれ)");
+			//            throw new CodeEE("マクロの展開数が1文あたりのabove限を超えました(自己参照-循環参照のおそれ)");
 			//        if (macro == null)
 			//            break;
-			//        //単語（識別子一個）でないマクロが出現したらここでは処理しない
+			//        //単語(識別子一個)でnotマクロが出現したらここではprocessしnot
 			//        if (macro.IDWord == null)
 			//        {
 			//            st.CurrentPosition = startpos;
-			//            return null;//変数処理に任せる。
+			//            return null;//variableprocessに任せる.
 			//        }
 			//        str = macro.IDWord.Code;
 			//    }
@@ -343,7 +343,7 @@ namespace MinorShift.Emuera.Sub
 		}
 
 		/// <summary>
-		/// 単語の取得。マクロ展開あり。関数型マクロ展開なし
+		/// 単語の取得.マクロ展開あり.functiontypeマクロ展開なし
 		/// </summary>
 		/// <param name="st"></param>
 		/// <returns></returns>
@@ -360,11 +360,11 @@ namespace MinorShift.Emuera.Sub
 					DefineMacro macro = GlobalStatic.IdentifierDictionary.GetMacro(str);
 					i++;
 					if (i > MAX_EXPAND_MACRO)
-						throw new CodeEE("マクロの展開数が1文あたりの上限値" + MAX_EXPAND_MACRO.ToString() + "を超えました(自己参照・循環参照のおそれ)");
+						throw new CodeEE("マクロの展開数が1文あたりのabove限value" + MAX_EXPAND_MACRO.ToString() + "を超えました(自己参照-循環参照のおそれ)");
 					if (macro == null)
 						break;
 					if (macro.IDWord != null)
-						throw new CodeEE("マクロ" + macro.Keyword + "はこの文脈では使用できません(1単語に置き換えるマクロのみが使用できます)");
+						throw new CodeEE("マクロ" + macro.Keyword + "はこの文脈ではuseできません(1単語に置き換えるマクロのみがuseできます)");
 					str = macro.IDWord.Code;
 				}
 			}
@@ -407,13 +407,13 @@ namespace MinorShift.Emuera.Sub
             ';',
         };
         /// <summary>
-        /// 単語を文字列で取得。マクロ適用なし
+        /// 単語をstringで取得.マクロ適forなし
         /// </summary>
         /// <param name="st"></param>
         /// <returns></returns>
         public static string ReadSingleIdentifier(StringStream st)
 		{
-			//1819 やや遅い。でもいずれやりたい
+			//1819 やや遅い.でもいずれやりたい
 			//Match m = idReg.Match(st.RowString, st.CurrentPosition);
 			//st.Jump(m.Length);
 			//return m.Value;
@@ -454,11 +454,11 @@ namespace MinorShift.Emuera.Sub
                 //	case '\"':
                 //	case '@':
                 //	case '.':
-                //	case ';'://コメントに関しては直後に行われるであろうSkipWhiteSpaceなどが対応する。
+                //	case ';'://コメントに関しては直after lineわれるであろうSkipWhiteSpaceetcが対応do.
                 //		goto end;
                 //	case '　':
                 //		if (!Config.SystemAllowFullSpace)
-                //			throw new CodeEE("予期しない全角スペースを発見しました(この警告はシステムオプション「" + Config.GetConfigName(ConfigCode.SystemAllowFullSpace) + "」により無視できます)");
+                //			throw new CodeEE("予期しnot全角スペースを発見しました(このwarningはsystemoption"" + Config.GetConfigName(ConfigCode.SystemAllowFullSpace) + ""にthan無視できます)");
                 //		goto end;
                 //}
 
@@ -468,7 +468,7 @@ namespace MinorShift.Emuera.Sub
                 else if(c == '　')
                 {
                     if(!Config.SystemAllowFullSpace)
-                	    throw new CodeEE("予期しない全角スペースを発見しました(この警告はシステムオプション「" + Config.GetConfigName(ConfigCode.SystemAllowFullSpace) + "」により無視できます)");
+                	    throw new CodeEE("予期しnot全角スペースを発見しました(このwarningはsystemoption"" + Config.GetConfigName(ConfigCode.SystemAllowFullSpace) + ""にthan無視できます)");
                     goto end;
                 }
                 st.ShiftNext();
@@ -478,8 +478,8 @@ namespace MinorShift.Emuera.Sub
 		}
 
 		/// <summary>
-		/// endWithが見つかるまで読み込む。始点と終端のチェックは呼び出し側で行うこと。
-		/// エスケープあり。
+		/// endWithが見つかるuntil読み込む.始点と終端のチェックはcall側でlineうthis.
+		/// エスケープあり.
 		/// </summary>
 		/// <param name="st"></param>
 		/// <returns></returns>
@@ -510,12 +510,12 @@ namespace MinorShift.Emuera.Sub
 						if (endWith == StrEndWith.LeftParenthesis_Bracket_Comma_Semicolon)
 							goto end;
 						break;
-					case '\\'://エスケープ処理
+					case '\\'://エスケープprocess
 						st.ShiftNext();//\を読み飛ばす
 						switch (st.Current)
 						{
 							case StringStream.EndOfString:
-								throw new CodeEE("エスケープ文字\\の後に文字がありません");
+								throw new CodeEE("エスケープ文字\\のafter 文字がdoes not exist");
 							case '\n': break;
 							case 's': buffer.Append(' '); break;
 							case 'S': buffer.Append('　'); break;
@@ -523,7 +523,7 @@ namespace MinorShift.Emuera.Sub
 							case 'n': buffer.Append('\n'); break;
 							default: buffer.Append(st.Current); break;
 						}
-						st.ShiftNext();//\の次の文字を読み飛ばす
+						st.ShiftNext();//\のnext 文字を読み飛ばす
 						continue;
 				}
 				buffer.Append(st.Current);
@@ -534,8 +534,8 @@ namespace MinorShift.Emuera.Sub
 		}
 
 		/// <summary>
-		/// 失敗したらCodeEE。OperatorManagerには頼らない
-		/// OperatorCode.Assignmentを返すことがある。
+		/// failedしたらCodeEE.OperatorManagerには頼らnot
+		/// OperatorCode.Assignmentを返すthisがexist.
 		/// </summary>
 		/// <param name="st"></param>
 		/// <returns></returns>
@@ -574,7 +574,7 @@ namespace MinorShift.Emuera.Sub
 					}
 					if (allowAssignment)
 						return OperatorCode.Assignment;
-					throw new CodeEE("予期しない代入演算子'='を発見しました(等価比較には'=='を使用してください)");
+					throw new CodeEE("予期しnot代入演算子'='を発見しました(等価比較には'=='をuseしてください)");
 				case '!':
 					if (next == '=')
 					{
@@ -645,12 +645,12 @@ namespace MinorShift.Emuera.Sub
 					return OperatorCode.Ternary_b;
 
 			}
-			throw new CodeEE("'" + cur + "'は演算子として認識できません");
+			throw new CodeEE("'" + cur + "'は演算子as認識できません");
 		}
 
 		/// <summary>
-		/// 失敗したらCodeEE。OperatorManagerには頼らない
-		/// "="の時、OperatorCode.Assignmentを返す。"=="の時はEqual
+		/// failedしたらCodeEE.OperatorManagerには頼らnot
+		/// "="のwhen,OperatorCode.Assignmentを返す."=="のwhenはEqual
 		/// </summary>
 		/// <param name="st"></param>
 		/// <returns></returns>
@@ -699,7 +699,7 @@ namespace MinorShift.Emuera.Sub
 						ret = OperatorCode.AssignmentStr;
 						break;
 					}
-					throw new CodeEE("\"\'\"は代入演算子として認識できません");
+					throw new CodeEE("\"\'\"は代入演算子as認識できません");
 				case '<':
 					if (next == '<')
 					{
@@ -709,7 +709,7 @@ namespace MinorShift.Emuera.Sub
 							ret = OperatorCode.LeftShift;
 							break;
 						}
-						throw new CodeEE("'<'は代入演算子として認識できません");
+						throw new CodeEE("'<'は代入演算子as認識できません");
 					}
 					break;
 				case '>':
@@ -721,7 +721,7 @@ namespace MinorShift.Emuera.Sub
 							ret = OperatorCode.RightShift;
 							break;
 						}
-						throw new CodeEE("'>'は代入演算子として認識できません");
+						throw new CodeEE("'>'は代入演算子as認識できません");
 					}
 					break;
 				case '|':
@@ -738,7 +738,7 @@ namespace MinorShift.Emuera.Sub
 					break;
 			}
 			if (ret == OperatorCode.NULL)
-				throw new CodeEE("'" + cur + "'は代入演算子として認識できません");
+				throw new CodeEE("'" + cur + "'は代入演算子as認識できません");
 			st.ShiftNext();
 			return ret;
 		}
@@ -746,7 +746,7 @@ namespace MinorShift.Emuera.Sub
 
 
 		/// <summary>
-		/// Consoleの文字表示用。字句解析や構文解析に使ってはならない
+		/// Consoleの文字displayfor.字句parseや構文parseに使ってはならnot
 		/// </summary>
 		public static int SkipAllSpace(StringStream st)
 		{
@@ -772,7 +772,7 @@ namespace MinorShift.Emuera.Sub
 		}
 
 		/// <summary>
-		/// 字句解析・構文解析用。ホワイトスペースの他、コメントも飛ばす。
+		/// 字句parse-構文parsefor.ホワイトスペースの他,コメントも飛ばす.
 		/// </summary>
 		public static int SkipWhiteSpace(StringStream st)
 		{
@@ -809,7 +809,7 @@ namespace MinorShift.Emuera.Sub
 		}
 
 		/// <summary>
-		/// 字句解析・構文解析用。文字列直前の半角スペースを飛ばす。性質上、半角スペースのみを見る。
+		/// 字句parse-構文parsefor.string直previous 半角スペースを飛ばす.性質above,半角スペースのみを見る.
 		/// </summary>
 		public static int SkipHalfSpace(StringStream st)
 		{
@@ -826,8 +826,8 @@ namespace MinorShift.Emuera.Sub
 		#region analyse
 		
 		/// <summary>
-		/// 解析できるものは関数宣言や式のみ。FORM文字列や普通の文字列を送ってはいけない
-		/// return時にはendWithの文字がCurrentになっているはず。終端の適切さの検証は呼び出し元が行う。
+		/// parsecanthingはfunction宣言や式のみ.FORMstringや普通のstringを送ってはいけnot
+		/// returnwhenにはendWithの文字がCurrentになっているはず.終端の適切さの検証はcalloriginalがlineう.
 		/// </summary>
 		/// <returns></returns>
 		public static WordCollection Analyse(StringStream st, LexEndWith endWith, LexAnalyzeFlag flag)
@@ -849,7 +849,7 @@ namespace MinorShift.Emuera.Sub
 						continue;
 					case '　':
 						if (!Config.SystemAllowFullSpace)
-							throw new CodeEE("字句解析中に予期しない全角スペースを発見しました(この警告はシステムオプション「" + Config.GetConfigName(ConfigCode.SystemAllowFullSpace) + "」により無視できます)");
+							throw new CodeEE("字句parseduring 予期しnot全角スペースを発見しました(このwarningはsystemoption"" + Config.GetConfigName(ConfigCode.SystemAllowFullSpace) + ""にthan無視できます)");
 						st.ShiftNext();
 						continue;
 					case '0':
@@ -885,7 +885,7 @@ namespace MinorShift.Emuera.Sub
 						if ((nestBracketS == 0) && (nestBracketL == 0))
 						{
 							if (endWith == LexEndWith.Operator)
-								goto end;//代入演算子のはずである。呼び出し元がチェックするはず
+								goto end;//代入演算子のはずでexist.calloriginalがチェックdoはず
 							else if ((endWith == LexEndWith.Percent) && (st.Current == '%'))
 								goto end;
 							else if ((endWith == LexEndWith.Question) && (st.Current == '?'))
@@ -899,12 +899,12 @@ namespace MinorShift.Emuera.Sub
 					case '[':
 						if (st.Next == '[')
 						{
-							//throw new CodeEE("字句解析中に予期しない文字'[['を発見しました");
-							////1808alpha006 rename処理変更
+							//throw new CodeEE("字句parseduring 予期しnot文字'[['を発見しました");
+							////1808alpha006 renameprocess変更
 							//1808beta009 ここだけ戻す
-							//現在の処理だとここに来た時点でrename失敗確定だが警告内容を元に戻すため
+							//currentのprocessだとここに来たwhen点でrenamefailed確定だがwarningin容をoriginalに戻すbecause
 							if (ParserMediator.RenameDic == null)
-								throw new CodeEE("字句解析中に予期しない文字\"[[\"を発見しました");
+								throw new CodeEE("字句parseduring 予期しnot文字\"[[\"を発見しました");
 							int start = st.CurrentPosition;
 							int find = st.Find("]]");
 							if (find <= 2)
@@ -912,17 +912,17 @@ namespace MinorShift.Emuera.Sub
 								if (find == 2)
 									throw new CodeEE("空の[[]]です");
 								else
-									throw new CodeEE("対応する\"]]\"のない\"[[\"です");
+									throw new CodeEE("対応do\"]]\"のnot\"[[\"です");
 							}
 							string key = st.Substring(start, find + 2);
-							//1810 ここまでで置換できなかったものは強制Errorにする
-							//行連結前に置換不能で行連結より置換することができるようになったものまで置換されていたため
-							throw new CodeEE("字句解析中に置換(rename)できない符号" + key + "を発見しました");
+							//1810 ここuntilで置換できなかったthingは強制Errorにdo
+							//line連結before 置換不能でline連結than置換dothisがcanようになったthinguntil置換されていたbecause
+							throw new CodeEE("字句parseduring 置換(rename)できnot符号" + key + "を発見しました");
 							//string value = null;
 							//if (!ParserMediator.RenameDic.TryGetValue(key, out value))
-							//    throw new CodeEE("字句解析中に置換(rename)できない符号" + key + "を発見しました");
+							//    throw new CodeEE("字句parseduring 置換(rename)できnot符号" + key + "を発見しました");
 							//st.Replace(start, find + 2, value);
-							//continue;//その場から再度解析スタート
+							//continue;//その場from再度parseスタート
 						}
 						ret.Add(new SymbolWord('[')); nestBracketL++; st.ShiftNext(); continue;
 					case ':': ret.Add(new SymbolWord(':')); st.ShiftNext(); continue;
@@ -944,20 +944,20 @@ namespace MinorShift.Emuera.Sub
 						}
 						if ((flag & LexAnalyzeFlag.AnalyzePrintV) != LexAnalyzeFlag.AnalyzePrintV)
 						{
-							//AssignmentStr用特殊処理 代入文の代入演算子を探索中で'=の場合のみ許可
+							//AssignmentStrfor特殊process 代入文の代入演算子を探索insideで'=のcaseのみallow
 							if ((endWith == LexEndWith.Operator) && (nestBracketS == 0) && (nestBracketL == 0) && st.Next == '=' )
 								goto end;
-							throw new CodeEE("字句解析中に予期しない文字'" + st.Current + "'を発見しました");
+							throw new CodeEE("字句parseduring 予期しnot文字'" + st.Current + "'を発見しました");
 						}
 						st.ShiftNext();
 						ret.Add(new LiteralStringWord(ReadString(st, StrEndWith.Comma)));
 						if (st.Current == ',')
-							goto case ',';//続きがあるなら,の処理へ。それ以外は行終端のはず
+							goto case ',';//続きがexistなら,のprocessto.それ以outはline終端のはず
 						goto end;
 					case '}':
 						if (endWith == LexEndWith.RightCurlyBrace)
 							goto end;
-						throw new CodeEE("字句解析中に予期しない文字'" + st.Current + "'を発見しました");
+						throw new CodeEE("字句parseduring 予期しnot文字'" + st.Current + "'を発見しました");
 					case '\"':
 						st.ShiftNext();
 						ret.Add(new LiteralStringWord(ReadString(st, StrEndWith.DoubleQuotation)));
@@ -986,7 +986,7 @@ namespace MinorShift.Emuera.Sub
 
 					case '\\':
 						if (st.Next != '@')
-							throw new CodeEE("字句解析中に予期しない文字'" + st.Current + "'を発見しました");
+							throw new CodeEE("字句parseduring 予期しnot文字'" + st.Current + "'を発見しました");
 						{
 							st.Jump(2);
 							ret.Add(new StrFormWord(new string[] { "", "" }, new SubWord[] { AnalyseYenAt(st) }));
@@ -994,8 +994,8 @@ namespace MinorShift.Emuera.Sub
 						break;
 					case '{':
 					case '$':
-						throw new CodeEE("字句解析中に予期しない文字'" + st.Current + "'を発見しました");
-					case ';'://1807 行中コメント
+						throw new CodeEE("字句parseduring 予期しnot文字'" + st.Current + "'を発見しました");
+					case ';'://1807 lineinsideコメント
 						if (st.CurrentEqualTo(";#;") && Program.DebugMode)
 						{
 							st.Jump(3);
@@ -1019,13 +1019,13 @@ namespace MinorShift.Emuera.Sub
 			if ((nestBracketS != 0) || (nestBracketL != 0))
 			{
 				if (nestBracketS < 0)
-					throw new CodeEE("字句解析中に対応する'('のない')'を発見しました");
+					throw new CodeEE("字句parseduring 対応do'('のnot')'を発見しました");
 				else if (nestBracketS > 0)
-					throw new CodeEE("字句解析中に対応する')'のない'('を発見しました");
+					throw new CodeEE("字句parseduring 対応do')'のnot'('を発見しました");
 				if (nestBracketL < 0)
-					throw new CodeEE("字句解析中に対応する'['のない']'を発見しました");
+					throw new CodeEE("字句parseduring 対応do'['のnot']'を発見しました");
 				else if (nestBracketL > 0)
-					throw new CodeEE("字句解析中に対応する']'のない'['を発見しました");
+					throw new CodeEE("字句parseduring 対応do']'のnot'['を発見しました");
 			}
 			if (UseMacro)
 				return expandMacro(ret);
@@ -1055,14 +1055,14 @@ namespace MinorShift.Emuera.Sub
 				}
 				count++;
 				if (count > MAX_EXPAND_MACRO)
-					throw new CodeEE("マクロの展開数が1文あたりの上限" + MAX_EXPAND_MACRO.ToString() + "を超えました(自己参照・循環参照のおそれ)");
+					throw new CodeEE("マクロの展開数が1文あたりのabove限" + MAX_EXPAND_MACRO.ToString() + "を超えました(自己参照-循環参照のおそれ)");
 				if (!macro.HasArguments)
 				{
 					wc.Remove();
 					wc.InsertRange(macro.Statement);
 					continue;
 				}
-				//関数型マクロ
+				//functiontypeマクロ
 				wc = expandFunctionlikeMacro(macro, wc);
 			}
 			wc.Pointer = 0;
@@ -1075,7 +1075,7 @@ namespace MinorShift.Emuera.Sub
 			wc.ShiftNext();
 			SymbolWord symbol = wc.Current as SymbolWord;
 			if (symbol == null || symbol.Type != '(')
-				throw new CodeEE("関数形式のマクロ" + macro.Keyword + "にargumentがありません");
+				throw new CodeEE("function形式のマクロ" + macro.Keyword + "にargumentがdoes not exist");
 			WordCollection macroWC = macro.Statement.Clone();
 			WordCollection[] args = new WordCollection[macro.ArgCount];
 			//argument部読み取りループ
@@ -1087,7 +1087,7 @@ namespace MinorShift.Emuera.Sub
 				{
 					wc.ShiftNext();
 					if (wc.EOL)
-						throw new CodeEE("関数形式のマクロ" + macro.Keyword + "の用法が正しくありません");
+						throw new CodeEE("function形式のマクロ" + macro.Keyword + "のfor法が正しくdoes not exist");
 					symbol = wc.Current as SymbolWord;
 					if (symbol == null)
 					{
@@ -1104,7 +1104,7 @@ namespace MinorShift.Emuera.Sub
 								break;
 							}
 							if (i != macro.ArgCount - 1)
-								throw new CodeEE("関数形式のマクロ" + macro.Keyword + "のargumentの数が正しくありません");
+								throw new CodeEE("function形式のマクロ" + macro.Keyword + "のargumentの数が正しくdoes not exist");
 							goto exitfor;
 						case ',':
 							if (macroNestBracketS == 0)
@@ -1115,14 +1115,14 @@ namespace MinorShift.Emuera.Sub
 				}
 			exitwhile:
 				if (args[i].Collection.Count == 0)
-					throw new CodeEE("関数形式のマクロ" + macro.Keyword + "のargumentを省略することはできません");
+					throw new CodeEE("function形式のマクロ" + macro.Keyword + "のargumentを省略docannot be");
 				continue;
 			}
 		//argument部読み取りループ終端
 		exitfor:
 			symbol = wc.Current as SymbolWord;
 			if (symbol == null || symbol.Type != ')')
-				throw new CodeEE("関数形式のマクロ" + macro.Keyword + "の用法が正しくありません");
+				throw new CodeEE("function形式のマクロ" + macro.Keyword + "のfor法が正しくdoes not exist");
 			int macroLength = wc.Pointer - macroStart + 1;
 			wc.Pointer = macroStart;
 			for (int j = 0; j < macroLength; j++)
@@ -1145,8 +1145,8 @@ namespace MinorShift.Emuera.Sub
 		}
 
 		/// <summary>
-		/// @"などの直後からの開始
-		/// return時にはendWithの文字がCurrentになっているはず。終端の適切さの検証は呼び出し元が行う。
+		/// @"etcの直afterfromのstart
+		/// returnwhenにはendWithの文字がCurrentになっているはず.終端の適切さの検証はcalloriginalがlineう.
 		/// </summary>
 		/// <returns></returns>
 		public static StrFormWord AnalyseFormattedString(StringStream st, FormStrEndWith endWith, bool trim)
@@ -1190,7 +1190,7 @@ namespace MinorShift.Emuera.Sub
 						st.ShiftNext();
 						SWTs.Add(new PercentSubWord(Analyse(st, LexEndWith.Percent, LexAnalyzeFlag.None)));
 						if (st.Current != '%')
-							throw new CodeEE("\'%\'が使われましたが対応する\'%\'が見つかりません");
+							throw new CodeEE("\'%\'が使われましたが対応do\'%\'not found");
 						break;
 					case '{':
 						strs.Add(buffer.ToString());
@@ -1198,7 +1198,7 @@ namespace MinorShift.Emuera.Sub
 						st.ShiftNext();
 						SWTs.Add(new CurlyBraceSubWord(Analyse(st, LexEndWith.RightCurlyBrace, LexAnalyzeFlag.None)));
 						if (st.Current != '}')
-							throw new CodeEE("\'{\'が使われましたが対応する\'}\'が見つかりません");
+							throw new CodeEE("\'{\'が使われましたが対応do\'}\'not found");
 						break;
 					case '*':
 					case '+':
@@ -1216,14 +1216,14 @@ namespace MinorShift.Emuera.Sub
 						else
 							buffer.Append(cur);
 						break;
-					case '\\'://エスケープ文字の使用
+					case '\\'://エスケープ文字のuse
 
 						st.ShiftNext();
 						cur = st.Current;
 						switch (cur)
 						{
 							case '\0':
-								throw new CodeEE("エスケープ文字\\の後に文字がありません");
+								throw new CodeEE("エスケープ文字\\のafter 文字がdoes not exist");
 							case '\n': break;
 							case 's': buffer.Append(' '); break;
 							case 'S': buffer.Append('　'); break;
@@ -1269,7 +1269,7 @@ namespace MinorShift.Emuera.Sub
 
 
 		/// <summary>
-		/// \@直後からの開始、\@の直後がCurrentになる
+		/// \@直afterfromのstart,\@の直afterがCurrentになる
 		/// </summary>
 		/// <param name="st"></param>
 		/// <returns></returns>
@@ -1277,21 +1277,21 @@ namespace MinorShift.Emuera.Sub
 		{
 			WordCollection w = Analyse(st, LexEndWith.Question, LexAnalyzeFlag.None);
 			if (st.Current != '?')
-				throw new CodeEE("\'\\@\'が使われましたが対応する\'?\'が見つかりません");
+				throw new CodeEE("\'\\@\'が使われましたが対応do\'?\'not found");
 			st.ShiftNext();
 			StrFormWord left = AnalyseFormattedString(st, FormStrEndWith.Sharp, true);
 			if (st.Current != '#')
 			{
 				if (st.Current != '@')
-					throw new CodeEE("\'\\@\',\'?\'が使われましたが対応する\'#\'が見つかりません");
+					throw new CodeEE("\'\\@\',\'?\'が使われましたが対応do\'#\'not found");
 				st.ShiftNext();
-				ParserMediator.Warn("\'\\@\',\'?\'が使われましたが対応する\'#\'が見つかりません", GlobalStatic.Process.GetScaningLine(), 1, false, false);
+				ParserMediator.Warn("\'\\@\',\'?\'が使われましたが対応do\'#\'not found", GlobalStatic.Process.GetScaningLine(), 1, false, false);
 				return new YenAtSubWord(w, left, null);
 			}
 			st.ShiftNext();
 			StrFormWord right = AnalyseFormattedString(st, FormStrEndWith.YenAt, true);
 			if (st.Current != '@')
-				throw new CodeEE("\'\\@\',\'?\',\'#\'が使われましたが対応する\'\\@\'が見つかりません");
+				throw new CodeEE("\'\\@\',\'?\',\'#\'が使われましたが対応do\'\\@\'not found");
 			st.ShiftNext();
 			return new YenAtSubWord(w, left, right);
 		}

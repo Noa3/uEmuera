@@ -21,7 +21,7 @@ namespace MinorShift.Emuera.GameData.Expression
     }
 
 	/// <summary>
-	/// 項。一単語だけ。
+	/// 項.一単語だけ.
 	/// </summary>
 	internal sealed class SingleTerm : IOperandTerm
 	{
@@ -63,7 +63,7 @@ namespace MinorShift.Emuera.GameData.Expression
 		{
 			get
 			{
-                //チェック済みの上での呼び出し
+                //チェック済みのaboveでのcall
                 //if (type != typeof(string))
                 //    throw new ExeEE("項の種別が異常");
 				return sValue;
@@ -74,7 +74,7 @@ namespace MinorShift.Emuera.GameData.Expression
 		{
 			get
 			{
-                //チェック済みの上での呼び出し
+                //チェック済みのaboveでのcall
                 //if (type != typeof(Int64))
                 //    throw new ExeEE("項の種別が異常");
 				return iValue;
@@ -95,7 +95,7 @@ namespace MinorShift.Emuera.GameData.Expression
         }
 	}
 	/// <summary>
-	/// 項。一単語だけ。
+	/// 項.一単語だけ.
 	/// </summary>
 	internal sealed class StrFormTerm : IOperandTerm
 	{

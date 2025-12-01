@@ -42,7 +42,7 @@ namespace MinorShift.Emuera.GameProc
 					{
 						Int64 charaNo = vTerm.GetElementInt(0, exm);
 						if ((charaNo < 0) || (charaNo >= GlobalStatic.VariableData.CharacterList.Count))
-							throw new CodeEE("キャラクタ配列変数" + vTerm.Identifier.Name + "の第１argument(" + charaNo.ToString() + ")はキャラ登録番号の範囲外です");
+							throw new CodeEE("characterarrayvariable" + vTerm.Identifier.Name + "の第１argument(" + charaNo.ToString() + ")はキャラ登録番号の範囲outです");
 						TransporterRef[i] = (Array)vTerm.Identifier.GetArrayChara((int)charaNo);
 					}
 					else
@@ -71,8 +71,8 @@ namespace MinorShift.Emuera.GameProc
 	}
 
 	/// <summary>
-	/// 現在呼び出し中の関数
-	/// イベント関数を除いて実行中に内部状態は変化しないので使いまわしても良い
+	/// currentcallinsideのfunction
+	/// eventfunctionを除いて実lineduring in部状態は変化しnotので使いまわしても良い
 	/// </summary>
 	internal sealed class CalledFunction
 	{
@@ -88,7 +88,7 @@ namespace MinorShift.Emuera.GameProc
 				FunctionLabelLine line = parent.LabelDictionary.GetNonEventLabel(label);
 				if (line != null)
 				{
-					throw new CodeEE("イベント関数でない関数@" + label + "(" + line.Position.Filename + ":" + line.Position.LineNo + "行目)に対しEVENT呼び出しが行われました");
+					throw new CodeEE("eventfunctionでnotfunction@" + label + "(" + line.Position.Filename + ":" + line.Position.LineNo + "line )に対しEVENTcallがlineわれました");
 				}
 				return null;
 			}
@@ -110,13 +110,13 @@ namespace MinorShift.Emuera.GameProc
 			{
 				if (parent.LabelDictionary.GetEventLabels(label) != null)
 				{
-					throw new CodeEE("イベント関数@" + label + "に対し通常のCALLが行われました(このErrorは互換性オプション「" + Config.GetConfigName(ConfigCode.CompatiCallEvent) + "」により無視できます)");
+					throw new CodeEE("eventfunction@" + label + "に対し通常のCALLがlineわれました(このErrorは互換性option"" + Config.GetConfigName(ConfigCode.CompatiCallEvent) + ""にthan無視できます)");
 				}
 				return null;
 			}
             else if (labelline.IsMethod)
             {
-                throw new CodeEE("#FUCNTION(S)が定義された関数@" + labelline.LabelName + "(" + labelline.Position.Filename + ":" + labelline.Position.LineNo.ToString() + "行目)に対し通常のCALLが行われました");
+                throw new CodeEE("#FUCNTION(S)がdefinitionされたfunction@" + labelline.LabelName + "(" + labelline.Position.Filename + ":" + labelline.Position.LineNo.ToString() + "line )に対し通常のCALLがlineわれました");
             }
 			called.TopLabel = labelline;
 			called.CurrentLabel = labelline;
@@ -138,9 +138,9 @@ namespace MinorShift.Emuera.GameProc
 		
 		static FunctionMethod tostrMethod = null;
 		/// <summary>
-		/// 1803beta005 予めargumentの数を合わせて規定値を代入しておく
-        /// 1806+v6.99 式中関数のargumentに無効な#DIM変数を与えている場合にExceptionになるのを修正
-		/// 1808beta009 REF型に対応
+		/// 1803beta005 予めargumentの数を合わせて規定valueを代入しておく
+        /// 1806+v6.99 式insidefunctionのargumentに無効な#DIMvariableを与えているcaseにExceptionになるのを修正
+		/// 1808beta009 REFtypeに対応
 		/// </summary>
 		public UserDefinedFunctionArgument ConvertArg(IOperandTerm[] srcArgs, out string errMes)
 		{
@@ -154,7 +154,7 @@ namespace MinorShift.Emuera.GameProc
             IOperandTerm[] convertedArg = new IOperandTerm[func.Arg.Length];
 			if(convertedArg.Length < srcArgs.Length)
 			{
-				errMes = "argumentの数が関数\"@" + func.LabelName + "\"に設定された数を超えています";
+				errMes = "argumentの数がfunction\"@" + func.LabelName + "\"にsettingされた数を超えています";
 				return null;
 			}
 			IOperandTerm term;
@@ -165,21 +165,21 @@ namespace MinorShift.Emuera.GameProc
 				term = (i < srcArgs.Length) ? srcArgs[i] : null;
 				destArg = func.Arg[i];
 				//isString = destArg.IsString;
-				if (destArg.Identifier.IsReference)//参照渡しの場合
+				if (destArg.Identifier.IsReference)//参照渡しのcase
 				{
 					if (term == null)
 					{
-						errMes = "\"@" + func.LabelName + "\"の" + (i + 1).ToString() + "番目のargumentは参照渡しのため省略できません";
+						errMes = "\"@" + func.LabelName + "\"の" + (i + 1).ToString() + "番目のargumentは参照渡しのbecause省略できません";
 						return null;
 					}
 					VariableTerm vTerm = term as VariableTerm;
 					if (vTerm == null || vTerm.Identifier.Dimension == 0)
 					{
-						errMes = "\"@" + func.LabelName + "\"の" + (i + 1).ToString() + "番目のargumentは参照渡しのための配列変数でなければなりません";
+						errMes = "\"@" + func.LabelName + "\"の" + (i + 1).ToString() + "番目のargumentは参照渡しのbecauseのarrayvariableでなければなりません";
 						return null;
 					}
-					//TODO 1810alpha007 キャラ型を認めるかどうかはっきりしたい 今のところ認めない方向
-					//型チェック
+					//TODO 1810alpha007 キャラtypeを認めるかどうかはっきりしたい 今のところ認めnot方向
+					//typeチェック
 					if (!((ReferenceToken)destArg.Identifier).MatchType(vTerm.Identifier, false, out errMes))
 					{
 						errMes = "\"@" + func.LabelName + "\"の" + (i + 1).ToString() + "番目のargument:" + errMes;
@@ -188,12 +188,12 @@ namespace MinorShift.Emuera.GameProc
 				}
 				else if (term == null)//argumentが省略されたとき
 				{
-					term = func.Def[i];//デフォルト値を代入
-					//1808beta001 デフォルト値がない場合はErrorにする
+					term = func.Def[i];//デフォルトvalueを代入
+					//1808beta001 デフォルトvalueがnotcaseはErrorにdo
 					//一応逃がす
 					if (term == null && !Config.CompatiFuncArgOptional)
 					{
-						errMes = "\"@" + func.LabelName + "\"の" + (i + 1).ToString() + "番目のargumentは省略できません(この警告は互換性オプション「" + Config.GetConfigName(ConfigCode.CompatiFuncArgOptional) + "」により無視できます)";
+						errMes = "\"@" + func.LabelName + "\"の" + (i + 1).ToString() + "番目のargumentは省略できません(このwarningは互換性option"" + Config.GetConfigName(ConfigCode.CompatiFuncArgOptional) + ""にthan無視できます)";
 						return null;
 					}
 				}
@@ -201,14 +201,14 @@ namespace MinorShift.Emuera.GameProc
 				{
 					if (term.GetOperandType() == typeof(string))
 					{
-						errMes = "\"@" + func.LabelName + "\"の" + (i + 1).ToString() + "番目のargumentを文字列型から整数型に変換できません";
+						errMes = "\"@" + func.LabelName + "\"の" + (i + 1).ToString() + "番目のargumentをstringtypefromintegertypeにconvertできません";
 						return null;
 					}
 					else
 					{
 						if (!Config.CompatiFuncArgAutoConvert)
 						{
-							errMes = "\"@" + func.LabelName + "\"の" + (i + 1).ToString() + "番目のargumentを整数型から文字列型に変換できません(この警告は互換性オプション「" + Config.GetConfigName(ConfigCode.CompatiFuncArgAutoConvert) + "」により無視できます)";
+							errMes = "\"@" + func.LabelName + "\"の" + (i + 1).ToString() + "番目のargumentをintegertypefromstringtypeにconvertできません(このwarningは互換性option"" + Config.GetConfigName(ConfigCode.CompatiFuncArgAutoConvert) + ""にthan無視できます)";
 							return null;
 						}
 						if (tostrMethod == null)
@@ -271,7 +271,7 @@ namespace MinorShift.Emuera.GameProc
 		}
 
 
-		#region イベント関数専用
+		#region eventfunction専for
 		public void ShiftNext()
 		{
 			while (true)
