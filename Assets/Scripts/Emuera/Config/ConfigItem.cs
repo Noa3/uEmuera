@@ -70,21 +70,21 @@ namespace MinorShift.Emuera
 			//if (this is ConfigItem<U>)
 				((ConfigItem<U>)(AConfigItem)this).Value = p;
             //else
-            //    throw new ExeEE("型が一致しない");
+            //    throw new ExeEE("Types do not match");
 		}
 
 		public override U GetValue<U>()
 		{
             ////if (this is ConfigItem<U>)
 				return ((ConfigItem<U>)(AConfigItem)this).Value;
-			//throw new ExeEE("型が一致しない");
+			//throw new ExeEE("Types do not match");
 		}
 
 		public override string ValueToString()
 		{
 			if(this is ConfigItem<bool>)
 			{
-				//ConfigItem<T>をConfigItem<bool>に直接キャストすることはできない
+				//Cannot directly cast ConfigItem<T> to ConfigItem<bool>
 				bool b = ((ConfigItem<bool>)(AConfigItem)this).Value;
 				if (b)
 					return "YES";
@@ -106,7 +106,7 @@ namespace MinorShift.Emuera
 
 
 
-		/// ジェネリック化大失敗。なんかうまい方法ないかな～
+		/// Failed to make generic. Is there a better way?
 		public override bool TryParse(string param)
 		{
 			bool ret = false;
@@ -119,7 +119,7 @@ namespace MinorShift.Emuera
 			{
 				bool b = false;
 				ret = tryStringToBool(str, ref b);
-				if (ret)//ConfigItem<T>をConfigItem<bool>に直接キャストすることはできない
+				if (ret)//Cannot directly cast ConfigItem<T> to ConfigItem<bool>
 					((ConfigItem<bool>)(AConfigItem)this).Value = b;
 			}
 			else if (this is ConfigItem<Color>)
@@ -129,7 +129,7 @@ namespace MinorShift.Emuera
 				if (ret)
 					((ConfigItem<Color>)(AConfigItem)this).Value = c;
                 else
-                    throw new CodeEE("値をColor指定子として認識できません");
+                    throw new CodeEE("Value could not be recognized as a Color specifier");
             }
 			else if (this is ConfigItem<char>)
 			{
@@ -192,7 +192,7 @@ namespace MinorShift.Emuera
                      = (TextDrawingMode)Enum.Parse(typeof(TextDrawingMode), str);
                 }
                 else
-                    throw new CodeEE("不正な指定です");
+                    throw new CodeEE("Invalid specification");
             }
             else if (this is ConfigItem<ReduceArgumentOnLoadFlag>)
             {
@@ -204,7 +204,7 @@ namespace MinorShift.Emuera
                      = (ReduceArgumentOnLoadFlag)Enum.Parse(typeof(ReduceArgumentOnLoadFlag), str);
                 }
                 else
-                    throw new CodeEE("不正な指定です");
+                    throw new CodeEE("Invalid specification");
             }
             else if (this is ConfigItem<DisplayWarningFlag>)
             {
@@ -216,7 +216,7 @@ namespace MinorShift.Emuera
                      = (DisplayWarningFlag)Enum.Parse(typeof(DisplayWarningFlag), str);
                 }
                 else
-                    throw new CodeEE("不正な指定です");
+                    throw new CodeEE("Invalid specification");
             }
             else if (this is ConfigItem<UseLanguage>)
             {
@@ -228,7 +228,7 @@ namespace MinorShift.Emuera
                         = (UseLanguage)Enum.Parse(typeof(UseLanguage), str);
                 }
                 else
-                    throw new CodeEE("不正な指定です");
+                    throw new CodeEE("Invalid specification");
             }
             else if (this is ConfigItem<TextEditorType>)
             {
@@ -240,10 +240,10 @@ namespace MinorShift.Emuera
                         = (TextEditorType)Enum.Parse(typeof(TextEditorType), str);
                 }
                 else
-                    throw new CodeEE("不正な指定です");
+                    throw new CodeEE("Invalid specification");
             }
             //else
-            //    throw new ExeEE("型不明なコンフィグ");
+            //    throw new ExeEE("Unknown config type");
 			return ret;
 		}
 		
@@ -261,7 +261,7 @@ namespace MinorShift.Emuera
 			}
 			if (str.Equals("NO", StringComparison.CurrentCultureIgnoreCase)
 				|| str.Equals("FALSE", StringComparison.CurrentCultureIgnoreCase)
-				|| str.Equals("後", StringComparison.CurrentCultureIgnoreCase))//"単位の位置"用
+				|| str.Equals("後", StringComparison.CurrentCultureIgnoreCase))//For "Unit position"
 			{
 				p = false;
 				return true;
@@ -273,7 +273,7 @@ namespace MinorShift.Emuera
 				p = true;
 				return true;
 			}
-			throw new CodeEE("不正な指定です");
+			throw new CodeEE("Invalid specification");
 		}
 
 		private bool tryStringsToColor(string str, out Color c)

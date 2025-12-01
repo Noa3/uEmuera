@@ -12,9 +12,9 @@ using uEmuera.Drawing;
 namespace MinorShift.Emuera
 {
 	/// <summary>
-	/// プログラム全体で使用される値でWindow作成前に設定して以後変更されないもの
-	/// (という予定だったが今は違う)
-	/// 1756 Config → ConfigDataへ改名
+	/// Values used throughout the program that are set before Window creation and not changed afterwards
+	/// (that was the plan, but it's different now)
+	/// 1756 Config -> Renamed to ConfigData
 	/// </summary>
 	internal sealed class ConfigData
 	{
@@ -29,7 +29,7 @@ static ConfigData() { }
 
 		private ConfigData() { setDefault(); }
 
-		//適当に大き目の配列を作っておく。
+		//Create a reasonably large array.
 		private AConfigItem[] configArray = new AConfigItem[70];
 		private AConfigItem[] replaceArray = new AConfigItem[50];
 		private AConfigItem[] debugArray = new AConfigItem[20];
@@ -181,7 +181,7 @@ static ConfigData() { }
 			AConfigItem item = GetItem(code);
             //if ((item != null) && (item is ConfigItem<T>))
 				return ((ConfigItem<T>)item).Value;
-            //throw new ExeEE("GetConfigValueのCodeまたは型が不適切");
+            //throw new ExeEE("Code or type for GetConfigValue is inappropriate");
 		}
 
 #region getitem
@@ -292,36 +292,36 @@ static ConfigData() { }
 			AConfigItem item = ConfigData.Instance.GetItem(text);
 			if(item == null)
 			{
-				errMes = "文字列\"" + text + "\"は適切なコンフィグ名ではありません";
+				errMes = "String \"" + text + "\" is not a valid config name";
 				return null;
 			}
 			SingleTerm term;
 			switch(item.Code)
 			{
 				//<bool>
-				case ConfigCode.AutoSave://"オートセーブを行なう"
-				case ConfigCode.MoneyFirst://"単位の位置"
+				case ConfigCode.AutoSave://"Enable auto save"
+				case ConfigCode.MoneyFirst://"Unit position"
 					if(item.GetValue<bool>())
 						term = new SingleTerm(1);
 					else
 						term = new SingleTerm(0);
 					break;
 				//<int>
-				case ConfigCode.WindowX:// "ウィンドウ幅"
-				case ConfigCode.PrintCPerLine:// "PRINTCを並べる数"
-				case ConfigCode.PrintCLength:// "PRINTCの文字数"
-				case ConfigCode.FontSize:// "フォントサイズ"
-				case ConfigCode.LineHeight:// "一行の高さ"
-				case ConfigCode.SaveDataNos:// "表示するセーブデータ数"
-				case ConfigCode.MaxShopItem:// "販売アイテム数"
-				case ConfigCode.ComAbleDefault:// "COM_ABLE初期値"
+				case ConfigCode.WindowX:// "Window width"
+				case ConfigCode.PrintCPerLine:// "PRINTC count per line"
+				case ConfigCode.PrintCLength:// "PRINTC character count"
+				case ConfigCode.FontSize:// "Font size"
+				case ConfigCode.LineHeight:// "Line height"
+				case ConfigCode.SaveDataNos:// "Number of save data to display"
+				case ConfigCode.MaxShopItem:// "Shop item count"
+				case ConfigCode.ComAbleDefault:// "COM_ABLE initial value"
 					term = new SingleTerm(item.GetValue<int>());
 					break;
 				//<Color>
-				case ConfigCode.ForeColor://"文字色"
-				case ConfigCode.BackColor://"背景色"
-				case ConfigCode.FocusColor://"選択中文字色"
-				case ConfigCode.LogColor://"履歴文字色"
+				case ConfigCode.ForeColor://"Text color"
+				case ConfigCode.BackColor://"Background color"
+				case ConfigCode.FocusColor://"Selected text color"
+				case ConfigCode.LogColor://"History text color"
 					{
 						Color color = item.GetValue<Color>();
 						term = new SingleTerm( ((color.R * 256) + color.G) * 256 + color.B);
@@ -329,34 +329,34 @@ static ConfigData() { }
 					break;
 
 				//<Int64>
-				case ConfigCode.pbandDef:// "PBANDの初期値"
-				case ConfigCode.RelationDef:// "RELATIONの初期値"
+				case ConfigCode.pbandDef:// "PBAND initial value"
+				case ConfigCode.RelationDef:// "RELATION initial value"
 					term = new SingleTerm(item.GetValue<Int64>());
 					break;
 
 				//<string>
-				case ConfigCode.FontName:// "フォント名"
-				case ConfigCode.MoneyLabel:// "お金の単位"
-				case ConfigCode.LoadLabel:// "起動時簡略表示"
-				case ConfigCode.DrawLineString:// "DRAWLINE文字"
-				case ConfigCode.TitleMenuString0:// "システムメニュー0"
-				case ConfigCode.TitleMenuString1:// "システムメニュー1"
-				case ConfigCode.TimeupLabel:// "時間切れ表示"
+				case ConfigCode.FontName:// "Font name"
+				case ConfigCode.MoneyLabel:// "Money unit"
+				case ConfigCode.LoadLabel:// "Startup brief display"
+				case ConfigCode.DrawLineString:// "DRAWLINE character"
+				case ConfigCode.TitleMenuString0:// "System menu 0"
+				case ConfigCode.TitleMenuString1:// "System menu 1"
+				case ConfigCode.TimeupLabel:// "Timeout display"
 					term = new SingleTerm(item.GetValue<string>());
 					break;
 				
 				//<char>
-				case ConfigCode.BarChar1:// "BAR文字1"
-				case ConfigCode.BarChar2:// "BAR文字2"
+				case ConfigCode.BarChar1:// "BAR character 1"
+				case ConfigCode.BarChar2:// "BAR character 2"
 					term = new SingleTerm(item.GetValue<char>().ToString());
 					break;
 				//<TextDrawingMode>
-				case ConfigCode.TextDrawingMode:// "描画インターフェース"
+				case ConfigCode.TextDrawingMode:// "Drawing interface"
 					term = new SingleTerm(item.GetValue<TextDrawingMode>().ToString());
 					break;
 				default:
 				{
-					errMes = "コンフィグ文字列\"" + text + "\"の値の取得は許可されていません";
+					errMes = "Getting value of config string \"" + text + "\" is not allowed";
 					return null;
 				}
 			}
@@ -378,7 +378,7 @@ static ConfigData() { }
 					if (item == null)
 						continue;
 					
-					//1806beta001 CompatiDRAWLINEの廃止、CompatiLinefeedAs1739へ移行
+					//1806beta001 Deprecated CompatiDRAWLINE, migrated to CompatiLinefeedAs1739
 					if (item.Code == ConfigCode.CompatiDRAWLINE)
 						continue;
 					if ((item.Code == ConfigCode.ChangeMasterNameIfDebug) && (item.GetValue<bool>()))
@@ -409,7 +409,7 @@ static ConfigData() { }
 
         public bool ReLoadConfig()
         {
-            //_fixed.configの中身が変わった場合、非固定になったものが保持されてしまうので、ここで一旦すべて解除
+            //If the content of _fixed.config has changed, unfixed items might be retained, so release all here first
             foreach (AConfigItem item in configArray)
             {
                 if (item == null)
@@ -486,7 +486,7 @@ static ConfigData() { }
                     }
 					if (item != null)
 					{
-						//1806beta001 CompatiDRAWLINEの廃止、CompatiLinefeedAs1739へ移行
+						//1806beta001 Deprecated CompatiDRAWLINE, migrated to CompatiLinefeedAs1739
 						if(item.Code == ConfigCode.CompatiDRAWLINE)
 						{
 							item = GetConfigItem(ConfigCode.CompatiLinefeedAs1739);
@@ -502,7 +502,7 @@ static ConfigData() { }
 						
 						if (item.Code == ConfigCode.TextEditor)
 						{
-							//パスの関係上tokens[2]は使わないといけない
+							//Due to path relations, tokens[2] must be used
 							if (tokens.Length > 2)
 							{
 								if (tokens[2].StartsWith("\\"))
@@ -518,13 +518,13 @@ static ConfigData() { }
 						}
 						if (item.Code == ConfigCode.EditorArgument)
 						{
-							//半角スペースを要求する引数が必要なエディタがあるので別処理で
+							//Some editors require half-width space in arguments, so handle separately
 							((ConfigItem<string>)item).Value = tokens[1];
 							continue;
 						}
                         if (item.Code == ConfigCode.MaxLog && Program.AnalysisMode)
                         {
-                            //解析モード時はここを上書きして十分な長さを確保する
+                            //In analysis mode, overwrite this to ensure sufficient length
                             tokens[1] = "10000";
                         }
 						if ((item.TryParse(tokens[1])) && (fix))
@@ -549,7 +549,7 @@ static ConfigData() { }
 		}
 
 #region replace
-		// 1.52a改変部分　（単位の差し替えおよび前置、後置のためのコンフィグ処理）
+		// 1.52a modification (config processing for unit replacement and prefix/suffix)
 		public void LoadReplaceFile(string filename)
 		{
 			EraStreamReader eReader = new EraStreamReader(false);
