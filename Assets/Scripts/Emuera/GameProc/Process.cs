@@ -82,11 +82,11 @@ namespace MinorShift.Emuera.GameProc
                     if (File.Exists(Program.ExeDir + "macro.txt"))
                     {
                         if (Config.DisplayReport)
-							console.PrintSystemLine("macro.txtLoading---");
+							console.PrintSystemLine("macro.txt読み込み中・・・");
                         KeyMacro.LoadMacroFile(Program.ExeDir + "macro.txt");
                     }
 				}
-				//_replace.csvloading
+				//_replace.csv読み込み
                 if (Config.UseReplaceFile && !Program.AnalysisMode)
                 {
 					if (File.Exists(Program.CsvDir + "_Replace.csv"))
@@ -222,7 +222,7 @@ namespace MinorShift.Emuera.GameProc
 			Int64[] selectcom = vEvaluator.SELECTCOM_ARRAY;
 			if (count >= selectcom.Length)
 			{
-				throw new CodeEE("CALLTRAIN命令のargumentのvalueがSELECTCOMの要素数を超えています");
+				throw new CodeEE("CALLTRAIN命令のargumentの値がSELECTCOMの要素数を超えています");
 			}
 			for (int i = 0; i < (int)count; i++)
 			{
@@ -420,7 +420,7 @@ namespace MinorShift.Emuera.GameProc
 			console.ThrowError(playSound);
 			if (exc is CodeEE)
 			{
-				console.PrintError("functionの終端でErroroccurred:" + Program.ExeName);
+				console.PrintError("関数の終端でErrorが発生しました:" + Program.ExeName);
 				console.PrintError(exc.Message);
 			}
 			else if (exc is ExeEE)

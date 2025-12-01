@@ -108,9 +108,9 @@ namespace MinorShift.Emuera.GameData
                 if (operand == null)
                 {
                     if (SWT is CurlyBraceSubWord)
-                        throw new CodeEE("{}のduring 式が存在しません");
+                        throw new CodeEE("{}の中に式が存在しません");
                     else
-                        throw new CodeEE("%%のduring 式が存在しません");
+                        throw new CodeEE("%%の中に式が存在しません");
                 }
                 IOperandTerm second = null;
 				SingleTerm third = null;
@@ -124,25 +124,25 @@ namespace MinorShift.Emuera.GameData
                     {
                         IdentifierWord id = wc.Current as IdentifierWord;
                         if (id == null)
-                            throw new CodeEE("','のafter RIGHT又はLEFTがdoes not exist");
+                            throw new CodeEE("','の後にRIGHT又はLEFTがありません");
                         if (string.Equals(id.Code, "LEFT", Config.SCVariable))//標準RIGHT
                             third = new SingleTerm(1);
                         else if (!string.Equals(id.Code, "RIGHT", Config.SCVariable))
-                            throw new CodeEE("','のafter RIGHT又はLEFT以outの単語があります");
+                            throw new CodeEE("','の後にRIGHT又はLEFT以外の単語があります");
                         wc.ShiftNext();
                     }
                     if (!wc.EOL)
-                        throw new CodeEE("RIGHT又はLEFTのafter 余分な文字があります");
+                        throw new CodeEE("RIGHT又はLEFTの後に余分な文字があります");
                 }
 				if (SWT is CurlyBraceSubWord)
 				{
 					if (operand.GetOperandType() != typeof(Int64))
-						throw new CodeEE("{}のinsideの式が数式ではdoes not exist");
+						throw new CodeEE("{}の中の式が数式ではありません");
 					termArray[i] = new FunctionMethodTerm(formatCurlyBrace, new IOperandTerm[] { operand, second, third });
 					continue;
 				}
 				if (operand.GetOperandType() != typeof(string))
-					throw new CodeEE("%%のinsideの式がstring式ではdoes not exist");
+					throw new CodeEE("%%の中の式が文字列式ではありません");
 				termArray[i] = new FunctionMethodTerm(formatPercent, new IOperandTerm[] { operand, second, third });
 			}
             ret.terms = termArray;
@@ -216,7 +216,7 @@ namespace MinorShift.Emuera.GameData
 			return builder.ToString();
 		}
 
-		#region FormattedStringMethod 書式付stringのin部
+		#region FormattedStringMethod 書式付文字列の内部
 		private abstract class FormattedStringMethod : FunctionMethod
 		{
 			public FormattedStringMethod()
@@ -225,8 +225,8 @@ namespace MinorShift.Emuera.GameData
 				ReturnType = typeof(string);
 				argumentTypeArray = null;
 			}
-			public override string CheckArgumentType(string name, IOperandTerm[] arguments) { throw new ExeEE("typeチェックはcalloriginalがlineうthis"); }
-			public override Int64 GetIntValue(ExpressionMediator exm, IOperandTerm[] arguments) { throw new ExeEE("戻りvalueのtypeがdifferent"); }
+			public override string CheckArgumentType(string name, IOperandTerm[] arguments) { throw new ExeEE("型チェックは呼び出し元が行うこと"); }
+			public override Int64 GetIntValue(ExpressionMediator exm, IOperandTerm[] arguments) { throw new ExeEE("戻り値の型が違う"); }
 			public override SingleTerm GetReturnValue(ExpressionMediator exm, IOperandTerm[] arguments) { return new SingleTerm(GetStrValue(exm, arguments)); }
 		}
 
@@ -254,7 +254,7 @@ namespace MinorShift.Emuera.GameData
 					return ret;
 				int totalLength = (int)arguments[1].GetIntValue(exm);
 				int currentLength = LangManager.GetStrlenLang(ret);
-				totalLength -= currentLength - ret.Length;//全角文字の数だけマイナス.タブ文字？ゼロ幅文字？知るか！
+				totalLength -= currentLength - ret.Length;//全角文字の数だけマイナス。タブ文字？ゼロ幅文字？知るか！
 				if (totalLength < ret.Length)
 					return ret;//PadLeftは0未満を送るとExceptionを投げる
 				if (arguments[2] != null)
@@ -266,7 +266,7 @@ namespace MinorShift.Emuera.GameData
 		}
 
 		private sealed class FormatYenAt : FormattedStringMethod
-		{//Operator のTernaryIntStrStrとやってるthisはsame
+		{//Operator のTernaryIntStrStrとやってることは同じ
 			public override string GetStrValue(ExpressionMediator exm, IOperandTerm[] arguments)
 			{
 				return (arguments[0].GetIntValue(exm) != 0) ? arguments[1].GetStrValue(exm) : arguments[2].GetStrValue(exm);

@@ -59,7 +59,7 @@ namespace MinorShift.Emuera.GameProc
 					case "GLOBAL":
 					case "SAVEDATA":
 					case "CHARADATA":
-						throw new CodeEE(dims + "insideでは" + keyword + "keyワードは指定できません", sc);
+						throw new CodeEE(dims + "中では" + keyword + "キーワードは指定できません", sc);
 					default:
 						ret.Name = keyword;
 						goto whilebreak;
@@ -67,13 +67,13 @@ namespace MinorShift.Emuera.GameProc
 			}
 		whilebreak:
 			if (ret.Name == null)
-				throw new CodeEE(keyword + "のafter 有効な識別子が指定されていません", sc);
+				throw new CodeEE(keyword + "の後に有効な識別子が指定されていません", sc);
 			if (wc.EOL || wc.Current.Type != '(')
-				throw new CodeEE("識別子のafter argumentdefinitionがdoes not exist", sc);
+				throw new CodeEE("識別子の後にargument定義がありません", sc);
 			string errMes = "";
 			int errLevel = -1;
 			GlobalStatic.IdentifierDictionary.CheckUserLabelName(ref errMes, ref errLevel, true, ret.Name);
-			if (errLevel == 0)//functionとvariableの両方fromチェック Errormessageが微妙だがひとまず気にしnot
+			if (errLevel == 0)//関数と変数の両方からチェック Errorメッセージが微妙だがひとまず気にしない
 				GlobalStatic.IdentifierDictionary.CheckUserVarName(ref errMes, ref errLevel, ret.Name);
 			if (errLevel >= 0)
 			{
@@ -85,9 +85,9 @@ namespace MinorShift.Emuera.GameProc
 			UserDifinedFunctionDataArgType argType = UserDifinedFunctionDataArgType.Null;
 
 			int state = 0;
-			//0=initial状態 1=カンマ括弧閉じ待ち 2=カンマ直after
-			//3=REFafterINTorSTR待ち 4=':'or','待ち 5=':'or '0'or ','待ち
-			while (true)// REF INT STR 0 '*' ',' ')' のみで構成be doneはず
+			//0=初期状態 1=カンマ括弧閉じ待ち 2=カンマ直後
+			//3=REF後INTorSTR待ち 4=':'or','待ち 5=':'or '0'or ','待ち
+			while (true)// REF INT STR 0 '*' ',' ')' のみで構成されるはず
 			{
 				wc.ShiftNext();
 				switch (wc.Current.Type)
@@ -100,12 +100,12 @@ namespace MinorShift.Emuera.GameProc
 						if (state == 4 || state == 5)
 						{
 							if ((int)(argType & UserDifinedFunctionDataArgType.__Dimention) == 0)
-								throw new CodeEE("REFargumentはarrayvariableでなければなりません", sc);
+								throw new CodeEE("REFargumentは配列変数でなければなりません", sc);
 							//state = 2;
 							argList.Add(argType);
 							goto argend;
 						}
-						throw new CodeEE("予期しnot括弧です", sc);
+						throw new CodeEE("予期しない括弧です", sc);
 					case '0':
 						if (((LiteralIntegerWord)wc.Current).Int != 0)
 							goto argerr;
@@ -120,7 +120,7 @@ namespace MinorShift.Emuera.GameProc
 						{
 							state = 5;
 							argType++; if ((int)(argType & UserDifinedFunctionDataArgType.__Dimention) > 3)
-								throw new CodeEE("REFargumentは4次original以aboveのarrayにできません", sc);
+								throw new CodeEE("REFargumentは4次元以上の配列にできません", sc);
 							continue;
 						}
 						goto argerr;
@@ -133,7 +133,7 @@ namespace MinorShift.Emuera.GameProc
 						if (state == 4 || state == 5)
 						{
 							if ((int)(argType & UserDifinedFunctionDataArgType.__Dimention) == 0)
-								throw new CodeEE("REFargumentはarrayvariableでなければなりません", sc);
+								throw new CodeEE("REFargumentは配列変数でなければなりません", sc);
 							state = 2;
 							argList.Add(argType);
 							continue;
@@ -183,14 +183,14 @@ namespace MinorShift.Emuera.GameProc
 		argend:
 			wc.ShiftNext();
 			if (!wc.EOL)
-				throw new CodeEE("宣言のafter 余分な文字があります", sc);
+				throw new CodeEE("宣言の後に余分な文字があります", sc);
 			ret.ArgList = new UserDifinedFunctionDataArgType[argList.Count];
 			argList.CopyTo(ret.ArgList);
 			return ret;
 		argerr:
 			if (!wc.EOL)
-				throw new CodeEE("argumentのparseduring 予期しnotトークン" + wc.Current.ToString() + "を発見しました", sc);
-			throw new CodeEE("argumentのparseduring Erroroccurred", sc);
+				throw new CodeEE("argumentの解析中に予期しないトークン" + wc.Current.ToString() + "を発見しました", sc);
+			throw new CodeEE("argumentの解析中にErrorが発生しました", sc);
 		}
 
 	}

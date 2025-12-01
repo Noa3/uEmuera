@@ -11,8 +11,8 @@ using uEmuera.Forms;
 
 namespace MinorShift.Emuera.GameView
 {
-	//1820 EmueraConsoleのうちdisplayLineListやprintBufferに触るthing
-	//いつかEmueraConsolefrom分離したい
+	//1820 EmueraConsoleのうちdisplayLineListやprintBufferに触るもの
+	//いつかEmueraConsoleから分離したい
 	internal sealed partial class EmueraConsole : IDisposable
 	{
         private readonly DisplayLineList displayLineList;
@@ -29,7 +29,7 @@ namespace MinorShift.Emuera.GameView
 			lineNo = 0;
 			lastDrawnLineNo = -1;
 			verticalScrollBarUpdate();
-			window.Refresh();//OnPaint発line
+			window.Refresh();//OnPaint発行
 		}
 
 
@@ -49,7 +49,7 @@ namespace MinorShift.Emuera.GameView
 					return defaultStyle;
 				if (UseSetColorStyle)
 					return userStyle;
-				//PRINTD系(SETCOLORignore do)
+				//PRINTD系(SETCOLORを無視する)
 				if (userStyle.Color == defaultStyle.Color)
 					return userStyle;
 				return new StringStyle(defaultStyle.Color, userStyle.FontStyle, userStyle.Fontname);
@@ -71,7 +71,7 @@ namespace MinorShift.Emuera.GameView
 		public bool EmptyLine { get { return printBuffer.IsEmpty; } }
 
 		/// <summary>
-		/// DRAWLINEforstring
+		/// DRAWLINE用文字列
 		/// </summary>
 		string stBar = null;
 
@@ -81,12 +81,12 @@ namespace MinorShift.Emuera.GameView
 		{
 			this.bgColor = color;
 			forceTextBoxColor = true;
-			//REDRAWされnotcaseはTextBoxの色は変えずにフラグだけ立てる
-			//first 再描画whenにcurrentの背景色に合わせる
+			//REDRAWされない場合はTextBoxの色は変えずにフラグだけ立てる
+			//最初の再描画時に現在の背景色に合わせる
 			if (redraw == ConsoleRedraw.None && window.ScrollBar.Value == window.ScrollBar.Maximum)
 				return;
 			uint sec = WinmmTimer.TickCount - lastBgColorChange;
-			//色変化が速くなりすぎnotように一定when間以inの再callは強制待ちにdo
+			//色変化が速くなりすぎないように一定時間以内の再呼び出しは強制待ちにする
 			//while (sec < 200)
 			//{
 			//	//Application.DoEvents();
@@ -97,7 +97,7 @@ namespace MinorShift.Emuera.GameView
 		}
 
 		/// <summary>
-		/// 最after 描画したwhenにlineNoのvalue
+		/// 最後に描画した時にlineNoの値
 		/// </summary>
 		int lastDrawnLineNo = -1;
 		int lineNo = 0;
@@ -136,7 +136,7 @@ namespace MinorShift.Emuera.GameView
 			}
 			if (errorStr != null)
 			{
-				MessageBox.Show("Emueraのdisplayprocessduring 不適正なフォントを検出しました\n描画processing 続lineできnotbecause強制will terminate", "フォント不適正");
+				MessageBox.Show("Emueraの表示処理中に不適正なフォントを検出しました\n描画処理を続行できないため強制終了します", "フォント不適正");
 				this.Quit();
 				return;
 			}
@@ -196,7 +196,7 @@ namespace MinorShift.Emuera.GameView
 			}
 		}
 
-        //空lineでexistかのチェック
+        //空行であるかのチェック
         public bool LastLineIsEmpty
         {
             get
@@ -207,13 +207,13 @@ namespace MinorShift.Emuera.GameView
             }
         }
 
-        //最終lineを書き換え＋next lineaddwhenにはそのlineを再利fordoようにsetting
+        //最終行を書き換え＋次の行追加時にはその行を再利用するように設定
         public void PrintTemporaryLine(string str)
 		{
 			PrintSingleLine(str, true);
 		}
 
-		//最終lineだけを書き換える
+		//最終行だけを書き換える
 		private void changeLastLine(string str)
 		{
 			deleteLine(1);
@@ -225,28 +225,28 @@ namespace MinorShift.Emuera.GameView
 		/// </summary>
 		/// <param name="str"></param>
 		/// <param name="position"></param>
-		/// <param name="level">warningレベル.0:軽微なミス.1:無視canline.2:lineが実lineされなければ無害.3:致命的</param>
+		/// <param name="level">警告レベル.0:軽微なミス.1:無視できる行.2:行が実行されなければ無害.3:致命的</param>
 		public void PrintWarning(string str, ScriptPosition position, int level)
 		{
 			if (level < Config.DisplayWarningLevel && !Program.AnalysisMode)
 				return;
-			//warningだけは強制display
+			//警告だけは強制表示
 			bool b = force_temporary;
 			force_temporary = false;
 			if (position != null)
 			{
 				if (position.LineNo >= 0)
 				{
-					PrintErrorButton(string.Format("warningLv{0}:{1}:{2}line :{3}", level, position.Filename, position.LineNo, str), position);
+					PrintErrorButton(string.Format("警告Lv{0}:{1}:{2}行目:{3}", level, position.Filename, position.LineNo, str), position);
 					GlobalStatic.Process.printRawLine(position);
 				}
 				else
-					PrintErrorButton(string.Format("warningLv{0}:{1}:{2}", level, position.Filename, str), position);
+					PrintErrorButton(string.Format("警告Lv{0}:{1}:{2}", level, position.Filename, str), position);
 
 			}
 			else
 			{
-				PrintError(string.Format("warningLv{0}:{1}", level, str));
+				PrintError(string.Format("警告Lv{0}:{1}", level, str));
 			}
 			force_temporary = b;
 		}
@@ -254,7 +254,7 @@ namespace MinorShift.Emuera.GameView
 
 
 		/// <summary>
-		/// ユーザー指定のフォントignore do.windowサイズを考慮せず確実に一lineで書く.systemfor.
+		/// ユーザー指定のフォントを無視する。ウィンドウサイズを考慮せず確実に一行で書く。システム用。
 		/// </summary>
 		/// <param name="str"></param>
 		public void PrintSystemLine(string str)
@@ -300,7 +300,7 @@ namespace MinorShift.Emuera.GameView
 		}
 
 		/// <summary>
-		/// 1813 従来のPrintLineをfor途を考慮してPrintSingleLineとPrintSystemLineに分割
+		/// 1813 従来のPrintLineを用途を考慮してPrintSingleLineとPrintSystemLineに分割
 		/// </summary>
 		/// <param name="str"></param>
 		public void PrintSingleLine(string str) { PrintSingleLine(str, false); }
@@ -500,7 +500,7 @@ namespace MinorShift.Emuera.GameView
 		/// <summary>
 		/// 
 		/// </summary>
-		/// <param name="force">バッファーが空でも改linedo</param>
+		/// <param name="force">バッファーが空でも改行する</param>
 		public void PrintFlush(bool force)
 		{
 			if (!this.Enabled)
@@ -517,16 +517,16 @@ namespace MinorShift.Emuera.GameView
 		}
 
 		/// <summary>
-		/// DRAWLINE命令に対応.これのフォントを変更canと面倒なthisになるのでRegularに固定do.
+		/// DRAWLINE命令に対応。これのフォントを変更できると面倒なことになるのでRegularに固定する。
 		/// </summary>
 		public void PrintBar()
 		{
-			//initialにsetting済みなので見る必要なし
+			//初期に設定済みなので見る必要なし
 			//if (stBar == null)
 			//    setStBar(StaticConfig.DrawLineString);
 
-			//1806beta001 CompatiDRAWLINEの廃止,CompatiLinefeedAs1739to移line
-			//CompatiLinefeedAs1739のprocessはPrintStringBuffer.csでlineう
+			//1806beta001 CompatiDRAWLINEの廃止、CompatiLinefeedAs1739へ移行
+			//CompatiLinefeedAs1739の処理はPrintStringBuffer.csで行う
 			//if (Config.CompatiDRAWLINE)
 			//	PrintFlush(false);
 			StringStyle ss = userStyle;
@@ -538,7 +538,7 @@ namespace MinorShift.Emuera.GameView
 		public void printCustomBar(string barStr)
 		{
 			if (string.IsNullOrEmpty(barStr))
-				throw new CodeEE("空stringによるDRAWLINEがlineわれました");
+				throw new CodeEE("空文字列によるDRAWLINEが行われました");
 			StringStyle ss = userStyle;
 			userStyle.FontStyle = FontStyle.Regular;
 			Print(getStBar(barStr));
@@ -557,12 +557,12 @@ namespace MinorShift.Emuera.GameView
 			int width = 0;
 			Font font = Config.Font;
 			while (width < Config.DrawableWidth)
-			{//境界を越えるuntil一文字ずつ増やす
+			{//境界を越えるまで一文字ずつ増やす
 				bar.Append(barStr);
 				width = stringMeasure.GetDisplayLength(bar.ToString(), font);
 			}
 			while (width > Config.DrawableWidth)
-			{//境界を越えたら,今度は超えなくなるuntil一文字ずつ減らす(barStrに複数字のstringがきたcaseに対応because)
+			{//境界を越えたら、今度は超えなくなるまで一文字ずつ減らす（barStrに複数字の文字列がきた場合に対応するため）
 				bar.Remove(bar.Length - 1, 1);
 				width = stringMeasure.GetDisplayLength(bar.ToString(), font);
 			}
@@ -589,7 +589,7 @@ namespace MinorShift.Emuera.GameView
 			}
 			catch (Exception)
 			{
-				MessageBox.Show("ログのoutputにfailedしました", "ログoutputfailed");
+				MessageBox.Show("ログの出力に失敗しました", "ログ出力失敗");
 				return false;
 			}
 			finally
@@ -608,7 +608,7 @@ namespace MinorShift.Emuera.GameView
 
             if (!filename.StartsWith(Program.ExeDir, StringComparison.CurrentCultureIgnoreCase))
             {
-                MessageBox.Show("ログfileは実linefile以belowのdirectoryにのみ保存できます", "ログoutputfailed");
+                MessageBox.Show("ログファイルは実行ファイル以下のディレクトリにのみ保存できます", "ログ出力失敗");
                 return false;
             }
 
@@ -616,7 +616,7 @@ namespace MinorShift.Emuera.GameView
 			{
 				if (window.Created)
 				{
-					PrintSystemLine("※※※ログfileを" + filename + "にoutputしました※※※");
+					PrintSystemLine("※※※ログファイルを" + filename + "に出力しました※※※");
 					RefreshStrings(true);
 				}
 				return true;

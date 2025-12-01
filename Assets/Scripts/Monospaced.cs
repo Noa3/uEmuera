@@ -2,20 +2,10 @@
 
 namespace UnityEngine.UI
 {
-    /// <summary>
-    /// A mesh effect that forces text to render with monospaced (fixed-width) character spacing.
-    /// This is essential for proper alignment of ERA game console output.
-    /// </summary>
     public class Monospaced : BaseMeshEffect
     {
         static readonly char[] _index_any = new char[] { '<', '\n' };
 
-        /// <summary>
-        /// Gets the next valid character index, skipping rich text tags.
-        /// </summary>
-        /// <param name="content">The text content.</param>
-        /// <param name="i">The current index.</param>
-        /// <returns>The next valid index after any rich text tags.</returns>
         int GetNextValidIndex(string content, int i)
         {
             if (i >= content.Length)
@@ -82,7 +72,7 @@ namespace UnityEngine.UI
             UIVertex v2 = new UIVertex();
             float linestart = -rectTransform.sizeDelta.x * rectTransform.pivot.x;
 
-            //Vertex index record
+            //顶点索引记录
             int vi = 0;
             char c = '\x0';
             for (; i < length && vi < count; ++i)
@@ -126,8 +116,8 @@ namespace UnityEngine.UI
 
                 d = v2.position.x - v1.position.x;
                 if (d > b)
-                    //When glyph size exceeds text size
-                    //May be using <size> rich text tag
+                    //字形大小超过文本尺寸时
+                    //可能使用<size>富文本标记
                     si = d;
                 else if (uEmuera.Utils.CheckFullSize(c))
                     si = size;

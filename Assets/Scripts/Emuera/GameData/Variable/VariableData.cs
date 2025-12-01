@@ -9,7 +9,7 @@ using MinorShift.Emuera.GameProc;
 namespace MinorShift.Emuera.GameData.Variable
 {
 	/// <summary>
-	/// variable全部
+	/// 変数全部
 	/// </summary>
 	internal sealed partial class VariableData : IDisposable
 	{
@@ -53,23 +53,23 @@ namespace MinorShift.Emuera.GameData.Variable
 		Dictionary<string, VariableLocal> localvarTokenDic = new Dictionary<string, VariableLocal>();
 
 		/// <summary>
-		/// ユーザーvariableのうちStaticかつ非Globalなthing.ERHでのDIM(非GLOBAL) とfunctionでのDIM (STATIC)の両方.loadやリセットでinitial化が必要.charactervariableは除く.
+		/// ユーザー変数のうちStaticかつ非Globalなもの。ERHでのDIM(非GLOBAL) と関数でのDIM (STATIC)の両方。ロードやリセットで初期化が必要。キャラクタ変数は除く。
 		/// </summary>
 		List<UserDefinedVariableToken> userDefinedStaticVarList = new List<UserDefinedVariableToken>();
 		/// <summary>
-		/// ユーザー広域variableのうちグローバルattribute持ち.
+		/// ユーザー広域変数のうちグローバル属性持ち。
 		/// </summary>
 		List<UserDefinedVariableToken> userDefinedGlobalVarList = new List<UserDefinedVariableToken>();
 		/// <summary>
-		/// ユーザー広域variableのうちsavebe donething.グローバル,charactervariableは除く.
+		/// ユーザー広域変数のうちセーブされるもの。グローバル、キャラクタ変数は除く。
 		/// </summary>
 		List<UserDefinedVariableToken>[] userDefinedSaveVarList = new List<UserDefinedVariableToken>[6];
 		/// <summary>
-		/// ユーザー広域variableのうち,グローバルかつsavebe donething.
+		/// ユーザー広域変数のうち、グローバルかつセーブされるもの。
 		/// </summary>
 		List<UserDefinedVariableToken>[] userDefinedGlobalSaveVarList = new List<UserDefinedVariableToken>[6];
 		/// <summary>
-		/// ユーザー広域variableのうち,charactervariableでexistthing.initial化やsavebe doneかどうかはCharacterDataの方で判断.
+		/// ユーザー広域変数のうち、キャラクタ変数であるもの。初期化やセーブされるかどうかはCharacterDataの方で判断。
 		/// </summary>
 		public List<UserDefinedCharaVariableToken> UserDefinedCharaVarList = new List<UserDefinedCharaVariableToken>();
 
@@ -373,14 +373,14 @@ namespace MinorShift.Emuera.GameData.Variable
 					{
 						case 1: ret = new UserDefinedCharaStr1DVariableToken(data, this, index); break;
 						case 2: ret = new UserDefinedCharaStr2DVariableToken(data, this, index); break;
-						default: throw new ExeEE("異常なvariable宣言");
+						default: throw new ExeEE("異常な変数宣言");
 					}
 				else
 					switch (data.Dimension)
 					{
 						case 1: ret = new UserDefinedCharaInt1DVariableToken(data, this, index); break;
 						case 2: ret = new UserDefinedCharaInt2DVariableToken(data, this, index); break;
-						default: throw new ExeEE("異常なvariable宣言");
+						default: throw new ExeEE("異常な変数宣言");
 					}
 			}
 			UserDefinedCharaVarList.Add(ret);
@@ -395,7 +395,7 @@ namespace MinorShift.Emuera.GameData.Variable
 					case 1: ret = new StaticStr1DVariableToken(data); break;
 					case 2: ret = new StaticStr2DVariableToken(data); break;
 					case 3: ret = new StaticStr3DVariableToken(data); break;
-					default: throw new ExeEE("異常なvariable宣言");
+					default: throw new ExeEE("異常な変数宣言");
 				}
 			else
 				switch (data.Dimension)
@@ -403,7 +403,7 @@ namespace MinorShift.Emuera.GameData.Variable
 					case 1: ret = new StaticInt1DVariableToken(data); break;
 					case 2: ret = new StaticInt2DVariableToken(data); break;
 					case 3: ret = new StaticInt3DVariableToken(data); break;
-					default: throw new ExeEE("異常なvariable宣言");
+					default: throw new ExeEE("異常な変数宣言");
 				}
 			if (ret.IsGlobal)
 				userDefinedGlobalVarList.Add(ret);
@@ -425,7 +425,7 @@ namespace MinorShift.Emuera.GameData.Variable
 		public UserDefinedVariableToken CreatePrivateVariable(UserDefinedVariableData data)
 		{
 			UserDefinedVariableToken ret = null;
-			if (data.Reference)//参照type
+			if (data.Reference)//参照型
 			{//すべて非Staticなはず
 				if (data.TypeIsStr)
 				{
@@ -434,7 +434,7 @@ namespace MinorShift.Emuera.GameData.Variable
 						case 1: ret = new ReferenceStr1DToken(data); break;
 						case 2: ret = new ReferenceStr2DToken(data); break;
 						case 3: ret = new ReferenceStr3DToken(data); break;
-						default: throw new ExeEE("異常なvariable宣言");
+						default: throw new ExeEE("異常な変数宣言");
 					}
 				}
 				else
@@ -444,7 +444,7 @@ namespace MinorShift.Emuera.GameData.Variable
 						case 1: ret = new ReferenceInt1DToken(data); break;
 						case 2: ret = new ReferenceInt2DToken(data); break;
 						case 3: ret = new ReferenceInt3DToken(data); break;
-						default: throw new ExeEE("異常なvariable宣言");
+						default: throw new ExeEE("異常な変数宣言");
 					}
 				}
 			}
@@ -457,7 +457,7 @@ namespace MinorShift.Emuera.GameData.Variable
 						case 1: ret = new StaticStr1DVariableToken(data); break;
 						case 2: ret = new StaticStr2DVariableToken(data); break;
 						case 3: ret = new StaticStr3DVariableToken(data); break;
-						default: throw new ExeEE("異常なvariable宣言");
+						default: throw new ExeEE("異常な変数宣言");
 					}
 				}
 				else
@@ -467,7 +467,7 @@ namespace MinorShift.Emuera.GameData.Variable
 						case 1: ret = new StaticInt1DVariableToken(data); break;
 						case 2: ret = new StaticInt2DVariableToken(data); break;
 						case 3: ret = new StaticInt3DVariableToken(data); break;
-						default: throw new ExeEE("異常なvariable宣言");
+						default: throw new ExeEE("異常な変数宣言");
 					}
 				}
 				userDefinedStaticVarList.Add(ret);
@@ -481,7 +481,7 @@ namespace MinorShift.Emuera.GameData.Variable
 						case 1: ret = new PrivateStr1DVariableToken(data); break;
 						case 2: ret = new PrivateStr2DVariableToken(data); break;
 						case 3: ret = new PrivateStr3DVariableToken(data); break;
-						default: throw new ExeEE("異常なvariable宣言");
+						default: throw new ExeEE("異常な変数宣言");
 					}
 				}
 				else
@@ -491,7 +491,7 @@ namespace MinorShift.Emuera.GameData.Variable
 						case 1: ret = new PrivateInt1DVariableToken(data); break;
 						case 2: ret = new PrivateInt2DVariableToken(data); break;
 						case 3: ret = new PrivateInt3DVariableToken(data); break;
-						default: throw new ExeEE("異常なvariable宣言");
+						default: throw new ExeEE("異常な変数宣言");
 					}
 				}
 			}
@@ -527,7 +527,7 @@ namespace MinorShift.Emuera.GameData.Variable
 
 
 		/// <summary>
-		/// ローカルとグローバル以outinitial化
+		/// ローカルとグローバル以外初期化
 		/// </summary>
 		public void SetDefaultValue(ConstantData constant)
 		{
@@ -813,7 +813,7 @@ namespace MinorShift.Emuera.GameData.Variable
 				if (int3DListDic.TryGetValue(code.ToString(), out var listlistlongarrfound))
 					copyListToArray3D(listlistlongarrfound, dataIntegerArray3D[(int)VariableCode.__LOWERCASE__ & (int)code]);
 
-			if (version < 1808)//ユーザーdefinitionvariableの保存の実装前
+			if (version < 1808)//ユーザー定義変数の保存の実装前
 				return;
 
 			strListDic = reader.ReadStringArrayExtended();
@@ -1017,8 +1017,8 @@ namespace MinorShift.Emuera.GameData.Variable
 		}
 
 		/// <summary>
-		/// 1808 charactertypeでnotvariableを一つ読む
-		/// file終端のcaseはfalseを返す
+		/// 1808 キャラクタ型でない変数を一つ読む
+		/// ファイル終端の場合はfalseを返す
 		/// </summary>
 		/// <param name="reader"></param>
 		public bool LoadVariableBinary(EraBinaryDataReader reader)
@@ -1035,7 +1035,7 @@ namespace MinorShift.Emuera.GameData.Variable
 					return false;
 				case EraSaveDataType.Int:
 					if (vToken == null || !vToken.IsInteger || vToken.Dimension != 0)
-						reader.ReadInt();//該当variableなし,ortype不一致なら読み捨てる
+						reader.ReadInt();//該当変数なし、or型不一致なら読み捨てる
 					else
 						vToken.SetValue(reader.ReadInt(), null);
 					break;
@@ -1082,7 +1082,7 @@ namespace MinorShift.Emuera.GameData.Variable
 						reader.ReadStrArray3D((string[, ,])vToken.GetArray(), true);
 					break;
 				default:
-					throw new FileEE("data異常");
+					throw new FileEE("データ異常");
 			}
 			return true;
 		}

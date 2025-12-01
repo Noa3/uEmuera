@@ -8,7 +8,7 @@ using MinorShift.Emuera.GameData.Function;
 
 namespace MinorShift.Emuera.GameProc.Function
 {
-	//1756 LogicalLineParserfrom分離.processing ArgumentBuilderに分割
+	//1756 LogicalLineParserから分離。処理をArgumentBuilderに分割
 	internal static partial class ArgumentParser
 	{
 		public static bool SetArgumentTo(InstructionLine line)
@@ -20,7 +20,7 @@ namespace MinorShift.Emuera.GameProc.Function
 			if (line.IsError)
 				return false;
 			if (!Program.DebugMode && line.Function.IsDebug())
-			{//非DebugモードでのDebug系命令.何もしnotのでargumentparseも不要
+			{//非DebugモードでのDebug系命令。何もしないのでargument解析も不要
 				line.Argument = null;
 				return true;
 			}
@@ -40,7 +40,7 @@ namespace MinorShift.Emuera.GameProc.Function
 			{
 				if (!line.IsError)
 				{
-					errmes = "命令のargumentparseduring 特定できnotErrorが発生";
+					errmes = "命令のargument解析中に特定できないErrorが発生";
 					goto error;
 				}
 				return false;

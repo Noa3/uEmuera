@@ -5,15 +5,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using MinorShift._Library;
 
-/// <summary>
-/// First window shown on application startup.
-/// Displays list of available ERA games and allows selection.
-/// </summary>
 public class FirstWindow : MonoBehaviour
 {
-    /// <summary>
-    /// Shows the first window dialog.
-    /// </summary>
     public static void Show()
     {
         var obj = Resources.Load<GameObject>("Prefab/FirstWindow");

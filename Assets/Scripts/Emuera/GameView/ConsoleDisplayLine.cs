@@ -27,7 +27,7 @@ namespace MinorShift.Emuera.GameView
 		RIGHT = 2,
 	}
 	/// <summary>
-	/// displayline.1つ以aboveのbutton(ConsoleButtonString)fromなる
+	/// 表示行。1つ以上のボタン（ConsoleButtonString）からなる
 	/// </summary>
 	internal sealed class ConsoleDisplayLine
 	{
@@ -48,7 +48,7 @@ namespace MinorShift.Emuera.GameView
 		}
 		public int LineNo = -1;
 		
-		///論理lineの最初となるcaseだけtrue.displayの都合で改lineされた2line 以降はfalse
+		///論理行の最初となる場合だけtrue。表示の都合で改行された2行目以降はfalse
 		readonly public bool IsLogicalLine = true;
 		readonly public bool IsTemporary = false;
 		//EmueraConsole parent;
@@ -69,7 +69,7 @@ namespace MinorShift.Emuera.GameView
 			int width = 0;
             for(var i = 0; i < buttons.Length; ++i)
                 width += buttons[i].Width;
-			//current位置
+			//現在位置
 			int pointX = buttons[0].PointX;
 
 			//目標位置
@@ -86,7 +86,7 @@ namespace MinorShift.Emuera.GameView
 			else if (align == DisplayLineAlignment.RIGHT)
 				movetoX = Config.WindowX - width;
 
-			//move距離
+			//移動距離
 			int shiftX = movetoX - pointX;
 			if(shiftX != 0)
 				this.ShiftPositionX(shiftX);
@@ -116,8 +116,8 @@ namespace MinorShift.Emuera.GameView
 
 		//public ConsoleButtonString GetPointingButton(int pointX)
 		//{
-		//	////1815 優ahead順位を逆順にdo
-		//	////afterfrom描画be donebuttonが優aheadbe doneように
+		//	////1815 優先順位を逆順にする
+		//	////後から描画されるボタンが優先されるように
 		//	for (int i = 0; i < buttons.Length; i++)
 		//	{
 		//		ConsoleButtonString button = buttons[buttons.Length - i - 1];
@@ -142,7 +142,7 @@ namespace MinorShift.Emuera.GameView
 		{
 			//foreach (ConsoleButtonString button in buttons)
 			//	button.GDIDrawTo(pointY, isBackLog);
-			//1819 毎回全消去doので穴埋めprocessは不要になった
+			//1819 毎回全消去するので穴埋め処理は不要になった
 			//int pointX = 0;
 			//foreach (ConsoleButtonString button in buttons)
 			//{
@@ -154,7 +154,7 @@ namespace MinorShift.Emuera.GameView
 			//		GDI.FillRectBGColor(rect);
 			//	}
 			//	button.GDIDrawTo(pointY, isBackLog);
-			//	//フォントの実heightさ＜line間のcase隙間ができてしまうので埋めるprocess
+			//	//フォントの実高さ＜行間の場合隙間ができてしまうので埋める処理
 			//	GDI.FillGap(Config.LineHeight, button.Width + (button.PointX - pointX), new Point(pointX, pointY));
 			//	pointX = button.PointX + button.Width;
 			//}

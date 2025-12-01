@@ -431,7 +431,7 @@ namespace MinorShift.Emuera.GameData.Variable
 
 		public void SaveToStreamBinary(EraBinaryDataWriter writer, VariableData varData)
 		{
-			//eramakervariableの保存
+			//eramaker変数の保存
 			foreach (KeyValuePair<string, VariableToken> pair in varData.GetVarTokenDic())
 			{
 				VariableToken var = pair.Value;
@@ -469,11 +469,11 @@ namespace MinorShift.Emuera.GameData.Variable
 				}
 			}
 
-			//1813add
+			//1813追加
 			if (UserDefCVarDataList.Count != 0)
 			{
 				writer.WriteSeparator();
-				//#DIM宣言variableの保存
+				//#DIM宣言変数の保存
 				foreach (UserDefinedCharaVariableToken var in varData.UserDefinedCharaVarList)
 				{
 					if (!var.IsSavedata || !var.IsCharacterData || var.IsGlobal)
@@ -578,7 +578,7 @@ namespace MinorShift.Emuera.GameData.Variable
 					//        reader.ReadStrArray3D(dataStringArray3D[codeInt], true);
 					//    break;
 					default:
-						throw new FileEE("data異常");
+						throw new FileEE("データ異常");
 				}
 			}
 		whilebreak:
@@ -699,7 +699,7 @@ namespace MinorShift.Emuera.GameData.Variable
 		{
 			//チェック済み
 			//if (!sortkey.IsCharacterData)
-			//    throw new ExeEE("charactervariableでnot");
+			//    throw new ExeEE("キャラクタ変数でない");
 			if (sortkey.IsString)
 			{
                 if (sortkey.IsArray2D)
@@ -712,7 +712,7 @@ namespace MinorShift.Emuera.GameData.Variable
                     int elem1 = (int)(elem64 >> 32);
                     int elem2 = (int)(elem64 & 0x7FFFFFFF);
                     if (elem1 < 0 || elem1 >= array.GetLength(0) || elem2 < 0 || elem2 >= array.GetLength(1))
-                        throw new CodeEE("ソートkeyがarrayoutを参照しています");
+                        throw new CodeEE("ソートキーが配列外を参照しています");
                     temp_SortKey = array[elem1, elem2];
                 }
                 else if (sortkey.IsArray1D)
@@ -723,7 +723,7 @@ namespace MinorShift.Emuera.GameData.Variable
                     else
                         array = dataStringArray[sortkey.CodeInt];
                     if (elem64 < 0 || elem64 >= array.Length)
-                        throw new CodeEE("ソートkeyがarrayoutを参照しています");
+                        throw new CodeEE("ソートキーが配列外を参照しています");
                     if (array[(int)elem64] != null)
                         temp_SortKey = array[(int)elem64];
                     else
@@ -731,7 +731,7 @@ namespace MinorShift.Emuera.GameData.Variable
                 }
                 else
                 {
-                    //ユーザーdefinitionキャラvariableは非arrayがnot
+                    //ユーザー定義キャラ変数は非配列がない
                     if (dataString[sortkey.CodeInt] != null)
                         temp_SortKey = dataString[sortkey.CodeInt];
                     else
@@ -750,7 +750,7 @@ namespace MinorShift.Emuera.GameData.Variable
 					int elem1 = (int)(elem64 >> 32);
 					int elem2 = (int)(elem64 & 0x7FFFFFFF);
 					if (elem1 < 0 || elem1 >= array.GetLength(0) || elem2 < 0 || elem2 >= array.GetLength(1))
-						throw new CodeEE("ソートkeyがarrayoutを参照しています");
+						throw new CodeEE("ソートキーが配列外を参照しています");
 					temp_SortKey = array[elem1, elem2];
 				}
 				else if (sortkey.IsArray1D)
@@ -761,7 +761,7 @@ namespace MinorShift.Emuera.GameData.Variable
                     else
                         array = dataIntegerArray[sortkey.CodeInt];
 					if (elem64 < 0 || elem64 >= array.Length)
-						throw new CodeEE("ソートkeyがarrayoutを参照しています");
+						throw new CodeEE("ソートキーが配列外を参照しています");
 					temp_SortKey = array[(int)elem64];
 				}
 				else

@@ -23,7 +23,7 @@ namespace MinorShift.Emuera.GameProc.Function
 				//PRINT(|V|S|FORM|FORMS)(|K)(|D)(|L|W) コレと
 				//PRINTSINGLE(|V|S|FORM|FORMS)(|K)(|D) コレと
 				//PRINT(|FORM)(C|LC)(|K)(|D) コレ
-				//PRINTDATA(|K)(|D)(|L|W) ←は別class
+				//PRINTDATA(|K)(|D)(|L|W) ←は別クラス
 				flag = IS_PRINT;
 				StringStream st = new StringStream(name);
 				st.Jump(5);//PRINT
@@ -194,7 +194,7 @@ namespace MinorShift.Emuera.GameProc.Function
                     return;
                 exm.Console.UseUserStyle = true;
 				exm.Console.UseSetColorStyle = !func.Function.IsPrintDFunction();
-				//displaydataが空なら何もしnotで飛ぶ
+				//表示データが空なら何もしないで飛ぶ
 				if (func.dataList.Count == 0)
 				{
 					state.JumpTo(func.JumpTo);
@@ -231,7 +231,7 @@ namespace MinorShift.Emuera.GameProc.Function
 						exm.Console.ReadAnyKey();
 				}
 				exm.Console.UseSetColorStyle = true;
-				//ジャンプdoが,流れが連続でexistthisを保証.
+				//ジャンプするが、流れが連続であることを保証。
 				state.JumpTo(func.JumpTo);
 				//state.RunningLine = null;
 			}
@@ -403,9 +403,9 @@ namespace MinorShift.Emuera.GameProc.Function
 					exm.VEvaluator.RESULT = term.GetIntValue(exm);
 				else// if (func.Argument.MethodTerm.GetOperandType() == typeof(string))
 					exm.VEvaluator.RESULTS = term.GetStrValue(exm);
-				//これら以outのtypeは現状not
+				//これら以外の型は現状ない
 				//else
-				//	throw new ExeEE(func.Function.Name + "命令のtypeが不明");
+				//	throw new ExeEE(func.Function.Name + "命令の型が不明");
 			}
 		}
 
@@ -546,7 +546,7 @@ namespace MinorShift.Emuera.GameProc.Function
 				{
 					Int64 x = terms[i].GetIntValue(exm);
 					if ((x < 0) || (x > 63))
-						throw new CodeEE("第2argumentがビットのレンジ(0from63)を超えています");
+						throw new CodeEE("第2argumentがビットのレンジ(0から63)を超えています");
 					Int64 baseValue = varTerm.GetIntValue(exm);
 					Int64 shift = 1L << (int)x;
 					if (op == 1)
@@ -683,7 +683,7 @@ namespace MinorShift.Emuera.GameProc.Function
 				req.OneInput = true;
 				if (arg.Term != null)
 				{
-					//TODO:二文字以aboveセットcanようにdoかError停止doか
+					//TODO:二文字以上セットできるようにするかError停止するか
 					//少なくともONETINPUTとの仕様を統一すべき
 					Int64 def;
 					if (arg.IsConst)
@@ -754,7 +754,7 @@ namespace MinorShift.Emuera.GameProc.Function
 				req.OneInput = isOne;
 				Int64 x = tinputarg.Time.GetIntValue(exm);
 				Int64 y = tinputarg.Def.GetIntValue(exm);
-				//TODO:ONEINPUTと標準のvalueを統一
+				//TODO:ONEINPUTと標準の値を統一
 				if (isOne)
 				{
 					if (y < 0)
@@ -833,7 +833,7 @@ namespace MinorShift.Emuera.GameProc.Function
 				if (callfArg.FuncTerm == null)
 				{
 					if (!Program.AnalysisMode)
-						ParserMediator.Warn("指定されたfunction名\"@" + callfArg.ConstStr + "\"は存在しません", func, 2, true, false);
+						ParserMediator.Warn("指定された関数名\"@" + callfArg.ConstStr + "\"は存在しません", func, 2, true, false);
 					else
 						ParserMediator.Warn(callfArg.ConstStr, func, 2, true, false);
 					return;
@@ -856,7 +856,7 @@ namespace MinorShift.Emuera.GameProc.Function
 					mToken = ((SpCallFArgment)func.Argument).FuncTerm;
 				}
 				if (mToken == null)
-					throw new CodeEE("式insidefunction\"@" + labelName + "\"not found");
+					throw new CodeEE("式中関数\"@" + labelName + "\"が見つかりません");
 				mToken.GetValue(exm);
 			}
 		}
@@ -908,8 +908,8 @@ namespace MinorShift.Emuera.GameProc.Function
                     decimal d = var.GetIntValue(exm) * (decimal)timesArg.DoubleValue;
                     unchecked
                     {
-                        //decimaltypeは強制的にOverFlowExceptionを投げるので対策が必要
-                        //OverFlowのcaseは昔の挙動に近づけてみる
+                        //decimal型は強制的にOverFlowExceptionを投げるので対策が必要
+                        //OverFlowの場合は昔の挙動に近づけてみる
                         if (d <= Int64.MaxValue && d >= Int64.MinValue)
                             var.SetValue((Int64)d, exm);
                         else
@@ -935,7 +935,7 @@ namespace MinorShift.Emuera.GameProc.Function
 			public override void DoInstruction(ExpressionMediator exm, InstructionLine func, ProcessState state)
 			{
 				if(!Config.CompatiSPChara && isSp)
-					throw new CodeEE("SPキャラ関係の機能は標準ではuseできません(互換性option"SPキャラをusedo"をONにしてください)");
+					throw new CodeEE("SPキャラ関係の機能は標準では使用できません(互換性オプション「SPキャラを使用する」をONにしてください)");
 				ExpressionArrayArgument intExpArg = (ExpressionArrayArgument)func.Argument;
 				Int64 integer;
 				Int64[] charaNoList = new Int64[intExpArg.TermList.Length];
@@ -1138,7 +1138,7 @@ namespace MinorShift.Emuera.GameProc.Function
 				FixedVariableTerm p = var.GetFixedVariableTerm(exm);
 				int start = 0;
 				int end = 0;
-				//endをaheadに取って判定のprocess変更
+				//endを先に取って判定の処理変更
 				if (spvarsetarg.End != null)
 					end = (int)spvarsetarg.End.GetIntValue(exm);
 				else if (var.Identifier.IsArray1D)
@@ -1185,14 +1185,14 @@ namespace MinorShift.Emuera.GameProc.Function
 				{
 					start = (int)spvarsetarg.Start.GetIntValue(exm);
 					if (start < 0 || start >= charaNum)
-						throw new CodeEE("命令CVARSETの第４argument(" + start.ToString() + ")がcharacterの範囲outです");
+						throw new CodeEE("命令CVARSETの第４argument(" + start.ToString() + ")がキャラクタの範囲外です");
 				}
 				int end;
 				if (spvarsetarg.End != null)
 				{
 					end = (int)spvarsetarg.End.GetIntValue(exm);
 					if (end < 0 || end > charaNum)
-						throw new CodeEE("命令CVARSETの第５argument(" + end.ToString() + ")がcharacterの範囲outです");
+						throw new CodeEE("命令CVARSETの第５argument(" + end.ToString() + ")がキャラクタの範囲外です");
 				}
 				else
 					end = charaNum;
@@ -1203,11 +1203,11 @@ namespace MinorShift.Emuera.GameProc.Function
 					end = temp;
 				}
 				if (!p.Identifier.IsCharacterData)
-					throw new CodeEE("命令CVARSETにcharactervariableでnotvariable" + p.Identifier.Name + "was passed");
+					throw new CodeEE("命令CVARSETにキャラクタ変数でない変数" + p.Identifier.Name + "が渡されました");
 				if (index.GetOperandType() == typeof(string) && p.Identifier.IsArray1D)
 				{
 					if (!GlobalStatic.ConstantData.isDefined(p.Identifier.Code, index.Str))
-						throw new CodeEE("string" + index.Str + "はarrayvariable" + p.Identifier.Name + "の要素ではdoes not exist");
+						throw new CodeEE("文字列" + index.Str + "は配列変数" + p.Identifier.Name + "の要素ではありません");
 				}
 				if (p.Identifier.IsString)
 				{
@@ -1332,9 +1332,9 @@ namespace MinorShift.Emuera.GameProc.Function
 		private static int toUInt32inArg(Int64 value, string funcName, int argnum)
 		{
 			if (value < 0)
-				throw new CodeEE(funcName + "の第" + argnum.ToString() + "argumentに負のvalue(" + value.ToString() + ")was specified");
+				throw new CodeEE(funcName + "の第" + argnum.ToString() + "argumentに負の値(" + value.ToString() + ")が指定されました");
 			else if (value > Int32.MaxValue)
-				throw new CodeEE(funcName + "の第" + argnum.ToString() + "argumentのvalue(" + value.ToString() + ")が大きすぎます");
+				throw new CodeEE(funcName + "の第" + argnum.ToString() + "argumentの値(" + value.ToString() + ")が大きすぎます");
 
 			return (int)value;
 		}
@@ -1360,7 +1360,7 @@ namespace MinorShift.Emuera.GameProc.Function
 					Int64 v = terms[i + 2].GetIntValue(exm);
 					savCharaList[i] = FunctionIdentifier.toUInt32inArg(v, "SAVECHARA", i + 3);
 					if (savCharaList[i] >= charanum)
-						throw new CodeEE("SAVECHARAの第" + (i + 3).ToString() + "argumentのvalueがキャラ登録番号の範囲を超えています");
+						throw new CodeEE("SAVECHARAの第" + (i + 3).ToString() + "argumentの値がキャラ登録番号の範囲を超えています");
 					for (int j = 0; j < i; j++)
 					{
 						if (savCharaList[i] == savCharaList[j])
@@ -1457,14 +1457,14 @@ namespace MinorShift.Emuera.GameProc.Function
 		{
 			public DO_NOTHING_Instruction()
 			{
-				//事実aboveENDIFの非フローコントロール版
+				//事実上ENDIFの非フローコントロール版
 				ArgBuilder = ArgumentParser.GetArgumentBuilder(FunctionArgType.VOID);
 				flag = METHOD_SAFE | EXTENDED | PARTIAL;
 			}
 
 			public override void DoInstruction(ExpressionMediator exm, InstructionLine func, ProcessState state)
 			{
-				//何もしnot
+				//何もしない
 			}
 		}
 
@@ -1486,9 +1486,9 @@ namespace MinorShift.Emuera.GameProc.Function
 			{
 				throw new NotImplCodeEE();
 
-#pragma warning disable CS0162 // 到達できnotコードが検出されました
+#pragma warning disable CS0162 // 到達できないコードが検出されました
 				RefArgument arg = (RefArgument)func.Argument;
-#pragma warning restore CS0162 // 到達できnotコードが検出されました
+#pragma warning restore CS0162 // 到達できないコードが検出されました
 				string str = null;
 				if (arg.SrcTerm != null)
 					str = arg.SrcTerm.GetStrValue(exm);
@@ -1496,22 +1496,22 @@ namespace MinorShift.Emuera.GameProc.Function
 				{
 					UserDefinedRefMethod srcRef = arg.SrcRefMethodToken;
 					CalledFunction call = arg.SrcCalledFunction;
-					if (str != null)//REFBYNAMEかつ第二argumentが定数でnot
+					if (str != null)//REFBYNAMEかつ第二argumentが定数でない
 					{
 						srcRef = GlobalStatic.IdentifierDictionary.GetRefMethod(str);
 						if (srcRef == null)
 						{
 							FunctionLabelLine label = GlobalStatic.LabelDictionary.GetNonEventLabel(str);
 							//if (label == null)
-							//    throw new CodeEE("式insidefunction" + str + "not found");
+							//    throw new CodeEE("式中関数" + str + "が見つかりません");
 							//if (!label.IsMethod)
-							//    throw new CodeEE("#FUNCTION(S)attributeを持たnotfunction" + str + "は参照できません");
+							//    throw new CodeEE("#FUNCTION(S)属性を持たない関数" + str + "は参照できません");
 							if (label != null && label.IsMethod)
 								call = CalledFunction.CreateCalledFunctionMethod(label, str);
 						}
 					}
 					else if (srcRef != null)
-						call = srcRef.CalledFunction;//第二argumentがfunction参照.callがnullならError
+						call = srcRef.CalledFunction;//第二argumentが関数参照。callがnullならError
 					if (call == null || !arg.RefMethodToken.MatchType(call))
 					{
 						arg.RefMethodToken.SetReference(null);
@@ -1533,7 +1533,7 @@ namespace MinorShift.Emuera.GameProc.Function
 					srcVar = GlobalStatic.IdentifierDictionary.GetVariableToken(str, null, true);
 
 					//if (srcVar == null)
-					//    throw new CodeEE("variable" + str + "not found");
+					//    throw new CodeEE("変数" + str + "が見つかりません");
 				}
 				if (srcVar == null || !refVar.MatchType(srcVar, false, out errmes))
 				{
@@ -1562,9 +1562,9 @@ namespace MinorShift.Emuera.GameProc.Function
 				long foreColor = arg.X.GetIntValue(exm);
 				long backColor = arg.Y.GetIntValue(exm);
 				if (foreColor < 0 || foreColor > 0xFFFFFF)
-					throw new CodeEE("第１argumentが色を表すintegerの範囲outです");
+					throw new CodeEE("第１argumentが色を表す整数の範囲外です");
 				if (backColor < 0 || backColor > 0xFFFFFF)
-					throw new CodeEE("第２argumentが色を表すintegerの範囲outです");
+					throw new CodeEE("第２argumentが色を表す整数の範囲外です");
 				Color fc = Color.FromArgb((int)foreColor >>16, (int)foreColor>>8 &0xFF,(int)foreColor &0xFF);
 				Color bc = Color.FromArgb((int)backColor >>16, (int)backColor>>8 &0xFF,(int)backColor &0xFF);
 				exm.Console.SetToolTipColor(fc, bc);
@@ -1588,7 +1588,7 @@ namespace MinorShift.Emuera.GameProc.Function
 				else
 					delay = arg.Term.GetIntValue(exm);
 				if (delay < 0 || delay > int.MaxValue)
-					throw new CodeEE("argumentのvalueが適切な範囲outです");
+					throw new CodeEE("argumentの値が適切な範囲外です");
 				exm.Console.SetToolTipDelay((int)delay);
 				return;
 			}
@@ -1610,7 +1610,7 @@ namespace MinorShift.Emuera.GameProc.Function
                 else
                     duration = arg.Term.GetIntValue(exm);
                 if (duration < 0 || duration > int.MaxValue)
-                    throw new CodeEE("argumentのvalueが適切な範囲outです");
+                    throw new CodeEE("argumentの値が適切な範囲外です");
                 if (duration > short.MaxValue)
                     duration = short.MaxValue;
                 exm.Console.SetToolTipDuration((int)duration);
@@ -1660,9 +1660,9 @@ namespace MinorShift.Emuera.GameProc.Function
 				{
 					waittime = arg.Term.GetIntValue(exm);
 					if (waittime < 0)
-						throw new CodeEE("AWAIT命令:負のvalue(" + waittime.ToString() + ")was specified");
+						throw new CodeEE("AWAIT命令:負の値(" + waittime.ToString() + ")が指定されました");
 					if (waittime > 10000)
-						throw new CodeEE("AWAIT命令:10秒以aboveの待機when間(" + waittime.ToString() + " ms)was specified");
+						throw new CodeEE("AWAIT命令:10秒以上の待機時間(" + waittime.ToString() + " ms)が指定されました");
 				}
 
 				exm.Console.Await((int)waittime);
@@ -1682,7 +1682,7 @@ namespace MinorShift.Emuera.GameProc.Function
 			public override void DoInstruction(ExpressionMediator exm, InstructionLine func, ProcessState state)
 			{
 				string keyword = func.Argument.ConstStr;
-				if (Config.ICFunction)//1756 BEGINのkeyワードはfunction扱いらしい
+				if (Config.ICFunction)//1756 BEGINのキーワードは関数扱いらしい
 					keyword = keyword.ToUpper();
 				state.SetBegin(keyword);
 				state.Return(0);
@@ -1706,10 +1706,10 @@ namespace MinorShift.Emuera.GameProc.Function
 					string funcName = state.Scope;
 					if (funcName == null)
 						funcName = "";
-					throw new CodeEE("@" + funcName + "insideでSAVEGAME/LOADGAME命令を実linedocannot be");
+					throw new CodeEE("@" + funcName + "中でSAVEGAME/LOADGAME命令を実行することはできません");
 				}
 				GlobalStatic.Process.saveCurrentState(true);
-				//バックアップに入れた旧ProcessStateの方を参照because,ここでstateは使えnot
+				//バックアップに入れた旧ProcessStateの方を参照するため、ここでstateは使えない
 				GlobalStatic.Process.getCurrentState.SaveLoadData(isSave);
 			}
 		}
@@ -1733,14 +1733,14 @@ namespace MinorShift.Emuera.GameProc.Function
 			{
 				SpForNextArgment forArg = (SpForNextArgment)func.Argument;
 				func.LoopCounter = forArg.Cnt;
-				//1.725 順序変更.REPEATにならう.
+				//1.725 順序変更。REPEATにならう。
 				func.LoopCounter.SetValue(forArg.Start.GetIntValue(exm), exm);
 				func.LoopEnd = forArg.End.GetIntValue(exm);
 				func.LoopStep = forArg.Step.GetIntValue(exm);
-				if ((func.LoopStep > 0) && (func.LoopEnd > func.LoopCounter.GetIntValue(exm)))//まだ回数が残っているなら,
-					return;//そのままnext lineto
-				else if ((func.LoopStep < 0) && (func.LoopEnd < func.LoopCounter.GetIntValue(exm)))//まだ回数が残っているなら,
-					return;//そのままnext lineto
+				if ((func.LoopStep > 0) && (func.LoopEnd > func.LoopCounter.GetIntValue(exm)))//まだ回数が残っているなら、
+					return;//そのまま次の行へ
+				else if ((func.LoopStep < 0) && (func.LoopEnd < func.LoopCounter.GetIntValue(exm)))//まだ回数が残っているなら、
+					return;//そのまま次の行へ
 				state.JumpTo(func.JumpTo);
 			}
 		}
@@ -1756,7 +1756,7 @@ namespace MinorShift.Emuera.GameProc.Function
 			{
 				ExpressionArgument expArg = (ExpressionArgument)func.Argument;
 				if (expArg.Term.GetIntValue(exm) != 0)//式が真
-					return;//そのままinsideのprocessto
+					return;//そのまま中の処理へ
 				state.JumpTo(func.JumpTo);
 			}
 		}
@@ -1775,31 +1775,31 @@ namespace MinorShift.Emuera.GameProc.Function
 				if ((jumpto == null) || (jumpto.NextLine == null) ||
 					(jumpto is FunctionLabelLine) || (jumpto is NullLine))
 				{
-					ParserMediator.Warn("SIF文のnext lineがdoes not exist", func, 2, true, false);
+					ParserMediator.Warn("SIF文の次の行がありません", func, 2, true, false);
 					return;
 				}
 				else if (jumpto is InstructionLine)
 				{
 					InstructionLine sifFunc = (InstructionLine)jumpto;
 					if (sifFunc.Function.IsPartial())
-						ParserMediator.Warn("SIF文のnext lineを" + sifFunc.Function.Name + "文にdocannot be", func, 2, true, false);
+						ParserMediator.Warn("SIF文の次の行を" + sifFunc.Function.Name + "文にすることはできません", func, 2, true, false);
 					else
 						func.JumpTo = func.NextLine.NextLine;
 				}
 				else if (jumpto is GotoLabelLine)
-					ParserMediator.Warn("SIF文のnext lineをラベルlineにdocannot be", func, 2, true, false);
+					ParserMediator.Warn("SIF文の次の行をラベル行にすることはできません", func, 2, true, false);
 				else
 					func.JumpTo = func.NextLine.NextLine;
 
 				if ((func.JumpTo != null) && (func.Position.LineNo + 1 != func.NextLine.Position.LineNo))
-					ParserMediator.Warn("SIF文のnext lineが空lineorコメントlineです(eramaker:SIF文は意味を失います)", func, 0, false, true);
+					ParserMediator.Warn("SIF文の次の行が空行またはコメント行です(eramaker:SIF文は意味を失います)", func, 0, false, true);
 			}
 
 			public override void DoInstruction(ExpressionMediator exm, InstructionLine func, ProcessState state)
 			{
 				ExpressionArgument expArg = (ExpressionArgument)func.Argument;
 				if (expArg.Term.GetIntValue(exm) == 0)//評価式が真ならそのまま流れ落ちる
-					state.ShiftNextLine();//偽なら一lineとばす.順に来たときとsame扱いにdo
+					state.ShiftNextLine();//偽なら一行とばす。順に来たときと同じ扱いにする
 			}
 		}
 
@@ -1816,7 +1816,7 @@ namespace MinorShift.Emuera.GameProc.Function
 				//	|| iFuncCode == FunctionCode.CASE || iFuncCode == FunctionCode.CASEELSE)
 				//チェック済み
 				//if (func.JumpTo == null)
-				//	throw new ExeEE(func.Function.Name + "のジャンプaheadがsettingされていnot");
+				//	throw new ExeEE(func.Function.Name + "のジャンプ先が設定されていない");
 				state.JumpTo(func.JumpTo);
 			}
 		}
@@ -1844,9 +1844,9 @@ namespace MinorShift.Emuera.GameProc.Function
 				LogicalLine ifJumpto = func.JumpTo;//ENDIF
 				//チェック済み
 				//if (func.IfCaseList == null)
-				//	throw new ExeEE("IFのIF-ELSEIFリストが適正にcreateされていnot");
+				//	throw new ExeEE("IFのIF-ELSEIFリストが適正に作成されていない");
 				//if (func.JumpTo == null)
-				//	throw new ExeEE("IFに対応doENDIFがsettingされていnot");
+				//	throw new ExeEE("IFに対応するENDIFが設定されていない");
 
 				InstructionLine line;
 				for (int i = 0; i < func.IfCaseList.Count; i++)
@@ -1863,9 +1863,9 @@ namespace MinorShift.Emuera.GameProc.Function
 					//ExpressionArgument expArg = (ExpressionArgument)(line.Argument);
 					//チェック済み
 					//if (expArg == null)
-					//	throw new ExeEE("IFチェックinside.argumentがparseされていnot.", func.IfCaseList[i].Position);
+					//	throw new ExeEE("IFチェック中。argumentが解析されていない。", func.IfCaseList[i].Position);
 
-					//1730 ELSEIFが出したErrorがIFのErroras検出されていた
+					//1730 ELSEIFが出したErrorがIFのErrorとして検出されていた
 					state.CurrentLine = line;
 					Int64 value = ((ExpressionArgument)(line.Argument)).Term.GetIntValue(exm);
 					if (value != 0)//式が真
@@ -1874,7 +1874,7 @@ namespace MinorShift.Emuera.GameProc.Function
 						break;
 					}
 				}
-				if (ifJumpto != func)//自分自身がジャンプaheadならそのまま
+				if (ifJumpto != func)//自分自身がジャンプ先ならそのまま
 					state.JumpTo(ifJumpto);
 				//state.RunningLine = null;
 			}
@@ -1900,9 +1900,9 @@ namespace MinorShift.Emuera.GameProc.Function
 					sValue = selectValue.GetStrValue(exm);
 				//チェック済み
 				//if (func.IfCaseList == null)
-				//	throw new ExeEE("SELECTCASEのCASEリストが適正にcreateされていnot");
+				//	throw new ExeEE("SELECTCASEのCASEリストが適正に作成されていない");
 				//if (func.JumpTo == null)
-				//	throw new ExeEE("SELECTCASEに対応doENDSELECTがsettingされていnot");
+				//	throw new ExeEE("SELECTCASEに対応するENDSELECTが設定されていない");
 				InstructionLine line;
 				for (int i = 0; i < func.IfCaseList.Count; i++)
 				{
@@ -1917,7 +1917,7 @@ namespace MinorShift.Emuera.GameProc.Function
 					CaseArgument caseArg = (CaseArgument)(line.Argument);
 					//チェック済み
 					//if (caseArg == null)
-					//	throw new ExeEE("CASEチェックinside.argumentがparseされていnot.", func.IfCaseList[i].Position);
+					//	throw new ExeEE("CASEチェック中。argumentが解析されていない。", func.IfCaseList[i].Position);
 
 					state.CurrentLine = line;
 					if (selectValue.IsInteger)
@@ -2034,7 +2034,7 @@ namespace MinorShift.Emuera.GameProc.Function
 			}
 			public override void DoInstruction(ExpressionMediator exm, InstructionLine func, ProcessState state)
 			{
-				//if (sequential)//abovefrom流れてきたなら何もしnotでENDCATCHに飛ぶ
+				//if (sequential)//上から流れてきたなら何もしないでENDCATCHに飛ぶ
 				state.JumpTo(func.JumpToEndCatch);
 			}
 		}
@@ -2061,15 +2061,15 @@ namespace MinorShift.Emuera.GameProc.Function
 			}
 			public override void DoInstruction(ExpressionMediator exm, InstructionLine func, ProcessState state)
 			{
-				////BREAKのJUMPaheadはRENDorNEXT.そのジャンプaheadでexistREPEATかFORをiLineに代入.
-				//1.723 仕様変更.BREAKのJUMPaheadにはREPEAT,FOR,WHILEを記憶do.そのJUMPaheadが本当のJUMPahead.
+				////BREAKのJUMP先はRENDまたはNEXT。そのジャンプ先であるREPEATかFORをiLineに代入。
+				//1.723 仕様変更。BREAKのJUMP先にはREPEAT、FOR、WHILEを記憶する。そのJUMP先が本当のJUMP先。
 				InstructionLine jumpTo = (InstructionLine)func.JumpTo;
 				InstructionLine iLine = (InstructionLine)jumpTo.JumpTo;
-				//WHILEとDOはカウンタがnotので,即ジャンプ
+				//WHILEとDOはカウンタがないので、即ジャンプ
 				if (jumpTo.FunctionCode != FunctionCode.WHILE && jumpTo.FunctionCode != FunctionCode.DO)
 				{
 					unchecked
-					{//eramakerではBREAKwhenにCOUNTが回る
+					{//eramakerではBREAK時にCOUNTが回る
 						jumpTo.LoopCounter.PlusValue(jumpTo.LoopStep, exm);
 					}
 				}
@@ -2089,7 +2089,7 @@ namespace MinorShift.Emuera.GameProc.Function
 				InstructionLine jumpTo = (InstructionLine)func.JumpTo;
 				if ((jumpTo.FunctionCode == FunctionCode.REPEAT) || (jumpTo.FunctionCode == FunctionCode.FOR))
 				{
-					//ループvariableが不明(REPEAT,FORを経由せずにループしようとしたcaseは無視してループを抜ける(eramakerがこういう仕様だったりdo))
+					//ループ変数が不明(REPEAT、FORを経由せずにループしようとした場合は無視してループを抜ける(eramakerがこういう仕様だったりする))
 					if (jumpTo.LoopCounter == null)
 					{
 						state.JumpTo(jumpTo.JumpTo);
@@ -2100,7 +2100,7 @@ namespace MinorShift.Emuera.GameProc.Function
 						jumpTo.LoopCounter.PlusValue(jumpTo.LoopStep, exm);
 					}
 					Int64 counter = jumpTo.LoopCounter.GetIntValue(exm);
-					//まだ回数が残っているなら,
+					//まだ回数が残っているなら、
 					if (((jumpTo.LoopStep > 0) && (jumpTo.LoopEnd > counter))
 						|| ((jumpTo.LoopStep < 0) && (jumpTo.LoopEnd < counter)))
 						state.JumpTo(func.JumpTo);
@@ -2118,7 +2118,7 @@ namespace MinorShift.Emuera.GameProc.Function
 				}
 				if (jumpTo.FunctionCode == FunctionCode.DO)
 				{
-					//こいつだけはCONTINUEthanもafterろに判定lineがexistbecause,判定lineにErrorがあったcaseに問題がexist
+					//こいつだけはCONTINUEよりも後ろに判定行があるため、判定行にErrorがあった場合に問題がある
 					InstructionLine tFunc = (InstructionLine)((InstructionLine)func.JumpTo).JumpTo;//LOOP
 					if (tFunc.IsError)
 						throw new CodeEE(tFunc.ErrMes, tFunc.Position);
@@ -2143,7 +2143,7 @@ namespace MinorShift.Emuera.GameProc.Function
 			public override void DoInstruction(ExpressionMediator exm, InstructionLine func, ProcessState state)
 			{
 				InstructionLine jumpTo = (InstructionLine)func.JumpTo;
-				//ループvariableが不明(REPEAT,FORを経由せずにループしようとしたcaseは無視してループを抜ける(eramakerがこういう仕様だったりdo))
+				//ループ変数が不明(REPEAT、FORを経由せずにループしようとした場合は無視してループを抜ける(eramakerがこういう仕様だったりする))
 				if (jumpTo.LoopCounter == null)
 				{
 					state.JumpTo(jumpTo.JumpTo);
@@ -2154,7 +2154,7 @@ namespace MinorShift.Emuera.GameProc.Function
 					jumpTo.LoopCounter.PlusValue(jumpTo.LoopStep, exm);
 				}
 				Int64 counter = jumpTo.LoopCounter.GetIntValue(exm);
-				//まだ回数が残っているなら,
+				//まだ回数が残っているなら、
 				if (((jumpTo.LoopStep > 0) && (jumpTo.LoopEnd > counter))
 					|| ((jumpTo.LoopStep < 0) && (jumpTo.LoopEnd < counter)))
 					state.JumpTo(func.JumpTo);
@@ -2205,7 +2205,7 @@ namespace MinorShift.Emuera.GameProc.Function
 				FunctionLabelLine label = func.ParentLabelLine;
 				if (!label.IsMethod)
 				{
-					ParserMediator.Warn("RETURNFは#FUNCTION以outではuseできません", func, 2, true, false);
+					ParserMediator.Warn("RETURNFは#FUNCTION以外では使用できません", func, 2, true, false);
 				}
 				if (func.Argument != null)
 				{
@@ -2215,9 +2215,9 @@ namespace MinorShift.Emuera.GameProc.Function
 						if (label.MethodType != term.GetOperandType())
 						{
 							if (label.MethodType == typeof(Int64))
-								ParserMediator.Warn("#FUNCTIONで始まるfunctionの戻りvalueにstringtypewas specified", func, 2, true, false);
+								ParserMediator.Warn("#FUNCTIONで始まる関数の戻り値に文字列型が指定されました", func, 2, true, false);
 							else if (label.MethodType == typeof(string))
-								ParserMediator.Warn("#FUCNTIONSで始まるfunctionの戻りvalueにnumerictypewas specified", func, 2, true, false);
+								ParserMediator.Warn("#FUCNTIONSで始まる関数の戻り値に数値型が指定されました", func, 2, true, false);
 						}
 					}
 				}
@@ -2317,7 +2317,7 @@ namespace MinorShift.Emuera.GameProc.Function
 				if (call == null)
 				{
 					if (!isTry)
-						throw new CodeEE("function\"@" + labelName + "\"not found");
+						throw new CodeEE("関数\"@" + labelName + "\"が見つかりません");
 					if (func.JumpToEndCatch != null)
 						state.JumpTo(func.JumpToEndCatch);
 					return;
@@ -2344,11 +2344,11 @@ namespace MinorShift.Emuera.GameProc.Function
 
 			public override void SetJumpTo(ref bool useCallForm, InstructionLine func, int currentDepth, ref string FunctionoNotFoundName)
 			{
-				//EVENTfunctionfromCALLされたaheadでCALLEVENTbe doneようなパターンはIntoFunctionで捕まえる
+				//EVENT関数からCALLされた先でCALLEVENTされるようなパターンはIntoFunctionで捕まえる
 				FunctionLabelLine label = func.ParentLabelLine;
 				if (label.IsEvent)
 				{
-					ParserMediator.Warn("EVENTfunctionduring CALLEVENT命令はuseできません", func, 2, true, false);
+					ParserMediator.Warn("EVENT関数中にCALLEVENT命令は使用できません", func, 2, true, false);
 				}
 			}
 
@@ -2388,18 +2388,18 @@ namespace MinorShift.Emuera.GameProc.Function
 				if (func.Argument.IsConst)
 				{
 					string labelName = func.Argument.ConstStr;
-					if (Config.ICVariable)//eramakerではGOTO文は大文字小文字を区別しnot
+					if (Config.ICVariable)//eramakerではGOTO文は大文字小文字を区別しない
 						labelName = labelName.ToUpper();
 					jumpto = GlobalStatic.LabelDictionary.GetLabelDollar(labelName, func.ParentLabelLine);
 					if (jumpto == null)
 					{
 						if (!func.Function.IsTry())
-							ParserMediator.Warn("指定されたラベル名\"$" + labelName + "\"はcurrentのfunctioninに存在しません", func, 2, true, false);
+							ParserMediator.Warn("指定されたラベル名\"$" + labelName + "\"は現在の関数内に存在しません", func, 2, true, false);
 						else
 							return;
 					}
 					else if (jumpto.IsError)
-						ParserMediator.Warn("指定されたラベル名\"$" + labelName + "\"は無効な$ラベルlineです", func, 2, true, false);
+						ParserMediator.Warn("指定されたラベル名\"$" + labelName + "\"は無効な$ラベル行です", func, 2, true, false);
 					else if (jumpto != null)
 					{
 						func.JumpTo = jumpto;
@@ -2428,13 +2428,13 @@ namespace MinorShift.Emuera.GameProc.Function
 				if (jumpto == null)
 				{
 					if (!func.Function.IsTry())
-						throw new CodeEE("指定されたラベル名\"$" + label + "\"はcurrentのfunctioninに存在しません");
+						throw new CodeEE("指定されたラベル名\"$" + label + "\"は現在の関数内に存在しません");
 					if (func.JumpToEndCatch != null)
 						state.JumpTo(func.JumpToEndCatch);
 					return;
 				}
 				else if (jumpto.IsError)
-					throw new CodeEE("指定されたラベル名\"$" + label + "\"は無効な$ラベルlineです");
+					throw new CodeEE("指定されたラベル名\"$" + label + "\"は無効な$ラベル行です");
 				state.JumpTo(jumpto);
 			}
 		}

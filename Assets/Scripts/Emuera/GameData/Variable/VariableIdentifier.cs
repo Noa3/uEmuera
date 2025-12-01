@@ -5,8 +5,8 @@ using MinorShift.Emuera.Sub;
 
 namespace MinorShift.Emuera.GameData.Variable
 {
-	//1756 allの機能をVariableTokenとManagerに委譲,消滅
-	//……しようと思ったがConstantDatafrom参照されているので捨て切れなかった.
+	//1756 全ての機能をVariableTokenとManagerに委譲、消滅
+	//……しようと思ったがConstantDataから参照されているので捨て切れなかった。
 	/// <summary>
 	/// VariableCodeのラッパー
 	/// </summary>
@@ -187,7 +187,7 @@ namespace MinorShift.Emuera.GameData.Variable
 						throw new ExeEE("STRINGかつARRAY2DのSAVE_EXTENDEDは未実装");
 #endif
 				nameDic.Add(key, code);
-				////saveが必要なvariableリストのcreate
+				////セーブが必要な変数リストの作成
 
 				////__SAVE_EXTENDED__フラグ持ち
 				//if ((code & VariableCode.__SAVE_EXTENDED__) == VariableCode.__SAVE_EXTENDED__)
@@ -202,7 +202,7 @@ namespace MinorShift.Emuera.GameData.Variable
 				//    && ((code & VariableCode.__UNCHANGEABLE__) != VariableCode.__UNCHANGEABLE__)
 				//    && ((code & VariableCode.__LOCAL__) != VariableCode.__LOCAL__)
 				//    && (!key.StartsWith("NOTUSE_")) )
-				//{//eramaker由来のvariableでsavedothing
+				//{//eramaker由来の変数でセーブするもの
 
 				//    VariableCode flag = code & (VariableCode.__ARRAY_1D__ | VariableCode.__ARRAY_2D__ | VariableCode.__ARRAY_3D__ | VariableCode.__STRING__ | VariableCode.__INTEGER__ | VariableCode.__CHARACTER_DATA__);
 				//    int codeInt = (int)VariableCode.__LOWERCASE__ & (int)code;
@@ -293,7 +293,7 @@ namespace MinorShift.Emuera.GameData.Variable
 				if (localvarNameDic.TryGetValue(key, out ret))
 					return new VariableIdentifier(ret, subStr);
 				if (nameDic.ContainsKey(key))
-					throw new CodeEE("ローカルvariableでnotvariable" + key + "に対して@が使われました");
+					throw new CodeEE("ローカル変数でない変数" + key + "に対して@が使われました");
 				throw new CodeEE("@の使い方が不正です");
 			}
 			if (nameDic.TryGetValue(key, out ret))

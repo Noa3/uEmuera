@@ -15,7 +15,7 @@ namespace MinorShift.Emuera.GameProc.Function
 	}
 
 	/// <summary>
-	/// 一般的なargument.複数のstring式及び数式
+	/// 一般的なargument。複数の文字列式及び数式
 	/// </summary>
 	internal sealed class ExpressionsArgument : Argument
 	{
@@ -25,7 +25,7 @@ namespace MinorShift.Emuera.GameProc.Function
 			ArgumentArray = terms;
 		}
 		/// <summary>
-		/// argumentのtype(ArgumentArraythanもLengthが大きいpossible性がexistので見るのはArgumentArrayにdothis)
+		/// argumentの型(ArgumentArrayよりもLengthが大きい可能性があるので見るのはArgumentArrayにすること)
 		/// </summary>
 		readonly public Type[] ArgumentTypeArray;
 		readonly public IOperandTerm[] ArgumentArray;

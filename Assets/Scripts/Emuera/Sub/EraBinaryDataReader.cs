@@ -5,7 +5,7 @@ using System.IO;
 
 namespace MinorShift.Emuera.Sub
 {
-	#region reader/writer共通data
+	#region reader/writer共通データ
 	public enum EraSaveFileType : byte
 	{
 		Normal = 0x00,
@@ -24,26 +24,26 @@ namespace MinorShift.Emuera.Sub
 		StrArray = 0x11,
 		StrArray2D = 0x12,
 		StrArray3D = 0x13,
-		//SOC = 0xFD,//キャラdata始まり
-		Separator = 0xFD,//data区切り
-		EOC = 0xFE,//キャラdata終わり
-		EOF = 0xFF,//file終端
+		//SOC = 0xFD,//キャラデータ始まり
+		Separator = 0xFD,//データ区切り
+		EOC = 0xFE,//キャラデータ終わり
+		EOF = 0xFF,//ファイル終端
 	}
 
-	static class Ebdb//EraBinaryDatainsideのマジックナンバーなバイト
+	static class Ebdb//EraBinaryData中のマジックナンバーなバイト
 	{
 		public const byte Byte = 0xCF;
-		public const byte Int16 = 0xD0;//直afterの2バイトがInt16
-		public const byte Int32 = 0xD1;//直afterの4バイトがInt32
-		public const byte Int64 = 0xD2;//直afterの8バイトがInt64
-		public const byte String = 0xD8;//直afterがString
+		public const byte Int16 = 0xD0;//直後の2バイトがInt16
+		public const byte Int32 = 0xD1;//直後の4バイトがInt32
+		public const byte Int64 = 0xD2;//直後の8バイトがInt64
+		public const byte String = 0xD8;//直後がString
 
-		public const byte EoA1 = 0xE0;//data区切り(一次original
-		public const byte EoA2 = 0xE1;//data区切り(二次original
-		public const byte Zero = 0xF0;//直after ゼロが連続do数
-		public const byte ZeroA1 = 0xF1;//直after 空arrayが連続do数(一次original
-		public const byte ZeroA2 = 0xF2;//直after 空arrayが連続do数(二次original
-		public const byte EoD = 0xFF;//variabledata終わり
+		public const byte EoA1 = 0xE0;//データ区切り（一次元
+		public const byte EoA2 = 0xE1;//データ区切り（二次元
+		public const byte Zero = 0xF0;//直後にゼロが連続する数
+		public const byte ZeroA1 = 0xF1;//直後に空配列が連続する数（一次元
+		public const byte ZeroA2 = 0xF2;//直後に空配列が連続する数（二次元
+		public const byte EoD = 0xFF;//変数データ終わり
 	}
 
 	static class EraBDConst
@@ -56,8 +56,8 @@ namespace MinorShift.Emuera.Sub
 	#endregion
 
 	/// <summary>
-	/// 1808add 新しいdata保存形式
-	/// 将来形式を変更したときのbecauseにabstractにしておく
+	/// 1808追加 新しいデータ保存形式
+	/// 将来形式を変更したときのためにabstractにしておく
 	/// </summary>
 	internal abstract class EraBinaryDataReader : IDisposable
 	{
@@ -75,8 +75,8 @@ namespace MinorShift.Emuera.Sub
 
 		public abstract int ReaderVersion { get; }
 		/// <summary>
-		/// FileStreamfromReaderをcreate
-		/// Invalid fileのcaseはnullを返す-Exceptionは投げnot
+		/// FileStreamからReaderを作成
+		/// Invalid ファイルの場合はnullを返す・Exceptionは投げない
 		/// </summary>
 		/// <param name="fs"></param>
 		/// <returns></returns>
@@ -109,7 +109,7 @@ namespace MinorShift.Emuera.Sub
 		public abstract EraSaveFileType ReadFileType();
 
 		/// <summary>
-		/// systemforの特殊process-圧縮なし
+		/// システム用の特殊処理・圧縮なし
 		/// </summary>
 		/// <returns></returns>
 		public abstract Int64 ReadInt64();
@@ -159,7 +159,7 @@ namespace MinorShift.Emuera.Sub
 				byte type = reader.ReadByte();
 				if (type >= 0 && type <= 3)
 					return (EraSaveFileType)type;
-				throw new FileEE("filedatatype異常");
+				throw new FileEE("ファイルデータ型異常");
 			}
 
 			private Int64 m_ReadInt()
@@ -173,7 +173,7 @@ namespace MinorShift.Emuera.Sub
 					return reader.ReadInt32();
 				if (b == Ebdb.Int64)
 					return reader.ReadInt64();
-				throw new FileEE("バイナリdataの異常");
+				throw new FileEE("バイナリデータの異常");
 			}
 
 			public override Int64 ReadInt64()
@@ -190,7 +190,7 @@ namespace MinorShift.Emuera.Sub
 				return new KeyValuePair<string, EraSaveDataType>(key, type);
 			}
 
-			//arrayじゃnotやつは特殊process
+			//配列じゃないやつは特殊処理
 			public override Int64 ReadInt()
 			{
 				return m_ReadInt();
@@ -208,16 +208,16 @@ namespace MinorShift.Emuera.Sub
 				byte b;
 				int x = 0;
 				int saveLength0 = reader.ReadInt32();
-				if (refArray == null)//読み捨て.レアケースのはず
+				if (refArray == null)//読み捨て。レアケースのはず
 					refArray = new Int64[saveLength0];
 
 				int length0 = refArray.Length;
 
-				//保存されたdataの方が大きいとき.レアケースのはず
+				//保存されたデータの方が大きいとき。レアケースのはず
 				if (length0 < saveLength0)
 				{
                     oriArray = refArray;
-                    //1818修正 サイズ違いのwhenにあふれnotように/arrayは最大until確保,作業doのは重複部分だけ
+                    //1818修正 サイズ違いの時にあふれないように/配列は最大まで確保、作業するのは重複部分だけ
                     refArray = new Int64[Math.Max(length0, saveLength0)];
 
                     length0 = Math.Min(length0, saveLength0);
@@ -245,7 +245,7 @@ namespace MinorShift.Emuera.Sub
 					else if (b == Ebdb.Int64)
 						refArray[x] = reader.ReadInt64();
 					else
-						throw new FileEE("バイナリdataの異常");
+						throw new FileEE("バイナリデータの異常");
 					x++;
 				}
 				if (needInit)
@@ -274,7 +274,7 @@ namespace MinorShift.Emuera.Sub
 				if (length0 < saveLength0 || length1 < saveLength1)
 				{
                     oriArray = refArray;
-                    //1818修正 サイズ違いのwhenにあふれnotように/arrayは最大until確保,作業doのは重複部分だけ
+                    //1818修正 サイズ違いの時にあふれないように/配列は最大まで確保、作業するのは重複部分だけ
                     refArray = new Int64[Math.Max(length0, saveLength0), Math.Max(length1, saveLength1)];
 
                     length0 = Math.Min(length0, saveLength0);
@@ -325,7 +325,7 @@ namespace MinorShift.Emuera.Sub
 					else if (b == Ebdb.Int64)
 						refArray[x, y] = reader.ReadInt64();
 					else
-						throw new FileEE("バイナリdataの異常");
+						throw new FileEE("バイナリデータの異常");
 					y++;
 				}
 				if (needInit)
@@ -348,8 +348,8 @@ namespace MinorShift.Emuera.Sub
 			/// <summary>
 			/// 
 			/// </summary>
-			/// <param name="refArray">dataを書き出すahead.読み捨てるならnull</param>
-			/// <param name="needInit">dataがnot部分を0で埋める必要がexistか</param>
+			/// <param name="refArray">データを書き出す先。読み捨てるならnull</param>
+			/// <param name="needInit">データがない部分を0で埋める必要があるか</param>
 			public override void ReadIntArray3D(Int64[, ,] refArray, bool needInit)
 			{
 				Int64[, ,] oriArray = null;
@@ -369,7 +369,7 @@ namespace MinorShift.Emuera.Sub
 				if (length0 < saveLength0 || length1 < saveLength1 || length2 < saveLength2)
 				{
 					oriArray = refArray;
-                    //1818修正 サイズ違いのwhenにあふれnotように/arrayは最大until確保,作業doのは重複部分だけ
+                    //1818修正 サイズ違いの時にあふれないように/配列は最大まで確保、作業するのは重複部分だけ
                     refArray = new Int64[Math.Max(length0, saveLength0), Math.Max(length1, saveLength1), Math.Max(length2, saveLength2)];
 
                     length0 = Math.Min(length0, saveLength0);
@@ -382,7 +382,7 @@ namespace MinorShift.Emuera.Sub
 					b = reader.ReadByte();
 					if (b == Ebdb.EoD)
 						break;
-					if (b == Ebdb.ZeroA2)//cnt分だけ空のline列が連続
+					if (b == Ebdb.ZeroA2)//cnt分だけ空の行列が連続
 					{
 						int cnt = (int)m_ReadInt();
 						if (needInit)
@@ -395,7 +395,7 @@ namespace MinorShift.Emuera.Sub
 						z = 0;
 						continue;
 					}
-					if (b == Ebdb.EoA2)//line列終わりor残りがall0
+					if (b == Ebdb.EoA2)//行列終わりor残りが全て0
 					{
 						if (needInit)
 						{
@@ -423,7 +423,7 @@ namespace MinorShift.Emuera.Sub
 						z = 0;
 						continue;
 					}
-					if (b == Ebdb.EoA1)//列終わりor残りall0
+					if (b == Ebdb.EoA1)//列終わりor残り全て0
 					{
 						if (needInit)
 							for (; z < length2; z++)
@@ -451,7 +451,7 @@ namespace MinorShift.Emuera.Sub
 					else if (b == Ebdb.Int64)
 						refArray[x, y, z] = reader.ReadInt64();
 					else
-						throw new FileEE("バイナリdataの異常");
+						throw new FileEE("バイナリデータの異常");
 					z++;
 				}
 				if (needInit)
@@ -483,16 +483,16 @@ namespace MinorShift.Emuera.Sub
 				byte b;
 				int x = 0;
 				int saveLength0 = reader.ReadInt32();
-				if (refArray == null)//読み捨て.レアケースのはず
+				if (refArray == null)//読み捨て。レアケースのはず
 					refArray = new string[saveLength0];
 
 				int length0 = refArray.Length;
 
-				//保存されたdataの方が大きいとき.レアケースのはず
+				//保存されたデータの方が大きいとき。レアケースのはず
 				if (length0 < saveLength0)
 				{
                     oriArray = refArray;
-                    //1818修正 サイズ違いのwhenにあふれnotように/arrayは最大until確保,作業doのは重複部分だけ
+                    //1818修正 サイズ違いの時にあふれないように/配列は最大まで確保、作業するのは重複部分だけ
                     refArray = new string[Math.Max(length0, saveLength0)];
 
                     length0 = Math.Min(length0, saveLength0);
@@ -514,7 +514,7 @@ namespace MinorShift.Emuera.Sub
 					if (b == Ebdb.String)
 						refArray[x] = ReadString();
 					else
-						throw new FileEE("バイナリdataの異常");
+						throw new FileEE("バイナリデータの異常");
 					x++;
 				}
 				if (needInit)
@@ -543,7 +543,7 @@ namespace MinorShift.Emuera.Sub
 				if (length0 < saveLength0 || length1 < saveLength1)
 				{
                     oriArray = refArray;
-                    //1818修正 サイズ違いのwhenにあふれnotように/arrayは最大until確保,作業doのは重複部分だけ
+                    //1818修正 サイズ違いの時にあふれないように/配列は最大まで確保、作業するのは重複部分だけ
                     refArray = new string[Math.Max(length0, saveLength0), Math.Max(length1, saveLength1)];
 
                     length0 = Math.Min(length0, saveLength0);
@@ -588,7 +588,7 @@ namespace MinorShift.Emuera.Sub
 					if (b == Ebdb.String)
 						refArray[x, y] = ReadString();
 					else
-						throw new FileEE("バイナリdataの異常");
+						throw new FileEE("バイナリデータの異常");
 					y++;
 				}
 				if (needInit)
@@ -627,7 +627,7 @@ namespace MinorShift.Emuera.Sub
 				if (length0 < saveLength0 || length1 < saveLength1 || length2 < saveLength2)
 				{
                     oriArray = refArray;
-                    //1818修正 サイズ違いのwhenにあふれnotように/arrayは最大until確保,作業doのは重複部分だけ
+                    //1818修正 サイズ違いの時にあふれないように/配列は最大まで確保、作業するのは重複部分だけ
                     refArray = new string[Math.Max(length0, saveLength0), Math.Max(length1, saveLength1), Math.Max(length2, saveLength2)];
 
                     length0 = Math.Min(length0, saveLength0);
@@ -640,7 +640,7 @@ namespace MinorShift.Emuera.Sub
 					b = reader.ReadByte();
 					if (b == Ebdb.EoD)
 						break;
-					if (b == Ebdb.ZeroA2)//cnt分だけ空のline列が連続
+					if (b == Ebdb.ZeroA2)//cnt分だけ空の行列が連続
 					{
 						int cnt = (int)m_ReadInt();
 						if (needInit)
@@ -653,7 +653,7 @@ namespace MinorShift.Emuera.Sub
 						z = 0;
 						continue;
 					}
-					if (b == Ebdb.EoA2)//line列終わりor残りがall0
+					if (b == Ebdb.EoA2)//行列終わりor残りが全て0
 					{
 						if (needInit)
 						{
@@ -681,7 +681,7 @@ namespace MinorShift.Emuera.Sub
 						z = 0;
 						continue;
 					}
-					if (b == Ebdb.EoA1)//列終わりor残りall0
+					if (b == Ebdb.EoA1)//列終わりor残り全て0
 					{
 						if (needInit)
 							for (; z < length2; z++)
@@ -703,7 +703,7 @@ namespace MinorShift.Emuera.Sub
 					if (b == Ebdb.String)
 						refArray[x, y, z] = ReadString();
 					else
-						throw new FileEE("バイナリdataの異常");
+						throw new FileEE("バイナリデータの異常");
 					z++;
 				}
 				if (needInit)

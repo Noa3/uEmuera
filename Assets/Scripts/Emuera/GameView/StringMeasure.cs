@@ -11,8 +11,8 @@ namespace MinorShift.Emuera.GameView
 {
 
 	/// <summary>
-	/// text長計測装置
-	/// 1819 必要になるたびにCreateGraphicsdo方式をやめてあらかじめGraphicsをfor意しておくthisにdo
+	/// テキスト長計測装置
+	/// 1819 必要になるたびにCreateGraphicsする方式をやめてあらかじめGraphicsを用意しておくことにする
 	/// </summary>
 	internal sealed class StringMeasure : IDisposable
 	{
@@ -21,7 +21,7 @@ namespace MinorShift.Emuera.GameView
 			textDrawingMode = Config.TextDrawingMode;
 			//layoutSize = new Size(Config.WindowX * 2, Config.LineHeight);
 			//layoutRect = new RectangleF(0, 0, Config.WindowX * 2, Config.LineHeight);
-			//fontDisplaySize = Config.Font.Size / 2 * 1.04f;//実際には指定したフォントthan若干幅をとる？
+			//fontDisplaySize = Config.Font.Size / 2 * 1.04f;//実際には指定したフォントより若干幅をとる？
 			////bmp = new Bitmap(Config.WindowX, Config.LineHeight, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
 			//bmp = new Bitmap(16, 16, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
 			//graph = Graphics.FromImage(bmp);
@@ -66,7 +66,7 @@ namespace MinorShift.Emuera.GameView
             //	Size size = GDI.MeasureText(s, font);
             //	return size.Width;
             //}
-            ////来るreasonがnot
+            ////来るわけがない
             ////else
             ////    throw new ExeEE("描画モード不明");
 

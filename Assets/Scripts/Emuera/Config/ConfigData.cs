@@ -37,109 +37,109 @@ static ConfigData() { }
 		private void setDefault()
 		{
 			int i = 0;
-			configArray[i++] = new ConfigItem<bool>(ConfigCode.IgnoreCase, "大文字小文字の違いignore do", true);
-			configArray[i++] = new ConfigItem<bool>(ConfigCode.UseRenameFile, "_Rename.csvを利fordo", false);
-			configArray[i++] = new ConfigItem<bool>(ConfigCode.UseReplaceFile, "_Replace.csvを利fordo", true);
-			configArray[i++] = new ConfigItem<bool>(ConfigCode.UseMouse, "マウスをusedo", true);
-			configArray[i++] = new ConfigItem<bool>(ConfigCode.UseMenu, "メニューをusedo", true);
-			configArray[i++] = new ConfigItem<bool>(ConfigCode.UseDebugCommand, "debugcommandをusedo", false);
-			configArray[i++] = new ConfigItem<bool>(ConfigCode.AllowMultipleInstances, "多重起動をallowdo", true);
-			configArray[i++] = new ConfigItem<bool>(ConfigCode.AutoSave, "オートsaveをlineなう", true);
-			configArray[i++] = new ConfigItem<bool>(ConfigCode.UseKeyMacro, "keyボードマクロをusedo", true);
-			configArray[i++] = new ConfigItem<bool>(ConfigCode.SizableWindow, "windowのheightさを可変にdo", true);
+			configArray[i++] = new ConfigItem<bool>(ConfigCode.IgnoreCase, "大文字小文字の違いを無視する", true);
+			configArray[i++] = new ConfigItem<bool>(ConfigCode.UseRenameFile, "_Rename.csvを利用する", false);
+			configArray[i++] = new ConfigItem<bool>(ConfigCode.UseReplaceFile, "_Replace.csvを利用する", true);
+			configArray[i++] = new ConfigItem<bool>(ConfigCode.UseMouse, "マウスを使用する", true);
+			configArray[i++] = new ConfigItem<bool>(ConfigCode.UseMenu, "メニューを使用する", true);
+			configArray[i++] = new ConfigItem<bool>(ConfigCode.UseDebugCommand, "デバッグコマンドを使用する", false);
+			configArray[i++] = new ConfigItem<bool>(ConfigCode.AllowMultipleInstances, "多重起動を許可する", true);
+			configArray[i++] = new ConfigItem<bool>(ConfigCode.AutoSave, "オートセーブを行なう", true);
+			configArray[i++] = new ConfigItem<bool>(ConfigCode.UseKeyMacro, "キーボードマクロを使用する", true);
+			configArray[i++] = new ConfigItem<bool>(ConfigCode.SizableWindow, "ウィンドウの高さを可変にする", true);
 			configArray[i++] = new ConfigItem<TextDrawingMode>(ConfigCode.TextDrawingMode, "描画インターフェース", TextDrawingMode.TEXTRENDERER);
-			//configArray[i++] = new ConfigItem<bool>(ConfigCode.UseImageBuffer, "イメージバッファをusedo", true);
-			configArray[i++] = new ConfigItem<int>(ConfigCode.WindowX, "window幅", 760);
-			configArray[i++] = new ConfigItem<int>(ConfigCode.WindowY, "windowheightさ", 480);
-			configArray[i++] = new ConfigItem<int>(ConfigCode.WindowPosX, "window位置X", 0);
-			configArray[i++] = new ConfigItem<int>(ConfigCode.WindowPosY, "window位置Y", 0);
-			configArray[i++] = new ConfigItem<bool>(ConfigCode.SetWindowPos, "起動whenのwindow位置を指定do", false);
-			configArray[i++] = new ConfigItem<bool>(ConfigCode.WindowMaximixed, "起動whenにwindowを最大化do", false);
-			configArray[i++] = new ConfigItem<int>(ConfigCode.MaxLog, "履歴ログのline数", 5000);
+			//configArray[i++] = new ConfigItem<bool>(ConfigCode.UseImageBuffer, "イメージバッファを使用する", true);
+			configArray[i++] = new ConfigItem<int>(ConfigCode.WindowX, "ウィンドウ幅", 760);
+			configArray[i++] = new ConfigItem<int>(ConfigCode.WindowY, "ウィンドウ高さ", 480);
+			configArray[i++] = new ConfigItem<int>(ConfigCode.WindowPosX, "ウィンドウ位置X", 0);
+			configArray[i++] = new ConfigItem<int>(ConfigCode.WindowPosY, "ウィンドウ位置Y", 0);
+			configArray[i++] = new ConfigItem<bool>(ConfigCode.SetWindowPos, "起動時のウィンドウ位置を指定する", false);
+			configArray[i++] = new ConfigItem<bool>(ConfigCode.WindowMaximixed, "起動時にウィンドウを最大化する", false);
+			configArray[i++] = new ConfigItem<int>(ConfigCode.MaxLog, "履歴ログの行数", 5000);
 			configArray[i++] = new ConfigItem<int>(ConfigCode.PrintCPerLine, "PRINTCを並べる数", 3);
 			configArray[i++] = new ConfigItem<int>(ConfigCode.PrintCLength, "PRINTCの文字数", 25);
 			configArray[i++] = new ConfigItem<string>(ConfigCode.FontName, "フォント名", "ＭＳ ゴシック");
 			configArray[i++] = new ConfigItem<int>(ConfigCode.FontSize, "フォントサイズ", 18);
-			configArray[i++] = new ConfigItem<int>(ConfigCode.LineHeight, "一lineのheightさ", 19);
+			configArray[i++] = new ConfigItem<int>(ConfigCode.LineHeight, "一行の高さ", 19);
 			configArray[i++] = new ConfigItem<Color>(ConfigCode.ForeColor, "文字色", Color.FromArgb(192, 192, 192));//LIGHTGRAY
 			configArray[i++] = new ConfigItem<Color>(ConfigCode.BackColor, "背景色", Color.FromArgb(0, 0, 0));//BLACK
-			configArray[i++] = new ConfigItem<Color>(ConfigCode.FocusColor, "選択inside文字色", Color.FromArgb(255, 255, 0));//YELLOW
+			configArray[i++] = new ConfigItem<Color>(ConfigCode.FocusColor, "選択中文字色", Color.FromArgb(255, 255, 0));//YELLOW
 			configArray[i++] = new ConfigItem<Color>(ConfigCode.LogColor, "履歴文字色", Color.FromArgb(192, 192, 192));//LIGHTGRAY//Color.FromArgb(128, 128, 128);//GRAY
 			configArray[i++] = new ConfigItem<int>(ConfigCode.FPS, "フレーム毎秒", 5);
 			configArray[i++] = new ConfigItem<int>(ConfigCode.SkipFrame, "最大スキップフレーム数", 3);
-			configArray[i++] = new ConfigItem<int>(ConfigCode.ScrollHeight, "スクロールline数", 1);
-			configArray[i++] = new ConfigItem<int>(ConfigCode.InfiniteLoopAlertTime, "無限ループwarninguntilのミリ秒数", 5000);
-			configArray[i++] = new ConfigItem<int>(ConfigCode.DisplayWarningLevel, "displaydo最低warningレベル", 1);
-			configArray[i++] = new ConfigItem<bool>(ConfigCode.DisplayReport, "loadwhenにレポートをdisplaydo", false);
-			configArray[i++] = new ConfigItem<ReduceArgumentOnLoadFlag>(ConfigCode.ReduceArgumentOnLoad, "loadwhenにargumentをparsedo", ReduceArgumentOnLoadFlag.NO);
-			//configArray[i++] = new ConfigItem<bool>(ConfigCode.ReduceFormattedStringOnLoad, "loadwhenにFORMstringをparsedo", true);
-			configArray[i++] = new ConfigItem<bool>(ConfigCode.IgnoreUncalledFunction, "呼び出されなかったfunctionignore do", true);
-			configArray[i++] = new ConfigItem<DisplayWarningFlag>(ConfigCode.FunctionNotFoundWarning, "functionが見つfromnotwarningの扱い", DisplayWarningFlag.IGNORE);
-			configArray[i++] = new ConfigItem<DisplayWarningFlag>(ConfigCode.FunctionNotCalledWarning, "functionが呼び出されなかったwarningの扱い", DisplayWarningFlag.IGNORE);
-			//configArray[i++] = new ConfigItem<List<string>>(ConfigCode.IgnoreWarningFiles, "指定したfileinsideのwarningignore do", new List<string>());
-			configArray[i++] = new ConfigItem<bool>(ConfigCode.ChangeMasterNameIfDebug, "debugcommandをuseしたwhenにMASTERのnameを変更do", true);
-			configArray[i++] = new ConfigItem<bool>(ConfigCode.ButtonWrap, "buttonの途insideでlineを折りかえさnot", false);
-			configArray[i++] = new ConfigItem<bool>(ConfigCode.SearchSubdirectory, "サブdirectoryを検索do", false);
-			configArray[i++] = new ConfigItem<bool>(ConfigCode.SortWithFilename, "loading順をfile名順にソートdo", false);
-			configArray[i++] = new ConfigItem<long>(ConfigCode.LastKey, "最終updateコード", 0);
-			configArray[i++] = new ConfigItem<int>(ConfigCode.SaveDataNos, "displaydosavedata数", 20);
-			configArray[i++] = new ConfigItem<bool>(ConfigCode.WarnBackCompatibility, "eramaker互換性に関dowarningをdisplaydo", true);
-			configArray[i++] = new ConfigItem<bool>(ConfigCode.AllowFunctionOverloading, "systemfunctionのabove書きをallowdo", true);
-			configArray[i++] = new ConfigItem<bool>(ConfigCode.WarnFunctionOverloading, "systemfunctionがabove書きされたときwarningをdisplaydo", true);
-			configArray[i++] = new ConfigItem<string>(ConfigCode.TextEditor, "関連づけるtextエディタ", "notepad");
-            configArray[i++] = new ConfigItem<TextEditorType>(ConfigCode.EditorType, "textエディタcommandライン指定", TextEditorType.USER_SETTING);
-			configArray[i++] = new ConfigItem<string>(ConfigCode.EditorArgument, "エディタに渡すline指定argument", "");
-			configArray[i++] = new ConfigItem<bool>(ConfigCode.WarnNormalFunctionOverloading, "同名の非eventfunctionが複数definitionされたときwarningdo", false);
-			configArray[i++] = new ConfigItem<bool>(ConfigCode.CompatiErrorLine, "解釈不possibleなlineがあっても実linedo", false);
-			configArray[i++] = new ConfigItem<bool>(ConfigCode.CompatiCALLNAME, "CALLNAMEが空stringのwhenにNAMEを代入do", false);
-			configArray[i++] = new ConfigItem<bool>(ConfigCode.UseSaveFolder, "savedataをsavfolderinにcreatedo", false);
-			configArray[i++] = new ConfigItem<bool>(ConfigCode.CompatiRAND, "擬似variableRANDの仕様をeramakerに合わせる", false);
-			configArray[i++] = new ConfigItem<bool>(ConfigCode.CompatiDRAWLINE, "DRAWLINEを常に新しいlineでlineう", false);
-			configArray[i++] = new ConfigItem<bool>(ConfigCode.CompatiFunctionNoignoreCase, "function-attributeについては大文字小文字ignore しnot", false); ;
+			configArray[i++] = new ConfigItem<int>(ConfigCode.ScrollHeight, "スクロール行数", 1);
+			configArray[i++] = new ConfigItem<int>(ConfigCode.InfiniteLoopAlertTime, "無限ループ警告までのミリ秒数", 5000);
+			configArray[i++] = new ConfigItem<int>(ConfigCode.DisplayWarningLevel, "表示する最低警告レベル", 1);
+			configArray[i++] = new ConfigItem<bool>(ConfigCode.DisplayReport, "ロード時にレポートを表示する", false);
+			configArray[i++] = new ConfigItem<ReduceArgumentOnLoadFlag>(ConfigCode.ReduceArgumentOnLoad, "ロード時にargumentを解析する", ReduceArgumentOnLoadFlag.NO);
+			//configArray[i++] = new ConfigItem<bool>(ConfigCode.ReduceFormattedStringOnLoad, "ロード時にFORM文字列を解析する", true);
+			configArray[i++] = new ConfigItem<bool>(ConfigCode.IgnoreUncalledFunction, "呼び出されなかった関数を無視する", true);
+			configArray[i++] = new ConfigItem<DisplayWarningFlag>(ConfigCode.FunctionNotFoundWarning, "関数が見つからない警告の扱い", DisplayWarningFlag.IGNORE);
+			configArray[i++] = new ConfigItem<DisplayWarningFlag>(ConfigCode.FunctionNotCalledWarning, "関数が呼び出されなかった警告の扱い", DisplayWarningFlag.IGNORE);
+			//configArray[i++] = new ConfigItem<List<string>>(ConfigCode.IgnoreWarningFiles, "指定したファイル中の警告を無視する", new List<string>());
+			configArray[i++] = new ConfigItem<bool>(ConfigCode.ChangeMasterNameIfDebug, "デバッグコマンドを使用した時にMASTERの名前を変更する", true);
+			configArray[i++] = new ConfigItem<bool>(ConfigCode.ButtonWrap, "ボタンの途中で行を折りかえさない", false);
+			configArray[i++] = new ConfigItem<bool>(ConfigCode.SearchSubdirectory, "サブディレクトリを検索する", false);
+			configArray[i++] = new ConfigItem<bool>(ConfigCode.SortWithFilename, "読み込み順をファイル名順にソートする", false);
+			configArray[i++] = new ConfigItem<long>(ConfigCode.LastKey, "最終更新コード", 0);
+			configArray[i++] = new ConfigItem<int>(ConfigCode.SaveDataNos, "表示するセーブデータ数", 20);
+			configArray[i++] = new ConfigItem<bool>(ConfigCode.WarnBackCompatibility, "eramaker互換性に関する警告を表示する", true);
+			configArray[i++] = new ConfigItem<bool>(ConfigCode.AllowFunctionOverloading, "システム関数の上書きを許可する", true);
+			configArray[i++] = new ConfigItem<bool>(ConfigCode.WarnFunctionOverloading, "システム関数が上書きされたとき警告を表示する", true);
+			configArray[i++] = new ConfigItem<string>(ConfigCode.TextEditor, "関連づけるテキストエディタ", "notepad");
+            configArray[i++] = new ConfigItem<TextEditorType>(ConfigCode.EditorType, "テキストエディタコマンドライン指定", TextEditorType.USER_SETTING);
+			configArray[i++] = new ConfigItem<string>(ConfigCode.EditorArgument, "エディタに渡す行指定argument", "");
+			configArray[i++] = new ConfigItem<bool>(ConfigCode.WarnNormalFunctionOverloading, "同名の非イベント関数が複数定義されたとき警告する", false);
+			configArray[i++] = new ConfigItem<bool>(ConfigCode.CompatiErrorLine, "解釈不可能な行があっても実行する", false);
+			configArray[i++] = new ConfigItem<bool>(ConfigCode.CompatiCALLNAME, "CALLNAMEが空文字列の時にNAMEを代入する", false);
+			configArray[i++] = new ConfigItem<bool>(ConfigCode.UseSaveFolder, "セーブデータをsavフォルダ内に作成する", false);
+			configArray[i++] = new ConfigItem<bool>(ConfigCode.CompatiRAND, "擬似変数RANDの仕様をeramakerに合わせる", false);
+			configArray[i++] = new ConfigItem<bool>(ConfigCode.CompatiDRAWLINE, "DRAWLINEを常に新しい行で行う", false);
+			configArray[i++] = new ConfigItem<bool>(ConfigCode.CompatiFunctionNoignoreCase, "関数・属性については大文字小文字を無視しない", false); ;
 			configArray[i++] = new ConfigItem<bool>(ConfigCode.SystemAllowFullSpace, "全角スペースをホワイトスペースに含める", true);
-			configArray[i++] = new ConfigItem<bool>(ConfigCode.SystemSaveInUTF8, "savedataをUTF-8で保存do", false);
-			configArray[i++] = new ConfigItem<bool>(ConfigCode.CompatiLinefeedAs1739, "ver1739以previous 非button折り返しを再現do", false);
-            configArray[i++] = new ConfigItem<UseLanguage>(ConfigCode.useLanguage, "in部でusedo東アジア言語", UseLanguage.JAPANESE);
-            configArray[i++] = new ConfigItem<bool>(ConfigCode.AllowLongInputByMouse, "ONEINPUT系命令でマウスによる2文字以aboveのinputをallowdo", false);
-			configArray[i++] = new ConfigItem<bool>(ConfigCode.CompatiCallEvent, "eventfunctionのCALLをallowdo", false);
-			configArray[i++] = new ConfigItem<bool>(ConfigCode.CompatiSPChara, "SPキャラをusedo", false);
+			configArray[i++] = new ConfigItem<bool>(ConfigCode.SystemSaveInUTF8, "セーブデータをUTF-8で保存する", false);
+			configArray[i++] = new ConfigItem<bool>(ConfigCode.CompatiLinefeedAs1739, "ver1739以前の非ボタン折り返しを再現する", false);
+            configArray[i++] = new ConfigItem<UseLanguage>(ConfigCode.useLanguage, "内部で使用する東アジア言語", UseLanguage.JAPANESE);
+            configArray[i++] = new ConfigItem<bool>(ConfigCode.AllowLongInputByMouse, "ONEINPUT系命令でマウスによる2文字以上の入力を許可する", false);
+			configArray[i++] = new ConfigItem<bool>(ConfigCode.CompatiCallEvent, "イベント関数のCALLを許可する", false);
+			configArray[i++] = new ConfigItem<bool>(ConfigCode.CompatiSPChara, "SPキャラを使用する", false);
 			
-			configArray[i++] = new ConfigItem<bool>(ConfigCode.SystemSaveInBinary, "savedataをバイナリ形式で保存do", false);
-			configArray[i++] = new ConfigItem<bool>(ConfigCode.CompatiFuncArgOptional, "ユーザーfunctionのallのargumentの省略をallowdo", false);
-			configArray[i++] = new ConfigItem<bool>(ConfigCode.CompatiFuncArgAutoConvert, "ユーザーfunctionのargumentに自動的にTOSTRを補完do", false);
-			configArray[i++] = new ConfigItem<bool>(ConfigCode.SystemIgnoreTripleSymbol, "FORMinsideの三連記号を展開しnot", false);
-            configArray[i++] = new ConfigItem<bool>(ConfigCode.TimesNotRigorousCalculation, "TIMESのcalculateをeramakerにあわせる", false);
-            //一文字variableのprohibitedoptionを考えた名残
-			//configArray[i++] = new ConfigItem<bool>(ConfigCode.ForbidOneCodeVariable, "一文字variableのuseをprohibiteddo", false);
-			configArray[i++] = new ConfigItem<bool>(ConfigCode.SystemNoTarget, "charactervariableのargumentを補完しnot", false);
-			configArray[i++] = new ConfigItem<bool>(ConfigCode.SystemIgnoreStringSet, "stringvariableの代入にstring式を強制do", false);
+			configArray[i++] = new ConfigItem<bool>(ConfigCode.SystemSaveInBinary, "セーブデータをバイナリ形式で保存する", false);
+			configArray[i++] = new ConfigItem<bool>(ConfigCode.CompatiFuncArgOptional, "ユーザー関数の全てのargumentの省略を許可する", false);
+			configArray[i++] = new ConfigItem<bool>(ConfigCode.CompatiFuncArgAutoConvert, "ユーザー関数のargumentに自動的にTOSTRを補完する", false);
+			configArray[i++] = new ConfigItem<bool>(ConfigCode.SystemIgnoreTripleSymbol, "FORM中の三連記号を展開しない", false);
+            configArray[i++] = new ConfigItem<bool>(ConfigCode.TimesNotRigorousCalculation, "TIMESの計算をeramakerにあわせる", false);
+            //一文字変数の禁止オプションを考えた名残
+			//configArray[i++] = new ConfigItem<bool>(ConfigCode.ForbidOneCodeVariable, "一文字変数の使用を禁止する", false);
+			configArray[i++] = new ConfigItem<bool>(ConfigCode.SystemNoTarget, "キャラクタ変数のargumentを補完しない", false);
+			configArray[i++] = new ConfigItem<bool>(ConfigCode.SystemIgnoreStringSet, "文字列変数の代入に文字列式を強制する", false);
 
 			i = 0;
-			debugArray[i++] = new ConfigItem<bool>(ConfigCode.DebugShowWindow, "起動whenにdebugウインドウをdisplaydo", true);
-			debugArray[i++] = new ConfigItem<bool>(ConfigCode.DebugWindowTopMost, "debugウインドウを最前面にdisplaydo", true);
-			debugArray[i++] = new ConfigItem<int>(ConfigCode.DebugWindowWidth, "debugwindow幅", 400);
-			debugArray[i++] = new ConfigItem<int>(ConfigCode.DebugWindowHeight, "debugwindowheightさ", 300);
-			debugArray[i++] = new ConfigItem<bool>(ConfigCode.DebugSetWindowPos, "debugwindow位置を指定do", false);
-			debugArray[i++] = new ConfigItem<int>(ConfigCode.DebugWindowPosX, "debugwindow位置X", 0);
-			debugArray[i++] = new ConfigItem<int>(ConfigCode.DebugWindowPosY, "debugwindow位置Y", 0);
+			debugArray[i++] = new ConfigItem<bool>(ConfigCode.DebugShowWindow, "起動時にデバッグウインドウを表示する", true);
+			debugArray[i++] = new ConfigItem<bool>(ConfigCode.DebugWindowTopMost, "デバッグウインドウを最前面に表示する", true);
+			debugArray[i++] = new ConfigItem<int>(ConfigCode.DebugWindowWidth, "デバッグウィンドウ幅", 400);
+			debugArray[i++] = new ConfigItem<int>(ConfigCode.DebugWindowHeight, "デバッグウィンドウ高さ", 300);
+			debugArray[i++] = new ConfigItem<bool>(ConfigCode.DebugSetWindowPos, "デバッグウィンドウ位置を指定する", false);
+			debugArray[i++] = new ConfigItem<int>(ConfigCode.DebugWindowPosX, "デバッグウィンドウ位置X", 0);
+			debugArray[i++] = new ConfigItem<int>(ConfigCode.DebugWindowPosY, "デバッグウィンドウ位置Y", 0);
 
 			i = 0;
 			replaceArray[i++] = new ConfigItem<string>(ConfigCode.MoneyLabel, "お金の単位", "$");
 			replaceArray[i++] = new ConfigItem<bool>(ConfigCode.MoneyFirst, "単位の位置", true);
-			replaceArray[i++] = new ConfigItem<string>(ConfigCode.LoadLabel, "起動when簡略display", "Now Loading...");
+			replaceArray[i++] = new ConfigItem<string>(ConfigCode.LoadLabel, "起動時簡略表示", "Now Loading...");
 			replaceArray[i++] = new ConfigItem<int>(ConfigCode.MaxShopItem, "販売アイテム数", 100);
 			replaceArray[i++] = new ConfigItem<string>(ConfigCode.DrawLineString, "DRAWLINE文字", "-");
 			replaceArray[i++] = new ConfigItem<char>(ConfigCode.BarChar1, "BAR文字1", '*');
 			replaceArray[i++] = new ConfigItem<char>(ConfigCode.BarChar2, "BAR文字2", '.');
-			replaceArray[i++] = new ConfigItem<string>(ConfigCode.TitleMenuString0, "systemメニュー0", "最初fromはじめる");
-			replaceArray[i++] = new ConfigItem<string>(ConfigCode.TitleMenuString1, "systemメニュー1", "loadしてはじめる");
-			replaceArray[i++] = new ConfigItem<int>(ConfigCode.ComAbleDefault, "COM_ABLEinitialvalue", 1);
-			replaceArray[i++] = new ConfigItem<List<Int64>>(ConfigCode.StainDefault, "汚れのinitialvalue", new List<Int64>(new Int64[] { 0, 0, 2, 1, 8 }));
-			replaceArray[i++] = new ConfigItem<string>(ConfigCode.TimeupLabel, "when間切れdisplay", "when間切れ");
-			replaceArray[i++] = new ConfigItem<List<Int64>>(ConfigCode.ExpLvDef, "EXPLVのinitialvalue", new List<long>(new Int64[] { 0, 1, 4, 20, 50, 200 }));
-			replaceArray[i++] = new ConfigItem<List<Int64>>(ConfigCode.PalamLvDef, "PALAMLVのinitialvalue", new List<long>(new Int64[] { 0, 100, 500, 3000, 10000, 30000, 60000, 100000, 150000, 250000 }));
-			replaceArray[i++] = new ConfigItem<Int64>(ConfigCode.pbandDef, "PBANDのinitialvalue", 4);
-            replaceArray[i++] = new ConfigItem<Int64>(ConfigCode.RelationDef, "RELATIONのinitialvalue", 0);
+			replaceArray[i++] = new ConfigItem<string>(ConfigCode.TitleMenuString0, "システムメニュー0", "最初からはじめる");
+			replaceArray[i++] = new ConfigItem<string>(ConfigCode.TitleMenuString1, "システムメニュー1", "ロードしてはじめる");
+			replaceArray[i++] = new ConfigItem<int>(ConfigCode.ComAbleDefault, "COM_ABLE初期値", 1);
+			replaceArray[i++] = new ConfigItem<List<Int64>>(ConfigCode.StainDefault, "汚れの初期値", new List<Int64>(new Int64[] { 0, 0, 2, 1, 8 }));
+			replaceArray[i++] = new ConfigItem<string>(ConfigCode.TimeupLabel, "時間切れ表示", "時間切れ");
+			replaceArray[i++] = new ConfigItem<List<Int64>>(ConfigCode.ExpLvDef, "EXPLVの初期値", new List<long>(new Int64[] { 0, 1, 4, 20, 50, 200 }));
+			replaceArray[i++] = new ConfigItem<List<Int64>>(ConfigCode.PalamLvDef, "PALAMLVの初期値", new List<long>(new Int64[] { 0, 100, 500, 3000, 10000, 30000, 60000, 100000, 150000, 250000 }));
+			replaceArray[i++] = new ConfigItem<Int64>(ConfigCode.pbandDef, "PBANDの初期値", 4);
+            replaceArray[i++] = new ConfigItem<Int64>(ConfigCode.RelationDef, "RELATIONの初期値", 0);
 		}
 
         public void Clear()
@@ -532,7 +532,7 @@ static ConfigData() { }
 					}
 #if UEMUERA_DEBUG
 					//else
-					//	throw new Exception("configfileが変");
+					//	throw new Exception("コンフィグファイルが変");
 #endif
 				}
 			}
@@ -644,7 +644,7 @@ static ConfigData() { }
 					}
 #if UEMUERA_DEBUG
 					//else
-					//	throw new Exception("configfileが変");
+					//	throw new Exception("コンフィグファイルが変");
 #endif
 				}
 			}

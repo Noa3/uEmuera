@@ -8,14 +8,14 @@ namespace MinorShift.Emuera.GameData.Expression
 	{
 		
 		//単項 > "*/%" > "+-" > 比較                > ビット演算  > 論理演算 > 代入
-		//xx   > 90    > 80   > 65,60(不等価優ahead)   > 50          > 40       > xx
-		//優ahead順は本家に準拠
+		//xx   > 90    > 80   > 65,60(不等価優先)   > 50          > 40       > xx
+		//優先順は本家に準拠
 		NULL = 0,
 		__PRIORITY_MASK__ = 0xFF,
 		__UNARY__ = 0x10000,//単項
 		__BINARY__ =  0x20000,//2項
         __TERNARY__ = 0x40000,//3項
-		__UNARY_AFTER__ = 0x80000,//after置単項
+		__UNARY_AFTER__ = 0x80000,//後置単項
 		Plus = 0x0100 + 0x80 | __UNARY__ | __BINARY__,//"+"単項可
 		Minus = 0x0200 + 0x80 | __UNARY__ | __BINARY__,//"-"
 		Mult = 0x0300 + 0x90 | __BINARY__,//"*"
@@ -37,14 +37,14 @@ namespace MinorShift.Emuera.GameData.Expression
         Nor = 0x1700 + 0x40 | __BINARY__,//"!^"
 		BitAnd = 0x0E00 + 0x50 | __BINARY__,//"&"
 		BitOr = 0x0F00 + 0x50 | __BINARY__,//"|"
-		BitXor = 0x1000 + 0x50 | __BINARY__,//"^",優ahead順位は&と|のinside間.
+		BitXor = 0x1000 + 0x50 | __BINARY__,//"^"、優先順位は&と|の中間。
 		Not = 0x1100 | __UNARY__,//"!"単項
 		BitNot = 0x1200 | __UNARY__,//"~"単項
 		RightShift = 0x1300 + 0x70 | __BINARY__,//">>"
 		LeftShift = 0x1400 + 0x70 | __BINARY__,//"<<"
 
-        Ternary_a = 0x1800 + 0x05 | __TERNARY__,//"?",三項演算子
-        Ternary_b = 0x1900 + 0x10 | __TERNARY__,//"#",三項演算子区切り":"が使えnotのでかわり
+        Ternary_a = 0x1800 + 0x05 | __TERNARY__,//"?"、三項演算子
+        Ternary_b = 0x1900 + 0x10 | __TERNARY__,//"#"、三項演算子区切り":"が使えないのでかわり
 
 
 		Assignment = 0x0100 + 0xFE,//"="
@@ -120,7 +120,7 @@ namespace MinorShift.Emuera.GameData.Expression
         }
 
 		/// <summary>
-		/// 大きい方が優ahead度がheightい. '&' < '+' < '*'等
+		/// 大きい方が優先度が高い。 '&' < '+' < '*'等
 		/// </summary>
 		/// <param name="type"></param>
 		/// <returns></returns>

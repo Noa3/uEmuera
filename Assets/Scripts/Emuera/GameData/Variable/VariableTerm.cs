@@ -126,7 +126,7 @@ namespace MinorShift.Emuera.GameData.Variable
 				if ((e is IndexOutOfRangeException) || (e is ArgumentOutOfRangeException) || (e is OverflowException))
 				{
 					Identifier.CheckElement(transporter);
-					throw new CodeEE("arrayvariable" + Identifier.Name + "の要素数を超えて代入attempted to");
+					throw new CodeEE("配列変数" + Identifier.Name + "の要素数を超えて代入しようとしました");
 				}
 				throw;
 			}
@@ -145,7 +145,7 @@ namespace MinorShift.Emuera.GameData.Variable
 				if ((e is IndexOutOfRangeException) || (e is ArgumentOutOfRangeException) || (e is OverflowException))
 				{
 					Identifier.CheckElement(transporter);
-					throw new CodeEE("arrayvariable" + Identifier.Name + "の要素数を超えて代入attempted to");
+					throw new CodeEE("配列変数" + Identifier.Name + "の要素数を超えて代入しようとしました");
 				}
 				throw;
 			}
@@ -236,14 +236,14 @@ namespace MinorShift.Emuera.GameData.Variable
 				}
 				else
 				{
-					//characterーdataの第1argumentはこのwhenpointでチェックしても意味がnotのと
-					//ARG系は限界超えてても必要な数に拡張be doneのでチェックしなくていい
+					//キャラクターデータの第1argumentはこの時点でチェックしても意味がないのと
+					//ARG系は限界超えてても必要な数に拡張されるのでチェックしなくていい
 					if ((i == 0 && Identifier.IsCharacterData) || Identifier.Name == "ARG" || Identifier.Name == "ARGS")
 						canCheck[i] = false;
 					else
 						canCheck[i] = true;
 					//if (allArgIsConst)
-					//チェックのbecauseにvalueが必要
+					//チェックのために値が必要
 					transporter[i] = arguments[i].GetIntValue(exm);
 				}
 			}
@@ -256,10 +256,10 @@ namespace MinorShift.Emuera.GameData.Variable
 			return this;
 		}
 
-        //以below添え字parseforのaddfunction
+        //以下添え字解析用の追加関数
         public bool checkSameTerm(VariableTerm term)
         {
-            //添え字が全部定数がexistthisがこのfunctionの前提(そもそもそうでnotと使い道がnot)
+            //添え字が全部定数があることがこの関数の前提(そもそもそうでないと使い道がない)
             if (!allArgIsConst)
                 return false;
             if (this.Identifier.Name != term.Identifier.Name)
@@ -277,7 +277,7 @@ namespace MinorShift.Emuera.GameData.Variable
 
         public string GetFullString()
         {
-            //添え字が全部定数がexistthisがこのfunctionの前提(IOperandTermfromvariable名を取れnotbecause)
+            //添え字が全部定数があることがこの関数の前提(IOperandTermから変数名を取れないため)
             if (!allArgIsConst)
                 return "";
             if (Identifier.IsArray1D)
@@ -401,7 +401,7 @@ namespace MinorShift.Emuera.GameData.Variable
 
 
 	/// <summary>
-	/// argumentがnotvariable.valueを参照,代入できnot
+	/// argumentがない変数。値を参照、代入できない
 	/// </summary>
 	internal sealed class VariableNoArgTerm : VariableTerm
 	{
@@ -412,27 +412,27 @@ namespace MinorShift.Emuera.GameData.Variable
 			this.allArgIsConst = true;
 		}
 		public override Int64 GetIntValue(ExpressionMediator exm)
-		{ throw new CodeEE("variable" + Identifier.Name + "に必要なargumentが不足しています"); }
+		{ throw new CodeEE("変数" + Identifier.Name + "に必要なargumentが不足しています"); }
 		public override string GetStrValue(ExpressionMediator exm)
-		{ throw new CodeEE("variable" + Identifier.Name + "に必要なargumentが不足しています"); }
+		{ throw new CodeEE("変数" + Identifier.Name + "に必要なargumentが不足しています"); }
 		public override void SetValue(Int64 value, ExpressionMediator exm)
-		{ throw new CodeEE("variable" + Identifier.Name + "に必要なargumentが不足しています"); }
+		{ throw new CodeEE("変数" + Identifier.Name + "に必要なargumentが不足しています"); }
 		public override void SetValue(string value, ExpressionMediator exm)
-		{ throw new CodeEE("variable" + Identifier.Name + "に必要なargumentが不足しています"); }
+		{ throw new CodeEE("変数" + Identifier.Name + "に必要なargumentが不足しています"); }
 		public override void SetValue(Int64[] array, ExpressionMediator exm)
-		{ throw new CodeEE("variable" + Identifier.Name + "に必要なargumentが不足しています"); }
+		{ throw new CodeEE("変数" + Identifier.Name + "に必要なargumentが不足しています"); }
 		public override void SetValue(string[] array, ExpressionMediator exm)
-		{ throw new CodeEE("variable" + Identifier.Name + "に必要なargumentが不足しています"); }
+		{ throw new CodeEE("変数" + Identifier.Name + "に必要なargumentが不足しています"); }
 		public override Int64 PlusValue(Int64 value, ExpressionMediator exm)
-		{ throw new CodeEE("variable" + Identifier.Name + "に必要なargumentが不足しています"); }
+		{ throw new CodeEE("変数" + Identifier.Name + "に必要なargumentが不足しています"); }
 		public override SingleTerm GetValue(ExpressionMediator exm)
-		{ throw new CodeEE("variable" + Identifier.Name + "に必要なargumentが不足しています"); }
+		{ throw new CodeEE("変数" + Identifier.Name + "に必要なargumentが不足しています"); }
 		public override void SetValue(SingleTerm value, ExpressionMediator exm)
-		{ throw new CodeEE("variable" + Identifier.Name + "に必要なargumentが不足しています"); }
+		{ throw new CodeEE("変数" + Identifier.Name + "に必要なargumentが不足しています"); }
 		public override void SetValue(IOperandTerm value, ExpressionMediator exm)
-		{ throw new CodeEE("variable" + Identifier.Name + "に必要なargumentが不足しています"); }
+		{ throw new CodeEE("変数" + Identifier.Name + "に必要なargumentが不足しています"); }
 		public override FixedVariableTerm GetFixedVariableTerm(ExpressionMediator exm)
-		{ throw new CodeEE("variable" + Identifier.Name + "に必要なargumentが不足しています"); }
+		{ throw new CodeEE("変数" + Identifier.Name + "に必要なargumentが不足しています"); }
 
 		public override IOperandTerm Restructure(ExpressionMediator exm)
 		{

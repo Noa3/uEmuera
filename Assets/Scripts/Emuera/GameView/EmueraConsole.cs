@@ -20,20 +20,20 @@ using uEmuera.Window;
 
 namespace MinorShift.Emuera.GameView
 {
-	//入output待ちの状況.
+	//入出力待ちの状況。
 	//Obfuscation attribute. Set (Exclude=true) when using enum.ToString() or enum.Parse().
 	[global::System.Reflection.Obfuscation(Exclude=false)]
 	internal enum ConsoleState
 	{
 		Initializing = 0,
 		Quit = 5,//QUIT
-		Error = 6,//Exceptionによるforce quit
+		Error = 6,//Exceptionによる強制終了
 		Running = 7,
 		WaitInput = 20,
         Sleep = 21,//DoEvents
 
         //WaitKey = 1,//WAIT
-        //WaitSystemInteger = 2,//Systemが要求doInput
+        //WaitSystemInteger = 2,//Systemが要求するInput
         //WaitInteger = 3,//INPUT
         //WaitString = 4,//INPUTS
         //WaitIntegerWithTimer = 8,
@@ -125,7 +125,7 @@ namespace MinorShift.Emuera.GameView
 		{
 			window = parent;
 
-			//1.713 この段階でsetStBarをuseしてはいけnot
+			//1.713 この段階でsetStBarを使用してはいけない
 			//setStBar(StaticConfig.DrawLineString);
 			state = ConsoleState.Initializing;
 			if (Config.FPS > 0)
@@ -153,10 +153,10 @@ namespace MinorShift.Emuera.GameView
 			timer.Enabled = false;
 			timer.Tick += new EventHandler(tickTimer);
 			timer.Interval = 10;
-			CBG_Clear();//string描画forダミーadd
+			CBG_Clear();//文字列描画用ダミー追加
 
 			redrawTimer = new Timer();
-			redrawTimer.Enabled = false;//TODO:1824アニメfor再描画タイマー有効化functionのadd
+			redrawTimer.Enabled = false;//TODO:1824アニメ用再描画タイマー有効化関数の追加
 			redrawTimer.Tick += new EventHandler(tickRedrawTimer);
 			redrawTimer.Interval = 10;
         }
@@ -170,7 +170,7 @@ namespace MinorShift.Emuera.GameView
 		class ClientBackGroundImage : IComparable<ClientBackGroundImage>
 		{
 			/// <summary>
-			/// zdepth == 0はstringforダミーなので他で使ってはいけnot
+			/// zdepth == 0は文字列用ダミーなので他で使ってはいけない
 			/// </summary>
 			/// <param name="zdepth"></param>
 			internal ClientBackGroundImage(int zdepth)
@@ -212,7 +212,7 @@ namespace MinorShift.Emuera.GameView
 			for (int i = 0; i < cbgList.Count;i++)
 			{
 				ClientBackGroundImage cimg = cbgList[i];
-				if (cimg.zdepth < zmin || cimg.zdepth > zmax || cimg.zdepth == 0)//0はダミーなのでdeleteしnot
+				if (cimg.zdepth < zmin || cimg.zdepth > zmax || cimg.zdepth == 0)//0はダミーなので削除しない
 					continue;
 
 				//使い捨て無名Imageを一応disposeしておく
@@ -310,7 +310,7 @@ namespace MinorShift.Emuera.GameView
 		public bool Enabled { get { return window.Created; } }
 
 		/// <summary>
-		/// current,Emueraがアクティブかどうか
+		/// 現在、Emueraがアクティブかどうか
 		/// </summary>
 		internal bool IsActive
 		{
@@ -325,8 +325,8 @@ namespace MinorShift.Emuera.GameView
         }
 
 		/// <summary>
-		/// scriptが継続insideかどうか
-		/// input系はmessageスキップやマクロも含めてIsInProcessを参照すべき
+		/// スクリプトが継続中かどうか
+		/// 入力系はメッセージスキップやマクロも含めてIsInProcessを参照すべき
 		/// </summary>
 		internal bool IsRunning
 		{
@@ -474,8 +474,8 @@ namespace MinorShift.Emuera.GameView
 		#region button関連
 		bool lastButtonIsInput = true;
         public bool updatedGeneration = false;
-		int lastButtonGeneration = 0;//最after addされた選択肢の世代.これと世代が一致しnot選択肢は選択できnot.
-		int newButtonGeneration = 0;//次にaddbe done選択肢の世代.Input又はInputsごとに増加
+		int lastButtonGeneration = 0;//最後に追加された選択肢の世代。これと世代が一致しない選択肢は選択できない。
+		int newButtonGeneration = 0;//次に追加される選択肢の世代。Input又はInputsごとに増加
 		//public int LastButtonGeneration { get { return lastButtonGeneration; } }
 		public int NewButtonGeneration { get { return newButtonGeneration; } }
         public void UpdateGeneration() { lastButtonGeneration = newButtonGeneration; updatedGeneration = true; }
@@ -484,18 +484,18 @@ namespace MinorShift.Emuera.GameView
 
 		private void newGeneration()
 		{
-            //valueのinputを求められnotwhenはupdateは必要notはず
+            //値の入力を求められない時は更新は必要ないはず
 			if (state != ConsoleState.WaitInput || !inputReq.NeedValue)
 				return;
             if (!updatedGeneration && emuera.getCurrentLine != lastInputLine)
             {
-                //button無しでnext inputに来たなら強制で世代update
+                //ボタン無しで次の入力に来たなら強制で世代更新
                 lastButtonGeneration = newButtonGeneration;
             }
             else
                 updatedGeneration = false;
             lastInputLine = emuera.getCurrentLine;
-			//古い選択肢を選択できnotように.INPUTで使った選択肢をINPUTSには流forできnotように.
+			//古い選択肢を選択できないように。INPUTで使った選択肢をINPUTSには流用できないように。
 			if (inputReq.InputType == InputType.IntValue)
 			{
 				if (lastButtonGeneration == newButtonGeneration)
@@ -515,7 +515,7 @@ namespace MinorShift.Emuera.GameView
 		}
 
 		/// <summary>
-		/// 選択insideのbutton.INPUTやINPUTSに対応したthingでなければならnot
+		/// 選択中のボタン。INPUTやINPUTSに対応したものでなければならない
 		/// </summary>
 		ConsoleButtonString selectingButton = null;
 		ConsoleButtonString lastSelectingButton = null;
@@ -523,12 +523,12 @@ namespace MinorShift.Emuera.GameView
 		public bool ButtonIsSelected(ConsoleButtonString button) { return selectingButton == button; }
 
 		/// <summary>
-		/// ToolTipdisplayしたフラグ
+		/// ToolTip表示したフラグ
 		/// </summary>
 		bool tooltipUsed = false;
 		/// <summary>
-		/// マウスの直belowにexisttext.buttonであってもよい.
-		/// ToolTipdisplayfor.世代無視,履歴insideもdisplay
+		/// マウスの直下にあるテキスト。ボタンであってもよい。
+		/// ToolTip表示用。世代無視、履歴中も表示
 		/// </summary>
 		ConsoleButtonString pointingString = null;
 		ConsoleButtonString lastPointingString = null;
@@ -556,7 +556,7 @@ namespace MinorShift.Emuera.GameView
 			//if (time > 0)
 			//	System.Threading.Thread.Sleep(time);
 
-			////DoEvents()の間にウインドウが閉じられたらおしまい.
+			////DoEvents()の間にウインドウが閉じられたらおしまい。
 			//if (!Enabled || state != ConsoleState.Sleep)
 			//{
 			//	ReadAnyKey();
@@ -601,7 +601,7 @@ namespace MinorShift.Emuera.GameView
 
 
 		/// <summary>
-		/// INPUTinsideのアニメーションforタイマー
+		/// INPUT中のアニメーション用タイマー
 		/// </summary>
 		Timer redrawTimer = null;
 
@@ -609,16 +609,16 @@ namespace MinorShift.Emuera.GameView
 		{
 			if (!redrawTimer.Enabled)
 				return;
-			//INPUT待ちでnotとき,又はタイマー付きINPUT状態のcaseはこれ以outのprocessに任せる
+			//INPUT待ちでないとき、又はタイマー付きINPUT状態の場合はこれ以外の処理に任せる
 			if (state != ConsoleState.WaitInput || timer.Enabled)
 			{
 				return;
 			}
-			window.Refresh();//OnPaint発line
+			window.Refresh();//OnPaint発行
 		}
 
 		/// <summary>
-		/// アニメーションforタイマーのsetting.0以belowのvalueを指定doとタイマー停止
+		/// アニメーション用タイマーの設定。0以下の値を指定するとタイマー停止
 		/// </summary>
 		public void setRedrawTimer(int tickcount)
 		{
@@ -637,15 +637,15 @@ namespace MinorShift.Emuera.GameView
 
 		Timer timer = null;
 		Int64 timerID = -1;
-		Int64 timer_startTime;//currentのタイマーをstartしたwhenのミリ秒数(WinmmTimer.TickCount基準)
-		Int64 timer_nextDisplayTime;//TINPUT系で次に残りwhen間をdisplaydowhenのTickCountミリ秒数
-		Int64 timer_endTime;//currentのタイマーをenddowhenのTickCountミリ秒数
+		Int64 timer_startTime;//現在のタイマーを開始した時のミリ秒数（WinmmTimer.TickCount基準）
+		Int64 timer_nextDisplayTime;//TINPUT系で次に残り時間を表示する時のTickCountミリ秒数
+		Int64 timer_endTime;//現在のタイマーを終了する時のTickCountミリ秒数
         bool wait_timeout = false;
         bool isTimeout = false;
         public bool IsTimeOut { get { return isTimeout; } }
 
 		/// <summary>
-		/// 1824 TINPUTwhenに直接タイマーをセットせずにfirst 再描画が終わってfromタイマーをセットdo(そうしnotとTINPUTと再描画だけでループしてしまうので)
+		/// 1824 TINPUT時に直接タイマーをセットせずに最初の再描画が終わってからタイマーをセットする（そうしないとTINPUTと再描画だけでループしてしまうので）
 		/// </summary>
 		bool need_settimer = false;
 
@@ -654,7 +654,7 @@ namespace MinorShift.Emuera.GameView
 			need_settimer = true;
 			if (inputReq.DisplayTime)
 			{
-				//100ms未満のcase,一瞬だけ残り0がdisplayされてend
+				//100ms未満の場合、一瞬だけ残り0が表示されて終了
 				//timer_nextDisplayTime = timer_startTime + 100;
 				long start = inputReq.Timelimit / 100;
 				string timeString1 = "残り ";
@@ -670,7 +670,7 @@ namespace MinorShift.Emuera.GameView
 			timer_startTime = WinmmTimer.TickCount;
 			timer_endTime = timer_startTime + inputReq.Timelimit;
 			//if (inputReq.DisplayTime)
-			//次に残りwhen間をdisplaydoタイミングのsetting.inputReq.DisplayTime==tureでnotならsettingdoだけで参照はされnot(はず
+			//次に残り時間を表示するタイミングの設定。inputReq.DisplayTime==tureでないなら設定するだけで参照はされない（はず
 			timer_nextDisplayTime = timer_startTime + 100;
 
 		}
@@ -683,7 +683,7 @@ namespace MinorShift.Emuera.GameView
             }
         }
 
-		//汎for
+		//汎用
 		private void tickTimer(object sender, EventArgs e)
 		{
 			if (!timer.Enabled)
@@ -705,7 +705,7 @@ namespace MinorShift.Emuera.GameView
 			}
 			if (inputReq.DisplayTime && curtime >= timer_nextDisplayTime)
 			{
-				//displayにwhen間がかかってタイマーが止まるのでnext 描画は100msafter.caseによってはdisplayが0.2一気に飛ぶ.
+				//表示に時間がかかってタイマーが止まるので次の描画は100ms後。場合によっては表示が0.2一気に飛ぶ。
 				timer_nextDisplayTime = curtime + 100;
 				long time = (timer_endTime - curtime) / 100;
 				string timeString1 = "残り ";
@@ -730,7 +730,7 @@ namespace MinorShift.Emuera.GameView
 		}
 
 		/// <summary>
-		/// tickTimerfromのみ呼ぶ
+		/// tickTimerからのみ呼ぶ
 		/// </summary>
 		private void endTimer()
 		{
@@ -740,7 +740,7 @@ namespace MinorShift.Emuera.GameView
             isTimeout = true;
 			if(IsWaitingPrimitive)
 			{
-				//callEmueraProgramはcallaheadでlineう.
+				//callEmueraProgramは呼び出し先で行う。
 				InputMouseKey(4, 0, 0, 0,0);
 				return;
 			}
@@ -748,7 +748,7 @@ namespace MinorShift.Emuera.GameView
 				changeLastLine(inputReq.TimeUpMes);
 			else if (inputReq.TimeUpMes != null)
 				PrintSingleLine(inputReq.TimeUpMes);
-			callEmueraProgram("");//ディフォルトinputのprocessはcallEmueraProgram側で
+			callEmueraProgram("");//ディフォルト入力の処理はcallEmueraProgram側で
 			if (state == ConsoleState.WaitInput && inputReq.NeedValue)
 			{
 				Point point = window.MainPicBox.PointToClient(Control.MousePosition);
@@ -769,15 +769,15 @@ namespace MinorShift.Emuera.GameView
 
 		#region Call系
 		/// <summary>
-		/// script実line.RefreshStringsはしnotのでcall側がdothis
+		/// スクリプト実行。RefreshStringsはしないので呼び出し側がすること
 		/// </summary>
 		/// <param name="str"></param>
 		private void callEmueraProgram(string str)
 		{
-			//inputstringのdisplayprocessing lineわnotcaseはstr == null
+			//入力文字列の表示処理を行わない場合はstr == null
 			if (str != null)
 			{
-				//INPUTstringをPRINTdoprocessetc
+				//INPUT文字列をPRINTする処理など
 				if (!doInputToEmueraProgram(str))
 					return;
 				if (state == ConsoleState.Error)
@@ -786,14 +786,14 @@ namespace MinorShift.Emuera.GameView
 			state = ConsoleState.Running;
 			emuera.DoScript();
 			if (state == ConsoleState.Running)
-			{//RunningならProcessはprocessing 継続doべき
+			{//RunningならProcessは処理を継続するべき
 				state = ConsoleState.Error;
-                PrintError("emueraのError:プログラムの状態を特定できません");
+                PrintError("emueraのError：プログラムの状態を特定できません");
 			}
 			if (state == ConsoleState.Error && !noOutputLog)
 				OutputLog(Program.ExeDir + "emuera.log");
 			PrintFlush(false);
-			//1819 Refreshはcall側でlineう
+			//1819 Refreshは呼び出し側で行う
 			//RefreshStrings(false);
 			newGeneration();
 		}
@@ -822,7 +822,7 @@ namespace MinorShift.Emuera.GameView
 					case InputType.StrValue:
 						if (string.IsNullOrEmpty(str) && inputReq.HasDefValue && !IsRunningTimer)
 							str = inputReq.DefStrValue;
-						//空inputとwhen間切れ
+						//空入力と時間切れ
 						if (str == null)
 							str = "";
 						emuera.InputString(str);
@@ -836,8 +836,8 @@ namespace MinorShift.Emuera.GameView
 		}
 		#endregion
 
-		#region input系
-		readonly string[] spliter = new string[] { "\\n", "\r\n", "\n", "\r" };//本物の改lineコードが来るthisは無いはずだけど一応
+		#region 入力系
+		readonly string[] spliter = new string[] { "\\n", "\r\n", "\n", "\r" };//本物の改行コードが来ることは無いはずだけど一応
 
 		public bool MesSkip = false;
 		private bool inProcess = false;
@@ -847,8 +847,8 @@ namespace MinorShift.Emuera.GameView
 		{
 			if (!IsWaitingPrimitive)
 				return;
-			//pointはクライアント左above基準の座標.
-			//clientPointをクライアント左below基準の座標に置き換え
+			//pointはクライアント左上基準の座標。
+			//clientPointをクライアント左下基準の座標に置き換え
 			Point clientPoint = point;
 			clientPoint.Y = point.Y - ClientHeight;
 			InputMouseKey(2, delta, clientPoint.X, clientPoint.Y, 0);
@@ -858,14 +858,14 @@ namespace MinorShift.Emuera.GameView
 		{
 			if (!IsWaitingPrimitive)
 				return;
-			//pointはクライアント左above基準の座標.
-			//clientPointをクライアント左below基準の座標に置き換え
+			//pointはクライアント左上基準の座標。
+			//clientPointをクライアント左下基準の座標に置き換え
 			Point clientPoint = point;
 			clientPoint.Y = point.Y - ClientHeight;
 			int buttonNum = -1;
 			if(cbgButtonMap != null && cbgButtonMap.IsCreated)
 			{
-				//マップ画像の左above基準の座標に置き換え
+				//マップ画像の左上基準の座標に置き換え
 				Point mapPoint = clientPoint;
 				mapPoint.Y = clientPoint.Y + cbgButtonMap.Height;
 				if(mapPoint.X >= 0 && mapPoint.Y >= 0 && mapPoint.X < cbgButtonMap.Width && mapPoint.Y < cbgButtonMap.Height)
@@ -881,14 +881,14 @@ namespace MinorShift.Emuera.GameView
 			InputMouseKey(1, (int)button, clientPoint.X, clientPoint.Y, buttonNum);
 		}
 
-		//1823 Keyinputを捕まえる
+		//1823 Key入力を捕まえる
 		internal void PressPrimitiveKey(int keycode, int keydata, int keymod)
 		{
 			if (IsWaitingPrimitive)
 				InputMouseKey(3, keycode, keydata, 0, 0);
 		}
 
-		//1823 Keyinputを捕まえる
+		//1823 Key入力を捕まえる
 		internal void InputMouseKey(int type, int result1, int result2, int result3, int result4)
 		{
 			emuera.InputResult5(type, result1, result2, result3, result4);
@@ -896,7 +896,7 @@ namespace MinorShift.Emuera.GameView
 			inProcess = true;
 			try
 			{
-				//1823 Esckeyもマクロも右クリックも不可.単純に押されたkeyを送るのみ.
+				//1823 Escキーもマクロも右クリックも不可。単純に押されたキーを送るのみ。
 				callEmueraProgram(null);
 				if (state == ConsoleState.WaitInput && inputReq.NeedValue)
 				{
@@ -940,7 +940,7 @@ namespace MinorShift.Emuera.GameView
 			try
 			{
 				string[] text;
-				if(changedByMouse)//1823 マウスによってinputされたならマクロparseをlineわnot
+				if(changedByMouse)//1823 マウスによって入力されたならマクロ解析を行わない
 				{ text = new string[] { str }; }
 				else
 				{
@@ -972,8 +972,8 @@ namespace MinorShift.Emuera.GameView
 
 					if (inputReq.OneInput && (!Config.AllowLongInputByMouse || !changedByMouse) && inputs.Length > 1)
 						inputs = inputs.Remove(1);
-					//1819 TODO:input無効系(強制待ちTWAIT)でスキップとマクロを止めるかそのままか
-					//currentはそのまま.強制待ちinsideはスキップのstartもできnotのにスキップinsideなら飛ばせる.
+					//1819 TODO:入力無効系（強制待ちTWAIT）でスキップとマクロを止めるかそのままか
+					//現在はそのまま。強制待ち中はスキップの開始もできないのにスキップ中なら飛ばせる。
 					if (inputReq.InputType == InputType.Void)
 					{
 						i--;
@@ -983,23 +983,23 @@ namespace MinorShift.Emuera.GameView
 					RefreshStrings(false);
 					while (MesSkip && state == ConsoleState.WaitInput)
 					{
-						//TODO:input無効を通していいか？スキップ停止をマクロでは飛ばせていいのか？
+						//TODO:入力無効を通していいか？スキップ停止をマクロでは飛ばせていいのか？
 						if (inputReq.NeedValue)
 							break;
 						if (inputReq.StopMesskip)
 							break;
 						callEmueraProgram("");
 						RefreshStrings(false);
-						//DoEventを呼ばnotと描画processすらまったくlineわれnot
+						//DoEventを呼ばないと描画処理すらまったく行われない
 						//Application.DoEvents();
-						//EscがマクロストップかつEscがスキップstartだfromEscでスキップを止められても即startしちゃったりdofromあんまり意味notよね
+						//EscがマクロストップかつEscがスキップ開始だからEscでスキップを止められても即開始しちゃったりするからあんまり意味ないよね
 						//if (KillMacro)
 						//	goto endMacro;
 					}
 					MesSkip = false;
 					if (state != ConsoleState.WaitInput)
 						break;
-					//マクロループwhenは待ちprocessが起こらnotのでここでsystemキューを捌く
+					//マクロループ時は待ち処理が起こらないのでここでシステムキューを捌く
 					//Application.DoEvents();
 #if UEMUERA_DEBUG
 					if (state != ConsoleState.WaitInput || inputReq == null)
@@ -1036,7 +1036,7 @@ namespace MinorShift.Emuera.GameView
 			}
 			else
 			{
-				//parseモードのcaseは見ているfileがERB\のbelowにexistとは限らnotかつフルpathを持っているのでこの補正はしなくてよい
+				//解析モードの場合は見ているファイルがERB\の下にあるとは限らないかつフルパスを持っているのでこの補正はしなくてよい
 				if (!Program.AnalysisMode)
 				{
 					if (fname.Contains(Program.ErbDir.ToUpper()))
@@ -1069,7 +1069,7 @@ namespace MinorShift.Emuera.GameView
 			catch (System.ComponentModel.Win32Exception)
 			{
 				uEmuera.Media.SystemSounds.Hand.Play();
-				PrintError("エディタを開くthisができませんでした");
+				PrintError("エディタを開くことができませんでした");
 				forceUpdateGeneration();
 			}
 			return;
@@ -1152,23 +1152,23 @@ namespace MinorShift.Emuera.GameView
 
 		bool runningERBfromMemory = false;
 		/// <summary>
-		/// 通常コンソールfromのDebugcommand,及びdebugウインドウのvariableウォッチetc,
-		/// *.ERBfileがdoes not existscriptを実lineinside
-		/// 1750 IsDebugfrom改名
+		/// 通常コンソールからのDebugコマンド、及びデバッグウインドウの変数ウォッチなど、
+		/// *.ERBファイルが存在しないスクリプトを実行中
+		/// 1750 IsDebugから改名
 		/// </summary>
 		public bool RunERBFromMemory { get { return runningERBfromMemory; } set { runningERBfromMemory = value; } }
 		void doSystemCommand(string command)
 		{
 			if(timer.Enabled)
 			{
-				PrintError("タイマー系命令の待ちwhen間insideはcommandをinputできません");
-				PrintError("");//タイマーdisplayprocessに消されちゃうかもしれnotので
+				PrintError("タイマー系命令の待ち時間中はコマンドを入力できません");
+				PrintError("");//タイマー表示処理に消されちゃうかもしれないので
 				RefreshStrings(true);
 				return;
 			}
 			if (IsInProcess)
 			{
-				PrintError("script実lineinsideはcommandをinputできません");
+				PrintError("スクリプト実行中はコマンドを入力できません");
 				RefreshStrings(true);
 				return;
 			}
@@ -1203,7 +1203,7 @@ namespace MinorShift.Emuera.GameView
 			{
 				if (!Program.DebugMode)
 				{
-					PrintError("debugウインドウは-Debugargument付きで起動したときのみ使えます");
+					PrintError("デバッグウインドウは-Debugargument付きで起動したときのみ使えます");
 					RefreshStrings(true);
 					return;
 				}
@@ -1213,11 +1213,11 @@ namespace MinorShift.Emuera.GameView
 			{
 				if (!Config.UseDebugCommand)
 				{
-					PrintError("debugcommandをuseできnotsettingになっています");
+					PrintError("デバッグコマンドを使用できない設定になっています");
 					RefreshStrings(true);
 					return;
 				}
-				//processing DebugMode系tomove
+				//処理をDebugMode系へ移動
 				DebugCommand(com, Config.ChangeMasterNameIfDebug, false);
 				PrintFlush(false);
 			}
@@ -1265,46 +1265,46 @@ namespace MinorShift.Emuera.GameView
 
 
 		/// <summary>
-		/// 1818以previous RefreshStringsfromselectingButton部分を抽出
-		/// ここでOnPaintを発line
+		/// 1818以前のRefreshStringsからselectingButton部分を抽出
+		/// ここでOnPaintを発行
 		/// </summary>
 		public void RefreshStrings(bool force_Paint)
 		{
 			bool isBackLog = window.ScrollBar.Value != window.ScrollBar.Maximum;
-			//ログdisplayはREDRAWのsettingに関係なくlineうようにdo
+			//ログ表示はREDRAWの設定に関係なく行うようにする
 			if ((redraw == ConsoleRedraw.None) && (!force_Paint) && (!isBackLog))
 				return;
-			//選択insidebuttonの適性チェック
+			//選択中ボタンの適性チェック
 			if (selectingButton != null)
 			{
-				//履歴displayinsideは選択肢無効→画面outに出てしまったbuttonも履歴from選択canように
+				//履歴表示中は選択肢無効→画面外に出てしまったボタンも履歴から選択できるように
 				//if (isBackLog)
 				//	selectingButton = null;
-				//numericかstringのinput待ち状態でなければ無効
+				//数値か文字列の入力待ち状態でなければ無効
 				if(state != ConsoleState.Error && state != ConsoleState.WaitInput)
 					selectingButton = null;
 				else if((state == ConsoleState.WaitInput) && !inputReq.NeedValue)
 					selectingButton = null;
-				//選択肢が最新でnotなら無効
+				//選択肢が最新でないなら無効
 				else if (selectingButton.Generation != lastButtonGeneration)
 					selectingButton = null;
 			}
 			if (!force_Paint)
-			{//forceならば確実に再描画.
-				//履歴displayinsideでなく,最終lineをdisplay済みであり,選択insidebuttonが変更されていnotならupdate不要
+			{//forceならば確実に再描画。
+				//履歴表示中でなく、最終行を表示済みであり、選択中ボタンが変更されていないなら更新不要
 				if ((!isBackLog) && (lastDrawnLineNo == lineNo) && (lastSelectingButton == selectingButton))
 					return;
 				//Environment.TickCountは分解能が悪すぎるのでwinmmのタイマーを呼んで来る
 				uint sec = WinmmTimer.TickCount - lastUpdate;
-				//まだ書き換えるタイミングでnotならnext updateを待ってみる
-				//ただし,input待ちetc,しばらくupdateのタイミングがnotcaseには強制的に書き換えてみる
+				//まだ書き換えるタイミングでないなら次の更新を待ってみる
+				//ただし、入力待ちなど、しばらく更新のタイミングがない場合には強制的に書き換えてみる
 				if (sec < msPerFrame && (state == ConsoleState.Running || state == ConsoleState.Initializing))
 					return;
 			}
 			if (forceTextBoxColor)
 			{
 				uint sec = WinmmTimer.TickCount - lastBgColorChange;
-				//色変化が速くなりすぎnotように一定when間以inの再callは強制待ちにdo
+				//色変化が速くなりすぎないように一定時間以内の再呼び出しは強制待ちにする
 				//while (sec < 200)
 				//{
 				//	//Application.DoEvents();
@@ -1314,23 +1314,23 @@ namespace MinorShift.Emuera.GameView
 				lastBgColorChange = WinmmTimer.TickCount;
 			}
 			verticalScrollBarUpdate();
-			window.Refresh();//OnPaint発line
+			window.Refresh();//OnPaint発行
 
 		}
 
 		///// <summary>
-		///// 1818以previous RefreshStringsのafter半とm_RefreshStringsを融合
-		///// 全面Clear法のみにしたのでさっぱりした.ダブルバッファリングはOnPaintが勝手にやるはず
+		///// 1818以前のRefreshStringsの後半とm_RefreshStringsを融合
+		///// 全面Clear法のみにしたのでさっぱりした。ダブルバッファリングはOnPaintが勝手にやるはず
 		///// </summary>
 		///// <param name="graph"></param>
 		//public void OnPaint(Graphics graph)
 		//{
-		//	//描画during Emueraが閉じられると廃棄されたPictureBoxにアクセスしてしまったりdoので
-		//	//OnPaintfromgraphをもらった直afterだfrom大丈夫だとは思うけど一応
+		//	//描画中にEmueraが閉じられると廃棄されたPictureBoxにアクセスしてしまったりするので
+		//	//OnPaintからgraphをもらった直後だから大丈夫だとは思うけど一応
 		//	if (!this.Enabled)
 		//		return;
 
-		//	//描画命令を発lineしたRefreshwhenにすべきか,OnPaintのstartにすべきか,OnPaintのendにdoか
+		//	//描画命令を発行したRefresh時にすべきか、OnPaintの開始にすべきか、OnPaintの終了にするか
 		//	lastUpdate = WinmmTimer.TickCount;
 
 		//	bool isBackLog = window.ScrollBar.Value != window.ScrollBar.Maximum;
@@ -1338,7 +1338,7 @@ namespace MinorShift.Emuera.GameView
 
 		//	int bottomLineNo = window.ScrollBar.Value - 1;
 		//	if (displayLineList.Count - 1 < bottomLineNo)
-		//		bottomLineNo = displayLineList.Count - 1;//1820 このprocess不要な気がdoけどError報告があったので入れとく
+		//		bottomLineNo = displayLineList.Count - 1;//1820 この処理不要な気がするけどError報告があったので入れとく
 		//	int topLineNo = bottomLineNo - (pointY / Config.LineHeight + 1);
 		//	if (topLineNo < 0)
 		//		topLineNo = 0;
@@ -1354,7 +1354,7 @@ namespace MinorShift.Emuera.GameView
 		//		//	displayLineList[i].GDIDrawTo(pointY, isBackLog);
 		//		//	pointY -= Config.LineHeight;
 		//		//}
-		//		//1820a12 abovefrombelowto描画do方向to変更
+		//		//1820a12 上から下へ描画する方向へ変更
 		//		for (int i =topLineNo ; i <= bottomLineNo; i++)
 		//		{
 		//			displayLineList[i].GDIDrawTo(pointY, isBackLog);
@@ -1370,7 +1370,7 @@ namespace MinorShift.Emuera.GameView
 		//		//	displayLineList[i].DrawTo(graph, pointY, isBackLog, true, Config.TextDrawingMode);
 		//		//	pointY -= Config.LineHeight;
 		//		//}
-		//		//1820a12 abovefrombelowto描画do方向to変更
+		//		//1820a12 上から下へ描画する方向へ変更
 		//		for (int i =topLineNo ; i <= bottomLineNo; i++)
 		//		{
 		//			displayLineList[i].DrawTo(graph, pointY, isBackLog, true, Config.TextDrawingMode);
@@ -1397,7 +1397,7 @@ namespace MinorShift.Emuera.GameView
 		//	else
 		//		lastDrawnLineNo = lineNo;
 		//	lastSelectingButton = selectingButton;
-		//	/*debugfor.描画が超重い環境を想定
+		//	/*デバッグ用。描画が超重い環境を想定
 		//	System.Threading.Thread.Sleep(50);
 		//	*/
 		//	forceTextBoxColor = false;
@@ -1425,7 +1425,7 @@ namespace MinorShift.Emuera.GameView
         //{
         //	//消したいが怖いので残し
         //	if (!window.Created)
-        //		throw new ExeEE("does not existwindowにアクセスした");
+        //		throw new ExeEE("存在しないウィンドウにアクセスした");
         //	//if (Config.UseImageBuffer)
         //	//	return Graphics.FromImage(window.MainPicBox.Image);
         //	//else
@@ -1440,26 +1440,26 @@ namespace MinorShift.Emuera.GameView
 		StringBuilder dConsoleLog = new StringBuilder("");
 		public string DebugConsoleLog { get { return dConsoleLog.ToString(); } }
 		List<string> dTraceLogList = new List<string>();
-#pragma warning disable CS0414 // フィールド 'EmueraConsole.dTraceLogChanged' が割り当てられていますが,valueはuseされていません.
+#pragma warning disable CS0414 // フィールド 'EmueraConsole.dTraceLogChanged' が割り当てられていますが、値は使用されていません。
 		bool dTraceLogChanged = true;
-#pragma warning restore CS0414 // フィールド 'EmueraConsole.dTraceLogChanged' が割り当てられていますが,valueはuseされていません.
+#pragma warning restore CS0414 // フィールド 'EmueraConsole.dTraceLogChanged' が割り当てられていますが、値は使用されていません。
 		public string GetDebugTraceLog(bool force)
 		{
 			//if (!dTraceLogChanged && !force)
 			//	return null;
 			StringBuilder builder = new StringBuilder("");
 			LogicalLine line = emuera.GetScaningLine();
-			builder.AppendLine("*実lineinsideのline");
+			builder.AppendLine("*実行中の行");
 			if ((line == null) || (line.Position == null))
 			{
-				builder.AppendLine("file名:なし");
-				builder.AppendLine("line番号:なし function名:なし");
+				builder.AppendLine("ファイル名:なし");
+				builder.AppendLine("行番号:なし 関数名:なし");
 				builder.AppendLine("");
 			}
 			else
 			{
-				builder.AppendLine("file名:" + line.Position.Filename);
-				builder.AppendLine("line番号:" + line.Position.LineNo.ToString() + " function名:" + line.ParentLabelLine.LabelName);
+				builder.AppendLine("ファイル名:" + line.Position.Filename);
+				builder.AppendLine("行番号:" + line.Position.LineNo.ToString() + " 関数名:" + line.ParentLabelLine.LabelName);
 				builder.AppendLine("");
 			}
 			builder.AppendLine("*スタックトレース");
@@ -1512,8 +1512,8 @@ namespace MinorShift.Emuera.GameView
 
 		public void DebugAddTraceLog(string str)
 		{
-			//Emueraがdebugモードで起動されていnotなら無視
-			//ERBfile以outのthing(debugcommand,variableウォッチ)を実lineinsideなら無視
+			//Emueraがデバッグモードで起動されていないなら無視
+			//ERBファイル以外のもの(デバッグコマンド、変数ウォッチ)を実行中なら無視
 			if (!Program.DebugMode || runningERBfromMemory)
 				return;
 			dTraceLogChanged = true;
@@ -1539,7 +1539,7 @@ namespace MinorShift.Emuera.GameView
 		{
 			ConsoleState temp_state = state;
 			runningERBfromMemory = true;
-            //script等がfailedしたcaseに備えて念のbecauseの保存
+            //スクリプト等が失敗した場合に備えて念のための保存
             GlobalStatic.Process.saveCurrentState(false);
             try
 			{
@@ -1573,27 +1573,27 @@ namespace MinorShift.Emuera.GameView
 				if (line is InvalidLine)
 					throw new CodeEE(line.ErrMes);
 				if (!(line is InstructionLine))
-					throw new CodeEE("debugcommandでusecanのは代入文か命令文だけです");
+					throw new CodeEE("デバッグコマンドで使用できるのは代入文か命令文だけです");
 				InstructionLine func = (InstructionLine)line;
 				if (func.Function.IsFlowContorol())
-					throw new CodeEE("フロー制御命令はuseできません");
-				//__METHOD_SAFE__をみるならいらnotかも
+					throw new CodeEE("フロー制御命令は使用できません");
+				//__METHOD_SAFE__をみるならいらないかも
 				if (func.Function.IsWaitInput())
-					throw new CodeEE(func.Function.Name + "命令はuseできません");
-				//1750 __METHOD_SAFE__とほぼ条件sameだよねってthisで
+					throw new CodeEE(func.Function.Name + "命令は使用できません");
+				//1750 __METHOD_SAFE__とほぼ条件同じだよねってことで
 				if (!func.Function.IsMethodSafe())
-					throw new CodeEE(func.Function.Name + "命令はuseできません");
-				//1756 SIFの次に来てはいけnotthingはここでも不可.
+					throw new CodeEE(func.Function.Name + "命令は使用できません");
+				//1756 SIFの次に来てはいけないものはここでも不可。
 				if (func.Function.IsPartial())
-					throw new CodeEE(func.Function.Name + "命令はuseできません");
+					throw new CodeEE(func.Function.Name + "命令は使用できません");
 				switch (func.FunctionCode)
 				{//取りこぼし
-					//逆にOUTPUTLOG,QUITはDebugCommandのbefore 捕まえる
+					//逆にOUTPUTLOG、QUITはDebugCommandの前に捕まえる
 					case FunctionCode.PUTFORM:
 					case FunctionCode.UPCHECK:
 					case FunctionCode.CUPCHECK:
 					case FunctionCode.SAVEDATA:
-						throw new CodeEE(func.Function.Name + "命令はuseできません");
+						throw new CodeEE(func.Function.Name + "命令は使用できません");
 				}
 				ArgumentParser.SetArgumentTo(func);
 				if (func.IsError)
@@ -1603,7 +1603,7 @@ namespace MinorShift.Emuera.GameView
 				{
 					if (!outputDebugConsole)
 						PrintSingleLine(com);
-					//DebugWindowのほうは少しくどくなるのでいらnotかな
+					//DebugWindowのほうは少しくどくなるのでいらないかな
 				}
 			}
 			catch (Exception e)
@@ -1619,7 +1619,7 @@ namespace MinorShift.Emuera.GameView
 			}
 			finally
 			{
-                //確実にoriginalの状態に戻す
+                //確実に元の状態に戻す
                 GlobalStatic.Process.loadPrevState();
                 runningERBfromMemory = false;
 				state = temp_state;
@@ -1633,30 +1633,30 @@ namespace MinorShift.Emuera.GameView
 		{
             //if (window == null || !window.Created)
             //	return new Point();
-            ////クライアント左above基準の座標取得
+            ////クライアント左上基準の座標取得
             //Point pos = window.MainPicBox.PointToClient(Cursor.Position);
-            ////クライアント左below基準の座標に置き換え
+            ////クライアント左下基準の座標に置き換え
             //pos.Y = pos.Y - ClientHeight;
             //return pos;
             return Point.Empty;
 		}
 
 		/// <summary>
-		/// マウス位置をbuttonの選択状態に反映させる
+		/// マウス位置をボタンの選択状態に反映させる
 		/// </summary>
 		/// <param name="point"></param>
-		/// <returns>このafterでRefreshStringsが必要かどうか</returns>
+		/// <returns>この後でRefreshStringsが必要かどうか</returns>
 		public bool MoveMouse(Point point)
 		{
             return false;
 		//	if (cbgButtonMap != null && cbgButtonMap.IsCreated)
 		//	{
-		//		//pointはクライアント左above基準の座標.
-		//		//clientPointをクライアント左below基準の座標に置き換え
+		//		//pointはクライアント左上基準の座標。
+		//		//clientPointをクライアント左下基準の座標に置き換え
 		//		Point clientPoint = point;
 		//		clientPoint.Y = point.Y - ClientHeight;
 		//		int buttonNum = -1;
-		//		//マップ画像の左above基準の座標に置き換え
+		//		//マップ画像の左上基準の座標に置き換え
 		//		Point mapPoint = clientPoint;
 		//		mapPoint.Y = mapPoint.Y + cbgButtonMap.Height;
 		//		if (mapPoint.X >= 0 && mapPoint.Y >= 0 && mapPoint.X < cbgButtonMap.Width && mapPoint.Y < cbgButtonMap.Height)
@@ -1687,15 +1687,15 @@ namespace MinorShift.Emuera.GameView
 		//	ConsoleButtonString select = null;
 		//	ConsoleButtonString pointing = null;
 		//	bool canSelect = false;
-		//	//numericかstringのinput待ち状態でなければ選択during はならnot
+		//	//数値か文字列の入力待ち状態でなければ選択中にはならない
 		//	if (state == ConsoleState.Error)
 		//		canSelect = true;
 		//	else if (state == ConsoleState.WaitInput && inputReq.NeedValue)
 		//		canSelect = true;
-		//	//script実lineinsideは無視//input-マクロprocessinsideは無視
+		//	//スクリプト実行中は無視//入力・マクロ処理中は無視
 		//	if(this.IsInProcess)
 		//		goto end;
-		//	//履歴displayinsideは無視
+		//	//履歴表示中は無視
 		//	//if (window.ScrollBar.Value != window.ScrollBar.Maximum)
 		//	//	goto end;
 		//	int pointX = point.X;
@@ -1704,12 +1704,12 @@ namespace MinorShift.Emuera.GameView
 
 		//	int bottomLineNo = window.ScrollBar.Value - 1;
 		//	if (displayLineList.Count - 1 < bottomLineNo)
-		//		bottomLineNo = displayLineList.Count - 1;//1820 このprocess不要な気がdoけどError報告があったので入れとく
+		//		bottomLineNo = displayLineList.Count - 1;//1820 この処理不要な気がするけどError報告があったので入れとく
 		//	int topLineNo = bottomLineNo - (window.MainPicBox.Height/ Config.LineHeight);
 		//	if (topLineNo < 0)
 		//		topLineNo = 0;
 		//	int relPointY = pointY - window.MainPicBox.Height;
-		//	//belowfromaboveto探索し発見次第打ち切り
+		//	//下から上へ探索し発見次第打ち切り
 		//	for (int i = bottomLineNo; i >= topLineNo; i--)
 		//	{
 		//		relPointY += Config.LineHeight;
@@ -1747,7 +1747,7 @@ namespace MinorShift.Emuera.GameView
 
 		//	//int posy_bottom2up = window.MainPicBox.Height - pointY;
 		//	//int logNum = window.ScrollBar.Maximum - window.ScrollBar.Value;
-		//	////displayinsideの一番belowのline番号
+		//	////表示中の一番下の行番号
 		//	//int curBottomLineNo = displayLineList.Count - logNum;
 		//	//int curPointingLineNo = curBottomLineNo - (posy_bottom2up / Config.LineHeight + 1);
 		//	//if ((curPointingLineNo < 0) || (curPointingLineNo >= displayLineList.Count))
@@ -1811,7 +1811,7 @@ namespace MinorShift.Emuera.GameView
 		{
 			//if (state == ConsoleState.Error)
 			//{
-			//    MessageBox.Show("Error発生whenはこの機能は使えません");
+			//    MessageBox.Show("Error発生時はこの機能は使えません");
 			//}
             forceStopTimer();
 			ClearDisplay();
@@ -1834,12 +1834,12 @@ namespace MinorShift.Emuera.GameView
 		{
 			if (state == ConsoleState.Error)
 			{
-				MessageBox.Show("Error発生whenはこの機能は使えません");
+				MessageBox.Show("Error発生時はこの機能は使えません");
 				return;
 			}
 			if (state == ConsoleState.Initializing)
 			{
-				MessageBox.Show("initial化insideはこの機能は使えません");
+				MessageBox.Show("初期化中はこの機能は使えません");
 				return;
 			}
             bool notRedraw = false;
@@ -1856,13 +1856,13 @@ namespace MinorShift.Emuera.GameView
             prevState = state;
 			prevReq = inputReq;
 			state = ConsoleState.Initializing;
-			PrintSingleLine("ERB再Loading……", true);
+			PrintSingleLine("ERB再読み込み中……", true);
 			force_temporary = true;
 			emuera.ReloadErb();
 			force_temporary = false;
-            PrintSingleLine("再loadingcomplete", true);
+            PrintSingleLine("再読み込み完了", true);
 			RefreshStrings(true);
-            //強制的にbutton世代が切り替わるのを防ぐ
+            //強制的にボタン世代が切り替わるのを防ぐ
             updatedGeneration = true;
             if (notRedraw)
                 redraw = ConsoleRedraw.None;
@@ -1884,12 +1884,12 @@ namespace MinorShift.Emuera.GameView
 		{
 			if (state == ConsoleState.Error)
 			{
-				MessageBox.Show("Error発生whenはこの機能は使えません");
+				MessageBox.Show("Error発生時はこの機能は使えません");
 				return;
 			}
 			if (state == ConsoleState.Initializing)
 			{
-				MessageBox.Show("initial化insideはこの機能は使えません");
+				MessageBox.Show("初期化中はこの機能は使えません");
 				return;
 			}
             bool notRedraw = false;
@@ -1906,13 +1906,13 @@ namespace MinorShift.Emuera.GameView
 			prevState = state;
 			prevReq = inputReq;
 			state = ConsoleState.Initializing;
-            PrintSingleLine("ERB再Loading……", true);
+            PrintSingleLine("ERB再読み込み中……", true);
 			force_temporary = true;
 			emuera.ReloadPartialErb(path);
 			force_temporary = false;
-            PrintSingleLine("再loadingcomplete", true);
+            PrintSingleLine("再読み込み完了", true);
 			RefreshStrings(true);
-            //強制的にbutton世代が切り替わるのを防ぐ
+            //強制的にボタン世代が切り替わるのを防ぐ
             updatedGeneration = true;
             if (notRedraw)
                 redraw = ConsoleRedraw.None;
@@ -1922,12 +1922,12 @@ namespace MinorShift.Emuera.GameView
 		{
             if (state == ConsoleState.Error)
 			{
-				MessageBox.Show("Error発生whenはこの機能は使えません");
+				MessageBox.Show("Error発生時はこの機能は使えません");
 				return;
 			}
 			if (state == ConsoleState.Initializing)
 			{
-				MessageBox.Show("initial化insideはこの機能は使えません");
+				MessageBox.Show("初期化中はこの機能は使えません");
 				return;
 			}
             if (timer.Enabled)
@@ -1957,13 +1957,13 @@ namespace MinorShift.Emuera.GameView
 			prevState = state;
 			prevReq = inputReq;
 			state = ConsoleState.Initializing;
-            PrintSingleLine("ERB再Loading……", true);
+            PrintSingleLine("ERB再読み込み中……", true);
 			force_temporary = true;
             emuera.ReloadPartialErb(paths);
 			force_temporary = false;
-            PrintSingleLine("再loadingcomplete", true);
+            PrintSingleLine("再読み込み完了", true);
 			RefreshStrings(true);
-            //強制的にbutton世代が切り替わるのを防ぐ
+            //強制的にボタン世代が切り替わるのを防ぐ
             updatedGeneration = true;
             if (notRedraw)
                 redraw = ConsoleRedraw.None;

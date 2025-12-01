@@ -14,14 +14,14 @@ namespace MinorShift.Emuera.GameData
 		public string ScriptYear = "";
 		public string ScriptTitle = "";
 		public Int64 ScriptUniqueCode = 0;
-		//1.713 訂正.eramakerのバージョンのinitialvalueは1000ではなく0だった
+		//1.713 訂正。eramakerのバージョンの初期値は1000ではなく0だった
 		public Int64 ScriptVersion = 0;//1000;
-		//1.713 aboveの変更とあわせて.savedataのバージョンが1000であり,currentのバージョンが未definitionでexistcase,savedataのバージョンをsameとみなす
+		//1.713 上の変更とあわせて。セーブデータのバージョンが1000であり、現在のバージョンが未定義である場合、セーブデータのバージョンを同じとみなす
 		public bool ScriptVersionDefined = false;
 		public Int64 ScriptCompatibleMinVersion = -1;
         public string Compatible_EmueraVer = "0.000.0.0";
 
-		//1.727 add.Form.Text
+		//1.727 追加。Form.Text
 		public string ScriptWindowTitle = null;
 		public string ScriptVersionText
 		{
@@ -39,7 +39,7 @@ namespace MinorShift.Emuera.GameData
 		}
 		public bool UniqueCodeEqualTo(Int64 target)
 		{
-			//1804 UniqueCode Int64toの拡張に伴い修正
+			//1804 UniqueCode Int64への拡張に伴い修正
 			if (target == 0L)
 				return true;
 			return target == ScriptUniqueCode;
@@ -79,10 +79,10 @@ namespace MinorShift.Emuera.GameData
 		}
 
 		/// <summary>
-		/// GAMEBASEloading.GAMEBASE.csvの存在は必須ではnotのでloadingfailedしたらなかったthisにdo.
+		/// GAMEBASE読み込み。GAMEBASE.csvの存在は必須ではないので読み込み失敗したらなかったことにする。
 		/// </summary>
 		/// <param name="basePath"></param>
-		/// <returns>loading続linedoなら真,Errorendなら偽</returns>
+		/// <returns>読み込み続行するなら真、Error終了なら偽</returns>
 		public bool LoadGameBaseCsv(string basePath)
 		{
             if (!File.Exists(basePath))
@@ -93,7 +93,7 @@ namespace MinorShift.Emuera.GameData
 			EraStreamReader eReader = new EraStreamReader(false);
 			if (!eReader.Open(basePath))
 			{
-				//output.PrintLine(eReader.Filename + "のオープンにfailedしました");
+				//output.PrintLine(eReader.Filename + "のオープンに失敗しました");
 				return true;
 			}
 			try
@@ -112,7 +112,7 @@ namespace MinorShift.Emuera.GameData
 							if (tryatoi(tokens[1], out ScriptUniqueCode))
 							{
 								if (ScriptUniqueCode == 0L)
-									ParserMediator.Warn("コード:0のsavedataはいかなるコードのscriptfromも読めるdataas扱われます", pos, 0);
+									ParserMediator.Warn("コード:0のセーブデータはいかなるコードのスクリプトからも読めるデータとして扱われます", pos, 0);
 							}							
 							break;
 						case "バージョン":
@@ -121,7 +121,7 @@ namespace MinorShift.Emuera.GameData
 						case "バージョン違い認める":
 							tryatoi(tokens[1], out ScriptCompatibleMinVersion);
 							break;
-						case "最初fromいるキャラ":
+						case "最初からいるキャラ":
 							tryatoi(tokens[1], out DefaultCharacter);
 							break;
 						case "アイテムなし":
@@ -136,10 +136,10 @@ namespace MinorShift.Emuera.GameData
 						case "製作年":
 							ScriptYear = tokens[1];
 							break;
-						case "addinfo":
+						case "追加情報":
 							ScriptDetail = tokens[1];
 							break;
-						case "windowタイトル":
+						case "ウィンドウタイトル":
 							ScriptWindowTitle = tokens[1];
 							break;
 							
@@ -147,7 +147,7 @@ namespace MinorShift.Emuera.GameData
                             Compatible_EmueraVer = tokens[1];
                             if (!Regex.IsMatch(Compatible_EmueraVer, @"^\d+\.\d+\.\d+\.\d+$"))
                             {
-                                ParserMediator.Warn("バージョン指定を読み取れなかったのでprocessing 省略します", pos, 0);
+                                ParserMediator.Warn("バージョン指定を読み取れなかったので処理を省略します", pos, 0);
                                 break;
                             }
                             Version curerntVersion = new Version(GlobalStatic.MainWindow.InternalEmueraVer);
@@ -163,7 +163,7 @@ namespace MinorShift.Emuera.GameData
 			}
 			catch
 			{
-                ParserMediator.Warn("GAMEBASE.CSVのLoadingにErrorが発生したbecause,読みこみand abortます", pos, 1);
+                ParserMediator.Warn("GAMEBASE.CSVの読み込み中にErrorが発生したため、読みこみを中断します", pos, 1);
 				return true;
 			}
 			finally

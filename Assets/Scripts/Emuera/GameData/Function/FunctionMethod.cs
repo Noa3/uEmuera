@@ -12,9 +12,9 @@ namespace MinorShift.Emuera.GameData.Function
 		protected Type[] argumentTypeArray;
 		protected string Name { get; private set; }
 
-		//argumentの数-typeが一致doかどうかのテスト
-		//正しくnotcaseはErrormessageを返す.
-		//argumentの数が不定でexistcaseやargumentの省略を許すcaseにはoverridedothis.
+		//argumentの数・型が一致するかどうかのテスト
+		//正しくない場合はErrorメッセージを返す。
+		//argumentの数が不定である場合やargumentの省略を許す場合にはoverrideすること。
 		public virtual string CheckArgumentType(string name, IOperandTerm[] arguments)
 		{
 			if (arguments.Length != argumentTypeArray.Length)
@@ -29,15 +29,15 @@ namespace MinorShift.Emuera.GameData.Function
 			return null;
 		}
 		
-		//Argumentがall定数のwhenにMethodを解体してよいかどうか.RANDやCharaを参照dothingetcは不可
+		//Argumentが全て定数の時にMethodを解体してよいかどうか。RANDやCharaを参照するものなどは不可
 		public bool CanRestructure { get; protected set; }
 
 		//FunctionMethodが固有のRestructure()を持つかどうか
 		public bool HasUniqueRestructure { get; protected set; }
 
-		//実際のcalculate.
-		public virtual Int64 GetIntValue(ExpressionMediator exm, IOperandTerm[] arguments) { throw new ExeEE("戻りvalueのtypeがdifferent or 未実装"); }
-		public virtual string GetStrValue(ExpressionMediator exm, IOperandTerm[] arguments) { throw new ExeEE("戻りvalueのtypeがdifferent or 未実装"); }
+		//実際の計算。
+		public virtual Int64 GetIntValue(ExpressionMediator exm, IOperandTerm[] arguments) { throw new ExeEE("戻り値の型が違う or 未実装"); }
+		public virtual string GetStrValue(ExpressionMediator exm, IOperandTerm[] arguments) { throw new ExeEE("戻り値の型が違う or 未実装"); }
 		public virtual SingleTerm GetReturnValue(ExpressionMediator exm, IOperandTerm[] arguments)
 		{
 			if (ReturnType == typeof(Int64))
@@ -47,7 +47,7 @@ namespace MinorShift.Emuera.GameData.Function
 		}
 
 		/// <summary>
-		/// 戻りvalueは全体をRestructurecanかどうか
+		/// 戻り値は全体をRestructureできるかどうか
 		/// </summary>
 		/// <param name="exm"></param>
 		/// <param name="arguments"></param>

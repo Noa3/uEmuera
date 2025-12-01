@@ -3,10 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using MinorShift.Emuera;
 
-/// <summary>
-/// Represents a single line of text in the Emuera console.
-/// Handles text rendering, button interactions, and monospaced layout.
-/// </summary>
 public class EmueraLine : EmueraBehaviour
 {
     void Awake()
@@ -16,9 +12,6 @@ public class EmueraLine : EmueraBehaviour
         click_handler_ = GetComponent<GenericUtils.PointerClickListener>();
     }
 
-    /// <summary>
-    /// Gets the Text component for this line.
-    /// </summary>
     public UnityEngine.UI.Text text
     {
         get
@@ -32,10 +25,6 @@ public class EmueraLine : EmueraBehaviour
         }
     }
     UnityEngine.UI.Text text_ = null;
-    
-    /// <summary>
-    /// Gets the Monospaced component for fixed-width text rendering.
-    /// </summary>
     public UnityEngine.UI.Monospaced monospaced
     {
         get
@@ -46,10 +35,6 @@ public class EmueraLine : EmueraBehaviour
         }
     }
     UnityEngine.UI.Monospaced monospaced_ = null;
-    
-    /// <summary>
-    /// Gets the ContentSizeFitter for automatic sizing.
-    /// </summary>
     public UnityEngine.UI.ContentSizeFitter size_fitter
     {
         get
@@ -86,7 +71,7 @@ public class EmueraLine : EmueraBehaviour
 #endif
 
     /// <summary>
-    /// Update content
+    /// 更新内容
     /// </summary>
     public override void UpdateContent()
     {

@@ -5,11 +5,11 @@ using System.IO;
 
 namespace MinorShift.Emuera.Sub
 {
-	//reader/writer共通のdataはreaderの方に
+	//reader/writer共通のデータはreaderの方に
 
 
 	/// <summary>
-	/// 1808add 新しいdata保存形式
+	/// 1808追加 新しいデータ保存形式
 	/// Reader と違ってWriterは最新の書き込み方式だけ知っていればよい
 	/// WriteHeader -> WriteFileType -> ... -> WriteEFO
 	/// </summary>
@@ -39,16 +39,16 @@ namespace MinorShift.Emuera.Sub
 
 
 		/// <summary>
-		/// systemfor.keyなしでInt64を保存
+		/// システム用。keyなしでInt64を保存
 		/// </summary>
 		/// <param name="v"></param>
 		public void WriteInt64(Int64 v)
 		{
-			//圧縮しnot
+			//圧縮しない
 			writer.Write(v);
 		}
 		/// <summary>
-		/// systemfor.keyなしでstringを保存
+		/// システム用。keyなしでstringを保存
 		/// </summary>
 		/// <param name="s"></param>
 		public void WriteString(string s)
@@ -126,10 +126,10 @@ namespace MinorShift.Emuera.Sub
 
 		private void m_WriteInt(Int64 v)
 		{
-			//savedata容量の爆発を避けるbecauseにcanだけWrite(Int64)はしnot
-			if (v >= 0 && v <= Ebdb.Byte)//0～207untilはそのままbyteに詰め込む
+			//セーブデータ容量の爆発を避けるためにできるだけWrite(Int64)はしない
+			if (v >= 0 && v <= Ebdb.Byte)//0～207まではそのままbyteに詰め込む
 				writer.Write((byte)v);
-			else if (v >= Int16.MinValue && v <= Int16.MaxValue)//integerの範囲に応じて適当に
+			else if (v >= Int16.MinValue && v <= Int16.MaxValue)//整数の範囲に応じて適当に
 			{
 				writer.Write(Ebdb.Int16);
 				writer.Write((Int16)v);
@@ -153,9 +153,9 @@ namespace MinorShift.Emuera.Sub
 
 		private void writeData(Int64[] array)
 		{
-			//arrayの記憶.0が連続docaseには圧縮を試みる.
+			//配列の記憶。0が連続する場合には圧縮を試みる。
 			writer.Write((Int32)array.Length);
-			int countZero = 0;//0については0が連続do数を記憶do.その他の数はそのまま記憶do.
+			int countZero = 0;//0については0が連続する数を記憶する。その他の数はそのまま記憶する。
 			for(int x = 0; x < array.Length; x++)
 			{
 				if (array[x] == 0)
@@ -171,14 +171,14 @@ namespace MinorShift.Emuera.Sub
 					this.m_WriteInt(array[x]);
 				}
 			}
-			//記憶途insideでarrayの残りが全部0でexistなら0の数も記憶せずarrayの終わりを記憶
+			//記憶途中で配列の残りが全部0であるなら0の数も記憶せず配列の終わりを記憶
 			writer.Write(Ebdb.EoD);
 		}
 
 		private void writeData(Int64[,] array)
 		{
-			int countZero = 0;//0については0が連続do数を記憶do.その他はそのまま記憶do.
-			int countAllZero = 0;//列の要素がall0でexist列の連続do数を記憶do.列の要素に一つでも非0がexistなら通常の記憶方式.
+			int countZero = 0;//0については0が連続する数を記憶する。その他はそのまま記憶する。
+			int countAllZero = 0;//列の要素が全て0である列の連続する数を記憶する。列の要素に一つでも非0があるなら通常の記憶方式。
 			int length0 = array.GetLength(0);
 			int length1 = array.GetLength(1);
 			writer.Write(length0);
@@ -210,7 +210,7 @@ namespace MinorShift.Emuera.Sub
 				if (countZero == length1)//列の要素が全部0
 					countAllZero++;
 				else
-					writer.Write(Ebdb.EoA1);//非0がexistなら列終端記号を記憶
+					writer.Write(Ebdb.EoA1);//非0があるなら列終端記号を記憶
 				countZero = 0;
 			}
 			writer.Write(Ebdb.EoD);
@@ -218,9 +218,9 @@ namespace MinorShift.Emuera.Sub
 
 		private void writeData(Int64[, ,] array)
 		{
-			int countZero = 0;//0については0が連続do数を記憶do.その他はそのまま記憶do.
-			int countAllZero = 0;//列の要素がall0でexist列の連続do数を記憶do.列の要素に一つでも非0がexistなら通常の記憶方式.
-			int countAllZero2D = 0;//line列の要素がall0でexistline列の･･･
+			int countZero = 0;//0については0が連続する数を記憶する。その他はそのまま記憶する。
+			int countAllZero = 0;//列の要素が全て0である列の連続する数を記憶する。列の要素に一つでも非0があるなら通常の記憶方式。
+			int countAllZero2D = 0;//行列の要素が全て0である行列の･･･
 			int length0 = array.GetLength(0);
 			int length1 = array.GetLength(1);
 			int length2 = array.GetLength(2);

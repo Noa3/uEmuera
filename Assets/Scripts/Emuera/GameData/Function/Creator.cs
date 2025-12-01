@@ -14,7 +14,7 @@ namespace MinorShift.Emuera.GameData.Function
 		{
             methodList = new Dictionary<string, FunctionMethod>
             {
-                //characterdata系
+                //キャラクタデータ系
                 ["GETCHARA"] = new GetcharaMethod(),
                 ["GETSPCHARA"] = new GetspcharaMethod(),
                 ["CSVNAME"] = new CsvStrDataMethod(CharacterStrData.NAME),
@@ -35,7 +35,7 @@ namespace MinorShift.Emuera.GameData.Function
                 ["FINDLASTCHARA"] = new FindcharaMethod(true),
                 ["EXISTCSV"] = new ExistCsvMethod(),
 
-                //汎forprocess系
+                //汎用処理系
                 ["VARSIZE"] = new VarsizeMethod(),
                 ["CHKFONT"] = new CheckfontMethod(),
                 ["CHKDATA"] = new CheckdataMethod(EraSaveFileType.Normal),
@@ -72,7 +72,7 @@ namespace MinorShift.Emuera.GameData.Function
                 ["GETMILLISECOND"] = new GetmsMethod(),
                 ["GETSECOND"] = new GetSecondMethod(),
 
-                //数学function
+                //数学関数
                 ["RAND"] = new RandMethod(),
                 ["MIN"] = new MaxMethod(false),
                 ["MAX"] = new MaxMethod(true),
@@ -86,7 +86,7 @@ namespace MinorShift.Emuera.GameData.Function
                 ["SIGN"] = new SignMethod(),
                 ["LIMIT"] = new GetLimitMethod(),
 
-                //variable操作系
+                //変数操作系
                 ["SUMARRAY"] = new SumArrayMethod(),
                 ["SUMCARRAY"] = new SumArrayMethod(true),
                 ["MATCH"] = new MatchMethod(),
@@ -111,7 +111,7 @@ namespace MinorShift.Emuera.GameData.Function
 
                 ["ARRAYMSORT"] = new ArrayMultiSortMethod(),
 
-                //string操作系
+                //文字列操作系
                 ["STRLENS"] = new StrlenMethod(),
                 ["STRLENSU"] = new StrlenuMethod(),
                 ["SUBSTRING"] = new SubstringMethod(),
@@ -148,7 +148,7 @@ namespace MinorShift.Emuera.GameData.Function
                 ["HTML_ESCAPE"] = new HtmlEscapeMethod(),
 
 
-                //画像process系
+                //画像処理系
                 ["SPRITECREATED"] = new SpriteStateMethod(),
                 ["SPRITEWIDTH"] = new SpriteStateMethod(),
                 ["SPRITEHEIGHT"] = new SpriteStateMethod(),
@@ -211,7 +211,7 @@ namespace MinorShift.Emuera.GameData.Function
             };
 
 
-            //1823 自分のfunction名を知っていた方が何かと便利なので覚えさせるthisにした
+            //1823 自分の関数名を知っていた方が何かと便利なので覚えさせることにした
             foreach (var pair in methodList)
 				pair.Value.SetMethodName(pair.Key);
         }

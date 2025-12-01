@@ -6,65 +6,24 @@ using UnityEngine.UI;
 using MinorShift.Emuera;
 using MinorShift.Emuera.GameView;
 
-/// <summary>
-/// Main content display component for Emuera console output.
-/// Manages text and image rendering for the game interface.
-/// </summary>
 public class EmueraContent : MonoBehaviour
 {
-    /// <summary>
-    /// Gets the singleton instance of EmueraContent.
-    /// </summary>
     public static EmueraContent instance { get { return instance_; } }
     static EmueraContent instance_ = null;
 
-    /// <summary>
-    /// Default font name used for text rendering.
-    /// </summary>
     public string default_fontname;
-    
-    /// <summary>
-    /// Template Text component for cloning new text elements.
-    /// </summary>
     public Text template_text;
-    
-    /// <summary>
-    /// Template Image component for block elements.
-    /// </summary>
     public Image template_block;
-    
-    /// <summary>
-    /// Template RectTransform for image containers.
-    /// </summary>
     public RectTransform template_images;
-    
-    /// <summary>
-    /// Container for image content.
-    /// </summary>
     public RectTransform image_content;
-    
-    /// <summary>
-    /// Container for text content.
-    /// </summary>
     public RectTransform text_content;
-    
-    /// <summary>
-    /// Cache container for images.
-    /// </summary>
     public RectTransform cache_images;
-    
-    /// <summary>
-    /// Reference to the option window.
-    /// </summary>
     public OptionWindow option_window;
 
     Camera main_camere;
     Image background;
     uEmuera.Drawing.Color background_color;
 
-    /// <summary>
-    /// Gets the RectTransform of this component.
-    /// </summary>
     public RectTransform rect_transform { get { return (RectTransform)transform; } }
     RectMask2D mask2d;
 
@@ -89,11 +48,6 @@ public class EmueraContent : MonoBehaviour
                     PlayerPrefs.GetInt("IntentBox_R", 0));
     }
 
-    /// <summary>
-    /// Sets the indent box margins.
-    /// </summary>
-    /// <param name="left">Left margin offset.</param>
-    /// <param name="right">Right margin offset.</param>
     public void SetIntentBox(int left, int right)
     {
         if(left == 0 && right == 0)
@@ -341,7 +295,7 @@ public class EmueraContent : MonoBehaviour
     {
         if(content_width > display_width)
         {
-            //left-rightMove
+            //左右移动
             if(local.x > 0)
                 local.x = 0;
             else if(local.x < display_width - content_width)
@@ -493,14 +447,14 @@ public class EmueraContent : MonoBehaviour
         console_lines_[max_index % max_log_count] = ld;
         if(invalid_count > 0)
             invalid_count -= 1;
-        //Addoffsetheight
+        //添加偏移高
         if(valid_count >= max_log_count)
             offset_height += Config.LineHeight;
         max_index += 1;
 
         ld.Update();
         
-        //Addcontainerheight
+        //添加容器高
         content_height += Config.LineHeight;
         if(roll_to_bottom)
         {
@@ -715,26 +669,26 @@ public class EmueraContent : MonoBehaviour
     float DISPLAY_HEIGHT { get { return rect_transform.rect.height; } }
 
     /// <summary>
-    /// offsetheight
+    /// 偏移高
     /// </summary>
     float offset_height = 0;
     /// <summary>
-    /// in容宽
+    /// 内容宽
     /// </summary>
     float content_width = 0;
     /// <summary>
-    /// in容height
+    /// 内容高
     /// </summary>
     float content_height = 0;
     /// <summary>
-    /// currentMovepoint
+    /// 当前移动点
     /// </summary>
     Vector2 local_position = Vector2.zero;
 
     List<EmueraLine> display_lines_ = new List<EmueraLine>();
     Dictionary<int, EmueraImage> display_images_ = new Dictionary<int, EmueraImage>();
     /// <summary>
-    /// Gettextdisplaycontrol
+    /// 获取文本显示控件
     /// </summary>
     /// <returns></returns>
     EmueraLine PullLine()
@@ -756,7 +710,7 @@ public class EmueraContent : MonoBehaviour
         return line;
     }
     /// <summary>
-    /// 交还textdisplaycontrol
+    /// 交还文本显示控件
     /// </summary>
     /// <param name="line"></param>
     void PushLine(EmueraLine line)
@@ -778,7 +732,7 @@ public class EmueraContent : MonoBehaviour
     Queue<EmueraLine> cache_lines_ = new Queue<EmueraLine>();
 
     /// <summary>
-    /// Getimagedisplaycontrol
+    /// 获取图片显示控件
     /// </summary>
     /// <returns></returns>
     EmueraImage PullImageContainer()
@@ -797,7 +751,7 @@ public class EmueraContent : MonoBehaviour
         return image;
     }
     /// <summary>
-    /// 交还imagedisplaycontrol
+    /// 交还图片显示控件
     /// </summary>
     /// <param name="image"></param>
     void PushImageContainer(EmueraImage image)

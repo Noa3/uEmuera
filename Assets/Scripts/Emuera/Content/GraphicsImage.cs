@@ -12,10 +12,6 @@ using uEmuera.Drawing;
 
 namespace MinorShift.Emuera.Content
 {
-	/// <summary>
-	/// Represents a graphics image created dynamically in ERB scripts.
-	/// Supports various drawing operations like clear, draw text, rectangles, and other images.
-	/// </summary>
 	internal sealed class GraphicsImage : AbstractImage
 	{
 		//public Bitmap Bitmap;
@@ -24,10 +20,6 @@ namespace MinorShift.Emuera.Content
 		//protected IntPtr hBitmap;
 		//protected IntPtr hDefaultImg;
 
-		/// <summary>
-		/// Initializes a new GraphicsImage with the specified ID.
-		/// </summary>
-		/// <param name="id">The unique identifier for this graphics image.</param>
 		public GraphicsImage(int id)
 		{
 			ID = id;
@@ -36,10 +28,6 @@ namespace MinorShift.Emuera.Content
 			//created = false;
 			//locked = false;
 		}
-		
-		/// <summary>
-		/// The unique identifier of this graphics image.
-		/// </summary>
 		public readonly int ID;
         //Size size;
         //Brush brush = null;

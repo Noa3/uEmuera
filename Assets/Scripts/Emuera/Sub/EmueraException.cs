@@ -21,7 +21,7 @@ namespace MinorShift.Emuera.Sub
 	}
 
 	/// <summary>
-	/// emuera本体に起因doと思われるError
+	/// emuera本体に起因すると思われるError
 	/// </summary>
     [Serializable]
     internal sealed class ExeEE : EmueraException
@@ -37,7 +37,7 @@ namespace MinorShift.Emuera.Sub
 	}
 
 	/// <summary>
-	/// script側に起因doと思われるError
+	/// スクリプト側に起因すると思われるError
 	/// </summary>
     [Serializable]
     internal class CodeEE : EmueraException
@@ -53,7 +53,7 @@ namespace MinorShift.Emuera.Sub
 	}
 
 	/// <summary>
-	/// script側に起因doと思われるErrorのうち,未definitionの識別子に関連dothing
+	/// スクリプト側に起因すると思われるErrorのうち、未定義の識別子に関連するもの
 	/// </summary>
 	[Serializable]
 	internal class IdentifierNotFoundCodeEE : CodeEE
@@ -85,7 +85,7 @@ namespace MinorShift.Emuera.Sub
 	}
 
 	/// <summary>
-	/// Save, LoadinsideのError
+	/// Save, Load中のError
 	/// </summary>
     [Serializable]
     internal sealed class FileEE : EmueraException
@@ -96,7 +96,7 @@ namespace MinorShift.Emuera.Sub
 	}
 
 	/// <summary>
-	/// Error箇所をdisplaybecauseの位置data.整形previous dataなのでErrordisplay以outの理由で参照doべきではnot.
+	/// Error箇所を表示するための位置データ。整形前のデータなのでError表示以外の理由で参照するべきではない。
 	/// </summary>
 	internal sealed class ScriptPosition : IEquatable<ScriptPosition>, IEqualityComparer<ScriptPosition>
 	{

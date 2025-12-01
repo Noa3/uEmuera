@@ -30,7 +30,7 @@ namespace MinorShift.Emuera.GameData.Variable
 		}
 
 		///// <summary>
-		///// まだfirst 識別子を読んでいnot状態from決め打ちでvariableを解読do
+		///// まだ最初の識別子を読んでいない状態から決め打ちで変数を解読する
 		///// </summary>
 		///// <param name="st"></param>
 		///// <returns></returns>
@@ -42,12 +42,12 @@ namespace MinorShift.Emuera.GameData.Variable
 		//    wc.ShiftNext();
 		//    VariableToken vid = ExpressionParser.ReduceVariableIdentifier(wc, id.Code);
 		//    if (vid == null)
-		//        throw new CodeEE("\"" + id.Code + "\"は解釈できnot識別子です");
+		//        throw new CodeEE("\"" + id.Code + "\"は解釈できない識別子です");
 		//    return ReduceVariable(vid, wc);
 		//}
 
 		/// <summary>
-		/// 識別子を読み終えた状態fromのparse
+		/// 識別子を読み終えた状態からの解析
 		/// </summary>
 		/// <param name="st"></param>
 		/// <returns></returns>
@@ -95,7 +95,7 @@ namespace MinorShift.Emuera.GameData.Variable
 					if ((op1 == null) && (op2 == null) && (op3 == null))
 						return new VariableNoArgTerm(id);
 					if ((op1 == null) || (op2 == null) || (op3 == null))
-						throw new CodeEE("character二次originalarrayvariable" + id.Name + "のargumentは省略できません");
+						throw new CodeEE("キャラクタ二次元配列変数" + id.Name + "のargumentは省略できません");
 					terms = new IOperandTerm[3];
 					terms[0] = op1;
 					terms[1] = op2;
@@ -104,13 +104,13 @@ namespace MinorShift.Emuera.GameData.Variable
 				else if (id.IsArray1D)
 				{
 					if (op3 != null)
-						throw new CodeEE("charactervariable" + id.Name + "のargumentが多すぎます");
+						throw new CodeEE("キャラクタ変数" + id.Name + "のargumentが多すぎます");
 					if ((op1 == null) && (op2 == null) && (op3 == null) && Config.SystemNoTarget)
 						return new VariableNoArgTerm(id);
 					if (op2 == null)
 					{
 						if (Config.SystemNoTarget)
-							throw new CodeEE("characterarrayvariable" + id.Name + "のargumentは省略できません(configにthanprohibitedが選択されています)");
+							throw new CodeEE("キャラクタ配列変数" + id.Name + "のargumentは省略できません(コンフィグにより禁止が選択されています)");
 						if (op1 == null)
 							op2 = ZeroTerm;
 						else
@@ -124,13 +124,13 @@ namespace MinorShift.Emuera.GameData.Variable
 				else
 				{
 					if (op2 != null)
-						throw new CodeEE("charactervariable" + id.Name + "のargumentが多すぎます");
+						throw new CodeEE("キャラクタ変数" + id.Name + "のargumentが多すぎます");
 					if ((op1 == null) && (op2 == null) && (op3 == null) && Config.SystemNoTarget)
 						return new VariableNoArgTerm(id);
 					if (op1 == null)
 					{
 						if (Config.SystemNoTarget)
-							throw new CodeEE("charactervariable" + id.Name + "のargumentは省略できません(configにthanprohibitedが選択されています)");
+							throw new CodeEE("キャラクタ変数" + id.Name + "のargumentは省略できません(コンフィグにより禁止が選択されています)");
 						op1 = TARGET;
 					}
 					terms = new IOperandTerm[1];
@@ -142,7 +142,7 @@ namespace MinorShift.Emuera.GameData.Variable
 				if ((op1 == null) && (op2 == null) && (op3 == null))
 					return new VariableNoArgTerm(id);
 				if ((op1 == null) || (op2 == null) || (op3 == null))
-					throw new CodeEE("三次originalarrayvariable" + id.Name + "のargumentは省略できません");
+					throw new CodeEE("三次元配列変数" + id.Name + "のargumentは省略できません");
 				terms = new IOperandTerm[3];
 				terms[0] = op1;
 				terms[1] = op2;
@@ -153,9 +153,9 @@ namespace MinorShift.Emuera.GameData.Variable
 				if ((op1 == null) && (op2 == null) && (op3 == null))
 					return new VariableNoArgTerm(id);
 				if ((op1 == null) || (op2 == null))
-					throw new CodeEE("二次originalarrayvariable" + id.Name + "のargumentは省略できません");
+					throw new CodeEE("二次元配列変数" + id.Name + "のargumentは省略できません");
 				if (op3 != null)
-					throw new CodeEE("二次originalarray" + id.Name + "のargumentが多すぎます");
+					throw new CodeEE("二次元配列" + id.Name + "のargumentが多すぎます");
 				terms = new IOperandTerm[2];
 				terms[0] = op1;
 				terms[1] = op2;
@@ -163,7 +163,7 @@ namespace MinorShift.Emuera.GameData.Variable
 			else if (id.IsArray1D)
 			{
 				if (op2 != null)
-					throw new CodeEE("一次originalarrayvariable" + id.Name + "のargumentが多すぎます");
+					throw new CodeEE("一次元配列変数" + id.Name + "のargumentが多すぎます");
                 if (op1 == null)
                 {
                     op1 = ZeroTerm;
@@ -182,7 +182,7 @@ namespace MinorShift.Emuera.GameData.Variable
 			}
 			else if (op1 != null)
 			{
-				throw new CodeEE("arrayでnotvariable" + id.Name + "をargument付きでcallています");
+				throw new CodeEE("配列でない変数" + id.Name + "をargument付きで呼び出しています");
 			}
 			else
 				terms = new IOperandTerm[0];

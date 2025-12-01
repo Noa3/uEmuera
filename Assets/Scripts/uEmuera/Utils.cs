@@ -4,90 +4,41 @@ using System.Collections.Generic;
 
 namespace uEmuera
 {
-    /// <summary>
-    /// Logging utility class for Emuera.
-    /// </summary>
     public static class Logger
     {
-        /// <summary>
-        /// Logs an informational message.
-        /// </summary>
-        /// <param name="content">The content to log.</param>
         public static void Info(object content)
         {
             if(info == null)
                 return;
             info(content);
         }
-        
-        /// <summary>
-        /// Logs a warning message.
-        /// </summary>
-        /// <param name="content">The content to log.</param>
         public static void Warn(object content)
         {
             if(warn == null)
                 return;
             warn(content);
         }
-        
-        /// <summary>
-        /// Logs an error message.
-        /// </summary>
-        /// <param name="content">The content to log.</param>
         public static void Error(object content)
         {
             if(error == null)
                 return;
             error(content);
         }
-        
-        /// <summary>
-        /// Callback for info logging.
-        /// </summary>
         public static System.Action<object> info;
-        
-        /// <summary>
-        /// Callback for warning logging.
-        /// </summary>
         public static System.Action<object> warn;
-        
-        /// <summary>
-        /// Callback for error logging.
-        /// </summary>
         public static System.Action<object> error;
     }
 
-    /// <summary>
-    /// Utility class with various helper methods for Emuera.
-    /// </summary>
     public static class Utils
     {
-        /// <summary>
-        /// Sets the SHIFT-JIS to UTF-8 conversion dictionary.
-        /// </summary>
-        /// <param name="dict">The dictionary to use for conversion.</param>
         public static void SetSHIFTJIS_to_UTF8Dict(Dictionary<string, string> dict)
         {
             shiftjis_to_utf8 = dict;
         }
-        
-        /// <summary>
-        /// Sets the character mapping dictionary for converting Chinese text variants.
-        /// Used for compatibility with different Chinese text encodings.
-        /// </summary>
-        /// <param name="dict">The dictionary to use for text mapping.</param>
         public static void SetUTF8ZHCN_to_UTF8Dict(Dictionary<string, string> dict)
         {
             utf8zhcn_to_utf8 = dict;
         }
-        
-        /// <summary>
-        /// Converts SHIFT-JIS encoded text to UTF-8.
-        /// </summary>
-        /// <param name="text">The text to convert.</param>
-        /// <param name="md5">The MD5 hash of the original content.</param>
-        /// <returns>The converted UTF-8 string, or null if not found.</returns>
         public static string SHIFTJIS_to_UTF8(string text, string md5)
         {
             if(shiftjis_to_utf8 == null)
@@ -102,10 +53,10 @@ namespace uEmuera
         static Dictionary<string, string> utf8zhcn_to_utf8;
 
         /// <summary>
-        /// Normalizes a file path by standardizing directory separators.
+        /// 标准化目录
         /// </summary>
-        /// <param name="path">The path to normalize.</param>
-        /// <returns>The normalized path.</returns>
+        /// <param name="path"></param>
+        /// <returns></returns>
         public static string NormalizePath(string path)
         {
             var ps = path.Split('/', '\\');
@@ -124,11 +75,6 @@ namespace uEmuera
             return "";
         }
 
-        /// <summary>
-        /// Gets the file extension (suffix) from a filename.
-        /// </summary>
-        /// <param name="filename">The filename to extract the extension from.</param>
-        /// <returns>The file extension without the dot.</returns>
         public static string GetSuffix(string filename)
         {
             int last_slash = filename.LastIndexOf('.');
@@ -136,39 +82,25 @@ namespace uEmuera
                 return filename.Substring(last_slash + 1);
             return filename;
         }
-        
         /// <summary>
-        /// Gets the display length of text based on font.
+        /// 获取文本长
         /// </summary>
-        /// <param name="s">The text to measure.</param>
-        /// <param name="font">The font to use for measurement.</param>
-        /// <returns>The display length in pixels.</returns>
+        /// <param name="s"></param>
+        /// <param name="font"></param>
+        /// <returns></returns>
         public static int GetDisplayLength(string s, uEmuera.Drawing.Font font)
         {
             return GetDisplayLength(s, font.Size);
         }
 
-        /// <summary>
-        /// Set of characters that are considered full-width.
-        /// </summary>
         public static readonly HashSet<char> fullsize = new HashSet<char>
         {
             '´',
         };
-        
-        /// <summary>
-        /// Checks if a character is full-width.
-        /// </summary>
-        /// <param name="c">The character to check.</param>
-        /// <returns>True if the character is full-width.</returns>
         public static bool CheckFullSize(char c)
         {
             return fullsize.Contains(c);
         }
-        
-        /// <summary>
-        /// Set of characters that are considered half-width.
-        /// </summary>
         public static readonly HashSet<char> halfsize = new HashSet<char>
         {
             '▀','▁','▂','▃','▄','▅',
@@ -185,7 +117,7 @@ namespace uEmuera
             return c < 0x127 || halfsize.Contains(c);
         }
         /// <summary>
-        /// Get text length
+        /// 获取文本长
         /// </summary>
         /// <param name="s"></param>
         /// <param name="font"></param>

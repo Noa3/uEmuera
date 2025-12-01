@@ -5,36 +5,36 @@ namespace MinorShift.Emuera.GameProc.Function
 {
 	/// <summary>
 	/// FunctionCodeのラッパー
-	/// BuiltInFunctionManagerをoriginalにclass化
+	/// BuiltInFunctionManagerを元にクラス化
 	/// </summary>
 	internal sealed partial class FunctionIdentifier
 	{
-		#region flagdefinition
-		//いちいちFunctionFlag.FLOW_CONTROLとか書くのが面倒だったfromenumではなくconst intで
+		#region flag定義
+		//いちいちFunctionFlag.FLOW_CONTROLとか書くのが面倒だったからenumではなくconst intで
 		public const int FLOW_CONTROL = 0x00001;
 		public const int EXTENDED = 0x00002;//Emuera拡張命令
-		public const int METHOD_SAFE = 0x00004;//#Functioninsideでcallてよい命令.WAITetcinputを伴うthing,CALLetcfunctioncallを伴うthingは不可.
-		public const int DEBUG_FUNC = 0x00008;//-Debugargument付きで起動したcaseにのみ実linebe done命令.
-		public const int PARTIAL = 0x00010;//複数lineに渡る構文のpartでexist命令.SIF文の次に来てはいけnot.debugcommandfromのcallも不適当.
-		public const int FORCE_SETARG = 0x00020;//loadwhenに必ずargumentparseをlineう必要のexistthing.IFやSELECTCASEetc
+		public const int METHOD_SAFE = 0x00004;//#Function中で呼び出してよい命令。WAITなど入力を伴うもの、CALLなど関数呼び出しを伴うものは不可。
+		public const int DEBUG_FUNC = 0x00008;//-Debugargument付きで起動した場合にのみ実行される命令。
+		public const int PARTIAL = 0x00010;//複数行に渡る構文の一部である命令。SIF文の次に来てはいけない。debugコマンドからの呼び出しも不適当。
+		public const int FORCE_SETARG = 0x00020;//ロード時に必ずargument解析を行う必要のあるもの。IFやSELECTCASEなど
 		public const int IS_JUMP = 0x00040;//JUMP命令
 		public const int IS_TRY = 0x00080;//TRY系命令
 		public const int IS_TRYC = 0x08000;//TRY系命令
 
-		public const int PRINT_NEWLINE = 0x00100;//PRINT命令でoutputafter改linedothing
-		public const int PRINT_WAITINPUT = 0x00200;//PRINT命令でoutputafterinput待ちdothing
+		public const int PRINT_NEWLINE = 0x00100;//PRINT命令で出力後改行するもの
+		public const int PRINT_WAITINPUT = 0x00200;//PRINT命令で出力後入力待ちするもの
 		public const int PRINT_SINGLE = 0x00400;//PRINTSINGLE系
-		public const int ISPRINTDFUNC = 0x00800;//PRINTD系判定for
-		public const int ISPRINTKFUNC = 0x01000;//PRINTK系判定for
+		public const int ISPRINTDFUNC = 0x00800;//PRINTD系判定用
+		public const int ISPRINTKFUNC = 0x01000;//PRINTK系判定用
 
-		public const int IS_PRINT = 0x02000;//SkipPrintにthan飛ばbe done命令.PRINT系及びWAIT系.DEBUGPRINTは含まnot.
-		public const int IS_INPUT = 0x04000;//userDefinedSkipをwarningdo命令.INPUT系.
-		public const int IS_PRINTDATA = 0x10000;//PRINTDATA系判定for,PRINTとはpartprocessがdifferentので,それfor.
+		public const int IS_PRINT = 0x02000;//SkipPrintにより飛ばされる命令。PRINT系及びWAIT系。DEBUGPRINTは含まない。
+		public const int IS_INPUT = 0x04000;//userDefinedSkipを警告する命令。INPUT系。
+		public const int IS_PRINTDATA = 0x10000;//PRINTDATA系判定用、PRINTとは一部処理が違うので、それ用。
 
 		#endregion
 
 		#region static
-		//originalBuiltInFunctionManager部分
+		//元BuiltInFunctionManager部分
 		readonly static Dictionary<string, FunctionIdentifier> funcDic = new Dictionary<string, FunctionIdentifier>();
 		readonly static Dictionary<FunctionCode, string> funcMatch = new Dictionary<FunctionCode, string>();
 		readonly static Dictionary<FunctionCode, FunctionCode> funcParent = new Dictionary<FunctionCode, FunctionCode>();
@@ -173,7 +173,7 @@ namespace MinorShift.Emuera.GameProc.Function
 			addFunction(FunctionCode.PRINTPLAIN, argb[FunctionArgType.STR_NULLABLE], METHOD_SAFE | EXTENDED);
 			addFunction(FunctionCode.PRINTPLAINFORM, argb[FunctionArgType.FORM_STR_NULLABLE], METHOD_SAFE | EXTENDED);
 
-			addFunction(FunctionCode.PRINT_ABL, argb[FunctionArgType.INT_EXPRESSION], METHOD_SAFE);//能力.argumentは登録番号
+			addFunction(FunctionCode.PRINT_ABL, argb[FunctionArgType.INT_EXPRESSION], METHOD_SAFE);//能力。argumentは登録番号
 			addFunction(FunctionCode.PRINT_TALENT, argb[FunctionArgType.INT_EXPRESSION], METHOD_SAFE);//素質
 			addFunction(FunctionCode.PRINT_MARK, argb[FunctionArgType.INT_EXPRESSION], METHOD_SAFE);//刻印
 			addFunction(FunctionCode.PRINT_EXP, argb[FunctionArgType.INT_EXPRESSION], METHOD_SAFE);//経験
@@ -181,10 +181,10 @@ namespace MinorShift.Emuera.GameProc.Function
 			addFunction(FunctionCode.PRINT_ITEM, argb[FunctionArgType.VOID], METHOD_SAFE);//所持アイテム
 			addFunction(FunctionCode.PRINT_SHOPITEM, argb[FunctionArgType.VOID], METHOD_SAFE);//ショップで売っているアイテム
 
-			addFunction(FunctionCode.DRAWLINE, argb[FunctionArgType.VOID], METHOD_SAFE);//画面の左端from右端until----と線を引く.
-			addFunction(FunctionCode.BAR, new BAR_Instruction(false));//[*****....]のようなグラフを書く.BAR (variable) , (最大value), (長さ)
-			addFunction(FunctionCode.BARL, new BAR_Instruction(true));//改line付き.
-			addFunction(FunctionCode.TIMES, new TIMES_Instruction());//小数calculate.TIMES (variable) , (小numeric)called 形で使う.
+			addFunction(FunctionCode.DRAWLINE, argb[FunctionArgType.VOID], METHOD_SAFE);//画面の左端から右端まで----と線を引く。
+			addFunction(FunctionCode.BAR, new BAR_Instruction(false));//[*****....]のようなグラフを書く。BAR (変数) , (最大値), (長さ)
+			addFunction(FunctionCode.BARL, new BAR_Instruction(true));//改行付き。
+			addFunction(FunctionCode.TIMES, new TIMES_Instruction());//小数計算。TIMES (変数) , (小数値)という形で使う。
 
 			addFunction(FunctionCode.WAIT, new WAIT_Instruction(false));
 			addFunction(FunctionCode.INPUT, new INPUT_Instruction());
@@ -204,19 +204,19 @@ namespace MinorShift.Emuera.GameProc.Function
 			#endregion
 			addFunction(FunctionCode.UPCHECK, argb[FunctionArgType.VOID], METHOD_SAFE);//パラメータの変動
 			addFunction(FunctionCode.CUPCHECK, argb[FunctionArgType.INT_EXPRESSION], METHOD_SAFE | EXTENDED);
-			addFunction(FunctionCode.ADDCHARA, new ADDCHARA_Instruction(false, false));//(キャラ番号)のcharacterをadd
-			addFunction(FunctionCode.ADDSPCHARA, new ADDCHARA_Instruction(true, false));//(キャラ番号)のSPcharacterをadd(フラグ0を1にしてcreate)
+			addFunction(FunctionCode.ADDCHARA, new ADDCHARA_Instruction(false, false));//(キャラ番号)のキャラクタを追加
+			addFunction(FunctionCode.ADDSPCHARA, new ADDCHARA_Instruction(true, false));//(キャラ番号)のSPキャラクタを追加（フラグ0を1にして作成）
 			addFunction(FunctionCode.ADDDEFCHARA, argb[FunctionArgType.VOID], METHOD_SAFE | EXTENDED);
-			addFunction(FunctionCode.ADDVOIDCHARA, new ADDVOIDCHARA_Instruction());//variableに何のsettingのnotキャラをcreate
-			addFunction(FunctionCode.DELCHARA, new ADDCHARA_Instruction(false, true));//(キャラ登録番号)のcharacterをdelete.
+			addFunction(FunctionCode.ADDVOIDCHARA, new ADDVOIDCHARA_Instruction());//変数に何の設定のないキャラを作成
+			addFunction(FunctionCode.DELCHARA, new ADDCHARA_Instruction(false, true));//(キャラ登録番号)のキャラクタを削除。
 
-			addFunction(FunctionCode.PUTFORM, argb[FunctionArgType.FORM_STR_NULLABLE], METHOD_SAFE);//@SAVEINFOfunctionでのみusepossible.PRINTFORMと同様の書式でsavedataに概要をつける.
-			addFunction(FunctionCode.QUIT, argb[FunctionArgType.VOID]);//ゲームをend
+			addFunction(FunctionCode.PUTFORM, argb[FunctionArgType.FORM_STR_NULLABLE], METHOD_SAFE);//@SAVEINFO関数でのみ使用可能。PRINTFORMと同様の書式でセーブデータに概要をつける。
+			addFunction(FunctionCode.QUIT, argb[FunctionArgType.VOID]);//ゲームを終了
 			addFunction(FunctionCode.OUTPUTLOG, argb[FunctionArgType.VOID]);
 
-			addFunction(FunctionCode.BEGIN, new BEGIN_Instruction());//systemfunctionの実line.実linedoとCALLのcalloriginaletcを忘れてしまう.
+			addFunction(FunctionCode.BEGIN, new BEGIN_Instruction());//システム関数の実行。実行するとCALLの呼び出し元などを忘れてしまう。
 
-			addFunction(FunctionCode.SAVEGAME, new SAVELOADGAME_Instruction(true));//save画面を呼ぶ.ショップのみ.
+			addFunction(FunctionCode.SAVEGAME, new SAVELOADGAME_Instruction(true));//セーブ画面を呼ぶ。ショップのみ。
 			addFunction(FunctionCode.LOADGAME, new SAVELOADGAME_Instruction(false));//
 			addFunction(FunctionCode.SAVEDATA, argb[FunctionArgType.SP_SAVEDATA], METHOD_SAFE | EXTENDED);
 			addFunction(FunctionCode.LOADDATA, argb[FunctionArgType.INT_EXPRESSION], EXTENDED | FLOW_CONTROL);
@@ -226,7 +226,7 @@ namespace MinorShift.Emuera.GameProc.Function
 			addFunction(FunctionCode.RESETDATA, new RESETDATA_Instruction());
 			addFunction(FunctionCode.RESETGLOBAL, new RESETGLOBAL_Instruction());
 
-			addFunction(FunctionCode.SIF, new SIF_Instruction());//一lineのみIF
+			addFunction(FunctionCode.SIF, new SIF_Instruction());//一行のみIF
 			addFunction(FunctionCode.IF, new IF_Instruction());
 			addFunction(FunctionCode.ELSE, new ELSEIF_Instruction(FunctionArgType.VOID));
 			addFunction(FunctionCode.ELSEIF, new ELSEIF_Instruction(FunctionArgType.INT_EXPRESSION));
@@ -236,7 +236,7 @@ namespace MinorShift.Emuera.GameProc.Function
 			addFunction(FunctionCode.CASEELSE, new ELSEIF_Instruction(FunctionArgType.VOID), EXTENDED);
 			addFunction(FunctionCode.ENDSELECT, new ENDIF_Instruction(), METHOD_SAFE | EXTENDED);
 
-			addFunction(FunctionCode.REPEAT, new REPEAT_Instruction(false));//RENDuntil繰り返し.繰り返した回数がCOUNTto.ネスト不可.
+			addFunction(FunctionCode.REPEAT, new REPEAT_Instruction(false));//RENDまで繰り返し。繰り返した回数がCOUNTへ。ネスト不可。
 			addFunction(FunctionCode.REND, new REND_Instruction());
 			addFunction(FunctionCode.FOR, new REPEAT_Instruction(true), EXTENDED);
 			addFunction(FunctionCode.NEXT, new REND_Instruction(), EXTENDED);
@@ -245,10 +245,10 @@ namespace MinorShift.Emuera.GameProc.Function
 			addFunction(FunctionCode.DO, new ENDIF_Instruction(), METHOD_SAFE | EXTENDED);
 			addFunction(FunctionCode.LOOP, new LOOP_Instruction());
 			addFunction(FunctionCode.CONTINUE, new CONTINUE_Instruction());//REPEATに戻る
-			addFunction(FunctionCode.BREAK, new BREAK_Instruction());//RENDのnext lineuntil
+			addFunction(FunctionCode.BREAK, new BREAK_Instruction());//RENDの次の行まで
 
-			addFunction(FunctionCode.RETURN, new RETURN_Instruction());//functionのend.RESULTにintegerを格納possible.省略したcase,０.(next @～～がRETURNと見なbe done.)  
-			addFunction(FunctionCode.RETURNFORM, new RETURNFORM_Instruction());//functionのend.RESULTにintegerを格納possible.省略したcase,０.(next @～～がRETURNと見なbe done.)  
+			addFunction(FunctionCode.RETURN, new RETURN_Instruction());//関数の終了。RESULTに整数を格納可能。省略した場合、０。(次の@～～がRETURNと見なされる。)  
+			addFunction(FunctionCode.RETURNFORM, new RETURNFORM_Instruction());//関数の終了。RESULTに整数を格納可能。省略した場合、０。(次の@～～がRETURNと見なされる。)  
 			addFunction(FunctionCode.RETURNF, new RETURNF_Instruction());
 
 			addFunction(FunctionCode.STRLEN, new STRLEN_Instruction(false, false));
@@ -321,8 +321,8 @@ namespace MinorShift.Emuera.GameProc.Function
 			addFunction(FunctionCode.ARRAYSORT, argb[FunctionArgType.SP_SORTARRAY], METHOD_SAFE | EXTENDED);
 			addFunction(FunctionCode.ARRAYCOPY, argb[FunctionArgType.SP_COPY_ARRAY], METHOD_SAFE | EXTENDED);
 
-			addFunction(FunctionCode.JUMP, new CALL_Instruction(false, true, false, false));//functionにmove
-			addFunction(FunctionCode.CALL, new CALL_Instruction(false, false, false, false));//functionにmove.moveoriginalを記憶し,RETURNで帰る.
+			addFunction(FunctionCode.JUMP, new CALL_Instruction(false, true, false, false));//関数に移動
+			addFunction(FunctionCode.CALL, new CALL_Instruction(false, false, false, false));//関数に移動。移動元を記憶し、RETURNで帰る。
 			addFunction(FunctionCode.TRYJUMP, new CALL_Instruction(false, true, true, false), EXTENDED);
 			addFunction(FunctionCode.TRYCALL, new CALL_Instruction(false, false, true, false), EXTENDED);
 			addFunction(FunctionCode.JUMPFORM, new CALL_Instruction(true, true, false, false), EXTENDED);
@@ -336,8 +336,8 @@ namespace MinorShift.Emuera.GameProc.Function
 			addFunction(FunctionCode.CALLEVENT, new CALLEVENT_Instruction());
 			addFunction(FunctionCode.CALLF, new CALLF_Instruction(false));
 			addFunction(FunctionCode.CALLFORMF, new CALLF_Instruction(true));
-			addFunction(FunctionCode.RESTART, new RESTART_Instruction());//functionの再開.functionの最初に戻る.
-			addFunction(FunctionCode.GOTO, new GOTO_Instruction(false, false, false));//$ラベルtoジャンプ
+			addFunction(FunctionCode.RESTART, new RESTART_Instruction());//関数の再開。関数の最初に戻る。
+			addFunction(FunctionCode.GOTO, new GOTO_Instruction(false, false, false));//$ラベルへジャンプ
 			addFunction(FunctionCode.TRYGOTO, new GOTO_Instruction(false, true, false), EXTENDED);
 			addFunction(FunctionCode.GOTOFORM, new GOTO_Instruction(true, false, false), EXTENDED);
 			addFunction(FunctionCode.TRYGOTOFORM, new GOTO_Instruction(true, true, false), EXTENDED);
@@ -379,13 +379,13 @@ namespace MinorShift.Emuera.GameProc.Function
 
 			addFunction(FunctionCode.INPUTMOUSEKEY, new INPUTMOUSEKEY_Instruction());
 			addFunction(FunctionCode.AWAIT, new AWAIT_Instruction());
-			#region 式insidefunctionのargument違い
-			addFunction(FunctionCode.VARSIZE, argb[FunctionArgType.SP_VAR], METHOD_SAFE | EXTENDED);//動作がdifferentのでMETHOD化できnot
-			addFunction(FunctionCode.GETTIME, argb[FunctionArgType.VOID], METHOD_SAFE | EXTENDED);//2つに代入do必要がexistのでMETHOD化できnot
-			addFunction(FunctionCode.POWER, argb[FunctionArgType.SP_POWER], METHOD_SAFE | EXTENDED);//argumentがdifferentのでMETHOD化できnot.
-			addFunction(FunctionCode.PRINTCPERLINE, argb[FunctionArgType.SP_GETINT], METHOD_SAFE | EXTENDED);//よく考えたらargumentの仕様differentや
-			addFunction(FunctionCode.SAVENOS, argb[FunctionArgType.SP_GETINT], METHOD_SAFE | EXTENDED);//argumentの仕様がdifferentので(ry
-			addFunction(FunctionCode.ENCODETOUNI, argb[FunctionArgType.FORM_STR_NULLABLE], METHOD_SAFE | EXTENDED);//式insidefunction版をadd.processが全然different
+			#region 式中関数のargument違い
+			addFunction(FunctionCode.VARSIZE, argb[FunctionArgType.SP_VAR], METHOD_SAFE | EXTENDED);//動作が違うのでMETHOD化できない
+			addFunction(FunctionCode.GETTIME, argb[FunctionArgType.VOID], METHOD_SAFE | EXTENDED);//2つに代入する必要があるのでMETHOD化できない
+			addFunction(FunctionCode.POWER, argb[FunctionArgType.SP_POWER], METHOD_SAFE | EXTENDED);//argumentが違うのでMETHOD化できない。
+			addFunction(FunctionCode.PRINTCPERLINE, argb[FunctionArgType.SP_GETINT], METHOD_SAFE | EXTENDED);//よく考えたらargumentの仕様違うや
+			addFunction(FunctionCode.SAVENOS, argb[FunctionArgType.SP_GETINT], METHOD_SAFE | EXTENDED);//argumentの仕様が違うので(ry
+			addFunction(FunctionCode.ENCODETOUNI, argb[FunctionArgType.FORM_STR_NULLABLE], METHOD_SAFE | EXTENDED);//式中関数版を追加。処理が全然違う
 			#endregion
 
 			Dictionary<string, FunctionMethod> methodList = FunctionMethodCreator.GetMethodList();
@@ -446,7 +446,7 @@ namespace MinorShift.Emuera.GameProc.Function
 
 		internal static FunctionCode getParentFunc(FunctionCode func)
 		{
-            //1755 どうもenum.ToString()が遅いようなのでaheadに逆引き辞書を作るthisに
+            //1755 どうもenum.ToString()が遅いようなので先に逆引き辞書を作ることに
             if (funcParent.TryGetValue(func, out FunctionCode ret))
                 return ret;
             else

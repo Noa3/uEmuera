@@ -10,7 +10,7 @@ using MinorShift.Emuera.GameProc.Function;
 namespace MinorShift.Emuera.GameProc
 {
 	/// <summary>
-	/// 命令文1lineに相当do抽象class
+	/// 命令文1行に相当する抽象クラス
 	/// </summary>
 	internal abstract class LogicalLine
 	{
@@ -52,7 +52,7 @@ namespace MinorShift.Emuera.GameProc
 	}
 
 	///// <summary>
-	///// コメントline.
+	///// コメント行。
 	///// </summary>
 	//internal sealed class CommentLine : LogicalLine
 	//{
@@ -69,7 +69,7 @@ namespace MinorShift.Emuera.GameProc
 	//}
 
 	/// <summary>
-	/// 無効なline.
+	/// 無効な行。
 	/// </summary>
 	internal sealed class InvalidLine : LogicalLine
 	{
@@ -133,7 +133,7 @@ namespace MinorShift.Emuera.GameProc
 		}
 
 		/// <summary>
-		/// 繰り返しのendを記憶do
+		/// 繰り返しの終了を記憶する
 		/// </summary>
 		public Int64 LoopEnd
 		{
@@ -143,7 +143,7 @@ namespace MinorShift.Emuera.GameProc
 
 		VariableTerm cnt;
 		/// <summary>
-		/// 繰り返しにつかうvariableを記憶do
+		/// 繰り返しにつかう変数を記憶する
 		/// </summary>
 		public VariableTerm LoopCounter
 		{
@@ -153,7 +153,7 @@ namespace MinorShift.Emuera.GameProc
 
 		Int64 step;
 		/// <summary>
-		/// 繰り返しのたびに増加dovalueを記憶do
+		/// 繰り返しのたびに増加する値を記憶する
 		/// </summary>
 		public Int64 LoopStep
 		{
@@ -163,9 +163,9 @@ namespace MinorShift.Emuera.GameProc
 
 		private LogicalLine jumpto = null;
         private LogicalLine jumptoendcatch = null;
-		//IF文とSELECT文のみが使う.
+		//IF文とSELECT文のみが使う。
 		public List<InstructionLine> IfCaseList = null;
-        //PRINTDATA文のみが使う.
+        //PRINTDATA文のみが使う。
         public List<List<InstructionLine>> dataList = null;
         //TRYCALLLIST系が使う
         public List<InstructionLine> callList = null;
@@ -185,12 +185,12 @@ namespace MinorShift.Emuera.GameProc
 	}
 
 	/// <summary>
-	/// fileの始端と終端
+	/// ファイルの始端と終端
 	/// </summary>
 	internal sealed class NullLine : LogicalLine { }
 	
 	/// <summary>
-	/// ラベルがErrorになっているfunctionline専forのclass
+	/// ラベルがErrorになっている関数行専用のクラス
 	/// </summary>
 	internal sealed class InvalidLabelLine : FunctionLabelLine
 	{
@@ -212,7 +212,7 @@ namespace MinorShift.Emuera.GameProc
 	}
 
 	/// <summary>
-	/// @で始まるラベルline
+	/// @で始まるラベル行
 	/// </summary>
 	internal class FunctionLabelLine : LogicalLine, IComparable<FunctionLabelLine>
 	{
@@ -268,20 +268,20 @@ namespace MinorShift.Emuera.GameProc
 		public int Depth { get; set; }
 
 		#region IComparable<FunctionLabelLine> メンバ
-		//ソートforinfo
+		//ソート用情報
 		public int Index { get; set; }
 		public int FileIndex { get; set; }
 		public int CompareTo(FunctionLabelLine other)
 		{
 			if (FileIndex != other.FileIndex)
 				return FileIndex.CompareTo(other.FileIndex);
-			//position == nullでexistLine(debugcommandetc)をSortdothisはnotはず
+			//position == nullであるLine(デバッグコマンドなど)をSortすることはないはず
 			if (position.LineNo != other.position.LineNo)
 				return position.LineNo.CompareTo(other.position.LineNo);
 			return Index.CompareTo(other.Index);
 		}
         #endregion
-        #region privatevariable
+        #region private変数
         readonly Dictionary<string, UserDefinedVariableToken> privateVar = new Dictionary<string, UserDefinedVariableToken>();
 		internal bool AddPrivateVariable(UserDefinedVariableData data)
 		{
@@ -289,7 +289,7 @@ namespace MinorShift.Emuera.GameProc
 				return false;
 			UserDefinedVariableToken var = GlobalStatic.VariableData.CreatePrivateVariable(data);
 			privateVar.Add(data.Name, var);
-			//静的なvariableのみのcaseはfunctioncallwhenに何もdo必要がnot
+			//静的な変数のみの場合は関数呼び出し時に何もする必要がない
 			if (!data.Static)
 				hasPrivDynamicVar = true;
 			return true;
@@ -301,7 +301,7 @@ namespace MinorShift.Emuera.GameProc
 		}
 
 		/// <summary>
-		/// argumentのvalueの確定after,argumentの代入thanbefore 呼ぶthis
+		/// argumentの値の確定後、argumentの代入より前に呼ぶこと
 		/// </summary>
 		internal void In()
 		{
@@ -326,7 +326,7 @@ namespace MinorShift.Emuera.GameProc
 	}
 
 	/// <summary>
-	/// $で始まるラベルline
+	/// $で始まるラベル行
 	/// </summary>
 	internal sealed class GotoLabelLine : LogicalLine, IEqualityComparer<GotoLabelLine>
 	{

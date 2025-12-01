@@ -256,7 +256,7 @@ internal static class SpriteManager
             kSetColor,
             kGetColor,
         }
-        //Todo: implement对于method
+        //Todo: 实现对于方法
     }
 
     static IEnumerator Loading(Bitmap baseimage)

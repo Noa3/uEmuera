@@ -20,20 +20,20 @@ namespace MinorShift.Emuera.GameProc
 			{
 				//bool sequential = state.Sequential;
 				state.ShiftNextLine();
-				//WinmmTimerfromwhen間を取得doのはそれ自体結構なコストがかかるので10000lineに一回くらいで.
+				//WinmmTimerから時間を取得するのはそれ自体結構なコストがかかるので10000行に一回くらいで。
 				if (Config.InfiniteLoopAlertTime > 0 && (state.lineCount % 10000 == 0))
 					checkInfiniteLoop();
 				LogicalLine line = state.CurrentLine;
 				InstructionLine func = line as InstructionLine;
-				//これがNULLになる様なprocessは現状notはず
+				//これがNULLになる様な処理は現状ないはず
 				//if (line == null)
-				//	throw new ExeEE("Emuera.exeは次に実linedolineを見失いました");
+				//	throw new ExeEE("Emuera.exeは次に実行する行を見失いました");
 				if (line.IsError)
 					throw new CodeEE(line.ErrMes);
 				else if (func != null)
-				{//1753 InstructionLineをaheadに持ってきてみる.わずかに速くなった気がしnotでもnot
+				{//1753 InstructionLineを先に持ってきてみる。わずかに速くなった気がしないでもない
 					if (!Program.DebugMode && func.Function.IsDebug())
-					{//非DebugモードでのDebug系命令.何もしnot.(SIF文のbecauseにコメントline扱いにはできnot)
+					{//非DebugモードでのDebug系命令。何もしない。（SIF文のためにコメント行扱いにはできない）
 						continue;
 					}
 					if (func.Argument == null)
@@ -46,9 +46,9 @@ namespace MinorShift.Emuera.GameProc
 					{
 						if ((userDefinedSkip) && (func.Function.IsInput()))
 						{
-							console.PrintError("displayスキップduring デフォルトvalueを持たnotINPUTに遭遇しました");
-							console.PrintError("INPUTに必要なprocessing NOSKIP～ENDNOSKIPで囲むか,SKIPDISP 0～SKIPDISP 1で囲ってください");
-							throw new CodeEE("無限ループに入るpossible性がheightいbecause実lineをwill terminate");
+							console.PrintError("表示スキップ中にデフォルト値を持たないINPUTに遭遇しました");
+							console.PrintError("INPUTに必要な処理をNOSKIP～ENDNOSKIPで囲むか、SKIPDISP 0～SKIPDISP 1で囲ってください");
+							throw new CodeEE("無限ループに入る可能性が高いため実行を終了します");
 						}
 						continue;
 					}
@@ -60,29 +60,29 @@ namespace MinorShift.Emuera.GameProc
 						doNormalFunction(func);
 				}
 				else if ((line is NullLine) || (line is FunctionLabelLine))
-				{//(function終端) or file終端
+				{//（関数終端） or ファイル終端
 					//if (sequential)
 					//{//流れ落ちてきた
 					if (!state.IsFunctionMethod)
 						vEvaluator.RESULT = 0;
 					state.Return(0);
 					//}
-					//1750 飛んできた直after ShiftNextが入るのでここが実linebe donethisは無いはず
+					//1750 飛んできた直後にShiftNextが入るのでここが実行されることは無いはず
 					//else//CALLやJUMPで飛んできた
 					//return;
 				}
 				else if (line is GotoLabelLine)
-					continue;//＄ラベル.何もdothisはnot.
+					continue;//＄ラベル。何もすることはない。
 				else if (line is InvalidLine)
 				{
 					if (string.IsNullOrEmpty(line.ErrMes))
-						throw new CodeEE("読込にfailedしたlineが実lineされました.Errorの詳細は読込whenのwarningを参照してください.");
+						throw new CodeEE("読込に失敗した行が実行されました。Errorの詳細は読込時の警告を参照してください。");
 					else
 						throw new CodeEE(line.ErrMes);
 				}
-				//currentそんなthingはnot
+				//現在そんなものはない
 				//else
-				//	throw new ExeEE("definitionされていnot種類のlineです");
+				//	throw new ExeEE("定義されていない種類の行です");
 				if (!console.IsRunning || state.ScriptEnd)
 					return;
 			}
@@ -107,7 +107,7 @@ namespace MinorShift.Emuera.GameProc
 			switch (func.FunctionCode)
 			{
 
-				case FunctionCode.PRINTBUTTON://variableのin容
+				case FunctionCode.PRINTBUTTON://変数の内容
 					{
 						if (skipPrint)
 							break;
@@ -115,7 +115,7 @@ namespace MinorShift.Emuera.GameProc
                         exm.Console.UseSetColorStyle = true;
                         SpButtonArgument bArg = (SpButtonArgument)func.Argument;
 						str = bArg.PrintStrTerm.GetStrValue(exm);
-						//buttonprocessに絡んでdisplayがおかしくなるbecause,PRINTBUTTONでの改lineコードはオミット
+						//ボタン処理に絡んで表示がおかしくなるため、PRINTBUTTONでの改行コードはオミット
 						str = str.Replace("\n", "");
 						if (bArg.ButtonWord.GetOperandType() == typeof(long))
 							exm.Console.PrintButton(str, bArg.ButtonWord.GetIntValue(exm));
@@ -123,7 +123,7 @@ namespace MinorShift.Emuera.GameProc
 							exm.Console.PrintButton(str, bArg.ButtonWord.GetStrValue(exm));
 					}
 					break;
-				case FunctionCode.PRINTBUTTONC://variableのin容
+				case FunctionCode.PRINTBUTTONC://変数の内容
 				case FunctionCode.PRINTBUTTONLC:
 					{
 						if (skipPrint)
@@ -132,7 +132,7 @@ namespace MinorShift.Emuera.GameProc
                         exm.Console.UseSetColorStyle = true;
                         SpButtonArgument bArg = (SpButtonArgument)func.Argument;
 						str = bArg.PrintStrTerm.GetStrValue(exm);
-						//buttonprocessに絡んでdisplayがおかしくなるbecause,PRINTBUTTONでの改lineコードはオミット
+						//ボタン処理に絡んで表示がおかしくなるため、PRINTBUTTONでの改行コードはオミット
 						str = str.Replace("\n", "");
 						bool isRight = (func.FunctionCode == FunctionCode.PRINTBUTTONC) ? true : false;
 						if (bArg.ButtonWord.GetOperandType() == typeof(long))
@@ -152,7 +152,7 @@ namespace MinorShift.Emuera.GameProc
 						exm.Console.PrintPlain(term.GetStrValue(exm));
 					}
 					break;
-				case FunctionCode.DRAWLINE://画面の左端from右端until----と線を引く.
+				case FunctionCode.DRAWLINE://画面の左端から右端まで----と線を引く。
 					if (skipPrint)
 						break;
 					exm.Console.PrintBar();
@@ -172,7 +172,7 @@ namespace MinorShift.Emuera.GameProc
 						//exm.Console.setStBar(Config.DrawLineString);
 					}
 					break;
-				case FunctionCode.PRINT_ABL://能力.argumentは登録番号
+				case FunctionCode.PRINT_ABL://能力。argumentは登録番号
 				case FunctionCode.PRINT_TALENT://素質
 				case FunctionCode.PRINT_MARK://刻印
 				case FunctionCode.PRINT_EXP://経験
@@ -192,7 +192,7 @@ namespace MinorShift.Emuera.GameProc
 						ExpressionArgument intExpArg = (ExpressionArgument)func.Argument;
 						Int64 target = intExpArg.Term.GetIntValue(exm);
 						int count = 0;
-						///100以降は否定の珠とかなのでdisplayしnot
+						///100以降は否定の珠とかなので表示しない
 						for (int i = 0; i < 100; i++)
 						{
 							string printStr = vEvaluator.GetCharacterParamString(target, i);
@@ -230,7 +230,7 @@ namespace MinorShift.Emuera.GameProc
 								if (printStr == null)
 									printStr = "";
 								Int64 price = vEvaluator.ITEMPRICE[i];
-								// 1.52a改変部分　(単位の差し替えand前置,after置に対応)
+								// 1.52a改変部分　（単位の差し替えおよび前置、後置に対応）
 								if (Config.MoneyFirst)
 									exm.Console.PrintC(string.Format("[{2}] {0}({3}{1})", printStr, price, i, Config.MoneyLabel), false);
 								else
@@ -270,22 +270,22 @@ namespace MinorShift.Emuera.GameProc
 							NoList[i] = term_i.GetIntValue(exm);
 							if (!(term_i is VariableTerm) || ((((VariableTerm)term_i).Identifier.Code != VariableCode.MASTER) && (((VariableTerm)term_i).Identifier.Code != VariableCode.ASSI) && (((VariableTerm)term_i).Identifier.Code != VariableCode.TARGET)))
 								if (NoList[i] < 0 || NoList[i] >= charaNum)
-									throw new CodeEE("命令PICKUPCHARAの第" + (i + 1).ToString() + "argumentにキャラリストの範囲outのvalue(" + NoList[i].ToString() + ")が与えられました");
+									throw new CodeEE("命令PICKUPCHARAの第" + (i + 1).ToString() + "argumentにキャラリストの範囲外の値(" + NoList[i].ToString() + ")が与えられました");
 						}
 						vEvaluator.PickUpChara(NoList);
 					}
 					break;
 				case FunctionCode.ADDDEFCHARA:
 					{
-						//debugcommandなら通す
+						//デバッグコマンドなら通す
 						if ((func.ParentLabelLine != null) && (func.ParentLabelLine.LabelName != "SYSTEM_TITLE"))
-							throw new CodeEE("@SYSTEM_TITLE以outでこの命令を使うcannot be");
+							throw new CodeEE("@SYSTEM_TITLE以外でこの命令を使うことはできません");
 						vEvaluator.AddCharacterFromCsvNo(0);
 						if (GlobalStatic.GameBaseData.DefaultCharacter > 0)
 							vEvaluator.AddCharacterFromCsvNo(GlobalStatic.GameBaseData.DefaultCharacter);
 						break;
 					}
-				case FunctionCode.PUTFORM://@SAVEINFOfunctionでのみusepossible.PRINTFORMと同様の書式でsavedataに概要をつける.
+				case FunctionCode.PUTFORM://@SAVEINFO関数でのみ使用可能。PRINTFORMと同様の書式でセーブデータに概要をつける。
 					{
 						term = ((ExpressionArgument)func.Argument).Term;
 						str = term.GetStrValue(exm);
@@ -295,7 +295,7 @@ namespace MinorShift.Emuera.GameProc
 							vEvaluator.SAVEDATA_TEXT = str;
 						break;
 					}
-				case FunctionCode.QUIT://ゲームをend
+				case FunctionCode.QUIT://ゲームを終了
 					exm.Console.Quit();
 					break;
 
@@ -311,15 +311,15 @@ namespace MinorShift.Emuera.GameProc
 						SpSaveDataArgument spSavedataArg = (SpSaveDataArgument)func.Argument;
 						Int64 target = spSavedataArg.Target.GetIntValue(exm);
 						if (target < 0)
-							throw new CodeEE("SAVEDATAのargumentに負のvalue(" + target.ToString() + ")was specified");
+							throw new CodeEE("SAVEDATAのargumentに負の値(" + target.ToString() + ")が指定されました");
 						else if (target > int.MaxValue)
 							throw new CodeEE("SAVEDATAのargument(" + target.ToString() + ")が大きすぎます");
 						string savemes = spSavedataArg.StrExpression.GetStrValue(exm);
 						if (savemes.Contains("\n"))
-							throw new CodeEE("SAVEDATAのsavetextに改line文字が与えられました(savedataが破損because改line文字は使えません)");
+							throw new CodeEE("SAVEDATAのセーブテキストに改行文字が与えられました（セーブデータが破損するため改行文字は使えません）");
 						if (!vEvaluator.SaveTo((int)target, savemes))
 						{
-							console.PrintError("SAVEDATA命令によるsaveduring 予期しnotErroroccurred");
+							console.PrintError("SAVEDATA命令によるセーブ中に予期しないErrorが発生しました");
 						}
 					}
 					break;
@@ -331,11 +331,11 @@ namespace MinorShift.Emuera.GameProc
 						double y = powerArg.Y.GetIntValue(exm);
 						double pow = Math.Pow(x, y);
 						if (double.IsNaN(pow))
-							throw new CodeEE("累乗結果が非numericです");
+							throw new CodeEE("累乗結果が非数値です");
 						else if (double.IsInfinity(pow))
 							throw new CodeEE("累乗結果が無限大です");
 						else if ((pow >= Int64.MaxValue) || (pow <= Int64.MinValue))
-							throw new CodeEE("累乗結果(" + pow.ToString() + ")が64ビット符号付きintegerの範囲outです");
+							throw new CodeEE("累乗結果(" + pow.ToString() + ")が64ビット符号付き整数の範囲外です");
 						powerArg.VariableDest.SetValue((long)pow, exm);
 						break;
 					}
@@ -343,11 +343,11 @@ namespace MinorShift.Emuera.GameProc
 					{
 						SpSwapVarArgument arg = (SpSwapVarArgument)func.Argument;
 						//1756beta2+v11
-						//valueを読み出すbefore 添え字を確定させておかnotと,RANDが添え字にexistcase正しくprocessできnot
+						//値を読み出す前に添え字を確定させておかないと、RANDが添え字にある場合正しく処理できない
 						FixedVariableTerm vTerm1 = arg.var1.GetFixedVariableTerm(exm);
 						FixedVariableTerm vTerm2 = arg.var2.GetFixedVariableTerm(exm);
 						if (vTerm1.GetOperandType() != vTerm2.GetOperandType())
-							throw new CodeEE("入れ替えるvariableのtypeが異なります");
+							throw new CodeEE("入れ替える変数の型が異なります");
 						if (vTerm1.GetOperandType() == typeof(Int64))
 						{
 							Int64 temp = vTerm1.GetIntValue(exm);
@@ -362,7 +362,7 @@ namespace MinorShift.Emuera.GameProc
 						}
 						else
 						{
-							throw new CodeEE("不明なvariabletypeです");
+							throw new CodeEE("不明な変数型です");
 						}
 						break;
 					}
@@ -375,7 +375,7 @@ namespace MinorShift.Emuera.GameProc
 						date = date * 100 + DateTime.Now.Minute;
 						date = date * 100 + DateTime.Now.Second;
 						date = date * 1000 + DateTime.Now.Millisecond;
-						vEvaluator.RESULT = date;//17桁.2京くらい.
+						vEvaluator.RESULT = date;//17桁。2京くらい。
 						vEvaluator.RESULTS = DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss");
 					}
 					break;
@@ -398,9 +398,9 @@ namespace MinorShift.Emuera.GameProc
 							colorG = colorArg.G.GetIntValue(exm);
 							colorB = colorArg.B.GetIntValue(exm);
 							if ((colorR < 0) || (colorG < 0) || (colorB < 0))
-								throw new CodeEE("SETCOLORのargumentに0未満のvaluewas specified");
+								throw new CodeEE("SETCOLORのargumentに0未満の値が指定されました");
 							if ((colorR > 255) || (colorG > 255) || (colorB > 255))
-								throw new CodeEE("SETCOLORのargumentに255を超えるvaluewas specified");
+								throw new CodeEE("SETCOLORのargumentに255を超える値が指定されました");
 						}
 						Color c = Color.FromArgb((Int32)colorR, (Int32)colorG, (Int32)colorB);
 						exm.Console.SetStringStyle(c);
@@ -413,7 +413,7 @@ namespace MinorShift.Emuera.GameProc
 						if (c.A == 0)
 						{
 							if (str.Equals("transparent", StringComparison.OrdinalIgnoreCase))
-								throw new CodeEE("無色透明(Transparent)は色as指定できません");
+								throw new CodeEE("無色透明(Transparent)は色として指定できません");
 							throw new CodeEE("指定された色名\"" + colorName + "\"は無効な色名です");
 						}
 						exm.Console.SetStringStyle(c);
@@ -445,9 +445,9 @@ namespace MinorShift.Emuera.GameProc
 							colorG = colorArg.G.GetIntValue(exm);
 							colorB = colorArg.B.GetIntValue(exm);
 							if ((colorR < 0) || (colorG < 0) || (colorB < 0))
-								throw new CodeEE("SETCOLORのargumentに0未満のvaluewas specified");
+								throw new CodeEE("SETCOLORのargumentに0未満の値が指定されました");
 							if ((colorR > 255) || (colorG > 255) || (colorB > 255))
-								throw new CodeEE("SETCOLORのargumentに255を超えるvaluewas specified");
+								throw new CodeEE("SETCOLORのargumentに255を超える値が指定されました");
 						}
 						Color c = Color.FromArgb((Int32)colorR, (Int32)colorG, (Int32)colorB);
 						exm.Console.SetBgColor(c);
@@ -460,7 +460,7 @@ namespace MinorShift.Emuera.GameProc
 						if (c.A == 0)
 						{
 							if (str.Equals("transparent", StringComparison.OrdinalIgnoreCase))
-								throw new CodeEE("無色透明(Transparent)は色as指定できません");
+								throw new CodeEE("無色透明(Transparent)は色として指定できません");
 							throw new CodeEE("指定された色名\"" + colorName + "\"は無効な色名です");
 						}
 						exm.Console.SetBgColor(c);
@@ -500,7 +500,7 @@ namespace MinorShift.Emuera.GameProc
 					else if (str.Equals("RIGHT", Config.SCVariable))
 						exm.Console.Alignment = DisplayLineAlignment.RIGHT;
 					else
-						throw new CodeEE("ALIGNMENTのkeyワード\"" + str + "\"は未definitionです");
+						throw new CodeEE("ALIGNMENTのキーワード\"" + str + "\"は未定義です");
 					break;
 
 				case FunctionCode.REDRAW:
@@ -532,7 +532,7 @@ namespace MinorShift.Emuera.GameProc
 							string[] temp = retStr;
 							retStr = new string[spSplitArg.Var.GetLength(0)];
 							Array.Copy(temp, retStr, retStr.Length);
-							//throw new CodeEE("SPLITによる分割afterのstringの数がarrayvariableの要素数を超えています");
+							//throw new CodeEE("SPLITによる分割後の文字列の数が配列変数の要素数を超えています");
 						}
 						spSplitArg.Var.SetValue(retStr, new long[] { 0, 0, 0 });
 					}
@@ -567,7 +567,7 @@ namespace MinorShift.Emuera.GameProc
 				case FunctionCode.NOSKIP:
 					{
 						if (func.JumpTo == null)
-							throw new CodeEE("対応doENDNOSKIPのnotNOSKIPです");
+							throw new CodeEE("対応するENDNOSKIPのないNOSKIPです");
 						saveSkip = skipPrint;
 						if (skipPrint)
 							skipPrint = false;
@@ -576,7 +576,7 @@ namespace MinorShift.Emuera.GameProc
 				case FunctionCode.ENDNOSKIP:
 					{
 						if (func.JumpTo == null)
-							throw new CodeEE("対応doNOSKIPのnotENDNOSKIPです");
+							throw new CodeEE("対応するNOSKIPのないENDNOSKIPです");
 						if (saveSkip)
 							skipPrint = true;
 					}
@@ -584,24 +584,24 @@ namespace MinorShift.Emuera.GameProc
 				case FunctionCode.OUTPUTLOG:
 					exm.Console.OutputLog(null);
 					break;
-				case FunctionCode.ARRAYSHIFT: //array要素をずらす
+				case FunctionCode.ARRAYSHIFT: //配列要素をずらす
 					{
 						SpArrayShiftArgument arrayArg = (SpArrayShiftArgument)func.Argument;
 						if (!arrayArg.VarToken.Identifier.IsArray1D)
-							throw new CodeEE("ARRAYSHIFTは1次originalarrayandarraytypecharactervariableのみに対応しています");
+							throw new CodeEE("ARRAYSHIFTは1次元配列および配列型キャラクタ変数のみに対応しています");
 						FixedVariableTerm dest = arrayArg.VarToken.GetFixedVariableTerm(exm);
 						int shift = (int)arrayArg.Num1.GetIntValue(exm);
 						if (shift == 0)
 							break;
 						int start = (int)arrayArg.Num3.GetIntValue(exm);
 						if (start < 0)
-							throw new CodeEE("ARRAYSHIFTの第４argumentが負のvalue(" + start.ToString() + ")です");
+							throw new CodeEE("ARRAYSHIFTの第４argumentが負の値(" + start.ToString() + ")です");
 						int num;
 						if (arrayArg.Num4 != null)
 						{
 							num = (int)arrayArg.Num4.GetIntValue(exm);
 							if (num < 0)
-								throw new CodeEE("ARRAYSHIFTの第５argumentが負のvalue(" + num.ToString() + ")です");
+								throw new CodeEE("ARRAYSHIFTの第５argumentが負の値(" + num.ToString() + ")です");
 							if (num == 0)
 								break;
 						}
@@ -623,14 +623,14 @@ namespace MinorShift.Emuera.GameProc
 					{
 						SpArrayControlArgument arrayArg = (SpArrayControlArgument)func.Argument;
 						if (!arrayArg.VarToken.Identifier.IsArray1D)
-							throw new CodeEE("ARRAYREMOVEは1次originalarrayandarraytypecharactervariableのみに対応しています");
+							throw new CodeEE("ARRAYREMOVEは1次元配列および配列型キャラクタ変数のみに対応しています");
 						FixedVariableTerm p = arrayArg.VarToken.GetFixedVariableTerm(exm);
 						int start = (int)arrayArg.Num1.GetIntValue(exm);
 						int num = (int)arrayArg.Num2.GetIntValue(exm);
 						if (start < 0)
-							throw new CodeEE("ARRAYREMOVEの第２argumentが負のvalue(" + start.ToString() + ")です");
+							throw new CodeEE("ARRAYREMOVEの第２argumentが負の値(" + start.ToString() + ")です");
 						if (num < 0)
-							throw new CodeEE("ARRAYREMOVEの第３argumentが負のvalue(" + start.ToString() + ")です");
+							throw new CodeEE("ARRAYREMOVEの第３argumentが負の値(" + start.ToString() + ")です");
 						if (num == 0)
 							break;
 						vEvaluator.RemoveArray(p, start, num);
@@ -640,17 +640,17 @@ namespace MinorShift.Emuera.GameProc
 					{
 						SpArraySortArgument arrayArg = (SpArraySortArgument)func.Argument;
 						if (!arrayArg.VarToken.Identifier.IsArray1D)
-							throw new CodeEE("ARRAYRESORTは1次originalarrayandarraytypecharactervariableのみに対応しています");
+							throw new CodeEE("ARRAYRESORTは1次元配列および配列型キャラクタ変数のみに対応しています");
 						FixedVariableTerm p = arrayArg.VarToken.GetFixedVariableTerm(exm);
 						int start = (int)arrayArg.Num1.GetIntValue(exm);
 						if (start < 0)
-							throw new CodeEE("ARRAYSORTの第３argumentが負のvalue(" + start.ToString() + ")です");
+							throw new CodeEE("ARRAYSORTの第３argumentが負の値(" + start.ToString() + ")です");
 						int num = 0;
 						if (arrayArg.Num2 != null)
 						{
 							num = (int)arrayArg.Num2.GetIntValue(exm);
 							if (num < 0)
-								throw new CodeEE("ARRAYSORTの第４argumentが負のvalue(" + start.ToString() + ")です");
+								throw new CodeEE("ARRAYSORTの第４argumentが負の値(" + start.ToString() + ")です");
 							if (num == 0)
 								break;
 						}
@@ -671,30 +671,30 @@ namespace MinorShift.Emuera.GameProc
 							names[0] = varName1.GetStrValue(exm);
 							names[1] = varName2.GetStrValue(exm);
 							if ((vars[0] = GlobalStatic.IdentifierDictionary.GetVariableToken(names[0], null, true)) == null)
-								throw new CodeEE("ARRAYCOPY命令の第１argument(" + names[0] + ")が有効なvariable名ではdoes not exist");
+								throw new CodeEE("ARRAYCOPY命令の第１argument(" + names[0] + ")が有効な変数名ではありません");
 							if (!vars[0].IsArray1D && !vars[0].IsArray2D && !vars[0].IsArray3D)
-								throw new CodeEE("ARRAYCOPY命令の第１argument\"" + names[0] + "\"はarrayvariableではdoes not exist");
+								throw new CodeEE("ARRAYCOPY命令の第１argument\"" + names[0] + "\"は配列変数ではありません");
 							if (vars[0].IsCharacterData)
-								throw new CodeEE("ARRAYCOPY命令の第１argument\"" + names[0] + "\"はcharactervariableです(対応していません)");
+								throw new CodeEE("ARRAYCOPY命令の第１argument\"" + names[0] + "\"はキャラクタ変数です（対応していません）");
 							if ((vars[1] = GlobalStatic.IdentifierDictionary.GetVariableToken(names[1], null, true)) == null)
-								throw new CodeEE("ARRAYCOPY命令の第２argument(" + names[0] + ")が有効なvariable名ではdoes not exist");
+								throw new CodeEE("ARRAYCOPY命令の第２argument(" + names[0] + ")が有効な変数名ではありません");
 							if (!vars[1].IsArray1D && !vars[1].IsArray2D && !vars[1].IsArray3D)
-								throw new CodeEE("ARRAYCOPY命令の第２argument\"" + names[1] + "\"はarrayvariableではdoes not exist");
+								throw new CodeEE("ARRAYCOPY命令の第２argument\"" + names[1] + "\"は配列変数ではありません");
 							if (vars[1].IsCharacterData)
-								throw new CodeEE("ARRAYCOPY命令の第２argument\"" + names[1] + "\"はcharactervariableです(対応していません)");
+								throw new CodeEE("ARRAYCOPY命令の第２argument\"" + names[1] + "\"はキャラクタ変数です（対応していません）");
 							if (vars[1].IsConst)
-								throw new CodeEE("ARRAYCOPY命令の第２argument\"" + names[1] + "\"はvalueを変更できnotvariableです");
+								throw new CodeEE("ARRAYCOPY命令の第２argument\"" + names[1] + "\"は値を変更できない変数です");
 							if ((vars[0].IsArray1D && !vars[1].IsArray1D) || (vars[0].IsArray2D && !vars[1].IsArray2D) || (vars[0].IsArray3D && !vars[1].IsArray3D))
-								throw new CodeEE("ARRAYCOPY命令の２つのarrayvariableの次original数が一致していません");
+								throw new CodeEE("ARRAYCOPY命令の２つの配列変数の次元数が一致していません");
 							if ((vars[0].IsInteger && vars[1].IsString) || (vars[0].IsString && vars[1].IsInteger))
-								throw new CodeEE("ARRAYCOPY命令の２つのarrayvariableのtypeが一致していません");
+								throw new CodeEE("ARRAYCOPY命令の２つの配列変数の型が一致していません");
 						}
 						else
 						{
 							vars[0] = GlobalStatic.IdentifierDictionary.GetVariableToken(((SingleTerm)varName1).Str, null, true);
 							vars[1] = GlobalStatic.IdentifierDictionary.GetVariableToken(((SingleTerm)varName2).Str, null, true);
 							if ((vars[0].IsInteger && vars[1].IsString) || (vars[0].IsString && vars[1].IsInteger))
-								throw new CodeEE("ARRAYCOPY命令の２つのarrayvariableのtypeが一致していません");
+								throw new CodeEE("ARRAYCOPY命令の２つの配列変数の型が一致していません");
 						}
 						vEvaluator.CopyArray(vars[0], vars[1]);
 					}
@@ -711,7 +711,7 @@ namespace MinorShift.Emuera.GameProc
 						int length = vEvaluator.RESULT_ARRAY.Length;
 						// result:0には長さが入るのでその分-1
 						if (target.Length > length - 1)
-							throw new CodeEE(String.Format("ENCODETOUNIのargumentが長すぎます(current{0}文字.最大{1}文字until)", target.Length, length - 1));
+							throw new CodeEE(String.Format("ENCODETOUNIのargumentが長すぎます（現在{0}文字。最大{1}文字まで）", target.Length, length - 1));
 
 						int[] ary = new int[target.Length];
 						for (int i = 0; i < target.Length; i++)
@@ -730,7 +730,7 @@ namespace MinorShift.Emuera.GameProc
 					break;
 				case FunctionCode.STRDATA:
 					{
-						//displaydataが空なら何もしnotで飛ぶ
+						//表示データが空なら何もしないで飛ぶ
 						if (func.dataList.Count == 0)
 						{
 							state.JumpTo(func.JumpTo);
@@ -751,13 +751,13 @@ namespace MinorShift.Emuera.GameProc
 								str += "\n";
 						}
 						((StrDataArgument)func.Argument).Var.SetValue(str, exm);
-						//ジャンプdoが,流れが連続でexistthisを保証.
+						//ジャンプするが、流れが連続であることを保証。
 						state.JumpTo(func.JumpTo);
 						break;
 					}
 #if UEMUERA_DEBUG
 				default:
-					throw new ExeEE("未definitionのfunction");
+					throw new ExeEE("未定義の関数");
 #endif
 			}
 			return;
@@ -779,16 +779,16 @@ namespace MinorShift.Emuera.GameProc
 						ExpressionArgument intExpArg = (ExpressionArgument)func.Argument;
 						Int64 target = intExpArg.Term.GetIntValue(exm);
 						if (target < 0)
-							throw new CodeEE("LOADDATAのargumentに負のvalue(" + target.ToString() + ")was specified");
+							throw new CodeEE("LOADDATAのargumentに負の値(" + target.ToString() + ")が指定されました");
 						else if (target > int.MaxValue)
 							throw new CodeEE("LOADDATAのargument(" + target.ToString() + ")が大きすぎます");
 						//EraDataResult result = vEvaluator.checkData((int)target);
 						EraDataResult result = vEvaluator.CheckData((int)target, EraSaveFileType.Normal);
 						if (result.State != EraDataState.OK)
-							throw new CodeEE("Invalid dataをloadattempted to");
+							throw new CodeEE("Invalid データをロードしようとしました");
 
 						if (!vEvaluator.LoadFrom((int)target))
-							throw new ExeEE("fileのloadduring 予期しnotErroroccurred");
+							throw new ExeEE("ファイルのロード中に予期しないErrorが発生しました");
 						state.ClearFunctionList();
 						state.SystemState = SystemStateCode.LoadData_DataLoaded;
 						return false;
@@ -867,20 +867,20 @@ namespace MinorShift.Emuera.GameProc
 					{
 						switch (state.SystemState)
 						{
-							//case SystemStateCode.Train_Begin://BEGIN TRAINfrom.
-							case SystemStateCode.Train_CallEventTrain://@EVENTTRAINのcallinside.スキップpossible
-							case SystemStateCode.Train_CallShowStatus://@SHOW_STATUSのcallinside
-							//case SystemStateCode.Train_CallComAbleXX://@COM_ABLExxのcallinside.
-							case SystemStateCode.Train_CallShowUserCom://@SHOW_USERCOMのcallinside
-							//case SystemStateCode.Train_WaitInput://input待ち状態.選択が実linepossibleならEVENTCOMfromCOMxx,そうでなければ@USERCOMにRESULTを渡す
-							//case SystemStateCode.Train_CallEventCom://@EVENTCOMのcallinside
-							//case SystemStateCode.Train_CallComXX://@COMxxのcallinside
-							//case SystemStateCode.Train_CallSourceCheck://@SOURCE_CHECKのcallinside
-							case SystemStateCode.Train_CallEventComEnd://@EVENTCOMENDのcallinside.スキップpossible.Train_CallEventTrainto帰る.@USERCOMのcallinsideもここ
+							//case SystemStateCode.Train_Begin://BEGIN TRAINから。
+							case SystemStateCode.Train_CallEventTrain://@EVENTTRAINの呼び出し中。スキップ可能
+							case SystemStateCode.Train_CallShowStatus://@SHOW_STATUSの呼び出し中
+							//case SystemStateCode.Train_CallComAbleXX://@COM_ABLExxの呼び出し中。
+							case SystemStateCode.Train_CallShowUserCom://@SHOW_USERCOMの呼び出し中
+							//case SystemStateCode.Train_WaitInput://入力待ち状態。選択が実行可能ならEVENTCOMからCOMxx、そうでなければ@USERCOMにRESULTを渡す
+							//case SystemStateCode.Train_CallEventCom://@EVENTCOMの呼び出し中
+							//case SystemStateCode.Train_CallComXX://@COMxxの呼び出し中
+							//case SystemStateCode.Train_CallSourceCheck://@SOURCE_CHECKの呼び出し中
+							case SystemStateCode.Train_CallEventComEnd://@EVENTCOMENDの呼び出し中。スキップ可能。Train_CallEventTrainへ帰る。@USERCOMの呼び出し中もここ
 								break;
 							default:
 								exm.Console.PrintSystemLine(state.SystemState.ToString());
-								throw new CodeEE("DOTRAIN命令をこの位置で実linedocannot be");
+								throw new CodeEE("DOTRAIN命令をこの位置で実行することはできません");
 						}
 						coms.Clear();
 						isCTrain = false;
@@ -888,16 +888,16 @@ namespace MinorShift.Emuera.GameProc
 
 						Int64 train = ((ExpressionArgument)func.Argument).Term.GetIntValue(exm);
 						if (train < 0)
-							throw new CodeEE("DOTRAIN命令に0未満のvaluewas passed");
+							throw new CodeEE("DOTRAIN命令に0未満の値が渡されました");
 						if (train >= TrainName.Length)
-							throw new CodeEE("DOTRAIN命令にTRAINNAMEのarray数以aboveのvaluewas passed");
+							throw new CodeEE("DOTRAIN命令にTRAINNAMEの配列数以上の値が渡されました");
 						doTrainSelectCom = train;
 						state.SystemState = SystemStateCode.Train_DoTrain;
 						return false;
 					}
 #if UEMUERA_DEBUG
 				default:
-					throw new ExeEE("未definitionのfunctionです");
+					throw new ExeEE("未定義の関数です");
 #endif
 			}
 			return true;
@@ -909,9 +909,9 @@ namespace MinorShift.Emuera.GameProc
 		List<ProcessState> prevStateList = new List<ProcessState>();
 		public void saveCurrentState(bool single)
 		{
-			//怖いところだが,現状起こらnot現象なので一旦消してみる
+			//怖いところだが、現状起こらない現象なので一旦消してみる
 			//if (single && (prevStateList.Count > 0))
-			//	throw new ExeEE("記憶している状態がexistのに再度記憶しようとした");
+			//	throw new ExeEE("記憶している状態があるのに再度記憶しようとした");
 			if (state != null)
 			{
 				prevStateList.Add(state);
@@ -921,9 +921,9 @@ namespace MinorShift.Emuera.GameProc
 
 		public void loadPrevState()
 		{
-			//怖いところだが,現状起こらnot現象なので一旦消してみる
+			//怖いところだが、現状起こらない現象なので一旦消してみる
 			//if (prevStateList.Count == 0)
-			//	throw new ExeEE("記憶している状態がnotのに呼び戻しされた");
+			//	throw new ExeEE("記憶している状態がないのに呼び戻しされた");
 			if (state != null)
 			{
 				state.ClearFunctionList();

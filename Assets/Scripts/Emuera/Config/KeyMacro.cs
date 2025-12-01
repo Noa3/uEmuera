@@ -13,11 +13,11 @@ namespace MinorShift.Emuera
 		public const int MaxFkey = 12;
 		public const int MaxMacro = MaxFkey * MaxGroup;
 		/// <summary>
-		/// マクロのin容
+		/// マクロの内容
 		/// </summary>
 		static string[] macro = new string[MaxMacro];
 		/// <summary>
-		/// マクロkey
+		/// マクロキー
 		/// </summary>
 		static string[] macroName = new string[MaxMacro];
 		static string[] groupName = new string[MaxGroup];

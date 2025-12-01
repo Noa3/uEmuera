@@ -6,7 +6,7 @@ using System.IO;
 namespace MinorShift.Emuera.Sub
 {
 	/// <summary>
-	/// stringを1文字ずつ評価becauseのclass
+	/// 文字列を1文字ずつ評価するためのクラス
 	/// </summary>
 	internal sealed class StringStream
 	{
@@ -62,11 +62,11 @@ namespace MinorShift.Emuera.Sub
 		}
 		
 		/// <summary>
-		/// string終端に達した
+		/// 文字列終端に達した
 		/// </summary>
 		public bool EOS { get { return pointer >= source.Length; } }
 
-		///variableの区切りでexist"[["と"]]"のahead読みetcにuse
+		///変数の区切りである"[["と"]]"の先読みなどに使用
 		public char Next
 		{
 			get
@@ -97,7 +97,7 @@ namespace MinorShift.Emuera.Sub
 
 		internal void Replace(int start, int count, string src)
 		{
-			//argumentに正しい数字が送られてくるthis前提
+			//argumentに正しい数字が送られてくること前提
 			source = (source.Remove(start, count)).Insert(start, src);
 			pointer = start;
 		}
@@ -113,7 +113,7 @@ namespace MinorShift.Emuera.Sub
         }
 
 		/// <summary>
-		/// 検索stringの相対位置を返す.見つfromnotcase,負のvalue.
+		/// 検索文字列の相対位置を返す。見つからない場合、負の値。
 		/// </summary>
 		/// <param name="str"></param>
 		public int Find(string str)
@@ -122,7 +122,7 @@ namespace MinorShift.Emuera.Sub
 		}
 
 		/// <summary>
-		/// 検索stringの相対位置を返す.見つfromnotcase,負のvalue.
+		/// 検索文字列の相対位置を返す。見つからない場合、負の値。
 		/// </summary>
 		public int Find(char c)
 		{
