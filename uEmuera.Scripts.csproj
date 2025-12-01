@@ -99,8 +99,8 @@
     <Compile Include="Assets\Scripts\uEmuera\VisualBasic.cs" />
     <Compile Include="Assets\Scripts\uEmuera\Application.cs" />
     <Compile Include="Assets\Scripts\Emuera\Config\Config.cs" />
-    <Compile Include="Assets\Scripts\QuickButtons.cs" />
     <Compile Include="Assets\Scripts\Emuera\Sub\LexicalAnalyzer.cs" />
+    <Compile Include="Assets\Scripts\QuickButtons.cs" />
     <Compile Include="Assets\Scripts\ResolutionHelper.cs" />
     <Compile Include="Assets\Scripts\Emuera\GameData\Variable\VariableEvaluator.cs" />
     <Compile Include="Assets\Scripts\Emuera\GameData\ParserMediator.cs" />
@@ -166,7 +166,6 @@
     <Compile Include="Assets\Scripts\EmueraThread.cs" />
     <Compile Include="Assets\Scripts\Emuera\GameProc\LabelDictionary.cs" />
     <Compile Include="Assets\Scripts\Emuera\GameProc\Function\BuiltInFunctionCode.cs" />
-    <Compile Include="Assets\Scripts\StartupFeedback.cs" />
     <Compile Include="Assets\Scripts\Emuera\Sub\EraBinaryDataWriter.cs" />
     <Compile Include="Assets\Scripts\Emuera\GameData\Function\Creator.cs" />
     <Compile Include="Assets\Scripts\Emuera\GameProc\Function\FunctionArgType.cs" />
