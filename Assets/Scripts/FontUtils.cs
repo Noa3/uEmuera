@@ -10,6 +10,12 @@ using TMPro;
 public static class FontUtils
 {
     /// <summary>
+    /// Suffix appended to font path names when loading TMP font assets.
+    /// TextMeshPro SDF fonts are typically named with this suffix.
+    /// </summary>
+    private const string TMP_FONT_SUFFIX = " SDF";
+    
+    /// <summary>
     /// Mapping of font names to their resource paths.
     /// </summary>
     static readonly Dictionary<string, string> name_path_map = new Dictionary<string, string>
@@ -115,7 +121,7 @@ public static class FontUtils
             last_tmp_font = default_tmp_font;
         else if(!tmp_font_map.TryGetValue(path, out last_tmp_font))
         {
-            last_tmp_font = Resources.Load<TMP_FontAsset>("Fonts/" + path + " SDF");
+            last_tmp_font = Resources.Load<TMP_FontAsset>("Fonts/" + path + TMP_FONT_SUFFIX);
             if(last_tmp_font == null)
                 last_tmp_font = default_tmp_font;
             tmp_font_map[path] = last_tmp_font;

@@ -153,9 +153,9 @@ public class EmueraLine : EmueraBehaviour
             text_.rectTransform.sizeDelta = new Vector2(Width, 0);
         }
 
-        var fontSize = text.fontSize;
         if(unit_desc.underline)
         {
+            var fontSize = text.fontSize;
             if(underline_ == null)
             {
                 var obj = GameObject.Instantiate(EmueraContent.instance.template_block.gameObject);
@@ -178,6 +178,7 @@ public class EmueraLine : EmueraBehaviour
 
         if(unit_desc.strickout)
         {
+            var fontSize = text.fontSize;
             if(strickout_ == null)
             {
                 var obj = GameObject.Instantiate(EmueraContent.instance.template_block.gameObject);

@@ -10,6 +10,11 @@ namespace UnityEngine.UI
     public class Monospaced : BaseMeshEffect
     {
         /// <summary>
+        /// Unicode character for zero-width space (U+200B).
+        /// </summary>
+        private const char ZERO_WIDTH_SPACE = (char)8203;
+        
+        /// <summary>
         /// Array of characters used to detect rich text tags.
         /// </summary>
         static readonly char[] _index_any = new char[] { '<', '\n' };
@@ -143,7 +148,7 @@ namespace UnityEngine.UI
                     si = size / 2.0f;
                 else if (c == ' ')
                     si = size / 2.0f;
-                else if (c == 8203)
+                else if (c == ZERO_WIDTH_SPACE)
                     si = 0;
                 else
                     si = size;

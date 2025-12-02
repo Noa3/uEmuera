@@ -11,6 +11,11 @@ namespace UnityEngine.UI
     public class TMPMonospaced : MonoBehaviour
     {
         /// <summary>
+        /// Unicode character for zero-width space (U+200B).
+        /// </summary>
+        private const char ZERO_WIDTH_SPACE = (char)8203;
+        
+        /// <summary>
         /// Array of characters used to detect rich text tags.
         /// </summary>
         static readonly char[] _index_any = new char[] { '<', '\n' };
@@ -21,6 +26,11 @@ namespace UnityEngine.UI
         /// </summary>
         [Tooltip("Width size for character spacing calculation. Uses font size if not set.")]
         public float widthsize = 0;
+        
+        /// <summary>
+        /// Flag to track if event is subscribed.
+        /// </summary>
+        private bool isSubscribed_ = false;
 
         /// <summary>
         /// Gets the next valid character index, skipping over rich text tags.
@@ -153,7 +163,7 @@ namespace UnityEngine.UI
                     si = size;
                 else if (uEmuera.Utils.CheckHalfSize(c))
                     si = size / 2.0f;
-                else if (c == 8203)
+                else if (c == ZERO_WIDTH_SPACE)
                     si = 0;
                 else
                     si = size;
@@ -197,7 +207,11 @@ namespace UnityEngine.UI
         /// </summary>
         void OnEnable()
         {
-            TMPro_EventManager.TEXT_CHANGED_EVENT.Add(OnTextChanged);
+            if (!isSubscribed_)
+            {
+                TMPro_EventManager.TEXT_CHANGED_EVENT.Add(OnTextChanged);
+                isSubscribed_ = true;
+            }
         }
 
         /// <summary>
@@ -205,7 +219,11 @@ namespace UnityEngine.UI
         /// </summary>
         void OnDisable()
         {
-            TMPro_EventManager.TEXT_CHANGED_EVENT.Remove(OnTextChanged);
+            if (isSubscribed_)
+            {
+                TMPro_EventManager.TEXT_CHANGED_EVENT.Remove(OnTextChanged);
+                isSubscribed_ = false;
+            }
         }
 
         /// <summary>
