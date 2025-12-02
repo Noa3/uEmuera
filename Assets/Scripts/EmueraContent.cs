@@ -1,8 +1,9 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using TMPro;
 using MinorShift.Emuera;
 using MinorShift.Emuera.GameView;
 
@@ -28,7 +29,7 @@ public class EmueraContent : MonoBehaviour
     /// Template text component for creating new text lines.
     /// </summary>
     [Tooltip("Template text component for creating new text lines")]
-    public Text template_text;
+    public TextMeshProUGUI template_text;
     
     /// <summary>
     /// Template image component for block elements.
@@ -439,9 +440,9 @@ public class EmueraContent : MonoBehaviour
         FontUtils.SetDefaultFont(Config.FontName);
 
         template_text.color = EmueraBehaviour.FontColor;
-        template_text.font = FontUtils.default_font;
+        template_text.font = FontUtils.default_tmp_font;
         if(template_text.font == null)
-            template_text.font = FontUtils.default_font;
+            template_text.font = FontUtils.default_tmp_font;
         template_text.fontSize = EmueraBehaviour.FontSize;
         template_text.rectTransform.sizeDelta =
             new Vector2(template_text.rectTransform.sizeDelta.x, 0);

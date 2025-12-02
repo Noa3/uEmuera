@@ -241,31 +241,35 @@ public abstract class EmueraBehaviour : MonoBehaviour
             }
         }
         /// <summary>
-        /// 对其方式
+        /// Gets the text alignment mode.
         /// </summary>
         public Align align { get { return (Align)display_line.Align; } }
         /// <summary>
-        /// 行号
+        /// Gets the line number.
         /// </summary>
         public int LineNo { get { return display_line.LineNo; } }
         /// <summary>
-        /// 是否为逻辑行
+        /// Gets whether this is a logical line (first line of a multi-line entry).
         /// </summary>
         public bool IsLogicalLine { get { return display_line.IsLogicalLine; } }
         /// <summary>
-        /// 坐标Y
+        /// The Y coordinate position of this line.
         /// </summary>
         public float position_y = 0.0f;
         /// <summary>
-        /// 高度
+        /// The height of this line in pixels.
         /// </summary>
         public float height = 0.0f;
         /// <summary>
-        /// 子对象
+        /// List of display units contained in this line.
         /// </summary>
         public List<UnitDesc> units = null;
     }
 
+    /// <summary>
+    /// Handles pointer click events for interactive elements.
+    /// </summary>
+    /// <param name="e">The pointer event data.</param>
     public static void OnClick(UnityEngine.EventSystems.PointerEventData e)
     {
         var obj = e.rawPointerPress;

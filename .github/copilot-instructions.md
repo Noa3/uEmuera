@@ -13,6 +13,15 @@ The project is based on emuera1824v15 source code and is licensed under the Apac
 - **Target Framework**: .NET Standard 2.1
 - **Primary Platforms**: Android, Windows Standalone
 
+### Allowed Packages
+
+The following Unity packages are approved for use in this project when it makes sense:
+
+- **com.unity.mathematics**: High-performance math library for SIMD-friendly operations
+- **com.unity.collections**: Native collection types for performance-critical code
+- **com.unity.burst**: Burst compiler for optimizing performance-critical code paths
+- **com.unity.textmeshpro**: Advanced text rendering (TextMeshPro)
+
 ## Project Structure
 
 ```

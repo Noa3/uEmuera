@@ -1,40 +1,59 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 using MinorShift.Emuera;
 
+/// <summary>
+/// Represents a single line of text in the Emuera console.
+/// Handles text rendering, styling, and user interaction for console output.
+/// </summary>
 public class EmueraLine : EmueraBehaviour
 {
+    /// <summary>
+    /// Initializes the line component and sets up event handlers.
+    /// </summary>
     void Awake()
     {
         GenericUtils.SetListenerOnClick(gameObject, OnClick);
-        monospaced_ = GetComponent<UnityEngine.UI.Monospaced>();
+        monospaced_ = GetComponent<UnityEngine.UI.TMPMonospaced>();
         click_handler_ = GetComponent<GenericUtils.PointerClickListener>();
     }
 
-    public UnityEngine.UI.Text text
+    /// <summary>
+    /// Gets the TextMeshProUGUI component for text rendering.
+    /// </summary>
+    public TextMeshProUGUI text
     {
         get
         {
             if (text_ == null)
             {
-                text_ = GetComponent<UnityEngine.UI.Text>();
+                text_ = GetComponent<TextMeshProUGUI>();
                 text_.maskable = false;
             }
             return text_;
         }
     }
-    UnityEngine.UI.Text text_ = null;
-    public UnityEngine.UI.Monospaced monospaced
+    TextMeshProUGUI text_ = null;
+    
+    /// <summary>
+    /// Gets the monospaced text modifier component.
+    /// </summary>
+    public UnityEngine.UI.TMPMonospaced monospaced
     {
         get
         {
             if(monospaced_ == null)
-                monospaced_ = GetComponent<UnityEngine.UI.Monospaced>();
+                monospaced_ = GetComponent<UnityEngine.UI.TMPMonospaced>();
             return monospaced_;
         }
     }
-    UnityEngine.UI.Monospaced monospaced_ = null;
+    UnityEngine.UI.TMPMonospaced monospaced_ = null;
+    
+    /// <summary>
+    /// Gets the content size fitter component for automatic sizing.
+    /// </summary>
     public UnityEngine.UI.ContentSizeFitter size_fitter
     {
         get
@@ -51,6 +70,9 @@ public class EmueraLine : EmueraBehaviour
     GenericUtils.PointerClickListener click_handler_ = null;
 
 #if UNITY_STANDALONE
+    /// <summary>
+    /// Gets the button component for standalone platforms.
+    /// </summary>
     public UnityEngine.UI.Button button
     {
         get
@@ -71,18 +93,15 @@ public class EmueraLine : EmueraBehaviour
 #endif
 
     /// <summary>
-    /// 更新内容
+    /// Updates the content of this line with the current unit description.
     /// </summary>
     public override void UpdateContent()
     {
         var ud = unit_desc;
 
         text.text = ud.content;
-        //text.alignment = (TextAnchor)line_desc.align;
-        //if((int)text.alignment > 0)
-        //    ud.posx = 0;
         text.color = ud.color;
-        text.supportRichText = ud.richedit;
+        text.richText = ud.richedit;
 
         if(ud.isbutton && ud.generation >= EmueraContent.instance.button_generation)
         {
@@ -105,13 +124,14 @@ public class EmueraLine : EmueraBehaviour
 #endif
         }
 
-        var font = FontUtils.default_font;
+        var font = FontUtils.default_tmp_font;
         if(ud.fontname != null)
-            font = FontUtils.GetFont(ud.fontname);
+            font = FontUtils.GetTMPFont(ud.fontname);
         if(text.font != font)
             text.font = font;
 
-        monospaced_.enabled = ud.monospaced;
+        if(monospaced_ != null)
+            monospaced_.enabled = ud.monospaced;
 
         logic_y = line_desc.position_y;
         logic_height = line_desc.height;
@@ -133,6 +153,7 @@ public class EmueraLine : EmueraBehaviour
             text_.rectTransform.sizeDelta = new Vector2(Width, 0);
         }
 
+        var fontSize = text.fontSize;
         if(unit_desc.underline)
         {
             if(underline_ == null)
@@ -146,8 +167,7 @@ public class EmueraLine : EmueraBehaviour
                 underline_.anchorMin = new Vector2(0, 1);
                 underline_.anchorMax = new Vector2(0, 1);
                 underline_.localScale = Vector3.one;
-                //underline_.position = transform.position + new Vector3(0, 1 - font.fontSize);
-                underline_.anchoredPosition = new Vector2(0, - font.fontSize - 1);
+                underline_.anchoredPosition = new Vector2(0, - fontSize - 1);
             }
             underline_.sizeDelta = new Vector2(Width, 1);
             underline_.GetComponent<UnityEngine.UI.Image>().color = unit_desc.color;
@@ -169,8 +189,7 @@ public class EmueraLine : EmueraBehaviour
                 strickout_.anchorMin = new Vector2(0, 1);
                 strickout_.anchorMax = new Vector2(0, 1);
                 strickout_.localScale = Vector3.one;
-                //strickout_.position = transform.position + new Vector3(0, - font.fontSize / 2.0f);
-                strickout_.anchoredPosition = new Vector2(0, - font.fontSize / 2.0f);
+                strickout_.anchoredPosition = new Vector2(0, - fontSize / 2.0f);
             }
             strickout_.sizeDelta = new Vector2(Width, 1);
             strickout_.GetComponent<UnityEngine.UI.Image>().color = unit_desc.color;
@@ -184,6 +203,10 @@ public class EmueraLine : EmueraBehaviour
 #endif
         gameObject.SetActive(true);
     }
+    
+    /// <summary>
+    /// Clears the line content and hides decorations.
+    /// </summary>
     public void Clear()
     {
         line_desc = null;

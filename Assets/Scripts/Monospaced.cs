@@ -1,11 +1,25 @@
-﻿using System;
+using System;
 
 namespace UnityEngine.UI
 {
+    /// <summary>
+    /// A mesh effect that modifies text to use monospaced character spacing.
+    /// This component adjusts the position of text characters to ensure uniform width,
+    /// supporting both half-width (ASCII) and full-width (Japanese) characters.
+    /// </summary>
     public class Monospaced : BaseMeshEffect
     {
+        /// <summary>
+        /// Array of characters used to detect rich text tags.
+        /// </summary>
         static readonly char[] _index_any = new char[] { '<', '\n' };
 
+        /// <summary>
+        /// Gets the next valid character index, skipping over rich text tags.
+        /// </summary>
+        /// <param name="content">The text content.</param>
+        /// <param name="i">Current index.</param>
+        /// <returns>The next valid character index.</returns>
         int GetNextValidIndex(string content, int i)
         {
             if (i >= content.Length)
@@ -44,6 +58,10 @@ namespace UnityEngine.UI
             return i;
         }
 
+        /// <summary>
+        /// Modifies the mesh vertices to apply monospaced character spacing.
+        /// </summary>
+        /// <param name="vh">The vertex helper containing the mesh data.</param>
         public override void ModifyMesh(VertexHelper vh)
         {
             if (!enabled || string.IsNullOrEmpty(text.text))
@@ -72,7 +90,7 @@ namespace UnityEngine.UI
             UIVertex v2 = new UIVertex();
             float linestart = -rectTransform.sizeDelta.x * rectTransform.pivot.x;
 
-            //顶点索引记录
+            // Vertex index tracker
             int vi = 0;
             char c = '\x0';
             for (; i < length && vi < count; ++i)
@@ -87,7 +105,7 @@ namespace UnityEngine.UI
                         if (i >= length)
                             break;
                         else if (i == ni)
-                            //非特殊
+                            // Not a special character
                             i -= 1;
                     }
                     s = 0;
@@ -116,8 +134,8 @@ namespace UnityEngine.UI
 
                 d = v2.position.x - v1.position.x;
                 if (d > b)
-                    //字形大小超过文本尺寸时
-                    //可能使用<size>富文本标记
+                    // Glyph size exceeds text size
+                    // May be using <size> rich text tag
                     si = d;
                 else if (uEmuera.Utils.CheckFullSize(c))
                     si = size;
@@ -127,10 +145,6 @@ namespace UnityEngine.UI
                     si = size / 2.0f;
                 else if (c == 8203)
                     si = 0;
-                //else if(c == '　')
-                //    si = size;
-                //else if(d < a)
-                //    si = size / 2.0f;
                 else
                     si = size;
 
@@ -155,9 +169,20 @@ namespace UnityEngine.UI
             }
         }
 
+        /// <summary>
+        /// Width size to use for character spacing calculation.
+        /// If zero or less than font size, the font size will be used.
+        /// </summary>
         public float widthsize = 0;
 
+        /// <summary>
+        /// Gets the RectTransform of this component.
+        /// </summary>
         RectTransform rectTransform => transform as RectTransform;
+        
+        /// <summary>
+        /// Gets the Text component attached to this GameObject.
+        /// </summary>
         Text text
         {
             get

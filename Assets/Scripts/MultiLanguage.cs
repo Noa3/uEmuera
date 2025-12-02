@@ -1,10 +1,24 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
+/// <summary>
+/// Static utility class for managing multi-language support.
+/// Handles loading and applying language translations to UI elements.
+/// </summary>
 public static class MultiLanguage
 {
+    /// <summary>
+    /// Characters used to split lines in language files.
+    /// </summary>
     public static readonly char[] splits = new char[] { '\xa', '\xd' };
+    
+    /// <summary>
+    /// Loads a language file and returns key-value pairs.
+    /// </summary>
+    /// <param name="lang">The language code to load.</param>
+    /// <returns>List of key-value pairs or null if not found.</returns>
     static List<KeyValuePair<string, string>> Load(string lang)
     {
         var text = Resources.Load<TextAsset>(string.Concat("Lang/", lang));
@@ -30,6 +44,11 @@ public static class MultiLanguage
         }
         return list;
     }
+    
+    /// <summary>
+    /// Sets the language from saved preferences.
+    /// </summary>
+    /// <returns>True if a language was set, false otherwise.</returns>
     public static bool SetLanguage()
     {
         var lang = PlayerPrefs.GetString("language", "");
@@ -38,6 +57,11 @@ public static class MultiLanguage
         SetLanguage(lang);
         return true;
     }
+    
+    /// <summary>
+    /// Sets the language and applies translations to all UI elements.
+    /// </summary>
+    /// <param name="lang">The language code to set.</param>
     public static void SetLanguage(string lang)
     {
         var list = Load(lang);
@@ -64,7 +88,7 @@ public static class MultiLanguage
                     else if(mv == "Menu2")
                         menu2 = fv;
                 }
-                catch(System.Exception e)
+                catch(System.Exception)
                 {
                 }
             }
@@ -85,8 +109,19 @@ public static class MultiLanguage
             var obj = GenericUtils.Get(key);
             if(obj == null)
                 continue;
-            var text = obj.GetComponent<UnityEngine.UI.Text>();
-            text.text = value;
+            
+            // Try TextMeshProUGUI first, fallback to legacy Text
+            var tmpText = obj.GetComponent<TextMeshProUGUI>();
+            if(tmpText != null)
+            {
+                tmpText.text = value;
+            }
+            else
+            {
+                var text = obj.GetComponent<UnityEngine.UI.Text>();
+                if(text != null)
+                    text.text = value;
+            }
 
             if(string.CompareOrdinal(key, 0, "FirstWindow", 0, 11) == 0)
                 FirstWindowTitlebar = value;
@@ -99,12 +134,18 @@ public static class MultiLanguage
             if(fv <= 0.001f)
                 continue;
 
-            var rt = text.transform as RectTransform;
+            var rt = obj.transform as RectTransform;
             rt.sizeDelta = new Vector2(fv - 52, rt.sizeDelta.y);
         }
 
         PlayerPrefs.SetString("language", lang);
     }
+    
+    /// <summary>
+    /// Gets the localized text for a key.
+    /// </summary>
+    /// <param name="key">The translation key.</param>
+    /// <returns>The translated text or the key if not found.</returns>
     public static string GetText(string key)
     {
         string v = null;
@@ -114,6 +155,12 @@ public static class MultiLanguage
         else
             return v;
     }
+    
+    /// <summary>
+    /// Sets the width of a menu element.
+    /// </summary>
+    /// <param name="menu">The menu name.</param>
+    /// <param name="v">The width value.</param>
     static void SetMenuWidth(string menu, float v)
     {
         var o = GenericUtils.Get("Options.MenuPad."+menu);
@@ -122,6 +169,14 @@ public static class MultiLanguage
         var rt = o.transform as RectTransform;
         rt.sizeDelta = new Vector2(v, rt.sizeDelta.y);
     }
+    
+    /// <summary>
+    /// Dictionary storing language translations.
+    /// </summary>
     static Dictionary<string, string> language_map = new Dictionary<string, string>();
+    
+    /// <summary>
+    /// Stores the localized title bar text for the first window.
+    /// </summary>
     public static string FirstWindowTitlebar = null;
 }

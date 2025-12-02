@@ -263,10 +263,10 @@ public static class GenericUtils
         public HashSet<Action<PointerEventData>> callbacks2 = new HashSet<Action<PointerEventData>>();
     }
     /// <summary>
-    /// 设置OnClick回调
+    /// Sets an OnClick callback on a GameObject.
     /// </summary>
-    /// <param name="obj">设置回调的目标UI</param>
-    /// <param name="callback">回调函数</param>
+    /// <param name="obj">The target UI GameObject.</param>
+    /// <param name="callback">The callback function.</param>
     public static void SetListenerOnClick(GameObject obj, Action callback)
     {
         if(!obj || callback == null)
@@ -443,10 +443,10 @@ public static class GenericUtils
     }
 
     /// <summary>
-    /// 设置OnDrag回调
+    /// Sets an OnDrag callback on a GameObject.
     /// </summary>
-    /// <param name="obj">设置回调的目标UI</param>
-    /// <param name="callback">回调函数</param>
+    /// <param name="obj">The target UI GameObject.</param>
+    /// <param name="callback">The callback function.</param>
     public static void SetListenerOnDrag(GameObject obj, Action<PointerEventData> callback)
     {
         if(!obj || callback == null)
@@ -475,10 +475,10 @@ public static class GenericUtils
         l.callbacks.Clear();
     }
     /// <summary>
-    /// 设置OnBeginDrag回调
+    /// Sets an OnBeginDrag callback on a GameObject.
     /// </summary>
-    /// <param name="obj">设置回调的目标UI</param>
-    /// <param name="callback">回调函数</param>
+    /// <param name="obj">The target UI GameObject.</param>
+    /// <param name="callback">The callback function.</param>
     public static void SetListenerOnBeginDrag(GameObject obj, Action<PointerEventData> callback)
     {
         if(!obj || callback == null)
@@ -605,10 +605,10 @@ public static class GenericUtils
         return md5s;
     }
     /// <summary>
-    /// 处理中间的‘：’
+    /// Calculates MD5 hashes for config file format, splitting at colon characters.
     /// </summary>
-    /// <param name="data"></param>
-    /// <returns></returns>
+    /// <param name="data">The byte array to process.</param>
+    /// <returns>A list of MD5 hash strings.</returns>
     public static List<string> CalcMd5ListForConfig(byte[] data)
     {
         var md5s = new List<string>();
@@ -678,16 +678,27 @@ public static class GenericUtils
         }
     }
     /// <summary>
-    /// 开启协程，方便在非MonoBehaviour对象中使用协程
+    /// Starts a coroutine from a non-MonoBehaviour context.
     /// </summary>
+    /// <param name="e">The coroutine enumerator to start.</param>
+    /// <returns>The Coroutine object.</returns>
     public static Coroutine StartCoroutine(System.Collections.IEnumerator e)
     {
         return CoroutineHelper.instance.DoCoroutine(e);
     }
+    
+    /// <summary>
+    /// Stops all coroutines started via this utility.
+    /// </summary>
     public static void StopAllCoroutines()
     {
         CoroutineHelper.instance.StopAllCoroutines();
     }
+    
+    /// <summary>
+    /// Stops a specific coroutine.
+    /// </summary>
+    /// <param name="co">The coroutine to stop.</param>
     public static void StopCoroutine(Coroutine co)
     {
         CoroutineHelper.instance.StopCoroutine(co);

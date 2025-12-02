@@ -1,8 +1,9 @@
-﻿using System.IO;
+using System.IO;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 using MinorShift._Library;
 
 /// <summary>
@@ -54,6 +55,9 @@ public class FirstWindow : MonoBehaviour
         emuera.Run();
     }
 
+    /// <summary>
+    /// Called when the component starts. Initializes the first window UI.
+    /// </summary>
     void Start()
     {
         if(!string.IsNullOrEmpty(MultiLanguage.FirstWindowTitlebar))
@@ -64,8 +68,16 @@ public class FirstWindow : MonoBehaviour
         setting_ = GenericUtils.FindChildByName(gameObject, "optionbtn", true);
         GenericUtils.SetListenerOnClick(setting_, OnOptionClick);
 
-        GenericUtils.FindChildByName<Text>(gameObject, "version")
-            .text = Application.version + " ";
+        var versionText = GenericUtils.FindChildByName<TextMeshProUGUI>(gameObject, "version");
+        if(versionText != null)
+            versionText.text = Application.version + " ";
+        else
+        {
+            // Fallback to legacy Text component
+            var legacyVersionText = GenericUtils.FindChildByName<Text>(gameObject, "version");
+            if(legacyVersionText != null)
+                legacyVersionText.text = Application.version + " ";
+        }
 
         GetList(Application.persistentDataPath);
         setting_.SetActive(true);
@@ -89,6 +101,9 @@ public class FirstWindow : MonoBehaviour
 #endif
     }
 
+    /// <summary>
+    /// Handles the option button click event.
+    /// </summary>
     void OnOptionClick()
     {
         var ow = EmueraContent.instance.option_window;
@@ -104,10 +119,24 @@ public class FirstWindow : MonoBehaviour
     {
         var rrt = item_.transform as UnityEngine.RectTransform;
         var obj = GameObject.Instantiate(item_);
-        var text = GenericUtils.FindChildByName<UnityEngine.UI.Text>(obj, "name");
-        text.text = folder;
-        text = GenericUtils.FindChildByName<UnityEngine.UI.Text>(obj, "path");
-        text.text = workspace + "/" + folder;
+        
+        // Try TextMeshProUGUI first, fallback to legacy Text
+        var tmpText = GenericUtils.FindChildByName<TextMeshProUGUI>(obj, "name");
+        if(tmpText != null)
+        {
+            tmpText.text = folder;
+            var pathTmpText = GenericUtils.FindChildByName<TextMeshProUGUI>(obj, "path");
+            if(pathTmpText != null)
+                pathTmpText.text = workspace + "/" + folder;
+        }
+        else
+        {
+            // Fallback to legacy Text component
+            var text = GenericUtils.FindChildByName<Text>(obj, "name");
+            if(text != null) text.text = folder;
+            var pathText = GenericUtils.FindChildByName<Text>(obj, "path");
+            if(pathText != null) pathText.text = workspace + "/" + folder;
+        }
 
         GenericUtils.SetListenerOnClick(obj, () =>
         {
@@ -157,7 +186,7 @@ public class FirstWindow : MonoBehaviour
                     AddItem(path.Substring(workspace.Length + 1), workspace);
             }
         }
-        catch(DirectoryNotFoundException e)
+        catch(DirectoryNotFoundException)
         { }
     }
 
@@ -165,7 +194,7 @@ public class FirstWindow : MonoBehaviour
     /// Title bar text component.
     /// </summary>
     [Tooltip("Title bar text component")]
-    public Text titlebar = null;
+    public TextMeshProUGUI titlebar = null;
     
     ScrollRect scroll_rect_ = null;
     GameObject item_ = null;
