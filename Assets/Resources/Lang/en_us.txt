@@ -28,3 +28,7 @@ FirstWindow.Titlebar.title=Game List
 [Failure]=Failure
 [Exit]=Exit
 [ExitContent]=Will exit. Are you sure?
+[SetDirectory]=Set Directory
+[DirectoryPlaceholder]=Enter game directory path...
+[DirectoryNotFound]=Directory not found!
+[Error]=Error

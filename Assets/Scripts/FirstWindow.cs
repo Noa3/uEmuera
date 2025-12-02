@@ -12,6 +12,11 @@ using MinorShift._Library;
 public class FirstWindow : MonoBehaviour
 {
     /// <summary>
+    /// PlayerPrefs key for storing custom game directory path.
+    /// </summary>
+    private const string CUSTOM_DIR_KEY = "CustomGameDirectory";
+    
+    /// <summary>
     /// Shows the first window by loading it from resources.
     /// </summary>
     public static void Show()
@@ -86,7 +91,117 @@ public class FirstWindow : MonoBehaviour
 #endif
 #if UNITY_STANDALONE && !UNITY_EDITOR
         GetList(Path.GetFullPath(Application.dataPath + "/.."));
+        // Load custom directory from PlayerPrefs for standalone platforms
+        LoadCustomDirectory();
+        // Create the "Set Directory" button for standalone platforms
+        CreateSetDirectoryButton();
 #endif
+#if UNITY_STANDALONE && UNITY_EDITOR
+        // Also enable in Editor when targeting standalone for testing
+        LoadCustomDirectory();
+        CreateSetDirectoryButton();
+#endif
+    }
+    
+    /// <summary>
+    /// Loads and scans the custom directory from PlayerPrefs.
+    /// </summary>
+    void LoadCustomDirectory()
+    {
+        string customDir = PlayerPrefs.GetString(CUSTOM_DIR_KEY, "");
+        if(!string.IsNullOrEmpty(customDir) && Directory.Exists(customDir))
+        {
+            GetList(customDir);
+        }
+    }
+    
+    /// <summary>
+    /// Creates the "Set Directory" button dynamically for standalone platforms.
+    /// </summary>
+    void CreateSetDirectoryButton()
+    {
+        // Clone the option button to create the set directory button
+        if(setting_ == null)
+            return;
+            
+        var setdir_btn_ = GameObject.Instantiate(setting_);
+        setdir_btn_.name = "setdirbtn";
+        
+        var rt = setdir_btn_.transform as RectTransform;
+        var settingRt = setting_.transform as RectTransform;
+        rt.SetParent(settingRt.parent);
+        rt.localScale = Vector3.one;
+        
+        // Position next to the option button (to the left)
+        rt.anchorMin = settingRt.anchorMin;
+        rt.anchorMax = settingRt.anchorMax;
+        rt.pivot = settingRt.pivot;
+        rt.sizeDelta = new Vector2(settingRt.sizeDelta.x * 2.5f, settingRt.sizeDelta.y);
+        rt.anchoredPosition = new Vector2(settingRt.anchoredPosition.x - settingRt.sizeDelta.x - 10, settingRt.anchoredPosition.y);
+        
+        // Change the button text
+        var text = setdir_btn_.GetComponentInChildren<Text>();
+        if(text != null)
+        {
+            text.text = MultiLanguage.GetText("[SetDirectory]");
+        }
+        
+        // Remove old click listeners and add new one
+        GenericUtils.RemoveListenerOnClick(setdir_btn_);
+        GenericUtils.SetListenerOnClick(setdir_btn_, OnSetDirectoryClick);
+        
+        setdir_btn_.SetActive(true);
+    }
+    
+    /// <summary>
+    /// Handles the "Set Directory" button click.
+    /// Shows a dialog to enter the game directory path.
+    /// </summary>
+    void OnSetDirectoryClick()
+    {
+        var ow = EmueraContent.instance.option_window;
+        string currentDir = PlayerPrefs.GetString(CUSTOM_DIR_KEY, "");
+        ow.ShowDirectoryInputBox(currentDir, OnDirectorySet);
+    }
+    
+    /// <summary>
+    /// Callback when a directory is set from the input dialog.
+    /// </summary>
+    /// <param name="path">The directory path entered by the user.</param>
+    void OnDirectorySet(string path)
+    {
+        if(string.IsNullOrEmpty(path))
+            return;
+            
+        // Normalize the path
+        path = uEmuera.Utils.NormalizePath(path);
+        
+        // Validate the directory exists
+        if(!Directory.Exists(path))
+        {
+            var ow = EmueraContent.instance.option_window;
+            ow.ShowMessageBoxPublic(
+                MultiLanguage.GetText("[Error]"),
+                MultiLanguage.GetText("[DirectoryNotFound]"));
+            return;
+        }
+        
+        // Save to PlayerPrefs
+        PlayerPrefs.SetString(CUSTOM_DIR_KEY, path);
+        PlayerPrefs.Save();
+        
+        // Refresh the game list
+        RefreshGameList();
+    }
+    
+    /// <summary>
+    /// Refreshes the game list by reloading the FirstWindow.
+    /// </summary>
+    void RefreshGameList()
+    {
+        // Destroy current FirstWindow and show a new one
+        GameObject.Destroy(gameObject);
+        Show();
     }
 
     void OnOptionClick()

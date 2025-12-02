@@ -28,3 +28,7 @@ FirstWindow.Titlebar.title=ゲームリスト
 [Failure]=失敗
 [Exit]=ゲームを終了します
 [ExitContent]=ゲームを終了しますか？
+[SetDirectory]=ディレクトリを設定
+[DirectoryPlaceholder]=ゲームディレクトリパスを入力...
+[DirectoryNotFound]=ディレクトリが見つかりません！
+[Error]=エラー

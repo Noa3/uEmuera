@@ -471,6 +471,201 @@ public class OptionWindow : MonoBehaviour
         intentbox_R_text.text = "0";
         EmueraContent.instance.SetIntentBox(0, 0);
     }
+    
+    #region Directory Input Box
+    
+    /// <summary>
+    /// Callback for when directory is confirmed.
+    /// </summary>
+    private System.Action<string> dir_input_callback_;
+    
+    /// <summary>
+    /// The dynamically created directory input box.
+    /// </summary>
+    private GameObject dir_input_box_;
+    
+    /// <summary>
+    /// The input field for directory path.
+    /// </summary>
+    private InputField dir_input_field_;
+    
+    /// <summary>
+    /// Shows a public message box (wrapper for ShowMessageBox).
+    /// </summary>
+    /// <param name="title">The title of the message box.</param>
+    /// <param name="content">The content of the message box.</param>
+    public void ShowMessageBoxPublic(string title, string content)
+    {
+        ShowMessageBox(title, content);
+    }
+    
+    /// <summary>
+    /// Shows the directory input dialog box.
+    /// </summary>
+    /// <param name="currentPath">The current path to display in the input field.</param>
+    /// <param name="callback">Callback when directory is confirmed.</param>
+    public void ShowDirectoryInputBox(string currentPath, System.Action<string> callback)
+    {
+        dir_input_callback_ = callback;
+        
+        // Create the dialog if it doesn't exist
+        if(dir_input_box_ == null)
+        {
+            CreateDirectoryInputBox();
+        }
+        
+        // Set the current path
+        if(dir_input_field_ != null)
+        {
+            dir_input_field_.text = currentPath ?? "";
+        }
+        
+        dir_input_box_.SetActive(true);
+    }
+    
+    /// <summary>
+    /// Creates the directory input box UI dynamically based on the existing message box.
+    /// </summary>
+    void CreateDirectoryInputBox()
+    {
+        // Clone the message box as a base
+        dir_input_box_ = GameObject.Instantiate(msg_box);
+        dir_input_box_.name = "DirectoryInputBox";
+        dir_input_box_.transform.SetParent(msg_box.transform.parent);
+        
+        var rt = dir_input_box_.transform as RectTransform;
+        var msgRt = msg_box.transform as RectTransform;
+        rt.localScale = Vector3.one;
+        rt.anchorMin = msgRt.anchorMin;
+        rt.anchorMax = msgRt.anchorMax;
+        rt.anchoredPosition = msgRt.anchoredPosition;
+        rt.sizeDelta = msgRt.sizeDelta;
+        
+        // Find and modify the title
+        var titleObj = GenericUtils.FindChildByName<Text>(dir_input_box_, "title");
+        if(titleObj != null)
+        {
+            titleObj.text = MultiLanguage.GetText("[SetDirectory]");
+        }
+        
+        // Find the content text and replace it with an InputField
+        var contentObj = GenericUtils.FindChildByName<Text>(dir_input_box_, "content");
+        if(contentObj != null)
+        {
+            // Get the content's parent and position
+            var contentRt = contentObj.transform as RectTransform;
+            var contentParent = contentRt.parent;
+            
+            // Create InputField GameObject
+            var inputFieldObj = new GameObject("DirectoryInput");
+            inputFieldObj.transform.SetParent(contentParent);
+            
+            var inputRt = inputFieldObj.AddComponent<RectTransform>();
+            inputRt.localScale = Vector3.one;
+            inputRt.anchorMin = contentRt.anchorMin;
+            inputRt.anchorMax = contentRt.anchorMax;
+            inputRt.anchoredPosition = contentRt.anchoredPosition;
+            inputRt.sizeDelta = new Vector2(contentRt.sizeDelta.x, 40);
+            inputRt.pivot = contentRt.pivot;
+            
+            // Add background image
+            var bgImage = inputFieldObj.AddComponent<Image>();
+            bgImage.color = new Color(1, 1, 1, 0.9f);
+            
+            // Create text child for the input field
+            var textObj = new GameObject("Text");
+            textObj.transform.SetParent(inputFieldObj.transform);
+            
+            var textRt = textObj.AddComponent<RectTransform>();
+            textRt.localScale = Vector3.one;
+            textRt.anchorMin = Vector2.zero;
+            textRt.anchorMax = Vector2.one;
+            textRt.offsetMin = new Vector2(10, 5);
+            textRt.offsetMax = new Vector2(-10, -5);
+            
+            textObj.AddComponent<CanvasRenderer>();
+            var inputText = textObj.AddComponent<Text>();
+            inputText.font = contentObj.font;
+            inputText.fontSize = contentObj.fontSize > 0 ? contentObj.fontSize : 20;
+            inputText.color = Color.black;
+            inputText.alignment = TextAnchor.MiddleLeft;
+            inputText.supportRichText = false;
+            
+            // Create placeholder text
+            var placeholderObj = new GameObject("Placeholder");
+            placeholderObj.transform.SetParent(inputFieldObj.transform);
+            
+            var phRt = placeholderObj.AddComponent<RectTransform>();
+            phRt.localScale = Vector3.one;
+            phRt.anchorMin = Vector2.zero;
+            phRt.anchorMax = Vector2.one;
+            phRt.offsetMin = new Vector2(10, 5);
+            phRt.offsetMax = new Vector2(-10, -5);
+            
+            placeholderObj.AddComponent<CanvasRenderer>();
+            var phText = placeholderObj.AddComponent<Text>();
+            phText.font = contentObj.font;
+            phText.fontSize = contentObj.fontSize > 0 ? contentObj.fontSize : 20;
+            phText.color = new Color(0.5f, 0.5f, 0.5f, 0.5f);
+            phText.alignment = TextAnchor.MiddleLeft;
+            phText.fontStyle = FontStyle.Italic;
+            phText.text = MultiLanguage.GetText("[DirectoryPlaceholder]");
+            
+            // Add InputField component
+            dir_input_field_ = inputFieldObj.AddComponent<InputField>();
+            dir_input_field_.textComponent = inputText;
+            dir_input_field_.placeholder = phText;
+            dir_input_field_.characterLimit = 0;
+            
+            // Hide original content text
+            contentObj.gameObject.SetActive(false);
+        }
+        
+        // Setup confirm button
+        var confirmBtn = GenericUtils.FindChildByName(dir_input_box_, "confirm");
+        if(confirmBtn != null)
+        {
+            GenericUtils.RemoveListenerOnClick(confirmBtn);
+            GenericUtils.SetListenerOnClick(confirmBtn, OnDirInputConfirm);
+        }
+        
+        // Setup cancel button
+        var cancelBtn = GenericUtils.FindChildByName(dir_input_box_, "cancel");
+        if(cancelBtn != null)
+        {
+            cancelBtn.SetActive(true);
+            GenericUtils.RemoveListenerOnClick(cancelBtn);
+            GenericUtils.SetListenerOnClick(cancelBtn, OnDirInputCancel);
+        }
+        
+        dir_input_box_.SetActive(false);
+    }
+    
+    /// <summary>
+    /// Called when the directory input confirm button is clicked.
+    /// </summary>
+    void OnDirInputConfirm()
+    {
+        string path = dir_input_field_ != null ? dir_input_field_.text : "";
+        dir_input_box_.SetActive(false);
+        
+        if(dir_input_callback_ != null)
+        {
+            dir_input_callback_(path);
+            dir_input_callback_ = null;
+        }
+    }
+    
+    /// <summary>
+    /// Called when the directory input cancel button is clicked.
+    /// </summary>
+    void OnDirInputCancel()
+    {
+        dir_input_box_.SetActive(false);
+        dir_input_callback_ = null;
+    }
+    
+    #endregion
 
     #region UI References
     

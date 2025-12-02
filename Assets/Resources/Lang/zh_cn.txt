@@ -27,3 +27,7 @@ FirstWindow.Titlebar.title=游戏列表
 [Failure]=失败
 [Exit]=退出游戏
 [ExitContent]=是否退出游戏？
+[SetDirectory]=设置目录
+[DirectoryPlaceholder]=输入游戏目录路径...
+[DirectoryNotFound]=目录不存在！
+[Error]=错误
