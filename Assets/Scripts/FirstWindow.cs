@@ -96,8 +96,8 @@ public class FirstWindow : MonoBehaviour
         // Create the "Set Directory" button for standalone platforms
         CreateSetDirectoryButton();
 #endif
-#if UNITY_STANDALONE && UNITY_EDITOR
-        // Also enable in Editor when targeting standalone for testing
+#if UNITY_EDITOR
+        // Also enable in Editor for testing (when targeting standalone)
         LoadCustomDirectory();
         CreateSetDirectoryButton();
 #endif
@@ -199,8 +199,21 @@ public class FirstWindow : MonoBehaviour
     /// </summary>
     void RefreshGameList()
     {
-        // Destroy current FirstWindow and show a new one
+        // Use coroutine to properly handle the destroy/create sequence
+        GenericUtils.StartCoroutine(RefreshGameListCoroutine());
+    }
+    
+    /// <summary>
+    /// Coroutine that handles refreshing the game list.
+    /// Waits for the current frame to end before creating a new window.
+    /// </summary>
+    System.Collections.IEnumerator RefreshGameListCoroutine()
+    {
+        // Destroy current FirstWindow
         GameObject.Destroy(gameObject);
+        // Wait for the end of frame to ensure destruction is processed
+        yield return null;
+        // Show a new FirstWindow
         Show();
     }
 

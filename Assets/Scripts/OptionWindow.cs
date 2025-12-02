@@ -475,6 +475,11 @@ public class OptionWindow : MonoBehaviour
     #region Directory Input Box
     
     /// <summary>
+    /// Default font size for directory input dialog.
+    /// </summary>
+    private const int DEFAULT_FONT_SIZE = 20;
+    
+    /// <summary>
     /// Callback for when directory is confirmed.
     /// </summary>
     private System.Action<string> dir_input_callback_;
@@ -586,7 +591,7 @@ public class OptionWindow : MonoBehaviour
             textObj.AddComponent<CanvasRenderer>();
             var inputText = textObj.AddComponent<Text>();
             inputText.font = contentObj.font;
-            inputText.fontSize = contentObj.fontSize > 0 ? contentObj.fontSize : 20;
+            inputText.fontSize = contentObj.fontSize > 0 ? contentObj.fontSize : DEFAULT_FONT_SIZE;
             inputText.color = Color.black;
             inputText.alignment = TextAnchor.MiddleLeft;
             inputText.supportRichText = false;
@@ -605,7 +610,7 @@ public class OptionWindow : MonoBehaviour
             placeholderObj.AddComponent<CanvasRenderer>();
             var phText = placeholderObj.AddComponent<Text>();
             phText.font = contentObj.font;
-            phText.fontSize = contentObj.fontSize > 0 ? contentObj.fontSize : 20;
+            phText.fontSize = contentObj.fontSize > 0 ? contentObj.fontSize : DEFAULT_FONT_SIZE;
             phText.color = new Color(0.5f, 0.5f, 0.5f, 0.5f);
             phText.alignment = TextAnchor.MiddleLeft;
             phText.fontStyle = FontStyle.Italic;
