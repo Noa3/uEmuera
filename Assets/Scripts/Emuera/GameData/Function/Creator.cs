@@ -207,7 +207,14 @@ namespace MinorShift.Emuera.GameData.Function
 
                 ["SPRITEANIMECREATE"] = new SpriteAnimeCreateMethod(),
                 ["SPRITEANIMEADDFRAME"] = new SpriteAnimeAddFrameMethod(),
-                ["SETANIMETIMER"] = new SetAnimeTimerMethod()
+                ["SETANIMETIMER"] = new SetAnimeTimerMethod(),
+
+                // Emuera EM/EE Extensions
+                ["EXISTFUNCTION"] = new ExistFunctionMethod(),
+                ["EXISTSOUND"] = new ExistSoundMethod(),
+                ["FLOOR"] = new FloorMethod(),
+                ["CEILING"] = new CeilingMethod(),
+                ["ROUND"] = new RoundMethod()
             };
 
 

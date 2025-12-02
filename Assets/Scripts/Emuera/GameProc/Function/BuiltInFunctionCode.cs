@@ -355,5 +355,27 @@ namespace MinorShift.Emuera.GameProc.Function
 		PRINT_SPACE,
 
 		INPUTMOUSEKEY,
+
+		// Emuera EM/EE Extensions
+		BINPUT,//ボタンのみ入力。整数入力。入力はRESULTへ。
+		BINPUTS,//ボタンのみ入力。文字列入力。入力はRESULTSへ。
+		
+		TRYCALLF,//TRY pattern for CALLF
+		TRYCALLFORMF,//TRY pattern for CALLFORMF
+
+		// Sound commands
+		PLAYSOUND,//サウンドファイルを再生
+		STOPSOUND,//サウンド再生を停止
+		PLAYBGM,//BGMを再生
+		STOPBGM,//BGM再生を停止
+		SETSOUNDVOLUME,//効果音の音量を設定
+		SETBGMVOLUME,//BGMの音量を設定
+
+		// Extended graphics commands
+		GDRAWTEXT,//テキストを描画
+		GDRAWSPRITE,//スプライトを描画
+
+		// Extended output log command
+		OUTPUTLOG_EXTENDED,//拡張版OUTPUTLOG
 	}
 }

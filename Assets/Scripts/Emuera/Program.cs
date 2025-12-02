@@ -57,22 +57,37 @@ namespace MinorShift.Emuera
 			CsvDir = ExeDir + "csv/";
 			if (!Directory.Exists(CsvDir)){
 				CsvDir = ExeDir + "CSV/";
+				if (!Directory.Exists(CsvDir)){
+					CsvDir = ExeDir + "Csv/";
+				}
 			}
 			ErbDir = ExeDir + "erb/";
 			if (!Directory.Exists(ErbDir)){
 				ErbDir = ExeDir + "ERB/";
+				if (!Directory.Exists(ErbDir)){
+					ErbDir = ExeDir + "Erb/";
+				}
 			}
 			DebugDir = ExeDir + "debug/";
 			if (!Directory.Exists(DebugDir)){
 				DebugDir = ExeDir + "DEBUG/";
+				if (!Directory.Exists(DebugDir)){
+					DebugDir = ExeDir + "Debug/";
+				}
 			}
 			DatDir = ExeDir + "dat/";
 			if (!Directory.Exists(DatDir)){
 				DatDir = ExeDir + "DAT/";
+				if (!Directory.Exists(DatDir)){
+					DatDir = ExeDir + "Dat/";
+				}
 			}
 			ContentDir = ExeDir + "resources/";
 			if (!Directory.Exists(ContentDir)){
 				ContentDir = ExeDir + "RESOURCES/";
+				if (!Directory.Exists(ContentDir)){
+					ContentDir = ExeDir + "Resources/";
+				}
 			}
 			//Error出力用
 			//1815 .exeが東方板のNGワードに引っかかるそうなので除去

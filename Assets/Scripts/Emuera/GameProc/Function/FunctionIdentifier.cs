@@ -379,6 +379,19 @@ namespace MinorShift.Emuera.GameProc.Function
 
 			addFunction(FunctionCode.INPUTMOUSEKEY, new INPUTMOUSEKEY_Instruction());
 			addFunction(FunctionCode.AWAIT, new AWAIT_Instruction());
+
+			// Emuera EM/EE Extensions
+			addFunction(FunctionCode.BINPUT, new BINPUT_Instruction());
+			addFunction(FunctionCode.BINPUTS, new BINPUTS_Instruction());
+			addFunction(FunctionCode.TRYCALLF, new TRYCALLF_Instruction(false));
+			addFunction(FunctionCode.TRYCALLFORMF, new TRYCALLF_Instruction(true));
+			addFunction(FunctionCode.PLAYSOUND, new PLAYSOUND_Instruction());
+			addFunction(FunctionCode.STOPSOUND, new STOPSOUND_Instruction());
+			addFunction(FunctionCode.PLAYBGM, new PLAYBGM_Instruction());
+			addFunction(FunctionCode.STOPBGM, new STOPBGM_Instruction());
+			addFunction(FunctionCode.SETSOUNDVOLUME, new SETSOUNDVOLUME_Instruction());
+			addFunction(FunctionCode.SETBGMVOLUME, new SETBGMVOLUME_Instruction());
+
 			#region 式中関数のargument違い
 			addFunction(FunctionCode.VARSIZE, argb[FunctionArgType.SP_VAR], METHOD_SAFE | EXTENDED);//動作が違うのでMETHOD化できない
 			addFunction(FunctionCode.GETTIME, argb[FunctionArgType.VOID], METHOD_SAFE | EXTENDED);//2つに代入する必要があるのでMETHOD化できない

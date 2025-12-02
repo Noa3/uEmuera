@@ -4318,5 +4318,136 @@ namespace MinorShift.Emuera.GameData.Function
 		}
 
 		#endregion
+
+		#region Emuera EM/EE Extensions
+
+		/// <summary>
+		/// EXISTFUNCTION method - checks if a function exists
+		/// Returns: 0 if not found, 1 if normal function, 2 if integer #FUNCTION, 3 if string #FUNCTIONS
+		/// </summary>
+		private sealed class ExistFunctionMethod : FunctionMethod
+		{
+			public ExistFunctionMethod()
+			{
+				ReturnType = typeof(Int64);
+				argumentTypeArray = new Type[] { typeof(string) };
+				CanRestructure = false;
+			}
+
+			public override Int64 GetIntValue(ExpressionMediator exm, IOperandTerm[] arguments)
+			{
+				string funcName = arguments[0].GetStrValue(exm);
+				if (string.IsNullOrEmpty(funcName))
+					return 0;
+
+				// Convert to uppercase if case-insensitive function names is enabled
+				if (Config.ICFunction)
+					funcName = funcName.ToUpper();
+
+				// Check if it's a user-defined function
+				FunctionLabelLine label = GlobalStatic.LabelDictionary.GetNonEventLabel(funcName);
+				if (label != null)
+				{
+					if (label.IsMethod)
+					{
+						// #FUNCTION or #FUNCTIONS
+						if (label.MethodType == typeof(Int64))
+							return 2;  // Integer returning function
+						else if (label.MethodType == typeof(string))
+							return 3;  // String returning function
+					}
+					return 1;  // Normal function
+				}
+
+				// Check if it's an event function
+				List<FunctionLabelLine>[] eventLabels = GlobalStatic.LabelDictionary.GetEventLabels(funcName);
+				if (eventLabels != null)
+					return 1;
+
+				return 0;  // Not found
+			}
+		}
+
+		/// <summary>
+		/// EXISTSOUND method - checks if a sound file exists
+		/// Returns: 1 if file exists, 0 otherwise
+		/// </summary>
+		private sealed class ExistSoundMethod : FunctionMethod
+		{
+			public ExistSoundMethod()
+			{
+				ReturnType = typeof(Int64);
+				argumentTypeArray = new Type[] { typeof(string) };
+				CanRestructure = false;
+			}
+
+			public override Int64 GetIntValue(ExpressionMediator exm, IOperandTerm[] arguments)
+			{
+				string filename = arguments[0].GetStrValue(exm);
+				return MinorShift.Emuera.Content.AudioManager.Instance.ExistSound(filename);
+			}
+		}
+
+		/// <summary>
+		/// FLOOR method - rounds a number down to the nearest integer
+		/// </summary>
+		private sealed class FloorMethod : FunctionMethod
+		{
+			public FloorMethod()
+			{
+				ReturnType = typeof(Int64);
+				argumentTypeArray = new Type[] { typeof(Int64) };
+				CanRestructure = true;
+			}
+
+			public override Int64 GetIntValue(ExpressionMediator exm, IOperandTerm[] arguments)
+			{
+				// In Emuera, all numbers are integers, so FLOOR just returns the input
+				// This is provided for compatibility with scripts that use FLOOR
+				return arguments[0].GetIntValue(exm);
+			}
+		}
+
+		/// <summary>
+		/// CEILING method - rounds a number up to the nearest integer
+		/// </summary>
+		private sealed class CeilingMethod : FunctionMethod
+		{
+			public CeilingMethod()
+			{
+				ReturnType = typeof(Int64);
+				argumentTypeArray = new Type[] { typeof(Int64) };
+				CanRestructure = true;
+			}
+
+			public override Int64 GetIntValue(ExpressionMediator exm, IOperandTerm[] arguments)
+			{
+				// In Emuera, all numbers are integers, so CEILING just returns the input
+				// This is provided for compatibility with scripts that use CEILING
+				return arguments[0].GetIntValue(exm);
+			}
+		}
+
+		/// <summary>
+		/// ROUND method - rounds a number to the nearest integer
+		/// </summary>
+		private sealed class RoundMethod : FunctionMethod
+		{
+			public RoundMethod()
+			{
+				ReturnType = typeof(Int64);
+				argumentTypeArray = new Type[] { typeof(Int64) };
+				CanRestructure = true;
+			}
+
+			public override Int64 GetIntValue(ExpressionMediator exm, IOperandTerm[] arguments)
+			{
+				// In Emuera, all numbers are integers, so ROUND just returns the input
+				// This is provided for compatibility with scripts that use ROUND
+				return arguments[0].GetIntValue(exm);
+			}
+		}
+
+		#endregion
 	}
 }

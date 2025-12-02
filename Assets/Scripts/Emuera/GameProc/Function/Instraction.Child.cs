@@ -1668,6 +1668,231 @@ namespace MinorShift.Emuera.GameProc.Function
 				exm.Console.Await((int)waittime);
 			}
 		}
+
+		// Emuera EM/EE Extensions - BINPUT (Button-only input)
+		private sealed class BINPUT_Instruction : AbstractInstruction
+		{
+			public BINPUT_Instruction()
+			{
+				ArgBuilder = ArgumentParser.GetArgumentBuilder(FunctionArgType.SP_INPUT);
+				flag = IS_PRINT | IS_INPUT | EXTENDED;
+			}
+
+			public override void DoInstruction(ExpressionMediator exm, InstructionLine func, ProcessState state)
+			{
+				ExpressionArgument arg = (ExpressionArgument)func.Argument;
+				InputRequest req = new InputRequest();
+				req.InputType = InputType.BIntValue;  // Button-only integer input
+				if (arg.Term != null)
+				{
+					Int64 def;
+					if (arg.IsConst)
+						def = arg.ConstInt;
+					else
+						def = arg.Term.GetIntValue(exm);
+					req.HasDefValue = true;
+					req.DefIntValue = def;
+				}
+				exm.Console.WaitInput(req);
+			}
+		}
+
+		private sealed class BINPUTS_Instruction : AbstractInstruction
+		{
+			public BINPUTS_Instruction()
+			{
+				ArgBuilder = ArgumentParser.GetArgumentBuilder(FunctionArgType.SP_INPUTS);
+				flag = IS_PRINT | IS_INPUT | EXTENDED;
+			}
+
+			public override void DoInstruction(ExpressionMediator exm, InstructionLine func, ProcessState state)
+			{
+				ExpressionArgument arg = (ExpressionArgument)func.Argument;
+				InputRequest req = new InputRequest();
+				req.InputType = InputType.BStrValue;  // Button-only string input
+				if (arg.Term != null)
+				{
+					string def;
+					if (arg.IsConst)
+						def = arg.ConstStr;
+					else
+						def = arg.Term.GetStrValue(exm);
+					req.HasDefValue = true;
+					req.DefStrValue = def;
+				}
+				exm.Console.WaitInput(req);
+			}
+		}
+
+		// Emuera EM/EE Extensions - TRYCALLF/TRYCALLFORMF
+		private sealed class TRYCALLF_Instruction : AbstractInstruction
+		{
+			public TRYCALLF_Instruction(bool form)
+			{
+				if (form)
+					ArgBuilder = ArgumentParser.GetArgumentBuilder(FunctionArgType.SP_CALLFORMF);
+				else
+					ArgBuilder = ArgumentParser.GetArgumentBuilder(FunctionArgType.SP_CALLF);
+				flag = EXTENDED | METHOD_SAFE | FORCE_SETARG | IS_TRY;
+			}
+
+			public override void SetJumpTo(ref bool useCallForm, InstructionLine func, int currentDepth, ref string FunctionoNotFoundName)
+			{
+				if (!func.Argument.IsConst)
+				{
+					useCallForm = true;
+					return;
+				}
+				SpCallFArgment callfArg = (SpCallFArgment)func.Argument;
+				if (Config.ICFunction)
+					callfArg.ConstStr = callfArg.ConstStr.ToUpper();
+				try
+				{
+					callfArg.FuncTerm = GlobalStatic.IdentifierDictionary.GetFunctionMethod(GlobalStatic.LabelDictionary, callfArg.ConstStr, callfArg.RowArgs, true);
+				}
+				catch (CodeEE e)
+				{
+					// For TRYCALLF, we don't warn - just continue with null
+					if (!Program.AnalysisMode)
+						callfArg.FuncTerm = null;
+					return;
+				}
+				// For TRYCALLF, we don't warn if function not found - just continue with null
+			}
+
+			public override void DoInstruction(ExpressionMediator exm, InstructionLine func, ProcessState state)
+			{
+				IOperandTerm mToken;
+				string labelName;
+				if ((!func.Argument.IsConst) || (exm.Console.RunERBFromMemory))
+				{
+					SpCallFArgment spCallformArg = (SpCallFArgment)func.Argument;
+					labelName = spCallformArg.FuncnameTerm.GetStrValue(exm);
+					try
+					{
+						mToken = GlobalStatic.IdentifierDictionary.GetFunctionMethod(GlobalStatic.LabelDictionary, labelName, spCallformArg.RowArgs, true);
+					}
+					catch (CodeEE)
+					{
+						mToken = null;
+					}
+				}
+				else
+				{
+					labelName = func.Argument.ConstStr;
+					mToken = ((SpCallFArgment)func.Argument).FuncTerm;
+				}
+				if (mToken == null)
+				{
+					// Function not found - set RESULT to 0 and return
+					exm.VEvaluator.RESULT = 0;
+					return;
+				}
+				mToken.GetValue(exm);
+				exm.VEvaluator.RESULT = 1;
+			}
+		}
+
+		// Emuera EM/EE Extensions - Sound commands
+		private sealed class PLAYSOUND_Instruction : AbstractInstruction
+		{
+			public PLAYSOUND_Instruction()
+			{
+				ArgBuilder = ArgumentParser.GetArgumentBuilder(FunctionArgType.STR_EXPRESSION);
+				flag = METHOD_SAFE | EXTENDED;
+			}
+
+			public override void DoInstruction(ExpressionMediator exm, InstructionLine func, ProcessState state)
+			{
+				string filename;
+				if (func.Argument.IsConst)
+					filename = func.Argument.ConstStr;
+				else
+					filename = ((ExpressionArgument)func.Argument).Term.GetStrValue(exm);
+				
+				Content.AudioManager.Instance.PlaySound(filename);
+			}
+		}
+
+		private sealed class STOPSOUND_Instruction : AbstractInstruction
+		{
+			public STOPSOUND_Instruction()
+			{
+				ArgBuilder = ArgumentParser.GetArgumentBuilder(FunctionArgType.VOID);
+				flag = METHOD_SAFE | EXTENDED;
+			}
+
+			public override void DoInstruction(ExpressionMediator exm, InstructionLine func, ProcessState state)
+			{
+				Content.AudioManager.Instance.StopSound();
+			}
+		}
+
+		private sealed class PLAYBGM_Instruction : AbstractInstruction
+		{
+			public PLAYBGM_Instruction()
+			{
+				ArgBuilder = ArgumentParser.GetArgumentBuilder(FunctionArgType.STR_EXPRESSION);
+				flag = METHOD_SAFE | EXTENDED;
+			}
+
+			public override void DoInstruction(ExpressionMediator exm, InstructionLine func, ProcessState state)
+			{
+				string filename;
+				if (func.Argument.IsConst)
+					filename = func.Argument.ConstStr;
+				else
+					filename = ((ExpressionArgument)func.Argument).Term.GetStrValue(exm);
+				
+				Content.AudioManager.Instance.PlayBGM(filename);
+			}
+		}
+
+		private sealed class STOPBGM_Instruction : AbstractInstruction
+		{
+			public STOPBGM_Instruction()
+			{
+				ArgBuilder = ArgumentParser.GetArgumentBuilder(FunctionArgType.VOID);
+				flag = METHOD_SAFE | EXTENDED;
+			}
+
+			public override void DoInstruction(ExpressionMediator exm, InstructionLine func, ProcessState state)
+			{
+				Content.AudioManager.Instance.StopBGM();
+			}
+		}
+
+		private sealed class SETSOUNDVOLUME_Instruction : AbstractInstruction
+		{
+			public SETSOUNDVOLUME_Instruction()
+			{
+				ArgBuilder = ArgumentParser.GetArgumentBuilder(FunctionArgType.INT_EXPRESSION);
+				flag = METHOD_SAFE | EXTENDED;
+			}
+
+			public override void DoInstruction(ExpressionMediator exm, InstructionLine func, ProcessState state)
+			{
+				ExpressionArgument arg = (ExpressionArgument)func.Argument;
+				int volume = (int)arg.Term.GetIntValue(exm);
+				Content.AudioManager.Instance.SetSoundVolume(volume);
+			}
+		}
+
+		private sealed class SETBGMVOLUME_Instruction : AbstractInstruction
+		{
+			public SETBGMVOLUME_Instruction()
+			{
+				ArgBuilder = ArgumentParser.GetArgumentBuilder(FunctionArgType.INT_EXPRESSION);
+				flag = METHOD_SAFE | EXTENDED;
+			}
+
+			public override void DoInstruction(ExpressionMediator exm, InstructionLine func, ProcessState state)
+			{
+				ExpressionArgument arg = (ExpressionArgument)func.Argument;
+				int volume = (int)arg.Term.GetIntValue(exm);
+				Content.AudioManager.Instance.SetBGMVolume(volume);
+			}
+		}
         #endregion
 
         #region flowControlFunction
