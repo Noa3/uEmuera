@@ -17,6 +17,16 @@ public class FirstWindow : MonoBehaviour
     private const string CUSTOM_DIR_KEY = "CustomGameDirectory";
     
     /// <summary>
+    /// Width multiplier for the Set Directory button relative to the option button.
+    /// </summary>
+    private const float SET_DIR_BUTTON_WIDTH_MULTIPLIER = 2.5f;
+    
+    /// <summary>
+    /// Horizontal spacing between the Set Directory button and the option button.
+    /// </summary>
+    private const float SET_DIR_BUTTON_SPACING = 10f;
+    
+    /// <summary>
     /// Shows the first window by loading it from resources.
     /// </summary>
     public static void Show()
@@ -136,8 +146,8 @@ public class FirstWindow : MonoBehaviour
         rt.anchorMin = settingRt.anchorMin;
         rt.anchorMax = settingRt.anchorMax;
         rt.pivot = settingRt.pivot;
-        rt.sizeDelta = new Vector2(settingRt.sizeDelta.x * 2.5f, settingRt.sizeDelta.y);
-        rt.anchoredPosition = new Vector2(settingRt.anchoredPosition.x - settingRt.sizeDelta.x - 10, settingRt.anchoredPosition.y);
+        rt.sizeDelta = new Vector2(settingRt.sizeDelta.x * SET_DIR_BUTTON_WIDTH_MULTIPLIER, settingRt.sizeDelta.y);
+        rt.anchoredPosition = new Vector2(settingRt.anchoredPosition.x - settingRt.sizeDelta.x - SET_DIR_BUTTON_SPACING, settingRt.anchoredPosition.y);
         
         // Change the button text
         var text = setdir_btn_.GetComponentInChildren<Text>();

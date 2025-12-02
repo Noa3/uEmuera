@@ -588,10 +588,13 @@ public class OptionWindow : MonoBehaviour
             textRt.offsetMin = new Vector2(10, 5);
             textRt.offsetMax = new Vector2(-10, -5);
             
+            // Calculate font size once to avoid duplication
+            int fontSize = contentObj.fontSize > 0 ? contentObj.fontSize : DEFAULT_FONT_SIZE;
+            
             textObj.AddComponent<CanvasRenderer>();
             var inputText = textObj.AddComponent<Text>();
             inputText.font = contentObj.font;
-            inputText.fontSize = contentObj.fontSize > 0 ? contentObj.fontSize : DEFAULT_FONT_SIZE;
+            inputText.fontSize = fontSize;
             inputText.color = Color.black;
             inputText.alignment = TextAnchor.MiddleLeft;
             inputText.supportRichText = false;
@@ -610,7 +613,7 @@ public class OptionWindow : MonoBehaviour
             placeholderObj.AddComponent<CanvasRenderer>();
             var phText = placeholderObj.AddComponent<Text>();
             phText.font = contentObj.font;
-            phText.fontSize = contentObj.fontSize > 0 ? contentObj.fontSize : DEFAULT_FONT_SIZE;
+            phText.fontSize = fontSize;
             phText.color = new Color(0.5f, 0.5f, 0.5f, 0.5f);
             phText.alignment = TextAnchor.MiddleLeft;
             phText.fontStyle = FontStyle.Italic;
