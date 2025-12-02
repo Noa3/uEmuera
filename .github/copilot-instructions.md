@@ -13,6 +13,15 @@ The project is based on emuera1824v15 source code and is licensed under the Apac
 - **Target Framework**: .NET Standard 2.1
 - **Primary Platforms**: Android, Windows Standalone
 
+### Allowed Packages
+
+The following Unity packages are approved for use in this project when it makes sense:
+
+- **com.unity.mathematics**: High-performance math library for SIMD-friendly operations
+- **com.unity.collections**: Native collection types for performance-critical code
+- **com.unity.burst**: Burst compiler for optimizing performance-critical code paths
+- **com.unity.textmeshpro**: Advanced text rendering (TextMeshPro)
+
 ## Project Structure
 
 ```
@@ -110,21 +119,6 @@ uEmuera/
 - EditMode tests run without Play mode
 - PlayMode tests require entering Play mode
 
-## Platform-Specific Notes
-
-### Android
-
-- Files should be placed in `sdcard/emuera` or `sdcard/uEmuera`
-- For Android 10+, use `sdcard/Android/data/xerysherry.uEmuera/files/`
-- Grant "File Access" permission on first run
-
-### Known Limitations
-
-1. Cannot modify era game configuration within the app
-2. No debugging functionality
-3. Some game instructions may cause performance issues
-4. Higher battery consumption (common with Unity apps)
-5. Some GXX-related drawing instructions are not implemented
 
 ## Contributing Guidelines
 
