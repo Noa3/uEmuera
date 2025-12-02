@@ -73,17 +73,21 @@ namespace MinorShift.Emuera.Content
 
         /// <summary>
         /// Initializes the sound directory path.
+        /// Checks multiple case variants: sound/, Sound/, SOUND/
         /// </summary>
         private void InitializeSoundDirectory()
         {
             string exeDir = Program.ExeDir;
-            _soundDir = exeDir + "sound/";
-            if (!Directory.Exists(_soundDir))
+            string[] variants = { "sound/", "Sound/", "SOUND/" };
+            
+            _soundDir = exeDir + "sound/"; // Default fallback
+            foreach (var variant in variants)
             {
-                _soundDir = exeDir + "Sound/";
-                if (!Directory.Exists(_soundDir))
+                string testPath = exeDir + variant;
+                if (Directory.Exists(testPath))
                 {
-                    _soundDir = exeDir + "SOUND/";
+                    _soundDir = testPath;
+                    break;
                 }
             }
         }
