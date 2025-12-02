@@ -11,6 +11,66 @@ internal static class SpriteManager
 {
     static float kPastTime = 300.0f;
 
+    // Attempts to resolve a full path in a case-insensitive manner by walking each segment.
+    // Useful on case-sensitive file systems or when asset references use inconsistent casing.
+    static string ResolvePathCaseInsensitive(string originalPath)
+    {
+        if (string.IsNullOrEmpty(originalPath))
+            return null;
+        try
+        {
+            var seps = new[] { Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar };
+            var root = Path.GetPathRoot(originalPath);
+            var relative = string.IsNullOrEmpty(root) ? originalPath : originalPath.Substring(root.Length);
+            var parts = relative.Split(seps, StringSplitOptions.RemoveEmptyEntries);
+
+            string current = string.IsNullOrEmpty(root) ? Directory.GetCurrentDirectory() : root.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+
+            for (int i = 0; i < parts.Length; i++)
+            {
+                var part = parts[i];
+                bool last = i == parts.Length - 1;
+                if (!Directory.Exists(current))
+                    return null;
+
+                if (!last)
+                {
+                    string matchedDir = null;
+                    var dirs = Directory.GetDirectories(current);
+                    for (int d = 0; d < dirs.Length; d++)
+                    {
+                        var dirName = Path.GetFileName(dirs[d]);
+                        if (string.Equals(dirName, part, StringComparison.OrdinalIgnoreCase))
+                        {
+                            matchedDir = dirs[d];
+                            break;
+                        }
+                    }
+                    if (matchedDir == null)
+                        return null;
+                    current = matchedDir;
+                }
+                else
+                {
+                    // Last segment assumed to be a file
+                    var files = Directory.GetFiles(current);
+                    for (int f = 0; f < files.Length; f++)
+                    {
+                        var fileName = Path.GetFileName(files[f]);
+                        if (string.Equals(fileName, part, StringComparison.OrdinalIgnoreCase))
+                            return files[f];
+                    }
+                    return null;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.LogWarning($"SpriteManager: ResolvePathCaseInsensitive failed for '{originalPath}': {ex.GetType().Name}: {ex.Message}");
+        }
+        return null;
+    }
+
     internal class SpriteInfo : IDisposable
     {
         internal SpriteInfo(TextureInfo p, Sprite s)
@@ -39,11 +99,27 @@ internal static class SpriteManager
             SpriteInfo sprite = null;
             if(!sprites.TryGetValue(src.Name, out sprite))
             {
-                sprite = new SpriteInfo(this, 
-                    Sprite.Create(texture,
-                        GenericUtils.ToUnityRect(src.Rectangle, texture.width, texture.height),
-                        Vector2.zero)
-                    );
+                // Validate rectangle before creating sprite to provide deterministic errors
+                var rect = GenericUtils.ToUnityRect(src.Rectangle, texture.width, texture.height);
+                if (rect.width <= 0 || rect.height <= 0 || rect.x < 0 || rect.y < 0 ||
+                    rect.x + rect.width > texture.width || rect.y + rect.height > texture.height)
+                {
+                    Debug.LogError($"SpriteManager: Invalid sprite rectangle for '{src?.Name}' on '{imagename}'. Rect=({rect.x},{rect.y},{rect.width},{rect.height}), Texture=({texture.width},{texture.height})");
+                    return null;
+                }
+                try
+                {
+                    sprite = new SpriteInfo(this, 
+                        Sprite.Create(texture,
+                            rect,
+                            Vector2.zero)
+                        );
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogError($"SpriteManager: Failed to create Sprite for '{src?.Name}' from '{imagename}'. Error={ex.GetType().Name}: {ex.Message}");
+                    return null;
+                }
                 sprites[src.Name] = sprite;
             }
             if(sprite != null)
@@ -74,7 +150,7 @@ internal static class SpriteManager
         internal float width { get { return texture.width; } }
         internal float height { get { return texture.height; } }
         internal Texture2D texture = null;
-        Dictionary<string, SpriteInfo> sprites = new Dictionary<string, SpriteInfo>();
+        Dictionary<string, SpriteInfo> sprites = new Dictionary<string, SpriteInfo>(StringComparer.OrdinalIgnoreCase);
     }
     class CallbackInfo
     {
@@ -123,8 +199,16 @@ internal static class SpriteManager
     public static void GetSprite(ASprite src, 
                                 object obj, Action<object, SpriteInfo> callback)
     {
-        if(src == null || src.Bitmap == null)
+        if(src == null)
         {
+            Debug.LogError("SpriteManager: GetSprite called with null ASprite");
+            if(callback != null)
+                callback(null, null);
+            return;
+        }
+        if(src.Bitmap == null)
+        {
+            Debug.LogError($"SpriteManager: ASprite '{src?.Name}' has null Bitmap");
             if(callback != null)
                 callback(null, null);
             return;
@@ -156,43 +240,75 @@ internal static class SpriteManager
         if(texture_dict.TryGetValue(name, out ti))
             return ti;
         if(string.IsNullOrEmpty(filename))
-            return null;
-
-        FileInfo fi = new FileInfo(filename);
-        if(!fi.Exists)
-            return null;
-
-        FileStream fs = fi.OpenRead();
-        var filesize = fs.Length;
-        byte[] content = new byte[filesize];
-        fs.Read(content, 0, (int)filesize);
-
-        TextureFormat format = TextureFormat.DXT1;
-
-        var extname = uEmuera.Utils.GetSuffix(filename).ToLower();
-        if (extname == "png")
-            format = TextureFormat.DXT5;
-
-        if (extname == "webp")
         {
-            var tex = Texture2DExt.CreateTexture2DFromWebP(content, false, false,
-                out Error err);
-            if (err != Error.Success)
+            Debug.LogError($"SpriteManager: Empty filename for texture '{name}'");
+            return null;
+        }
+
+        string pathToLoad = filename.Replace('/', Path.DirectorySeparatorChar).Replace('\\', Path.DirectorySeparatorChar);
+        FileInfo fi = new FileInfo(pathToLoad);
+        if(!fi.Exists)
+        {
+            // Attempt case-insensitive full path resolution
+            var resolved = ResolvePathCaseInsensitive(pathToLoad);
+            if (!string.IsNullOrEmpty(resolved))
             {
-                Debug.LogWarning($"{filename} {err.ToString()}");
+                Debug.LogWarning($"SpriteManager: Fixed path casing for '{filename}' -> '{resolved}'");
+                pathToLoad = resolved;
+                fi = new FileInfo(pathToLoad);
+            }
+            else
+            {
+                Debug.LogError($"SpriteManager: File not found for texture '{name}': {filename}");
                 return null;
             }
-            ti = new TextureInfo(name, tex);
-            texture_dict.Add(name, ti);
         }
-        else
+
+        try
         {
-            var tex = new Texture2D(4, 4, format, false);
-            if (tex.LoadImage(content))
+            var content = File.ReadAllBytes(pathToLoad);
+            if (content == null || content.Length == 0)
             {
+                Debug.LogError($"SpriteManager: Empty content while reading '{pathToLoad}'");
+                return null;
+            }
+
+            // Use a safe default format for runtime-loaded images
+            TextureFormat format = TextureFormat.RGBA32;
+
+            var extname = uEmuera.Utils.GetSuffix(pathToLoad).ToLower();
+
+            if (extname == "webp")
+            {
+                var tex = Texture2DExt.CreateTexture2DFromWebP(content, false, false,
+                    out Error err);
+                if (err != Error.Success)
+                {
+                    Debug.LogError($"SpriteManager: Failed to decode WEBP '{pathToLoad}'. Error={err}");
+                    return null;
+                }
                 ti = new TextureInfo(name, tex);
                 texture_dict.Add(name, ti);
             }
+            else
+            {
+                var tex = new Texture2D(2, 2, format, false);
+                if (tex.LoadImage(content))
+                {
+                    ti = new TextureInfo(name, tex);
+                    texture_dict.Add(name, ti);
+                }
+                else
+                {
+                    Debug.LogError($"SpriteManager: Failed to load image '{pathToLoad}' (ext={extname})");
+                    return null;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"SpriteManager: Exception while reading texture '{name}' from '{pathToLoad}'. Error={ex.GetType().Name}: {ex.Message}");
+            return null;
         }
         return ti;
     }
@@ -262,50 +378,79 @@ internal static class SpriteManager
     static IEnumerator Loading(Bitmap baseimage)
     {
         TextureInfo ti = null;
-        FileInfo fi = new FileInfo(baseimage.path);
+        string pathToLoad = baseimage.path.Replace('/', Path.DirectorySeparatorChar).Replace('\\', Path.DirectorySeparatorChar);
+        FileInfo fi = new FileInfo(pathToLoad);
+        if(!fi.Exists)
+        {
+            var resolved = ResolvePathCaseInsensitive(pathToLoad);
+            if (!string.IsNullOrEmpty(resolved))
+            {
+                Debug.LogWarning($"SpriteManager: Fixed path casing for '{pathToLoad}' -> '{resolved}'");
+                pathToLoad = resolved;
+                fi = new FileInfo(pathToLoad);
+            }
+        }
         if(fi.Exists)
         {
-            FileStream fs = fi.OpenRead();
-            var filesize = fs.Length;
-            byte[] content = new byte[filesize];
-
-            var async = fs.BeginRead(content, 0, (int)filesize, null, null);
-            while(!async.IsCompleted)
-                yield return null;
-
-            TextureFormat format = TextureFormat.DXT1;
-
-            var extname = uEmuera.Utils.GetSuffix(baseimage.path).ToLower();
-            if (extname == "png")
-                format = TextureFormat.DXT5;
-
-            if (extname == "webp")
+            byte[] content = null;
+            try
             {
-                var tex = Texture2DExt.CreateTexture2DFromWebP(content, false, false,
-                out Error err);
-                if (err != Error.Success)
-                {
-                    Debug.LogWarning($"{baseimage.path} {err.ToString()}");
-                    yield break;
-                }
-                ti = new TextureInfo(baseimage.filename, tex);
-                texture_dict.Add(baseimage.filename, ti);
+                content = File.ReadAllBytes(pathToLoad);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"SpriteManager: Exception while reading image '{pathToLoad}'. Error={ex.GetType().Name}: {ex.Message}");
+            }
 
-                baseimage.size.Width = tex.width;
-                baseimage.size.Height = tex.height;
+            if (content == null || content.Length == 0)
+            {
+                Debug.LogError($"SpriteManager: Empty content after reading '{pathToLoad}'");
             }
             else
             {
-                var tex = new Texture2D(4, 4, format, false);
-                if (tex.LoadImage(content))
-                {
-                    ti = new TextureInfo(baseimage.filename, tex);
-                    texture_dict.Add(baseimage.filename, ti);
+                // Use a safe default format for runtime-loaded images
+                TextureFormat format = TextureFormat.RGBA32;
 
-                    baseimage.size.Width = tex.width;
-                    baseimage.size.Height = tex.height;
+                var extname = uEmuera.Utils.GetSuffix(pathToLoad).ToLower();
+
+                if (extname == "webp")
+                {
+                    var tex = Texture2DExt.CreateTexture2DFromWebP(content, false, false,
+                    out Error err);
+                    if (err != Error.Success)
+                    {
+                        Debug.LogError($"SpriteManager: Failed to decode WEBP '{pathToLoad}'. Error={err}");
+                    }
+                    else
+                    {
+                        ti = new TextureInfo(baseimage.filename, tex);
+                        texture_dict.Add(baseimage.filename, ti);
+
+                        baseimage.size.Width = tex.width;
+                        baseimage.size.Height = tex.height;
+                    }
+                }
+                else
+                {
+                    var tex = new Texture2D(2, 2, format, false);
+                    if (tex.LoadImage(content))
+                    {
+                        ti = new TextureInfo(baseimage.filename, tex);
+                        texture_dict.Add(baseimage.filename, ti);
+
+                        baseimage.size.Width = tex.width;
+                        baseimage.size.Height = tex.height;
+                    }
+                    else
+                    {
+                        Debug.LogError($"SpriteManager: Failed to load image '{pathToLoad}' (ext={extname})");
+                    }
                 }
             }
+        }
+        else
+        {
+            Debug.LogError($"SpriteManager: File not found '{pathToLoad}' for bitmap '{baseimage.filename}'");
         }
         List<CallbackInfo> list = null;
         if(loading_set.TryGetValue(baseimage.filename, out list))
@@ -320,9 +465,20 @@ internal static class SpriteManager
             list.Clear();
             loading_set.Remove(baseimage.filename);
         }
+        yield break;
     }
     static SpriteInfo GetSpriteInfo(TextureInfo textinfo, ASprite src)
     {
+        if (textinfo == null)
+        {
+            Debug.LogError($"SpriteManager: TextureInfo is null for sprite '{src?.Name}'. Bitmap='{src?.Bitmap?.filename}', Path='{src?.Bitmap?.path}'");
+            return null;
+        }
+        if (src == null)
+        {
+            Debug.LogError("SpriteManager: GetSpriteInfo called with null ASprite");
+            return null;
+        }
         return textinfo.GetSprite(src);
     }
     internal static void GivebackSpriteInfo(SpriteInfo info)
@@ -448,7 +604,7 @@ internal static class SpriteManager
         UnityEngine.PlayerPrefs.SetString(filename, null);
     }
     static Dictionary<string, List<CallbackInfo>> loading_set =
-        new Dictionary<string, List<CallbackInfo>>();
+        new Dictionary<string, List<CallbackInfo>>(StringComparer.OrdinalIgnoreCase);
     static Dictionary<string, TextureInfo> texture_dict =
-        new Dictionary<string, TextureInfo>();
+        new Dictionary<string, TextureInfo>(StringComparer.OrdinalIgnoreCase);
 }
