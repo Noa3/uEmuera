@@ -249,18 +249,37 @@ internal static class SpriteManager
         FileInfo fi = new FileInfo(pathToLoad);
         if(!fi.Exists)
         {
-            // Attempt case-insensitive full path resolution
-            var resolved = ResolvePathCaseInsensitive(pathToLoad);
-            if (!string.IsNullOrEmpty(resolved))
+            // Try original, lower, upper, and mixed-case filename variants within the same directory first
+            var dir = Path.GetDirectoryName(pathToLoad);
+            var file = Path.GetFileName(pathToLoad);
+            if (!string.IsNullOrEmpty(dir) && !string.IsNullOrEmpty(file) && Directory.Exists(dir))
             {
-                Debug.LogWarning($"SpriteManager: Fixed path casing for '{filename}' -> '{resolved}'");
-                pathToLoad = resolved;
-                fi = new FileInfo(pathToLoad);
+                foreach (var variant in GenerateFilenameCaseVariants(dir, file))
+                {
+                    if (File.Exists(variant))
+                    {
+                        Debug.LogWarning($"SpriteManager: Using case-variant for '{pathToLoad}' -> '{variant}'");
+                        pathToLoad = variant;
+                        fi = new FileInfo(pathToLoad);
+                        break;
+                    }
+                }
             }
-            else
+            // Attempt case-insensitive full path resolution
+            if(!fi.Exists)
             {
-                Debug.LogError($"SpriteManager: File not found for texture '{name}': {filename}");
-                return null;
+                var resolved = ResolvePathCaseInsensitive(pathToLoad);
+                if (!string.IsNullOrEmpty(resolved))
+                {
+                    Debug.LogWarning($"SpriteManager: Fixed path casing for '{filename}' -> '{resolved}'");
+                    pathToLoad = resolved;
+                    fi = new FileInfo(pathToLoad);
+                }
+                else
+                {
+                    Debug.LogError($"SpriteManager: File not found for texture '{name}': {filename}");
+                    return null;
+                }
             }
         }
 
@@ -382,12 +401,30 @@ internal static class SpriteManager
         FileInfo fi = new FileInfo(pathToLoad);
         if(!fi.Exists)
         {
-            var resolved = ResolvePathCaseInsensitive(pathToLoad);
-            if (!string.IsNullOrEmpty(resolved))
+            var dir = Path.GetDirectoryName(pathToLoad);
+            var file = Path.GetFileName(pathToLoad);
+            if (!string.IsNullOrEmpty(dir) && !string.IsNullOrEmpty(file) && Directory.Exists(dir))
             {
-                Debug.LogWarning($"SpriteManager: Fixed path casing for '{pathToLoad}' -> '{resolved}'");
-                pathToLoad = resolved;
-                fi = new FileInfo(pathToLoad);
+                foreach (var variant in GenerateFilenameCaseVariants(dir, file))
+                {
+                    if (File.Exists(variant))
+                    {
+                        Debug.LogWarning($"SpriteManager: Using case-variant for '{pathToLoad}' -> '{variant}'");
+                        pathToLoad = variant;
+                        fi = new FileInfo(pathToLoad);
+                        break;
+                    }
+                }
+            }
+            if(!fi.Exists)
+            {
+                var resolved = ResolvePathCaseInsensitive(pathToLoad);
+                if (!string.IsNullOrEmpty(resolved))
+                {
+                    Debug.LogWarning($"SpriteManager: Fixed path casing for '{pathToLoad}' -> '{resolved}'");
+                    pathToLoad = resolved;
+                    fi = new FileInfo(pathToLoad);
+                }
             }
         }
         if(fi.Exists)
@@ -607,4 +644,54 @@ internal static class SpriteManager
         new Dictionary<string, List<CallbackInfo>>(StringComparer.OrdinalIgnoreCase);
     static Dictionary<string, TextureInfo> texture_dict =
         new Dictionary<string, TextureInfo>(StringComparer.OrdinalIgnoreCase);
+    // Generate mixed-case variants for a filename to improve chances on case-sensitive filesystems.
+    static IEnumerable<string> GenerateFilenameCaseVariants(string directory, string file)
+    {
+        if (string.IsNullOrEmpty(directory) || string.IsNullOrEmpty(file))
+            yield break;
+        var name = Path.GetFileNameWithoutExtension(file);
+        var ext = Path.GetExtension(file);
+        var extNoDot = ext?.TrimStart('.') ?? string.Empty;
+
+        // Base variants
+        yield return Path.Combine(directory, file); // original
+        yield return Path.Combine(directory, file.ToLowerInvariant());
+        yield return Path.Combine(directory, file.ToUpperInvariant());
+
+        // Name variants
+        var capFirst = (name.Length > 0) ? char.ToUpperInvariant(name[0]) + name.Substring(1).ToLowerInvariant() : name;
+        var capWords = name;
+        try
+        {
+            var parts = name.Split(new[] { '_', '-', ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            for (int i = 0; i < parts.Length; i++)
+            {
+                var p = parts[i];
+                if (p.Length > 0)
+                    parts[i] = char.ToUpperInvariant(p[0]) + p.Substring(1).ToLowerInvariant();
+            }
+            capWords = string.Join("_", parts);
+        }
+        catch { }
+
+        // Extension variants
+        var extLower = string.IsNullOrEmpty(ext) ? ext : ext.ToLowerInvariant();
+        var extUpper = string.IsNullOrEmpty(ext) ? ext : ext.ToUpperInvariant();
+
+        // Combine name + extension variants
+        if (!string.IsNullOrEmpty(ext))
+        {
+            yield return Path.Combine(directory, name + extLower);
+            yield return Path.Combine(directory, name + extUpper);
+            yield return Path.Combine(directory, capFirst + extLower);
+            yield return Path.Combine(directory, capFirst + extUpper);
+            yield return Path.Combine(directory, capWords + extLower);
+            yield return Path.Combine(directory, capWords + extUpper);
+        }
+        else
+        {
+            yield return Path.Combine(directory, capFirst);
+            yield return Path.Combine(directory, capWords);
+        }
+    }
 }

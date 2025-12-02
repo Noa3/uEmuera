@@ -4,3 +4,5 @@ Logs/
 Temp/
 UserSettings/
 era/
+Build/
+*.keystore
