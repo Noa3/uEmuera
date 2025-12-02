@@ -156,6 +156,7 @@
     <Compile Include="Assets\Scripts\EmueraImage.cs" />
     <Compile Include="Assets\Scripts\Emuera\GameProc\InputRequest.cs" />
     <Compile Include="Assets\Scripts\Emuera\GameProc\UserDefinedFunction.cs" />
+    <Compile Include="Assets\Scripts\Emuera\Content\AudioManager.cs" />
     <Compile Include="Assets\Scripts\Emuera\GameData\Variable\VariableData.cs" />
     <Compile Include="Assets\Scripts\Emuera\GameView\ButtonStringCreator.cs" />
     <Compile Include="Assets\Scripts\Emuera\GameProc\ErbLoader.cs" />
