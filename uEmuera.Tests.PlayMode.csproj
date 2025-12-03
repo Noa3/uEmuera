@@ -49,6 +49,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Tests\PlayMode\GenericUtilsTests.cs" />
+    <Compile Include="Assets\Tests\PlayMode\OnDemandRenderManagerTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Tests\PlayMode\uEmuera.Tests.PlayMode.asmdef" />

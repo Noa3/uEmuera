@@ -110,6 +110,7 @@
     <Compile Include="Assets\Scripts\Emuera\GameProc\Function\BuiltInFunctionCode.cs" />
     <Compile Include="Assets\Scripts\Emuera\GameData\ConstantData.cs" />
     <Compile Include="Assets\Scripts\Emuera\_Library\GDI.cs" />
+    <Compile Include="Assets\Scripts\OnDemandRenderManager.cs" />
     <Compile Include="Assets\Scripts\Emuera\GameData\Expression\ExpressionMediator.cs" />
     <Compile Include="Assets\Scripts\Emuera\_Library\WinmmTimer.cs" />
     <Compile Include="Assets\Scripts\Emuera\Sub\EraStreamReader.cs" />

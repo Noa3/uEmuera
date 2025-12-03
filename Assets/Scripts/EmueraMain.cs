@@ -9,6 +9,16 @@ using MinorShift._Library;
 /// </summary>
 public class EmueraMain : MonoBehaviour
 {
+    void Awake()
+    {
+        // Preload saved scale before any UI starts; Start() will apply it
+        var saved_scale = PlayerPrefs.GetFloat(PREF_SCALE_VALUE, 1.0f);
+        if (saved_scale <= 0f)
+            saved_scale = 1.0f;
+        next_scale_value_ = saved_scale;
+        last_scale_value_ = -1.0f; // force ApplyScale() to run in Start
+    }
+
     /// <summary>
     /// Starts the Emuera game engine.
     /// </summary>
@@ -97,6 +107,9 @@ public class EmueraMain : MonoBehaviour
         float h = size_delta_.y;
         size_delta_.x = Mathf.Max(w, h);
         size_delta_.y = Mathf.Min(w, h);
+
+        // Apply the preloaded scale immediately so UI uses saved scale from first frame
+        ApplyScale();
     }
 
     /// <summary>
@@ -236,6 +249,10 @@ public class EmueraMain : MonoBehaviour
 
         canvas_scaler_.referenceResolution = default_resolution_ / last_scale_value_;
         dirty_flag_ = true;
+
+        // Persist applied scale
+        PlayerPrefs.SetFloat(PREF_SCALE_VALUE, last_scale_value_);
+        PlayerPrefs.Save();
     }
     
     /// <summary>
@@ -259,4 +276,7 @@ public class EmueraMain : MonoBehaviour
         }
     }
     DeviceOrientation last_orientation_ = DeviceOrientation.Unknown;
+
+    // Preference key for saving scale value
+    const string PREF_SCALE_VALUE = "ScalePad_Value";
 }

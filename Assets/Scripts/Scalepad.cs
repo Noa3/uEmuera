@@ -12,6 +12,14 @@ public class Scalepad : MonoBehaviour
         GenericUtils.SetListenerOnClick(autofit_btn, OnAutoFit);
         slider.onValueChanged.AddListener(OnValueChanged);
         text.text = "1x";
+
+        // Load saved scale value (default to 1.0x if not present)
+        var saved = PlayerPrefs.GetFloat(PREF_SCALE_VALUE, 1.0f);
+        if (emuera_main != null)
+        {
+            emuera_main.SetScaleValue(saved);
+        }
+        UpdateSlider();
     }
     public bool IsShow { get { return gameObject.activeSelf; } }
 
@@ -33,6 +41,8 @@ public class Scalepad : MonoBehaviour
             value = (1 + value / 2);
         emuera_main.SetScaleValue(value);
         text.text = string.Format("{0:F1}x", value);
+        // Persist current scale value
+        PlayerPrefs.SetFloat(PREF_SCALE_VALUE, value);
     }
     public void SetColor(Color sprite_color)
     {
@@ -73,6 +83,8 @@ public class Scalepad : MonoBehaviour
         else
             value = (value - 1) * 2;
         slider.value = value;
+        // Persist current scale value
+        PlayerPrefs.SetFloat(PREF_SCALE_VALUE, emuera_main.scale_value);
     }
 
     public EmueraMain emuera_main;
@@ -80,4 +92,7 @@ public class Scalepad : MonoBehaviour
     public GameObject autofit_btn;
     public Slider slider;
     public Text text;
+
+    // Preference key for saving scale value
+    const string PREF_SCALE_VALUE = "ScalePad_Value";
 }
