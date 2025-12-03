@@ -196,9 +196,9 @@ public class EmueraContent : MonoBehaviour
 
     public void Update()
     {
-        if(!dirty && drag_delta == Vector2.zero)
+        if(!dirty_ && drag_delta == Vector2.zero)
             return;
-        dirty = false;
+        dirty_ = false;
 
         float display_width = DISPLAY_WIDTH;
         float display_height = DISPLAY_HEIGHT;
@@ -376,11 +376,25 @@ public class EmueraContent : MonoBehaviour
     /// </summary>
     public void SetDirty()
     {
-        dirty = true;
-        //ToBottom();
+        SetDirtyInternal(true);
+    }
+    
+    /// <summary>
+    /// Internal method to set dirty flag and optionally notify the render manager.
+    /// </summary>
+    /// <param name="value">The dirty state value.</param>
+    private void SetDirtyInternal(bool value)
+    {
+        dirty_ = value;
+        
+        // Notify on-demand rendering manager when content becomes dirty
+        if (value && OnDemandRenderManager.instance != null)
+        {
+            OnDemandRenderManager.instance.SetContentDirty();
+        }
     }
 
-    bool dirty = false;
+    bool dirty_ = false;
     uint last_click_tic = 0;
     void OnBeginDrag(PointerEventData e)
     {
@@ -390,13 +404,13 @@ public class EmueraContent : MonoBehaviour
     }
     void OnDrag(PointerEventData e)
     {
-        dirty = true;
+        SetDirtyInternal(true);
         drag_curr_position = e.position;
         drag_delta = Vector3.zero;
     }
     void OnEndDrag(PointerEventData e)
     {
-        dirty = true;
+        SetDirtyInternal(true);
         float display_width = DISPLAY_WIDTH;
         float display_height = DISPLAY_HEIGHT;
         local_position = GetLimitPosition(
@@ -425,6 +439,12 @@ public class EmueraContent : MonoBehaviour
         background.color = GenericUtils.ToUnityColor(color);
         background_color = color;
         main_camere.backgroundColor = background.color;
+        
+        // Notify on-demand rendering manager of visual change
+        if (OnDemandRenderManager.instance != null)
+        {
+            OnDemandRenderManager.instance.SetContentDirty();
+        }
     }
     public void Ready()
     {
@@ -483,7 +503,7 @@ public class EmueraContent : MonoBehaviour
         offset_height = 0;
         local_position = Vector2.zero;
         drag_delta = Vector2.zero;
-        dirty = true;
+        SetDirtyInternal(true);
     }
     /// <summary>
     /// Adds a new line to the console display.
@@ -522,7 +542,7 @@ public class EmueraContent : MonoBehaviour
         {
             drag_delta.y += Config.LineHeight * 1.5f;
         }
-        dirty = true;
+        SetDirtyInternal(true);
     }
     /// <summary>
     /// Gets a line by index.
@@ -642,13 +662,13 @@ public class EmueraContent : MonoBehaviour
 
         invalid_count += count;
         max_index -= count;
-        dirty = true;
+        SetDirtyInternal(true);
     }
     public void ToBottom()
     {
         local_position.y = content_height - rect_transform.rect.height;
         drag_delta = Vector2.zero;
-        dirty = true;
+        SetDirtyInternal(true);
         Update();
     }
     public void ShowIsInProcess(bool value)

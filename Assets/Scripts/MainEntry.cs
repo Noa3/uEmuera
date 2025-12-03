@@ -10,8 +10,25 @@ public class MainEntry : MonoBehaviour
 {
     void Awake()
     {
-        Application.targetFrameRate = 24;
+        Application.targetFrameRate = 60; // Increase base frame rate since on-demand rendering will handle optimization
         ResolutionHelper.Apply();
+        
+        // Initialize on-demand rendering manager
+        InitializeOnDemandRendering();
+    }
+    
+    /// <summary>
+    /// Initializes the on-demand rendering system.
+    /// Creates the OnDemandRenderManager if it doesn't exist.
+    /// </summary>
+    void InitializeOnDemandRendering()
+    {
+        if (OnDemandRenderManager.instance == null)
+        {
+            var renderManagerObj = new GameObject("OnDemandRenderManager");
+            renderManagerObj.AddComponent<OnDemandRenderManager>();
+            DontDestroyOnLoad(renderManagerObj);
+        }
     }
 
     void Start()
