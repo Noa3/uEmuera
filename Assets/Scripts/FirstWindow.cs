@@ -14,17 +14,12 @@ public class FirstWindow : MonoBehaviour
     /// <summary>
     /// PlayerPrefs key for storing custom game directory path.
     /// </summary>
-    private const string CUSTOM_DIR_KEY = "CustomGameDirectory";
+    public const string CUSTOM_DIR_KEY = "CustomGameDirectory";
     
     /// <summary>
-    /// Width multiplier for the Set Directory button relative to the option button.
+    /// Singleton instance for accessing FirstWindow from other scripts.
     /// </summary>
-    private const float SET_DIR_BUTTON_WIDTH_MULTIPLIER = 2.5f;
-    
-    /// <summary>
-    /// Horizontal spacing between the Set Directory button and the option button.
-    /// </summary>
-    private const float SET_DIR_BUTTON_SPACING = 10f;
+    public static FirstWindow instance { get; private set; }
     
     /// <summary>
     /// Shows the first window by loading it from resources.
@@ -69,6 +64,17 @@ public class FirstWindow : MonoBehaviour
         emuera.Run();
     }
 
+    void Awake()
+    {
+        instance = this;
+    }
+    
+    void OnDestroy()
+    {
+        if(instance == this)
+            instance = null;
+    }
+
     void Start()
     {
         if(!string.IsNullOrEmpty(MultiLanguage.FirstWindowTitlebar))
@@ -89,8 +95,11 @@ public class FirstWindow : MonoBehaviour
         var main_entry = GameObject.FindObjectOfType<MainEntry>();
         if(!string.IsNullOrEmpty(main_entry.era_path))
             GetList(main_entry.era_path);
+        // In editor, also allow standalone directory logic for testing
+        InitStandaloneDirectory();
 #endif
 #if UNITY_ANDROID && !UNITY_EDITOR
+        // Android: Use predefined paths only
         GetList("storage/emulated/0/emuera");
         GetList("storage/emulated/1/emuera");
         GetList("storage/emulated/2/emuera");
@@ -100,76 +109,53 @@ public class FirstWindow : MonoBehaviour
         GetList("storage/sdcard2/emuera");
 #endif
 #if UNITY_STANDALONE && !UNITY_EDITOR
+        // Standalone (Windows, Linux, macOS): Allow custom directory selection
         GetList(Path.GetFullPath(Application.dataPath + "/.."));
-        // Load custom directory from PlayerPrefs for standalone platforms
-        LoadCustomDirectory();
-        // Create the "Set Directory" button for standalone platforms
-        CreateSetDirectoryButton();
-#endif
-#if UNITY_EDITOR
-        // Also enable in Editor for testing (when targeting standalone)
-        LoadCustomDirectory();
-        CreateSetDirectoryButton();
+        InitStandaloneDirectory();
 #endif
     }
     
     /// <summary>
-    /// Loads and scans the custom directory from PlayerPrefs.
+    /// Initializes the directory system for standalone platforms.
+    /// Loads custom directory if valid, otherwise shows the directory selection dialog.
     /// </summary>
-    void LoadCustomDirectory()
+    void InitStandaloneDirectory()
     {
         string customDir = PlayerPrefs.GetString(CUSTOM_DIR_KEY, "");
+        
+        // Check if we have a valid custom directory
         if(!string.IsNullOrEmpty(customDir) && Directory.Exists(customDir))
         {
+            // Valid directory exists, load games from it
             GetList(customDir);
         }
-    }
-    
-    /// <summary>
-    /// Creates the "Set Directory" button dynamically for standalone platforms.
-    /// </summary>
-    void CreateSetDirectoryButton()
-    {
-        // Clone the option button to create the set directory button
-        if(setting_ == null)
-            return;
-            
-        var setdir_btn_ = GameObject.Instantiate(setting_);
-        setdir_btn_.name = "setdirbtn";
-        
-        var rt = setdir_btn_.transform as RectTransform;
-        var settingRt = setting_.transform as RectTransform;
-        rt.SetParent(settingRt.parent);
-        rt.localScale = Vector3.one;
-        
-        // Position next to the option button (to the left)
-        rt.anchorMin = settingRt.anchorMin;
-        rt.anchorMax = settingRt.anchorMax;
-        rt.pivot = settingRt.pivot;
-        rt.sizeDelta = new Vector2(settingRt.sizeDelta.x * SET_DIR_BUTTON_WIDTH_MULTIPLIER, settingRt.sizeDelta.y);
-        rt.anchoredPosition = new Vector2(settingRt.anchoredPosition.x - settingRt.sizeDelta.x - SET_DIR_BUTTON_SPACING, settingRt.anchoredPosition.y);
-        
-        // Change the button text
-        var text = setdir_btn_.GetComponentInChildren<Text>();
-        if(text != null)
+        else
         {
-            text.text = MultiLanguage.GetText("[SetDirectory]");
+            // No valid directory set, show the directory selection dialog automatically
+            // Use a small delay to ensure UI is ready
+            GenericUtils.StartCoroutine(ShowDirectoryDialogDelayed());
         }
-        
-        // Remove old click listeners and add new one
-        GenericUtils.RemoveListenerOnClick(setdir_btn_);
-        GenericUtils.SetListenerOnClick(setdir_btn_, OnSetDirectoryClick);
-        
-        setdir_btn_.SetActive(true);
     }
     
     /// <summary>
-    /// Handles the "Set Directory" button click.
-    /// Shows a dialog to enter the game directory path.
+    /// Shows the directory dialog after a short delay to ensure UI is initialized.
     /// </summary>
-    void OnSetDirectoryClick()
+    System.Collections.IEnumerator ShowDirectoryDialogDelayed()
+    {
+        yield return null; // Wait one frame
+        ShowDirectoryDialog();
+    }
+    
+    /// <summary>
+    /// Shows the directory selection dialog.
+    /// Can be called from menu items or automatically on startup.
+    /// </summary>
+    public void ShowDirectoryDialog()
     {
         var ow = EmueraContent.instance.option_window;
+        if(ow == null)
+            return;
+            
         string currentDir = PlayerPrefs.GetString(CUSTOM_DIR_KEY, "");
         ow.ShowDirectoryInputBox(currentDir, OnDirectorySet);
     }
@@ -178,7 +164,7 @@ public class FirstWindow : MonoBehaviour
     /// Callback when a directory is set from the input dialog.
     /// </summary>
     /// <param name="path">The directory path entered by the user.</param>
-    void OnDirectorySet(string path)
+    public void OnDirectorySet(string path)
     {
         if(string.IsNullOrEmpty(path))
             return;
@@ -207,7 +193,7 @@ public class FirstWindow : MonoBehaviour
     /// <summary>
     /// Refreshes the game list by reloading the FirstWindow.
     /// </summary>
-    void RefreshGameList()
+    public void RefreshGameList()
     {
         // Use coroutine to properly handle the destroy/create sequence
         GenericUtils.StartCoroutine(RefreshGameListCoroutine());
