@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 114261996631008494}
   - component: {fileID: 114058263415347820}
   - component: {fileID: 5329679344073824513}
+  - component: {fileID: 5872360432904903543}
   m_Layer: 5
   m_Name: Menu1
   m_TagString: Untagged
@@ -123,6 +124,20 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
+--- !u!114 &5872360432904903543
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1002723294999168}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3245ec927659c4140ac4f8d17403cc18, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.ContentSizeFitter
+  m_HorizontalFit: 0
+  m_VerticalFit: 2
 --- !u!1 &1011320937677310
 GameObject:
   m_ObjectHideFlags: 0
