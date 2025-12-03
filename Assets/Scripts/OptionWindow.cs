@@ -26,6 +26,18 @@ public class OptionWindow : MonoBehaviour
         GenericUtils.SetListenerOnClick(menu_pad, OnMenuPad);
         GenericUtils.SetListenerOnClick(menu_1_resolution, OnMenuResolution);
         GenericUtils.SetListenerOnClick(menu_1_language, ShowLanguageBox);
+        // Only show directory option on standalone platforms (Windows, Linux, macOS)
+        // Hide on Android
+        if(menu_1_directory != null)
+        {
+#if UNITY_STANDALONE || UNITY_EDITOR
+            menu_1_directory.SetActive(true);
+            GenericUtils.SetListenerOnClick(menu_1_directory, OnMenuDirectory);
+#else
+            // Hide directory button on Android and other non-standalone platforms
+            menu_1_directory.SetActive(false);
+#endif
+        }
         GenericUtils.SetListenerOnClick(menu_1_github, OnGithub);
         GenericUtils.SetListenerOnClick(menu_1_exit, OnMenuExit);
 
@@ -52,6 +64,9 @@ public class OptionWindow : MonoBehaviour
         GenericUtils.SetListenerOnClick(intentbox_R_right, OnIntentRRight);
         GenericUtils.SetListenerOnClick(intentbox_close, OnIntentClose);
         GenericUtils.SetListenerOnClick(intentbox_reset, OnIntentReset);
+
+        // Initialize directory input box for standalone platforms
+        InitDirectoryInputBox();
 
         HideResolutionIcon();
         switch(ResolutionHelper.resolution_index)
@@ -230,6 +245,20 @@ public class OptionWindow : MonoBehaviour
         resolution_pad.SetActive(true);
         HideMenu();
     }
+    
+    /// <summary>
+    /// Called when the directory menu item is clicked.
+    /// Shows the directory selection dialog. Only available on standalone platforms.
+    /// </summary>
+    void OnMenuDirectory()
+    {
+        HideMenu();
+        if(FirstWindow.instance != null)
+        {
+            FirstWindow.instance.ShowDirectoryDialog();
+        }
+    }
+    
     void OnMenuExit()
     {
         ShowMessageBox(
@@ -403,7 +432,7 @@ public class OptionWindow : MonoBehaviour
 
     void OnGithub()
     {
-        Application.OpenURL("https://github.com/xerysherry/uEmuera/releases");
+        Application.OpenURL("https://github.com/noa3/uEmuera/releases");
     }
 
     void OnIntentBoxShow()
@@ -471,6 +500,124 @@ public class OptionWindow : MonoBehaviour
         intentbox_R_text.text = "0";
         EmueraContent.instance.SetIntentBox(0, 0);
     }
+    
+    #region Directory Input Box
+    
+    /// <summary>
+    /// Callback for when directory is confirmed.
+    /// </summary>
+    private System.Action<string> dir_input_callback_;
+    
+    /// <summary>
+    /// Shows a public message box (wrapper for ShowMessageBox).
+    /// </summary>
+    /// <param name="title">The title of the message box.</param>
+    /// <param name="content">The content of the message box.</param>
+    public void ShowMessageBoxPublic(string title, string content)
+    {
+        ShowMessageBox(title, content);
+    }
+    
+    /// <summary>
+    /// Initializes the directory input box by wiring up button events.
+    /// Called from Start(). Only active on standalone platforms (Windows, Linux, macOS).
+    /// </summary>
+    void InitDirectoryInputBox()
+    {
+        if(directoryInputBox == null)
+            return;
+
+        // Ensure directory box starts hidden on all platforms
+        directoryInputBox.SetActive(false);
+        
+#if UNITY_STANDALONE || UNITY_EDITOR
+        // Wire up confirm button (only on standalone platforms)
+        if(directoryInputConfirm != null)
+        {
+            GenericUtils.SetListenerOnClick(directoryInputConfirm, OnDirInputConfirm);
+        }
+        
+        // Wire up cancel button (only on standalone platforms)
+        if(directoryInputCancel != null)
+        {
+            GenericUtils.SetListenerOnClick(directoryInputCancel, OnDirInputCancel);
+        }
+#endif
+    }
+    
+    /// <summary>
+    /// Shows the directory input dialog box.
+    /// Only available on standalone platforms (Windows, Linux, macOS).
+    /// </summary>
+    /// <param name="currentPath">The current path to display in the input field.</param>
+    /// <param name="callback">Callback when directory is confirmed.</param>
+    public void ShowDirectoryInputBox(string currentPath, System.Action<string> callback)
+    {
+#if !UNITY_STANDALONE && !UNITY_EDITOR
+        // Directory selection is not available on Android
+        return;
+#endif
+        if(directoryInputBox == null)
+        {
+            Debug.LogWarning("DirectoryInputBox is not assigned in OptionWindow");
+            return;
+        }
+        
+        dir_input_callback_ = callback;
+        
+        // Set the current path
+        if(directoryInputField != null)
+        {
+            directoryInputField.text = currentPath ?? "";
+        }
+        
+        directoryInputBox.SetActive(true);
+    }
+    
+    /// <summary>
+    /// Hides the directory input dialog box.
+    /// </summary>
+    public void HideDirectoryInputBox()
+    {
+        if(directoryInputBox != null)
+        {
+            directoryInputBox.SetActive(false);
+        }
+        dir_input_callback_ = null;
+    }
+    
+    /// <summary>
+    /// Called when the directory input confirm button is clicked.
+    /// </summary>
+    void OnDirInputConfirm()
+    {
+        string path = directoryInputField != null ? directoryInputField.text : "";
+        
+        if(directoryInputBox != null)
+        {
+            directoryInputBox.SetActive(false);
+        }
+        
+        if(dir_input_callback_ != null)
+        {
+            dir_input_callback_(path);
+            dir_input_callback_ = null;
+        }
+    }
+    
+    /// <summary>
+    /// Called when the directory input cancel button is clicked.
+    /// </summary>
+    void OnDirInputCancel()
+    {
+        if(directoryInputBox != null)
+        {
+            directoryInputBox.SetActive(false);
+        }
+        dir_input_callback_ = null;
+    }
+    
+    #endregion
 
     #region UI References
     
@@ -570,6 +717,7 @@ public class OptionWindow : MonoBehaviour
     public GameObject menu_1;
     public GameObject menu_1_resolution;
     public GameObject menu_1_language;
+    public GameObject menu_1_directory;
     public GameObject menu_1_github;
     public GameObject menu_1_exit;
 
@@ -609,6 +757,16 @@ public class OptionWindow : MonoBehaviour
     public GameObject intentbox_reset;
     public Text intentbox_L_text;
     public Text intentbox_R_text;
+
+    [Header("Directory Input Box")]
+    [Tooltip("Directory input dialog container (for standalone platforms)")]
+    public GameObject directoryInputBox;
+    [Tooltip("Input field for directory path")]
+    public InputField directoryInputField;
+    [Tooltip("Confirm button for directory input")]
+    public GameObject directoryInputConfirm;
+    [Tooltip("Cancel button for directory input")]
+    public GameObject directoryInputCancel;
     
     #endregion
 

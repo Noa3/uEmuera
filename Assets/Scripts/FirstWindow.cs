@@ -12,6 +12,16 @@ using MinorShift._Library;
 public class FirstWindow : MonoBehaviour
 {
     /// <summary>
+    /// PlayerPrefs key for storing custom game directory path.
+    /// </summary>
+    public const string CUSTOM_DIR_KEY = "CustomGameDirectory";
+    
+    /// <summary>
+    /// Singleton instance for accessing FirstWindow from other scripts.
+    /// </summary>
+    public static FirstWindow instance { get; private set; }
+    
+    /// <summary>
     /// Shows the first window by loading it from resources.
     /// </summary>
     public static void Show()
@@ -54,6 +64,17 @@ public class FirstWindow : MonoBehaviour
         emuera.Run();
     }
 
+    void Awake()
+    {
+        instance = this;
+    }
+    
+    void OnDestroy()
+    {
+        if(instance == this)
+            instance = null;
+    }
+
     void Start()
     {
         if(!string.IsNullOrEmpty(MultiLanguage.FirstWindowTitlebar))
@@ -74,8 +95,11 @@ public class FirstWindow : MonoBehaviour
         var main_entry = GameObject.FindObjectOfType<MainEntry>();
         if(!string.IsNullOrEmpty(main_entry.era_path))
             GetList(main_entry.era_path);
+        // In editor, also allow standalone directory logic for testing
+        InitStandaloneDirectory();
 #endif
 #if UNITY_ANDROID && !UNITY_EDITOR
+        // Android: Use predefined paths only
         GetList("storage/emulated/0/emuera");
         GetList("storage/emulated/1/emuera");
         GetList("storage/emulated/2/emuera");
@@ -85,8 +109,108 @@ public class FirstWindow : MonoBehaviour
         GetList("storage/sdcard2/emuera");
 #endif
 #if UNITY_STANDALONE && !UNITY_EDITOR
+        // Standalone (Windows, Linux, macOS): Allow custom directory selection
         GetList(Path.GetFullPath(Application.dataPath + "/.."));
+        InitStandaloneDirectory();
 #endif
+    }
+    
+    /// <summary>
+    /// Initializes the directory system for standalone platforms.
+    /// Loads custom directory if valid, otherwise shows the directory selection dialog.
+    /// </summary>
+    void InitStandaloneDirectory()
+    {
+        string customDir = PlayerPrefs.GetString(CUSTOM_DIR_KEY, "");
+        
+        // Check if we have a valid custom directory
+        if(!string.IsNullOrEmpty(customDir) && Directory.Exists(customDir))
+        {
+            // Valid directory exists, load games from it
+            GetList(customDir);
+        }
+        else
+        {
+            // No valid directory set, show the directory selection dialog automatically
+            // Use a small delay to ensure UI is ready
+            GenericUtils.StartCoroutine(ShowDirectoryDialogDelayed());
+        }
+    }
+    
+    /// <summary>
+    /// Shows the directory dialog after a short delay to ensure UI is initialized.
+    /// </summary>
+    System.Collections.IEnumerator ShowDirectoryDialogDelayed()
+    {
+        yield return null; // Wait one frame
+        ShowDirectoryDialog();
+    }
+    
+    /// <summary>
+    /// Shows the directory selection dialog.
+    /// Can be called from menu items or automatically on startup.
+    /// </summary>
+    public void ShowDirectoryDialog()
+    {
+        var ow = EmueraContent.instance.option_window;
+        if(ow == null)
+            return;
+            
+        string currentDir = PlayerPrefs.GetString(CUSTOM_DIR_KEY, "");
+        ow.ShowDirectoryInputBox(currentDir, OnDirectorySet);
+    }
+    
+    /// <summary>
+    /// Callback when a directory is set from the input dialog.
+    /// </summary>
+    /// <param name="path">The directory path entered by the user.</param>
+    public void OnDirectorySet(string path)
+    {
+        if(string.IsNullOrEmpty(path))
+            return;
+            
+        // Normalize the path
+        path = uEmuera.Utils.NormalizePath(path);
+        
+        // Validate the directory exists
+        if(!Directory.Exists(path))
+        {
+            var ow = EmueraContent.instance.option_window;
+            ow.ShowMessageBoxPublic(
+                MultiLanguage.GetText("[Error]"),
+                MultiLanguage.GetText("[DirectoryNotFound]"));
+            return;
+        }
+        
+        // Save to PlayerPrefs
+        PlayerPrefs.SetString(CUSTOM_DIR_KEY, path);
+        PlayerPrefs.Save();
+        
+        // Refresh the game list
+        RefreshGameList();
+    }
+    
+    /// <summary>
+    /// Refreshes the game list by reloading the FirstWindow.
+    /// </summary>
+    public void RefreshGameList()
+    {
+        // Use coroutine to properly handle the destroy/create sequence
+        GenericUtils.StartCoroutine(RefreshGameListCoroutine());
+    }
+    
+    /// <summary>
+    /// Coroutine that handles refreshing the game list.
+    /// Waits for the current frame to end before creating a new window.
+    /// </summary>
+    System.Collections.IEnumerator RefreshGameListCoroutine()
+    {
+        // Destroy current FirstWindow
+        GameObject.Destroy(gameObject);
+        // Wait for the end of frame to ensure destruction is processed
+        yield return null;
+        // Show a new FirstWindow
+        Show();
     }
 
     void OnOptionClick()
