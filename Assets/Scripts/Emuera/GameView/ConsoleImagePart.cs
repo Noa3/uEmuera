@@ -155,7 +155,8 @@ namespace MinorShift.Emuera.GameView
 
 		public override string ToString()
 		{
-			if (AltText == null)
+			// When image is not loaded, return empty string to avoid showing raw HTML tags
+			if (cImage == null || AltText == null)
 				return "";
 			return AltText;
 		}
