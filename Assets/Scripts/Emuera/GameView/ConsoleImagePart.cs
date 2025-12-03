@@ -58,13 +58,15 @@ namespace MinorShift.Emuera.GameView
                 sb.Append("'>");
                 AltText = sb.ToString();
 #if !UNITY_EDITOR
-                Str = AltText;
+                // When image is not found, show empty string instead of raw HTML tag
+                Str = "";
                 return;
             }
 #else
             if(cImage == null)
             {
-                Str = AltText;
+                // When image is not found, show empty string instead of raw HTML tag
+                Str = "";
                 return;
             }
 #endif  
