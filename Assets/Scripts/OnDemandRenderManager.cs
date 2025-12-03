@@ -67,6 +67,7 @@ public class OnDemandRenderManager : MonoBehaviour
     private Vector3 last_mouse_position_;
     private int frames_since_activity_;
     private bool content_dirty_;
+    private int extended_frame_count_ = 0;
 
     void Awake()
     {
@@ -219,6 +220,4 @@ public class OnDemandRenderManager : MonoBehaviour
         extended_frame_count_ = frameCount;
         OnDemandRendering.renderFrameInterval = activeFrameInterval;
     }
-    
-    private int extended_frame_count_ = 0;
 }
