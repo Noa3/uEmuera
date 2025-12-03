@@ -103,16 +103,16 @@ namespace uEmuera.Tests.PlayMode
         }
 
         [Test]
-        public void Enabled_DefaultTrue()
+        public void OnDemandEnabled_DefaultTrue()
         {
-            Assert.IsTrue(render_manager_.enabled_);
+            Assert.IsTrue(render_manager_.OnDemandEnabled);
         }
 
         [Test]
-        public void Enabled_CanBeDisabled()
+        public void OnDemandEnabled_CanBeDisabled()
         {
-            render_manager_.enabled_ = false;
-            Assert.IsFalse(render_manager_.enabled_);
+            render_manager_.OnDemandEnabled = false;
+            Assert.IsFalse(render_manager_.OnDemandEnabled);
         }
 
         #endregion
@@ -122,7 +122,7 @@ namespace uEmuera.Tests.PlayMode
         [UnityTest]
         public IEnumerator Update_WhenDisabled_DoesNotThrow()
         {
-            render_manager_.enabled_ = false;
+            render_manager_.OnDemandEnabled = false;
             yield return null; // Wait one frame for Update to run
             // Test passes if no exception was thrown
         }
@@ -130,7 +130,7 @@ namespace uEmuera.Tests.PlayMode
         [UnityTest]
         public IEnumerator Update_WhenEnabled_DoesNotThrow()
         {
-            render_manager_.enabled_ = true;
+            render_manager_.OnDemandEnabled = true;
             yield return null; // Wait one frame for Update to run
             // Test passes if no exception was thrown
         }
@@ -138,7 +138,7 @@ namespace uEmuera.Tests.PlayMode
         [UnityTest]
         public IEnumerator SetContentDirty_TriggersActiveRendering()
         {
-            render_manager_.enabled_ = true;
+            render_manager_.OnDemandEnabled = true;
             render_manager_.SetContentDirty();
             yield return null; // Wait one frame for Update to run
             

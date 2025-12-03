@@ -51,7 +51,17 @@ public class OnDemandRenderManager : MonoBehaviour
     /// Whether on-demand rendering is enabled.
     /// </summary>
     [Tooltip("Enable on-demand rendering to save power when screen is static.")]
-    public bool enabled_ = true;
+    [SerializeField]
+    private bool on_demand_enabled_ = true;
+    
+    /// <summary>
+    /// Gets or sets whether on-demand rendering is enabled.
+    /// </summary>
+    public bool OnDemandEnabled
+    {
+        get => on_demand_enabled_;
+        set => on_demand_enabled_ = value;
+    }
 
     // Tracking variables
     private Vector3 last_mouse_position_;
@@ -85,7 +95,7 @@ public class OnDemandRenderManager : MonoBehaviour
 
     void Update()
     {
-        if (!enabled_)
+        if (!on_demand_enabled_)
         {
             // When disabled, render every frame
             OnDemandRendering.renderFrameInterval = 1;
@@ -103,9 +113,13 @@ public class OnDemandRenderManager : MonoBehaviour
         {
             frames_since_activity_++;
             
-            if (frames_since_activity_ >= activeFrameCount)
+            // Use extended frame count if set, otherwise use default active frame count
+            int effective_frame_count = extended_frame_count_ > 0 ? extended_frame_count_ : activeFrameCount;
+            
+            if (frames_since_activity_ >= effective_frame_count)
             {
                 OnDemandRendering.renderFrameInterval = idleFrameInterval;
+                extended_frame_count_ = 0; // Reset extended count once we go idle
             }
         }
     }
@@ -199,8 +213,12 @@ public class OnDemandRenderManager : MonoBehaviour
     /// <param name="frameCount">Number of frames to render.</param>
     public void RequestRenderFrames(int frameCount)
     {
-        // Reset the counter to negative to extend active rendering
-        frames_since_activity_ = -frameCount;
+        // Reset the counter to 0 and set the active frame count temporarily
+        frames_since_activity_ = 0;
+        // Store the extended frame count so rendering continues for the requested duration
+        extended_frame_count_ = frameCount;
         OnDemandRendering.renderFrameInterval = activeFrameInterval;
     }
+    
+    private int extended_frame_count_ = 0;
 }
