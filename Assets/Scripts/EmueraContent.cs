@@ -76,7 +76,7 @@ public class EmueraContent : MonoBehaviour
     void Awake()
     {
         FontUtils.SetDefaultFont(default_fontname);
-        main_camere = GameObject.FindObjectOfType<Camera>();
+        main_camere = Object.FindFirstObjectByType<Camera>();
     }
 
     void Start()

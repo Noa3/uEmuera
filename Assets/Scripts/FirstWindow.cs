@@ -60,7 +60,7 @@ public class FirstWindow : MonoBehaviour
             yield return null;
 
         EmueraContent.instance.SetNoReady();
-        var emuera = GameObject.FindObjectOfType<EmueraMain>();
+        var emuera = Object.FindFirstObjectByType<EmueraMain>();
         emuera.Run();
     }
 
@@ -92,7 +92,7 @@ public class FirstWindow : MonoBehaviour
         setting_.SetActive(true);
 
 #if UNITY_EDITOR
-        var main_entry = GameObject.FindObjectOfType<MainEntry>();
+        var main_entry = Object.FindFirstObjectByType<MainEntry>();
         if(!string.IsNullOrEmpty(main_entry.era_path))
             GetList(main_entry.era_path);
         // In editor, also allow standalone directory logic for testing
@@ -281,7 +281,7 @@ public class FirstWindow : MonoBehaviour
                     AddItem(path.Substring(workspace.Length + 1), workspace);
             }
         }
-        catch(DirectoryNotFoundException e)
+        catch(DirectoryNotFoundException)
         { }
     }
 

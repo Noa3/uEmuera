@@ -163,8 +163,10 @@ namespace MinorShift.Emuera.GameView
 #region 1823 cbg関連
 		private readonly List<ClientBackGroundImage> cbgList = new List<ClientBackGroundImage>();
 		private GraphicsImage cbgButtonMap = null;
+#pragma warning disable CS0414 // Field is assigned but its value is never used
 		private int selectingCBGButtonInt = -1;
 		private int lastSelectingCBGButtonInt = -1;
+#pragma warning restore CS0414
 		//ConsoleButtonString selectingButton = null;
 		//ConsoleButtonString lastSelectingButton = null;
 		class ClientBackGroundImage : IComparable<ClientBackGroundImage>
@@ -525,13 +527,17 @@ namespace MinorShift.Emuera.GameView
 		/// <summary>
 		/// ToolTip表示したフラグ
 		/// </summary>
+#pragma warning disable CS0414 // Field is assigned but its value is never used
 		bool tooltipUsed = false;
+#pragma warning restore CS0414
 		/// <summary>
 		/// マウスの直下にあるテキスト。ボタンであってもよい。
 		/// ToolTip表示用。世代無視、履歴中も表示
 		/// </summary>
 		ConsoleButtonString pointingString = null;
+#pragma warning disable CS0414 // Field is assigned but its value is never used
 		ConsoleButtonString lastPointingString = null;
+#pragma warning restore CS0414
 		#endregion
 
 		#region Input & Timer系

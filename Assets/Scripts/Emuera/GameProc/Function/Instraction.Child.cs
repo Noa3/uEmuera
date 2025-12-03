@@ -1750,7 +1750,7 @@ namespace MinorShift.Emuera.GameProc.Function
 				{
 					callfArg.FuncTerm = GlobalStatic.IdentifierDictionary.GetFunctionMethod(GlobalStatic.LabelDictionary, callfArg.ConstStr, callfArg.RowArgs, true);
 				}
-				catch (CodeEE e)
+				catch (CodeEE)
 				{
 					// For TRYCALLF, we don't warn - just continue with null
 					if (!Program.AnalysisMode)
