@@ -64,7 +64,7 @@ public static class MultiLanguage
                     else if(mv == "Menu2")
                         menu2 = fv;
                 }
-                catch(System.Exception e)
+                catch(System.Exception)
                 {
                 }
             }

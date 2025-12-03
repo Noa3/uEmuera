@@ -36,10 +36,11 @@ public static class ResolutionHelper
     {
         var height = resolutions[resolution_index];
         var width = (int)Mathf.Ceil(height * aspect);
+        var fullScreenMode = FullScreenMode.FullScreenWindow;
         if(Screen.width > Screen.height)
-            Screen.SetResolution(width, height, true, 24);
+            Screen.SetResolution(width, height, fullScreenMode);
         else
-            Screen.SetResolution(height, width, true, 24);
+            Screen.SetResolution(height, width, fullScreenMode);
     }
 
     static float aspect {

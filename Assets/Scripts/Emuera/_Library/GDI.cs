@@ -129,7 +129,9 @@ namespace MinorShift._Library
 		//   int nBottomRect, int nXRadial1, int nYRadial1, int nXRadial2, int nYRadial2);
 
 		static IntPtr hDC;
+#pragma warning disable CS0414 // Field is assigned but its value is never used
 		static Font lastFont = null;
+#pragma warning restore CS0414
 		static IntPtr defaulthFont;
 		static IntPtr defaulthBrush;
 		static IntPtr defaulthPen;
@@ -137,7 +139,9 @@ namespace MinorShift._Library
 		static Color lastBrushColor;
 		static Color lastPenColor;
 		static Size fontMetrics;
+#pragma warning disable CS0414 // Field is assigned but its value is never used
 		static bool usingStockBrush = false;
+#pragma warning restore CS0414
 		static int devnull;
 		//static bool isNt = (System.Environment.OSVersion.Platform == PlatformID.Win32NT) ? true : false;
 		static GDI()
@@ -308,7 +312,9 @@ namespace MinorShift._Library
         #region MesureText用
 
         static IntPtr hDCMesureText;
+#pragma warning disable CS0414 // Field is assigned but its value is never used
 		static Font mtLastFont = null;
+#pragma warning restore CS0414
 		static IntPtr mtDefaulthFont;
 
 		static Size MeasureText98(string str, Font font)
