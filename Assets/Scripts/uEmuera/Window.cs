@@ -57,6 +57,12 @@ namespace uEmuera.Window
             dirty_ = true;
             if(console_ != null)
                 console_.NeedSetTimer();
+            
+            // Notify on-demand rendering manager of visual change
+            if (OnDemandRenderManager.instance != null)
+            {
+                OnDemandRenderManager.instance.SetContentDirty();
+            }
         }
 
         public void Close()

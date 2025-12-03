@@ -10,8 +10,51 @@ public class MainEntry : MonoBehaviour
 {
     void Awake()
     {
-        Application.targetFrameRate = 24;
+        // Set target frame rate to match the screen's refresh rate
+        // This prevents rendering faster than the display can show
+        int screenRefreshRate = GetScreenRefreshRate();
+        Application.targetFrameRate = screenRefreshRate;
+        
         ResolutionHelper.Apply();
+        
+        // Initialize on-demand rendering manager
+        InitializeOnDemandRendering();
+    }
+    
+    /// <summary>
+    /// Gets the screen's refresh rate in Hz.
+    /// Falls back to 60 Hz if unable to determine.
+    /// </summary>
+    /// <returns>The screen refresh rate in Hz.</returns>
+    int GetScreenRefreshRate()
+    {
+        // Try to get the current display's refresh rate
+        Resolution currentResolution = Screen.currentResolution;
+        int refreshRate = currentResolution.refreshRateRatio.numerator > 0 
+            ? (int)(currentResolution.refreshRateRatio.value)
+            : 60;
+        
+        // Ensure we have a reasonable value (at least 30, at most 240)
+        if (refreshRate < 30)
+            refreshRate = 60;
+        else if (refreshRate > 240)
+            refreshRate = 240;
+            
+        return refreshRate;
+    }
+    
+    /// <summary>
+    /// Initializes the on-demand rendering system.
+    /// Creates the OnDemandRenderManager if it doesn't exist.
+    /// </summary>
+    void InitializeOnDemandRendering()
+    {
+        if (OnDemandRenderManager.instance == null)
+        {
+            var renderManagerObj = new GameObject("OnDemandRenderManager");
+            renderManagerObj.AddComponent<OnDemandRenderManager>();
+            DontDestroyOnLoad(renderManagerObj);
+        }
     }
 
     void Start()
