@@ -48,11 +48,11 @@
     <Analyzer Include="C:\Program Files\Unity\Hub\Editor\6000.2.14f1\Editor\Data\Tools\Unity.SourceGenerators\Unity.UIToolkit.SourceGenerator.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\unity.webp\Info.cs" />
     <Compile Include="Assets\unity.webp\Texture2DExt.cs" />
-    <Compile Include="Assets\unity.webp\NativeBindings.cs" />
     <Compile Include="Assets\unity.webp\Error.cs" />
     <Compile Include="Assets\unity.webp\libwebpdemux.cs" />
+    <Compile Include="Assets\unity.webp\Info.cs" />
+    <Compile Include="Assets\unity.webp\NativeBindings.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\unity.webp\Plugins\x64\libwebpdemux.dll" />

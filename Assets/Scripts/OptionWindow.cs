@@ -427,7 +427,7 @@ public class OptionWindow : MonoBehaviour
 
     void OnGithub()
     {
-        Application.OpenURL("https://github.com/xerysherry/uEmuera/releases");
+        Application.OpenURL("https://github.com/noa3/uEmuera/releases");
     }
 
     void OnIntentBoxShow()
