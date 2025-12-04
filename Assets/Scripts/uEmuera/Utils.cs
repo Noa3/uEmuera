@@ -63,6 +63,13 @@ namespace uEmuera
     /// </summary>
     public static class Utils
     {
+        // Helper for platform detection compatible with .NET Standard 2.1
+        static bool IsWindows()
+        {
+            var p = Environment.OSVersion.Platform;
+            return p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows || p == PlatformID.WinCE;
+        }
+
         /// <summary>
         /// Sets the SHIFT-JIS to UTF-8 conversion dictionary.
         /// </summary>
@@ -122,6 +129,111 @@ namespace uEmuera
             else if(ps.Length > 0)
                 return n + ps[ps.Length - 1];
             return "";
+        }
+
+        /// <summary>
+        /// Attempts to resolve the given path to the exact-case path on disk.
+        /// Returns null if resolution fails.
+        /// On Windows, returns the input path because the filesystem is case-insensitive.
+        /// </summary>
+        public static string ResolvePathInsensitive(string path, bool expectDirectory)
+        {
+            if (string.IsNullOrEmpty(path))
+                return null;
+            try
+            {
+                // Windows is already case-insensitive
+                if (IsWindows())
+                    return path;
+
+                // Normalize separators
+                var normalized = path.Replace('/', Path.DirectorySeparatorChar)
+                                     .Replace('\\', Path.DirectorySeparatorChar);
+
+                // Handle absolute vs relative roots
+                string root = Path.GetPathRoot(normalized);
+                string current = string.IsNullOrEmpty(root) ? Directory.GetCurrentDirectory() : root.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+
+                // Build parts excluding root
+                string relative = string.IsNullOrEmpty(root) ? normalized : normalized.Substring(root.Length);
+                var parts = relative.Split(new[] { Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar }, StringSplitOptions.RemoveEmptyEntries);
+
+                for (int i = 0; i < parts.Length; i++)
+                {
+                    var part = parts[i];
+                    bool last = i == parts.Length - 1;
+
+                    if (!Directory.Exists(current))
+                        return null;
+
+                    if (!last || expectDirectory)
+                    {
+                        string matchedDir = null;
+                        var dirs = Directory.GetDirectories(current);
+                        for (int d = 0; d < dirs.Length; d++)
+                        {
+                            var dirName = Path.GetFileName(dirs[d]);
+                            if (string.Equals(dirName, part, StringComparison.OrdinalIgnoreCase))
+                            {
+                                matchedDir = dirs[d];
+                                break;
+                            }
+                        }
+                        if (matchedDir == null)
+                        {
+                            // If last part and expectDirectory, a missing directory means failure
+                            if (last && expectDirectory)
+                                return null;
+                            // Otherwise, path cannot be resolved
+                            return null;
+                        }
+                        current = matchedDir;
+                    }
+                    else
+                    {
+                        // Last segment expected to be a file
+                        var files = Directory.GetFiles(current);
+                        for (int f = 0; f < files.Length; f++)
+                        {
+                            var fileName = Path.GetFileName(files[f]);
+                            if (string.Equals(fileName, part, StringComparison.OrdinalIgnoreCase))
+                                return files[f];
+                        }
+                        return null;
+                    }
+                }
+
+                // If we reach here, we resolved a directory path
+                return current;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Returns true if a directory exists, performing case-insensitive lookup on case-sensitive systems.
+        /// </summary>
+        public static bool DirectoryExistsInsensitive(string path)
+        {
+            if (string.IsNullOrEmpty(path))
+                return false;
+            if (Directory.Exists(path))
+                return true;
+            var resolved = ResolvePathInsensitive(path, expectDirectory: true);
+            return !string.IsNullOrEmpty(resolved) && Directory.Exists(resolved);
+        }
+
+        /// <summary>
+        /// Normalize input and resolve existing directory path to actual casing if found.
+        /// Falls back to normalized input if resolution fails.
+        /// </summary>
+        public static string NormalizeExistingDirectoryPath(string path)
+        {
+            var normalized = NormalizePath(path);
+            var resolved = ResolvePathInsensitive(normalized, expectDirectory: true);
+            return string.IsNullOrEmpty(resolved) ? normalized : NormalizePath(resolved);
         }
 
         /// <summary>

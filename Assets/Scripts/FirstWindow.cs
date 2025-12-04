@@ -51,8 +51,18 @@ public class FirstWindow : MonoBehaviour
         System.GC.Collect();
         SpriteManager.Init();
 
-        Sys.SetWorkFolder(workspace);
-        Sys.SetSourceFolder(era);
+        // Resolve and set folders case-insensitively for cross-platform
+        var resolvedWorkspace = uEmuera.Utils.NormalizeExistingDirectoryPath(workspace);
+        var resolvedEraDir = uEmuera.Utils.NormalizeExistingDirectoryPath(Path.Combine(workspace, era));
+        if (!string.IsNullOrEmpty(resolvedWorkspace))
+            Sys.SetWorkFolder(resolvedWorkspace);
+        else
+            Sys.SetWorkFolder(workspace);
+        if (!string.IsNullOrEmpty(resolvedEraDir))
+            Sys.SetSourceFolder(Path.GetFileName(resolvedEraDir));
+        else
+            Sys.SetSourceFolder(era);
+
         uEmuera.Utils.ResourcePrepare();
 
         async = Resources.UnloadUnusedAssets();
@@ -123,10 +133,11 @@ public class FirstWindow : MonoBehaviour
     {
         string customDir = PlayerPrefs.GetString(CUSTOM_DIR_KEY, "");
         
-        // Check if we have a valid custom directory
-        if(!string.IsNullOrEmpty(customDir) && Directory.Exists(customDir))
+        // Check if we have a valid custom directory (case-insensitive on Unix/mac)
+        if(!string.IsNullOrEmpty(customDir) && uEmuera.Utils.DirectoryExistsInsensitive(customDir))
         {
-            // Valid directory exists, load games from it
+            // Normalize to actual casing if possible
+            customDir = uEmuera.Utils.NormalizeExistingDirectoryPath(customDir);
             GetList(customDir);
         }
         else
@@ -169,11 +180,13 @@ public class FirstWindow : MonoBehaviour
         if(string.IsNullOrEmpty(path))
             return;
             
-        // Normalize the path
-        path = uEmuera.Utils.NormalizePath(path);
+        // Normalize and resolve the path across platforms
+        var normalized = uEmuera.Utils.NormalizePath(path);
+        var resolved = uEmuera.Utils.NormalizeExistingDirectoryPath(normalized);
+        var finalPath = string.IsNullOrEmpty(resolved) ? normalized : resolved;
         
-        // Validate the directory exists
-        if(!Directory.Exists(path))
+        // Validate the directory exists (case-insensitive check)
+        if(!uEmuera.Utils.DirectoryExistsInsensitive(finalPath))
         {
             var ow = EmueraContent.instance.option_window;
             ow.ShowMessageBoxPublic(
@@ -183,7 +196,7 @@ public class FirstWindow : MonoBehaviour
         }
         
         // Save to PlayerPrefs
-        PlayerPrefs.SetString(CUSTOM_DIR_KEY, path);
+        PlayerPrefs.SetString(CUSTOM_DIR_KEY, finalPath);
         PlayerPrefs.Save();
         
         // Refresh the game list
@@ -268,8 +281,12 @@ public class FirstWindow : MonoBehaviour
     /// <param name="workspace">The workspace path to scan.</param>
     void GetList(string workspace)
     {
-        workspace = uEmuera.Utils.NormalizePath(workspace);
-        if(!Directory.Exists(workspace))
+        // Normalize and resolve workspace path across platforms
+        var normalized = uEmuera.Utils.NormalizePath(workspace);
+        var resolvedWorkspace = uEmuera.Utils.NormalizeExistingDirectoryPath(normalized);
+        workspace = string.IsNullOrEmpty(resolvedWorkspace) ? normalized : resolvedWorkspace;
+
+        if(!uEmuera.Utils.DirectoryExistsInsensitive(workspace))
             return;
         try
         {
@@ -277,8 +294,16 @@ public class FirstWindow : MonoBehaviour
             foreach(var p in paths)
             {
                 var path = uEmuera.Utils.NormalizePath(p);
-                if(File.Exists(path + "/emuera.config") || Directory.Exists(path + "/ERB"))
-                    AddItem(path.Substring(workspace.Length + 1), workspace);
+                // Resolve each entry to actual casing to build robust UI strings
+                var eraDir = uEmuera.Utils.NormalizeExistingDirectoryPath(path);
+                var effectivePath = string.IsNullOrEmpty(eraDir) ? path : eraDir;
+
+                if(File.Exists(effectivePath + "/emuera.config") || Directory.Exists(effectivePath + "/ERB") || Directory.Exists(effectivePath + "/erb") || Directory.Exists(effectivePath + "/Erb"))
+                {
+                    // Use actual folder name from resolved path when available
+                    var folderName = Path.GetFileName(effectivePath);
+                    AddItem(folderName, workspace);
+                }
             }
         }
         catch(DirectoryNotFoundException)
