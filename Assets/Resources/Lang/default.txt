@@ -95,3 +95,28 @@ EmueraMain.Template.template_text=uEmuera
 [InfiniteLoopMessage]=当前正在执行{0}的第{1}行。\n自上次输入已过{3}毫秒，已执行{2}行。\n是否中止并强制退出？
 ; Game Messages - Continuous command execution
 [ContinuousCommandFormat]=＜连续命令执行：{0}/{1}＞
+; ERB Loading messages
+[ElapsedTime]=已用时间: {0}ms
+[LoadingFile]=正在加载{0}...
+[BuildingUserFunctionList]=正在构建用户定义函数列表...
+[CheckingSyntax]=正在检查脚本语法...
+[LoadComplete]=加载完成
+[UnexpectedError]=发生意外错误:
+[FileOpenFailed]=打开{0}失败
+[CallformUsedNoCheck]=由于使用了CALLFORM系列指令，未调用函数检查已跳过。
+[FunctionNotFoundWarning]=・未找到的函数: 如果在其他文件中定义，可以忽略此警告
+[GeneralFunctions]=　○一般函数:
+[InlineFunctions]=　○内联函数:
+[TimesCount]=次
+[WarningLv1Ignored]=警告Lv1: 忽略了{0}条关于已定义但从未调用的函数的警告
+[WarningLv2Ignored]=警告Lv2: 忽略了{0}条关于调用未定义函数的警告
+[ErbStatistics]=非注释行数:{0}, 函数总计:{1}, 被调用函数:{2}
+[WarningBanner]=＊＊＊＊＊警告＊＊＊＊＊
+[SystemFunctionOverwritten]=  系统函数"{0}"已被用户定义函数覆盖
+[ScriptMayNotWorkAsIntended]=  使用上述函数的脚本可能无法按预期工作
+[WarningForEmueraScripts]=  ※此警告针对使用这些表达式函数的Emuera专用脚本。
+[NoEffectOnEramaker]=  对eramaker脚本无影响。
+[DisableWarningHint]=  如果不需要此警告，请在配置中关闭"系统函数被覆盖时显示警告"。
+[WarningBannerEnd]=＊＊＊＊＊＊＊＊＊＊＊＊
+; Header file loading
+[LoadingHeader]=正在加载{0}...

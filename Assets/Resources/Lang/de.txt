@@ -87,3 +87,28 @@ FirstWindow.Titlebar.title=Spielliste
 [InfiniteLoopMessage]=Derzeit wird Zeile {1} von {0} ausgeführt.\n{3} Millisekunden seit der letzten Eingabe vergangen und {2} Zeilen wurden ausgeführt.\nAbbrechen und zwangsweise beenden?
 ; Game Messages - Continuous command execution
 [ContinuousCommandFormat]=<Kontinuierliche Befehlsausführung: {0}/{1}>
+; ERB Loading messages
+[ElapsedTime]=Verstrichene Zeit: {0}ms
+[LoadingFile]=Lade {0}...
+[BuildingUserFunctionList]=Erstelle Liste benutzerdefinierter Funktionen...
+[CheckingSyntax]=Prüfe Skript-Syntax...
+[LoadComplete]=Laden abgeschlossen
+[UnexpectedError]=Unerwarteter Fehler aufgetreten:
+[FileOpenFailed]=Öffnen von {0} fehlgeschlagen
+[CallformUsedNoCheck]=CALLFORM-Befehle wurden verwendet, daher wird die Prüfung nicht aufgerufener Funktionen übersprungen.
+[FunctionNotFoundWarning]=・Nicht gefundene Funktionen: Wenn in anderen Dateien definiert, kann diese Warnung ignoriert werden
+[GeneralFunctions]=　○Allgemeine Funktionen:
+[InlineFunctions]=　○Inline-Funktionen:
+[TimesCount]= Mal
+[WarningLv1Ignored]=Warnung Lv1: {0} Warnungen über definierte, aber nie aufgerufene Funktionen ignoriert
+[WarningLv2Ignored]=Warnung Lv2: {0} Warnungen über Aufrufe undefinierter Funktionen ignoriert
+[ErbStatistics]=Nicht-Kommentarzeilen: {0}, Funktionen gesamt: {1}, Aufgerufene Funktionen: {2}
+[WarningBanner]=＊＊＊＊＊WARNUNG＊＊＊＊＊
+[SystemFunctionOverwritten]=  Systemfunktion "{0}" wurde von benutzerdefinierter Funktion überschrieben
+[ScriptMayNotWorkAsIntended]=  Skripte, die obige Funktionen verwenden, funktionieren möglicherweise nicht wie beabsichtigt
+[WarningForEmueraScripts]=  ※Diese Warnung gilt für Emuera-spezifische Skripte, die diese Ausdrucksfunktionen verwenden.
+[NoEffectOnEramaker]=  Hat keinen Einfluss auf eramaker-Skripte.
+[DisableWarningHint]=  Um diese Warnung zu deaktivieren, schalten Sie "Warnung anzeigen, wenn Systemfunktion überschrieben wird" in der Konfiguration aus.
+[WarningBannerEnd]=＊＊＊＊＊＊＊＊＊＊＊＊
+; Header file loading
+[LoadingHeader]=Lade {0}...

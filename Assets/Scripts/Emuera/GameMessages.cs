@@ -74,4 +74,31 @@ public static class GameMessages
 
     // Format helper for continuous command execution
     public static string ContinuousCommandFormat => Get("[ContinuousCommandFormat]");
+
+    // ERB Loading messages
+    public static string ElapsedTime => Get("[ElapsedTime]");
+    public static string LoadingFile => Get("[LoadingFile]");
+    public static string BuildingUserFunctionList => Get("[BuildingUserFunctionList]");
+    public static string CheckingSyntax => Get("[CheckingSyntax]");
+    public static string LoadComplete => Get("[LoadComplete]");
+    public static string UnexpectedError => Get("[UnexpectedError]");
+    public static string FileOpenFailed => Get("[FileOpenFailed]");
+    public static string CallformUsedNoCheck => Get("[CallformUsedNoCheck]");
+    public static string FunctionNotFoundWarning => Get("[FunctionNotFoundWarning]");
+    public static string GeneralFunctions => Get("[GeneralFunctions]");
+    public static string InlineFunctions => Get("[InlineFunctions]");
+    public static string TimesCount => Get("[TimesCount]");
+    public static string WarningLv1Ignored => Get("[WarningLv1Ignored]");
+    public static string WarningLv2Ignored => Get("[WarningLv2Ignored]");
+    public static string ErbStatistics => Get("[ErbStatistics]");
+    public static string WarningBanner => Get("[WarningBanner]");
+    public static string SystemFunctionOverwritten => Get("[SystemFunctionOverwritten]");
+    public static string ScriptMayNotWorkAsIntended => Get("[ScriptMayNotWorkAsIntended]");
+    public static string WarningForEmueraScripts => Get("[WarningForEmueraScripts]");
+    public static string NoEffectOnEramaker => Get("[NoEffectOnEramaker]");
+    public static string DisableWarningHint => Get("[DisableWarningHint]");
+    public static string WarningBannerEnd => Get("[WarningBannerEnd]");
+
+    // Header file loading
+    public static string LoadingHeader => Get("[LoadingHeader]");
 }
