@@ -32,3 +32,58 @@ FirstWindow.Titlebar.title=Game List
 [DirectoryPlaceholder]=Enter game directory path...
 [DirectoryNotFound]=Directory not found!
 [Error]=Error
+; Game Messages - Loading/Initialization
+[LoadingMacroTxt]=Loading macro.txt...
+[LoadingReplaceCsv]=Loading _Replace.csv...
+[LoadingRenameCsv]=Loading _Rename.csv...
+[ConfigFileError]=Config file has issues\nDo you want to exit Emuera?
+[ConfigFileErrorTitle]=Config Error
+[ConfigExitSelected]=Config file had issues and exit was selected, processing terminated
+[ResourcesLoadError]=Issues found while loading resources folder, processing terminated
+[ReplaceCsvError]=_Replace.csv has issues\nDo you want to exit Emuera?
+[ReplaceCsvErrorTitle]=_Replace.csv Error
+[ReplaceCsvExitSelected]=_Replace.csv had issues and exit was selected, processing terminated
+[RenameCsvNotFound]=csv\_Rename.csv not found
+[GamebaseLoadError]=Problem occurred while loading GAMEBASE.CSV, processing terminated
+[ErhLoadError]=Error occurred while loading ERH, processing terminated
+[FatalInitError]=A fatal Error occurred during initialization, processing terminated
+; Game Messages - Analysis mode
+[FileAnalysisComplete]=File analysis complete: Outputting to Analysis.log
+[PressEnterToExit]=Press Enter key or click to exit
+[ErbCodeError]=ERB code contains uninterpretable lines, Emuera will exit
+[CompatibilityOptionHint]=※Compatibility option can force operation
+[OutputLogToFile]=Outputting log to emuera.log
+; Game Messages - Error messages
+[ErrorAtFunctionEnd]=Error occurred at end of function:
+[EmueraErrorAtFunctionEnd]=Emuera Error occurred at end of function:
+[UnexpectedErrorAtFunctionEnd]=Unexpected Error occurred at end of function:
+[ThrowOccurred]=THROW occurred
+[ThrowContent]=THROW content:
+[ErrorOccurred]=Error occurred:
+[ErrorContent]=Error content:
+[CurrentFunction]=Current function:
+[FunctionCallStack]=Function call stack:
+[EmueraErrorOccurred]=Emuera Error occurred:
+[UnexpectedErrorOccurred]=Unexpected Error occurred:
+; Game Messages - Game flow
+[InvalidValue]=Invalid value
+[CommandExecutionFailed]=Command could not be executed
+[AutoSaveError]=Unexpected Error occurred during auto save
+[AutoSaveSkipped]=Skipping auto save
+[NotEnoughMoney]=Not enough money.
+[NotForSale]=Not for sale.
+[SaveError]=Unexpected Error occurred during save
+[NoData]=No data
+; Game Messages - Save/Load
+[WhichNumberToSave]=Which number do you want to save to?
+[WhichNumberToLoad]=Which number do you want to load?
+[Back]=Back
+[ShowSaveData]=Show save data {0}～{1}
+[DataExistsOverwrite]=Data already exists. Overwrite?
+[Yes]=Yes
+[No]=No
+; Game Messages - Infinite loop detection
+[InfiniteLoopDetected]=Possible infinite loop detected
+[InfiniteLoopMessage]=Currently executing line {1} of {0}.\n{3} milliseconds have passed since last input and {2} lines have been executed.\nDo you want to abort and force quit?
+; Game Messages - Continuous command execution
+[ContinuousCommandFormat]=<Continuous command execution: {0}/{1}>

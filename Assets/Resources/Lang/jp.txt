@@ -32,3 +32,58 @@ FirstWindow.Titlebar.title=ゲームリスト
 [DirectoryPlaceholder]=ゲームディレクトリパスを入力...
 [DirectoryNotFound]=ディレクトリが見つかりません！
 [Error]=エラー
+; Game Messages - Loading/Initialization
+[LoadingMacroTxt]=macro.txt読み込み中・・・
+[LoadingReplaceCsv]=_Replace.csv読み込み中・・・
+[LoadingRenameCsv]=_Rename.csv読み込み中・・・
+[ConfigFileError]=設定ファイルに問題があります\nEmueraを終了しますか？
+[ConfigFileErrorTitle]=設定エラー
+[ConfigExitSelected]=設定ファイルに問題があり、終了が選択されたため、処理を終了します
+[ResourcesLoadError]=リソースフォルダの読み込み中に問題が見つかりました、処理を終了します
+[ReplaceCsvError]=_Replace.csvに問題があります\nEmueraを終了しますか？
+[ReplaceCsvErrorTitle]=_Replace.csvエラー
+[ReplaceCsvExitSelected]=_Replace.csvに問題があり、終了が選択されたため、処理を終了します
+[RenameCsvNotFound]=csv\_Rename.csvが見つかりません
+[GamebaseLoadError]=GAMEBASE.CSVの読み込み中に問題が発生しました、処理を終了します
+[ErhLoadError]=ERHの読み込み中にエラーが発生しました、処理を終了します
+[FatalInitError]=初期化中に致命的なエラーが発生しました、処理を終了します
+; Game Messages - Analysis mode
+[FileAnalysisComplete]=ファイル解析終了：Analysis.logに出力します
+[PressEnterToExit]=エンターキーもしくはクリックで終了します
+[ErbCodeError]=ERBコードに解釈不可能な行があるためEmueraを終了します
+[CompatibilityOptionHint]=※互換性オプションにより強制的に動作させることができます
+[OutputLogToFile]=emuera.logにログを出力します
+; Game Messages - Error messages
+[ErrorAtFunctionEnd]=関数の終端でエラーが発生しました:
+[EmueraErrorAtFunctionEnd]=関数の終端でEmueraエラーが発生しました:
+[UnexpectedErrorAtFunctionEnd]=関数の終端で予期しないエラーが発生しました:
+[ThrowOccurred]=THROWが発生しました
+[ThrowContent]=THROWの内容:
+[ErrorOccurred]=エラーが発生しました:
+[ErrorContent]=エラーの内容:
+[CurrentFunction]=現在の関数:
+[FunctionCallStack]=関数呼び出しスタック:
+[EmueraErrorOccurred]=Emueraエラーが発生しました:
+[UnexpectedErrorOccurred]=予期しないエラーが発生しました:
+; Game Messages - Game flow
+[InvalidValue]=無効な値です
+[CommandExecutionFailed]=コマンドを実行できませんでした
+[AutoSaveError]=オートセーブ中に予期しないエラーが発生しました
+[AutoSaveSkipped]=オートセーブをスキップします
+[NotEnoughMoney]=お金が足りません。
+[NotForSale]=売っていません。
+[SaveError]=セーブ中に予期しないエラーが発生しました
+[NoData]=データがありません
+; Game Messages - Save/Load
+[WhichNumberToSave]=何番にセーブしますか？
+[WhichNumberToLoad]=何番をロードしますか？
+[Back]=戻る
+[ShowSaveData]=セーブデータ{0}～{1}を表示
+[DataExistsOverwrite]=既にデータが存在します。上書きしますか？
+[Yes]=はい
+[No]=いいえ
+; Game Messages - Infinite loop detection
+[InfiniteLoopDetected]=無限ループの可能性があります
+[InfiniteLoopMessage]={0}の{1}行目を実行中です。\n前回の入力から{3}ミリ秒経過し、{2}行が実行されました。\n中断して強制終了しますか？
+; Game Messages - Continuous command execution
+[ContinuousCommandFormat]=＜コマンド連続実行：{0}/{1}＞

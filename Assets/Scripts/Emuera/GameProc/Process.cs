@@ -61,10 +61,10 @@ namespace MinorShift.Emuera.GameProc
 				if (ParserMediator.HasWarning)
 				{
 					ParserMediator.FlushWarningList();
-					if(MessageBox.Show("Config file has issues\nDo you want to exit Emuera?","Config Error", MessageBoxButtons.YesNo)
+					if(MessageBox.Show(GameMessages.ConfigFileError, GameMessages.ConfigFileErrorTitle, MessageBoxButtons.YesNo)
 						== DialogResult.Yes)
 					{
-						console.PrintSystemLine("Config file had issues and exit was selected, processing terminated");
+						console.PrintSystemLine(GameMessages.ConfigExitSelected);
 						return false;
 					}
 				}
@@ -72,7 +72,7 @@ namespace MinorShift.Emuera.GameProc
 				if (!Content.AppContents.LoadContents())
 				{
 					ParserMediator.FlushWarningList();
-					console.PrintSystemLine("Issues found while loading resources folder, processing terminated");
+					console.PrintSystemLine(GameMessages.ResourcesLoadError);
 					return false;
 				}
 				ParserMediator.FlushWarningList();
@@ -82,7 +82,7 @@ namespace MinorShift.Emuera.GameProc
                     if (File.Exists(Program.ExeDir + "macro.txt"))
                     {
                         if (Config.DisplayReport)
-							console.PrintSystemLine("macro.txt読み込み中・・・");
+							console.PrintSystemLine(GameMessages.LoadingMacroTxt);
                         KeyMacro.LoadMacroFile(Program.ExeDir + "macro.txt");
                     }
 				}
@@ -92,15 +92,15 @@ namespace MinorShift.Emuera.GameProc
 					if (File.Exists(Program.CsvDir + "_Replace.csv"))
 					{
 						if (Config.DisplayReport)
-							console.PrintSystemLine("Loading _Replace.csv...");
+							console.PrintSystemLine(GameMessages.LoadingReplaceCsv);
 						ConfigData.Instance.LoadReplaceFile(Program.CsvDir + "_Replace.csv");
 						if (ParserMediator.HasWarning)
 						{
 							ParserMediator.FlushWarningList();
-							if (MessageBox.Show("_Replace.csv has issues\nDo you want to exit Emuera?", "_Replace.csv Error", MessageBoxButtons.YesNo)
+							if (MessageBox.Show(GameMessages.ReplaceCsvError, GameMessages.ReplaceCsvErrorTitle, MessageBoxButtons.YesNo)
 								== DialogResult.Yes)
 							{
-								console.PrintSystemLine("_Replace.csv had issues and exit was selected, processing terminated");
+								console.PrintSystemLine(GameMessages.ReplaceCsvExitSelected);
 								return false;
 							}
 						}
@@ -116,11 +116,11 @@ namespace MinorShift.Emuera.GameProc
 					if (File.Exists(Program.CsvDir + "_Rename.csv"))
                     {
                         if (Config.DisplayReport || Program.AnalysisMode)
-							console.PrintSystemLine("Loading _Rename.csv...");
+							console.PrintSystemLine(GameMessages.LoadingRenameCsv);
 						ParserMediator.LoadEraExRenameFile(Program.CsvDir + "_Rename.csv");
                     }
                     else
-                        console.PrintError("csv\\_Rename.csv not found");
+                        console.PrintError(GameMessages.RenameCsvNotFound);
                 }
                 if (!Config.DisplayReport)
                 {
@@ -132,7 +132,7 @@ namespace MinorShift.Emuera.GameProc
                 if (!gamebase.LoadGameBaseCsv(Program.CsvDir + "GAMEBASE.CSV"))
                 {
 					ParserMediator.FlushWarningList();
-                    console.PrintSystemLine("Problem occurred while loading GAMEBASE.CSV, processing terminated");
+                    console.PrintSystemLine(GameMessages.GamebaseLoadError);
                     return false;
                 }
 				console.SetWindowTitle(gamebase.ScriptWindowTitle);
@@ -166,7 +166,7 @@ namespace MinorShift.Emuera.GameProc
 				if (!hLoader.LoadHeaderFiles(Program.ErbDir, Config.DisplayReport))
 				{
 					ParserMediator.FlushWarningList();
-					console.PrintSystemLine("Error occurred while loading ERH, processing terminated");
+					console.PrintSystemLine(GameMessages.ErhLoadError);
 					return false;
 				}
 				LexicalAnalyzer.UseMacro = idDic.UseMacro();
@@ -185,7 +185,7 @@ namespace MinorShift.Emuera.GameProc
 			catch (Exception e)
 			{
                 handleException(e, null, true);
-				console.PrintSystemLine("A fatal Error occurred during initialization, processing terminated");
+				console.PrintSystemLine(GameMessages.FatalInitError);
 				return false;
 			}
 			if (labelDic == null)
@@ -328,9 +328,9 @@ namespace MinorShift.Emuera.GameProc
 				return;//Skip if current line is in a special state
 			if (!console.Enabled)
 				return;//Cannot show MessageBox if closed.
-			string caption = string.Format("Possible infinite loop detected");
+			string caption = GameMessages.InfiniteLoopDetected;
 			string text = string.Format(
-				"Currently executing line {1} of {0}.\n{3} milliseconds have passed since last input and {2} lines have been executed.\nDo you want to abort and force quit?",
+				GameMessages.InfiniteLoopMessage,
 				currentLine.Position.Filename, currentLine.Position.LineNo, state.lineCount, time);
 			DialogResult result = MessageBox.Show(text, caption, MessageBoxButtons.YesNo);
 			if (result == DialogResult.Yes)
@@ -420,17 +420,17 @@ namespace MinorShift.Emuera.GameProc
 			console.ThrowError(playSound);
 			if (exc is CodeEE)
 			{
-				console.PrintError("関数の終端でErrorが発生しました:" + Program.ExeName);
+				console.PrintError(GameMessages.ErrorAtFunctionEnd + Program.ExeName);
 				console.PrintError(exc.Message);
 			}
 			else if (exc is ExeEE)
 			{
-				console.PrintError("Emuera Error occurred at end of function:" + Program.ExeName);
+				console.PrintError(GameMessages.EmueraErrorAtFunctionEnd + Program.ExeName);
 				console.PrintError(exc.Message);
 			}
 			else
 			{
-				console.PrintError("Unexpected Error occurred at end of function:" + Program.ExeName);
+				console.PrintError(GameMessages.UnexpectedErrorAtFunctionEnd + Program.ExeName);
 				console.PrintError(exc.GetType().ToString() + ":" + exc.Message);
 				string[] stack = exc.StackTrace.Split('\n');
 				for (int i = 0; i < stack.Length; i++)
@@ -465,18 +465,18 @@ namespace MinorShift.Emuera.GameProc
 				{
                     if (current is InstructionLine procline && procline.FunctionCode == FunctionCode.THROW)
                     {
-                        console.PrintErrorButton(posString + "THROW occurred", position);
+                        console.PrintErrorButton(posString + GameMessages.ThrowOccurred, position);
                         printRawLine(position);
-                        console.PrintError("THROW content: " + exc.Message);
+                        console.PrintError(GameMessages.ThrowContent + " " + exc.Message);
                     }
                     else
                     {
-                        console.PrintErrorButton(posString + "Error occurred: " + Program.ExeName, position);
+                        console.PrintErrorButton(posString + GameMessages.ErrorOccurred + " " + Program.ExeName, position);
 						printRawLine(position);
-						console.PrintError("Error content: " + exc.Message);
+						console.PrintError(GameMessages.ErrorContent + " " + exc.Message);
                     }
-                    console.PrintError("Current function: @" + current.ParentLabelLine.LabelName + " (line " + current.ParentLabelLine.Position.LineNo.ToString() + " of " + current.ParentLabelLine.Position.Filename + ")");
-                    console.PrintError("Function call stack:");
+                    console.PrintError(GameMessages.CurrentFunction + " @" + current.ParentLabelLine.LabelName + " (line " + current.ParentLabelLine.Position.LineNo.ToString() + " of " + current.ParentLabelLine.Position.Filename + ")");
+                    console.PrintError(GameMessages.FunctionCallStack);
                     LogicalLine parent;
                     int depth = 0;
                     while ((parent = state.GetReturnAddressSequensial(depth++)) != null)
@@ -489,18 +489,18 @@ namespace MinorShift.Emuera.GameProc
 				}
 				else
 				{
-					console.PrintError(posString + "Error occurred: " + Program.ExeName);
+					console.PrintError(posString + GameMessages.ErrorOccurred + " " + Program.ExeName);
 					console.PrintError(exc.Message);
 				}
 			}
 			else if (exc is ExeEE)
 			{
-				console.PrintError(posString + "Emuera Error occurred: " + Program.ExeName);
+				console.PrintError(posString + GameMessages.EmueraErrorOccurred + " " + Program.ExeName);
 				console.PrintError(exc.Message);
 			}
 			else
             {
-				console.PrintError(posString + "Unexpected Error occurred: " + Program.ExeName);
+				console.PrintError(posString + GameMessages.UnexpectedErrorOccurred + " " + Program.ExeName);
 				console.PrintError(exc.GetType().ToString() + ":" + exc.Message);
 				string[] stack = exc.StackTrace.Split('\n');
 				for (int i = 0; i < stack.Length; i++)

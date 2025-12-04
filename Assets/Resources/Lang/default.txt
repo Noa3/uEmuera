@@ -40,3 +40,58 @@ Options.IntentBox.border.R=0
 Options.IntentBox.border.close.Text=关闭
 Options.IntentBox.border.reset.Text=重置
 EmueraMain.Template.template_text=uEmuera
+; Game Messages - Loading/Initialization
+[LoadingMacroTxt]=正在加载macro.txt...
+[LoadingReplaceCsv]=正在加载_Replace.csv...
+[LoadingRenameCsv]=正在加载_Rename.csv...
+[ConfigFileError]=配置文件存在问题\n是否退出Emuera？
+[ConfigFileErrorTitle]=配置错误
+[ConfigExitSelected]=配置文件存在问题，已选择退出，处理终止
+[ResourcesLoadError]=加载资源文件夹时发现问题，处理终止
+[ReplaceCsvError]=_Replace.csv存在问题\n是否退出Emuera？
+[ReplaceCsvErrorTitle]=_Replace.csv错误
+[ReplaceCsvExitSelected]=_Replace.csv存在问题，已选择退出，处理终止
+[RenameCsvNotFound]=未找到csv\_Rename.csv
+[GamebaseLoadError]=加载GAMEBASE.CSV时发生问题，处理终止
+[ErhLoadError]=加载ERH时发生错误，处理终止
+[FatalInitError]=初始化时发生致命错误，处理终止
+; Game Messages - Analysis mode
+[FileAnalysisComplete]=文件解析完成：输出到Analysis.log
+[PressEnterToExit]=按回车键或点击退出
+[ErbCodeError]=ERB代码包含无法解析的行，Emuera将退出
+[CompatibilityOptionHint]=※兼容性选项可强制运行
+[OutputLogToFile]=输出日志到emuera.log
+; Game Messages - Error messages
+[ErrorAtFunctionEnd]=函数末端发生错误:
+[EmueraErrorAtFunctionEnd]=函数末端发生Emuera错误:
+[UnexpectedErrorAtFunctionEnd]=函数末端发生意外错误:
+[ThrowOccurred]=发生THROW
+[ThrowContent]=THROW内容:
+[ErrorOccurred]=发生错误:
+[ErrorContent]=错误内容:
+[CurrentFunction]=当前函数:
+[FunctionCallStack]=函数调用栈:
+[EmueraErrorOccurred]=发生Emuera错误:
+[UnexpectedErrorOccurred]=发生意外错误:
+; Game Messages - Game flow
+[InvalidValue]=无效的值
+[CommandExecutionFailed]=无法执行命令
+[AutoSaveError]=自动保存时发生意外错误
+[AutoSaveSkipped]=跳过自动保存
+[NotEnoughMoney]=钱不够。
+[NotForSale]=不出售。
+[SaveError]=保存时发生意外错误
+[NoData]=没有数据
+; Game Messages - Save/Load
+[WhichNumberToSave]=保存到几号？
+[WhichNumberToLoad]=加载几号？
+[Back]=返回
+[ShowSaveData]=显示存档{0}～{1}
+[DataExistsOverwrite]=数据已存在。是否覆盖？
+[Yes]=是
+[No]=否
+; Game Messages - Infinite loop detection
+[InfiniteLoopDetected]=可能检测到无限循环
+[InfiniteLoopMessage]=当前正在执行{0}的第{1}行。\n自上次输入已过{3}毫秒，已执行{2}行。\n是否中止并强制退出？
+; Game Messages - Continuous command execution
+[ContinuousCommandFormat]=＜连续命令执行：{0}/{1}＞

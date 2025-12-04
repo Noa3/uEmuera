@@ -103,6 +103,8 @@ public class LocalizationHelper : MonoBehaviour
                 return "en";
             case "jp":
                 return "ja";
+            case "de":
+                return "de";
             default:
                 return "zh-Hans";
         }
@@ -127,6 +129,8 @@ public class LocalizationHelper : MonoBehaviour
                 return "en_us";
             case "ja":
                 return "jp";
+            case "de":
+                return "de";
             default:
                 return "zh_cn";
         }
