@@ -226,6 +226,38 @@ namespace uEmuera
         }
 
         /// <summary>
+        /// Returns true if a file exists, performing case-insensitive lookup on case-sensitive systems.
+        /// </summary>
+        public static bool FileExistsInsensitive(string path)
+        {
+            if (string.IsNullOrEmpty(path))
+                return false;
+            if (File.Exists(path))
+                return true;
+
+            try
+            {
+                var normalized = path.Replace('/', Path.DirectorySeparatorChar)
+                                      .Replace('\\', Path.DirectorySeparatorChar);
+                var dir = Path.GetDirectoryName(normalized);
+                var target = Path.GetFileName(normalized);
+                if (string.IsNullOrEmpty(dir) || string.IsNullOrEmpty(target))
+                    return false;
+                if (!Directory.Exists(dir))
+                    return false;
+                var files = Directory.GetFiles(dir, "*", SearchOption.TopDirectoryOnly);
+                for (int i = 0; i < files.Length; i++)
+                {
+                    var name = Path.GetFileName(files[i]);
+                    if (string.Equals(name, target, StringComparison.OrdinalIgnoreCase))
+                        return true;
+                }
+            }
+            catch { }
+            return false;
+        }
+
+        /// <summary>
         /// Normalize input and resolve existing directory path to actual casing if found.
         /// Falls back to normalized input if resolution fails.
         /// </summary>

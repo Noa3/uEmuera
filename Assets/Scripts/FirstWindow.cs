@@ -298,7 +298,13 @@ public class FirstWindow : MonoBehaviour
                 var eraDir = uEmuera.Utils.NormalizeExistingDirectoryPath(path);
                 var effectivePath = string.IsNullOrEmpty(eraDir) ? path : eraDir;
 
-                if(File.Exists(effectivePath + "/emuera.config") || Directory.Exists(effectivePath + "/ERB") || Directory.Exists(effectivePath + "/erb") || Directory.Exists(effectivePath + "/Erb"))
+                // robust check: emuera.config name can vary in casing, ERB folder can be ERB/erb/Erb
+                var hasConfig = uEmuera.Utils.FileExistsInsensitive(Path.Combine(effectivePath, "emuera.config"));
+                var hasErbDir = uEmuera.Utils.DirectoryExistsInsensitive(Path.Combine(effectivePath, "ERB"))
+                                 || uEmuera.Utils.DirectoryExistsInsensitive(Path.Combine(effectivePath, "erb"))
+                                 || uEmuera.Utils.DirectoryExistsInsensitive(Path.Combine(effectivePath, "Erb"));
+
+                if(hasConfig || hasErbDir)
                 {
                     // Use actual folder name from resolved path when available
                     var folderName = Path.GetFileName(effectivePath);
