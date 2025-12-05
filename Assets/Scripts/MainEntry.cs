@@ -59,17 +59,25 @@ public class MainEntry : MonoBehaviour
 
     void Start()
     {
+        // Initialize logging system - always enabled for debugging
+        InitializeLogging();
+        
         LoadConfigMaps();
         if(!MultiLanguage.SetLanguage())
         {
             Object.FindFirstObjectByType<OptionWindow>().ShowLanguageBox();
         }
-
-#if UNITY_EDITOR
+    }
+    
+    /// <summary>
+    /// Initializes the logging system to output to Unity console.
+    /// This is always enabled to help with debugging errors and warnings.
+    /// </summary>
+    void InitializeLogging()
+    {
         uEmuera.Logger.info = GenericUtils.Info;
         uEmuera.Logger.warn = GenericUtils.Warn;
         uEmuera.Logger.error = GenericUtils.Error;
-#endif
     }
 
 #if UNITY_EDITOR

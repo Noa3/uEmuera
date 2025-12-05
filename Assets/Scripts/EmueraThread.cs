@@ -189,7 +189,7 @@ public class EmueraThread
         }
         catch (Exception ex)
         {
-            uEmuera.Logger.Error($"Game thread error: {ex.Message}\n{ex.StackTrace}");
+            uEmuera.Logger.Exception(ex, "Game thread error");
         }
     }
 }

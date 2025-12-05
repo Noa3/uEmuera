@@ -59,7 +59,7 @@ namespace uEmuera.Forms
                 }
                 catch (Exception ex)
                 {
-                    uEmuera.Logger.Error($"Timer tick error: {ex.Message}\n{ex.StackTrace}");
+                    uEmuera.Logger.Exception(ex, "Timer tick error");
                 }
             }
         }
