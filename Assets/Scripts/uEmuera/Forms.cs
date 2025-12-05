@@ -12,29 +12,64 @@ namespace uEmuera.Forms
         Maximized = 2
     }
 
+    /// <summary>
+    /// Thread-safe timer implementation for game logic updates.
+    /// Can be safely called from the background game thread.
+    /// </summary>
     public class Timer : IDisposable
     {
+        private static readonly object sync_lock_ = new object();
+        private static readonly HashSet<Timer> timers_ = new HashSet<Timer>();
+        
+        // Cached list for iteration to avoid allocation during Update
+        private static readonly List<Timer> update_list_ = new List<Timer>();
+
+        /// <summary>
+        /// Updates all timers. Thread-safe.
+        /// Called from the background game thread.
+        /// </summary>
         public static void Update()
         {
             var curr_tick = WinmmTimer.TickCount;
-            var iter = timers.GetEnumerator();
-            while(iter.MoveNext())
+            
+            // Copy timers to update list while holding lock
+            lock (sync_lock_)
             {
-                var timer = iter.Current;
-                if(curr_tick - timer.last_tick < timer.Interval)
+                update_list_.Clear();
+                foreach (var timer in timers_)
+                {
+                    update_list_.Add(timer);
+                }
+            }
+            
+            // Process timers outside the lock to prevent deadlocks
+            for (int i = 0; i < update_list_.Count; i++)
+            {
+                var timer = update_list_[i];
+                if (curr_tick - timer.last_tick_ < timer.Interval)
                     continue;
-                timer.last_tick = curr_tick;
+                timer.last_tick_ = curr_tick;
 
-                if(!timer.Enabled)
+                if (!timer.Enabled)
                     continue;
-                timer.Tick(timer, EventArgs.Empty);
+                    
+                try
+                {
+                    timer.Tick?.Invoke(timer, EventArgs.Empty);
+                }
+                catch (Exception ex)
+                {
+                    uEmuera.Logger.Error($"Timer tick error: {ex.Message}");
+                }
             }
         }
-        static HashSet<Timer> timers = new HashSet<Timer>();
 
         public Timer()
         {
-            timers.Add(this);
+            lock (sync_lock_)
+            {
+                timers_.Add(this);
+            }
         }
 
         public bool Enabled { get; set; }
@@ -42,15 +77,20 @@ namespace uEmuera.Forms
         public object Tag { get; set; }
 
         public event EventHandler Tick;
-        public uint last_tick = 0;
+        private uint last_tick_ = 0;
 
         public void Start()
-        {}
+        { }
+        
         public void Stop()
-        {}
+        { }
+        
         public void Dispose()
         {
-            timers.Remove(this);
+            lock (sync_lock_)
+            {
+                timers_.Remove(this);
+            }
         }
     }
 

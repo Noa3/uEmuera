@@ -7,7 +7,9 @@ using UnityEngine.Rendering;
 /// - Mouse moves (if present)
 /// - Touch input is detected
 /// - Keyboard input is detected
-/// - Content changes (text/color updates)
+/// - Content changes (text/color updates from background game thread)
+/// 
+/// Thread Safety: SetContentDirty() can be called from any thread.
 /// </summary>
 public class OnDemandRenderManager : MonoBehaviour
 {
@@ -63,10 +65,10 @@ public class OnDemandRenderManager : MonoBehaviour
         set => on_demand_enabled_ = value;
     }
 
-    // Tracking variables
+    // Tracking variables - using volatile for thread-safe access from game thread
     private Vector3 last_mouse_position_;
     private int frames_since_activity_;
-    private bool content_dirty_;
+    private volatile bool content_dirty_;
     private int extended_frame_count_ = 0;
 
     void Awake()
@@ -131,7 +133,7 @@ public class OnDemandRenderManager : MonoBehaviour
     /// <returns>True if rendering should occur.</returns>
     private bool CheckForActivity()
     {
-        // Check for content changes
+        // Check for content changes (thread-safe volatile read)
         if (content_dirty_)
         {
             content_dirty_ = false;
@@ -188,19 +190,19 @@ public class OnDemandRenderManager : MonoBehaviour
     /// <summary>
     /// Marks the content as dirty, triggering a render.
     /// Call this when text, colors, or other visual content changes.
+    /// Thread-safe: Can be called from the background game thread.
     /// </summary>
     public void SetContentDirty()
     {
         content_dirty_ = true;
-        frames_since_activity_ = 0;
-        
-        // Immediately set to active rendering for responsiveness
-        OnDemandRendering.renderFrameInterval = activeFrameInterval;
+        // Note: We don't reset frames_since_activity_ here as it's not thread-safe
+        // The Update() loop will handle it on the next frame
     }
 
     /// <summary>
     /// Requests immediate rendering for the next few frames.
     /// Useful for ensuring animations or transitions complete smoothly.
+    /// Must be called from the main thread.
     /// </summary>
     public void RequestRender()
     {
@@ -210,6 +212,7 @@ public class OnDemandRenderManager : MonoBehaviour
 
     /// <summary>
     /// Requests rendering for a specific number of frames.
+    /// Must be called from the main thread.
     /// </summary>
     /// <param name="frameCount">Number of frames to render.</param>
     public void RequestRenderFrames(int frameCount)

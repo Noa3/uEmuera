@@ -1,133 +1,192 @@
-﻿using System;
+using System;
 using System.Threading;
-using UnityEngine;
 
+/// <summary>
+/// Manages the Emuera game execution thread.
+/// The game runs on a separate thread, independent of Unity's frame rate.
+/// This allows the game logic to continue processing even when not rendering.
+/// </summary>
 public class EmueraThread
 {
-    public static EmueraThread instance { get { return instance_; } }
-    static EmueraThread instance_ = new EmueraThread();
+    /// <summary>
+    /// Gets the singleton instance of the EmueraThread.
+    /// </summary>
+    public static EmueraThread instance => instance_;
+    private static readonly EmueraThread instance_ = new EmueraThread();
 
-    EmueraThread()
+    // Thread synchronization
+    private readonly object sync_lock_ = new object();
+    private readonly ManualResetEventSlim input_event_ = new ManualResetEventSlim(false);
+    
+    // Thread state
+    private Thread game_thread_;
+    private volatile bool running_;
+    private volatile bool debugmode_;
+    
+    // Input state (volatile for thread safety)
+    private volatile string input_;
+    private volatile bool skipflag_;
+    
+    // Performance tracking
+    private const int TIMER_UPDATE_INTERVAL_MS = 1;
+    private const int INPUT_PROCESS_DELAY_MS = 10;
+
+    private EmueraThread()
     { }
 
+    /// <summary>
+    /// Starts the game engine on a background thread.
+    /// </summary>
+    /// <param name="debug">Enable debug mode.</param>
+    /// <param name="use_coroutine">Ignored - always uses background thread for framerate independence.</param>
     public void Start(bool debug, bool use_coroutine)
     {
-        debugmode = debug;
-        running = true;
-        if(use_coroutine)
+        debugmode_ = debug;
+        running_ = true;
+        input_event_.Reset();
+        
+        // Always use background thread for framerate-independent execution
+        game_thread_ = new Thread(Work)
         {
-            coroutine = GenericUtils.StartCoroutine(WorkCo());
-            return;
-        }
-        ThreadPool.QueueUserWorkItem(new WaitCallback(p =>
-        {
-            Work();
-        }));
+            Name = "EmueraGameThread",
+            IsBackground = true,
+            Priority = ThreadPriority.Normal
+        };
+        game_thread_.Start();
     }
 
+    /// <summary>
+    /// Stops the game execution thread.
+    /// </summary>
     public void End()
     {
-        if(coroutine != null)
+        running_ = false;
+        input_event_.Set(); // Wake up any waiting thread
+        
+        // Wait for thread to finish (with timeout)
+        if (game_thread_ != null && game_thread_.IsAlive)
         {
-            GenericUtils.StopCoroutine(coroutine);
-            coroutine = null;
+            if (!game_thread_.Join(TimeSpan.FromSeconds(2)))
+            {
+                // Thread didn't stop gracefully - this shouldn't happen
+                // but we handle it to prevent hangs
+                uEmuera.Logger.Warn("Game thread did not stop gracefully");
+            }
         }
-        running = false;
+        game_thread_ = null;
     }
 
+    /// <summary>
+    /// Checks if the game is currently processing.
+    /// </summary>
+    /// <returns>True if the game is actively processing.</returns>
     public bool Running()
     {
         var console = MinorShift.Emuera.GlobalStatic.Console;
-        if(console != null && console.IsInProcess)
-            return true;
-        return false;
+        return console != null && console.IsInProcess;
     }
 
+    /// <summary>
+    /// Sends input to the game.
+    /// </summary>
+    /// <param name="c">The input string.</param>
+    /// <param name="from_button">Whether the input is from a button press.</param>
+    /// <param name="skip">Whether to skip (double-click behavior).</param>
     public void Input(string c, bool from_button, bool skip = false)
     {
         var console = MinorShift.Emuera.GlobalStatic.Console;
-        if(console == null)
+        if (console == null)
             return;
-        if(!from_button && console.IsWaitingInputSomething)
+        if (!from_button && console.IsWaitingInputSomething)
             return;
-        input = c;
-        skipflag = skip;
-    }
-    public bool IsSkipFlag { get { return skipflag; } }
-
-    void Work()
-    {
-        //初始化
-        MinorShift.Emuera.Program.debugMode = debugmode;
-        MinorShift.Emuera.Program.Main(new string[0] { });
-
-        uEmuera.Utils.ResourceClear();
-        GC.Collect();
-
-        input = null;
-        var console = MinorShift.Emuera.GlobalStatic.Console;
-        var random = new System.Random();
-        while(running)
+            
+        lock (sync_lock_)
         {
-            skipflag = false;
-
-            while(input == null)
-            {
-                Thread.Sleep(1);
-                if(!running)
-                    return;
-                uEmuera.Forms.Timer.Update();
-            }
-
-            if(console.IsWaitingInput)
-            {
-                if(console.IsWaitingEnterKey)
-                    input = "";
-                console.PressEnterKey(skipflag, input, false);
-            }
-            Thread.Sleep(10);
-            input = null;
+            input_ = c;
+            skipflag_ = skip;
+            input_event_.Set(); // Signal that input is available
         }
     }
+    
+    /// <summary>
+    /// Gets whether the skip flag is set.
+    /// </summary>
+    public bool IsSkipFlag => skipflag_;
 
-    System.Collections.IEnumerator WorkCo()
+    /// <summary>
+    /// Main game loop running on a background thread.
+    /// This loop is independent of Unity's frame rate.
+    /// </summary>
+    private void Work()
     {
-        //初始化
-        MinorShift.Emuera.Program.debugMode = debugmode;
-        MinorShift.Emuera.Program.Main(new string[0] { });
-
-        uEmuera.Utils.ResourceClear();
-        GC.Collect();
-        yield return null;
-
-        input = null;
-        var console = MinorShift.Emuera.GlobalStatic.Console;
-        while(running)
+        try
         {
-            skipflag = false;
+            // Initialize game
+            MinorShift.Emuera.Program.debugMode = debugmode_;
+            MinorShift.Emuera.Program.Main(Array.Empty<string>());
 
-            while(input == null)
-            {
-                yield return null;
-                if(!running)
-                    yield break;
-                uEmuera.Forms.Timer.Update();
-            }
+            uEmuera.Utils.ResourceClear();
+            GC.Collect();
 
-            if(console.IsWaitingInput)
+            input_ = null;
+            var console = MinorShift.Emuera.GlobalStatic.Console;
+            
+            while (running_)
             {
-                if(console.IsWaitingEnterKey)
-                    input = "";
-                console.PressEnterKey(skipflag, input, false);
+                skipflag_ = false;
+
+                // Wait for input with periodic timer updates
+                while (input_ == null)
+                {
+                    // Wait for input signal with timeout for timer updates
+                    if (input_event_.Wait(TIMER_UPDATE_INTERVAL_MS))
+                    {
+                        // Input received, exit wait loop
+                        input_event_.Reset();
+                        break;
+                    }
+                    
+                    if (!running_)
+                        return;
+                        
+                    // Update timers even while waiting for input
+                    uEmuera.Forms.Timer.Update();
+                }
+
+                // Process input if console is ready
+                if (console.IsWaitingInput)
+                {
+                    string current_input;
+                    bool current_skip;
+                    
+                    lock (sync_lock_)
+                    {
+                        current_input = input_;
+                        current_skip = skipflag_;
+                    }
+                    
+                    if (console.IsWaitingEnterKey)
+                        current_input = "";
+                        
+                    console.PressEnterKey(current_skip, current_input, false);
+                }
+                
+                // Small delay to prevent CPU spinning
+                Thread.Sleep(INPUT_PROCESS_DELAY_MS);
+                
+                lock (sync_lock_)
+                {
+                    input_ = null;
+                }
             }
-            yield return new WaitForSeconds(0.01f);
-            input = null;
+        }
+        catch (ThreadAbortException)
+        {
+            // Thread was aborted - expected during shutdown
+        }
+        catch (Exception ex)
+        {
+            uEmuera.Logger.Error($"Game thread error: {ex.Message}\n{ex.StackTrace}");
         }
     }
-
-    UnityEngine.Coroutine coroutine = null;
-    bool debugmode;
-    bool running;
-    string input;
-    bool skipflag;
 }
