@@ -1298,7 +1298,7 @@ check1break:
 					errPos = "cstr.csv";
 					break;
 				default:
-					ParserMediator.Warn("\"" + tokens[0] + "\"は解釈できない識別子です", position, 1);
+					ParserMediator.Warn(string.Format(GameMessages.UnrecognizedIdentifier, tokens[0]), position, 1);
 					return;
 			}
 			if (length < 0)
@@ -1340,7 +1340,7 @@ check1break:
 				else if (tokens[1].Length == 0)
 					ParserMediator.Warn("二つ目の識別子がありません", position, 1);
 				else
-					ParserMediator.Warn("\"" + tokens[1] + "\"は解釈できない識別子です", position, 1);
+					ParserMediator.Warn(string.Format(GameMessages.UnrecognizedIdentifier, tokens[1]), position, 1);
 				return;
 			}
 			if (strArray != null)

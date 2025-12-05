@@ -120,3 +120,11 @@ EmueraMain.Template.template_text=uEmuera
 [WarningBannerEnd]=＊＊＊＊＊＊＊＊＊＊＊＊
 ; Header file loading
 [LoadingHeader]=正在加载{0}...
+; Warning and log messages
+[WarningLvWithLineNo]=警告Lv{0}:{1}:第{2}行:{3}
+[WarningLvWithFile]=警告Lv{0}:{1}:{2}
+[WarningLvSimple]=警告Lv{0}:{1}
+[LogFileOutputSuccess]=※※※日志文件已输出到{0}※※※
+[LogFileOutputFailed]=日志文件只能保存在可执行文件所在目录下
+[LogFileOutputFailedTitle]=日志输出失败
+[UnrecognizedIdentifier]="{0}"是无法识别的标识符

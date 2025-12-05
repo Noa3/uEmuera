@@ -652,7 +652,7 @@ namespace MinorShift.Emuera
 			
 				}
 			}
-			throw new IdentifierNotFoundCodeEE("\"" + idStr + "\"は解釈できない識別子です");
+			throw new IdentifierNotFoundCodeEE(string.Format(GameMessages.UnrecognizedIdentifier, idStr));
 		}
 		#endregion
 

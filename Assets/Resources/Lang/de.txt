@@ -112,3 +112,11 @@ FirstWindow.Titlebar.title=Spielliste
 [WarningBannerEnd]=＊＊＊＊＊＊＊＊＊＊＊＊
 ; Header file loading
 [LoadingHeader]=Lade {0}...
+; Warning and log messages
+[WarningLvWithLineNo]=Warnung Lv{0}:{1}:Zeile {2}:{3}
+[WarningLvWithFile]=Warnung Lv{0}:{1}:{2}
+[WarningLvSimple]=Warnung Lv{0}:{1}
+[LogFileOutputSuccess]=※※※Logdatei wurde nach {0} ausgegeben※※※
+[LogFileOutputFailed]=Logdateien können nur in Verzeichnissen unter der ausführbaren Datei gespeichert werden
+[LogFileOutputFailedTitle]=Log-Ausgabe fehlgeschlagen
+[UnrecognizedIdentifier]="{0}" ist ein nicht erkannter Bezeichner

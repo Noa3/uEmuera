@@ -111,3 +111,11 @@ FirstWindow.Titlebar.title=ゲームリスト
 [WarningBannerEnd]=＊＊＊＊＊＊＊＊＊＊＊＊
 ; Header file loading
 [LoadingHeader]={0}読み込み中・・・
+; Warning and log messages
+[WarningLvWithLineNo]=警告Lv{0}:{1}:{2}行目:{3}
+[WarningLvWithFile]=警告Lv{0}:{1}:{2}
+[WarningLvSimple]=警告Lv{0}:{1}
+[LogFileOutputSuccess]=※※※ログファイルを{0}に出力しました※※※
+[LogFileOutputFailed]=ログファイルは実行ファイル以下のディレクトリにのみ保存できます
+[LogFileOutputFailedTitle]=ログ出力失敗
+[UnrecognizedIdentifier]="{0}"は解釈できない識別子です

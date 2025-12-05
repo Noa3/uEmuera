@@ -101,4 +101,13 @@ public static class GameMessages
 
     // Header file loading
     public static string LoadingHeader => Get("[LoadingHeader]");
+
+    // Warning and log messages
+    public static string WarningLvWithLineNo => Get("[WarningLvWithLineNo]");
+    public static string WarningLvWithFile => Get("[WarningLvWithFile]");
+    public static string WarningLvSimple => Get("[WarningLvSimple]");
+    public static string LogFileOutputSuccess => Get("[LogFileOutputSuccess]");
+    public static string LogFileOutputFailed => Get("[LogFileOutputFailed]");
+    public static string LogFileOutputFailedTitle => Get("[LogFileOutputFailedTitle]");
+    public static string UnrecognizedIdentifier => Get("[UnrecognizedIdentifier]");
 }

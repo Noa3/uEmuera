@@ -111,3 +111,11 @@ FirstWindow.Titlebar.title=Game List
 [WarningBannerEnd]=＊＊＊＊＊＊＊＊＊＊＊＊
 ; Header file loading
 [LoadingHeader]=Loading {0}...
+; Warning and log messages
+[WarningLvWithLineNo]=Warning Lv{0}:{1}:Line {2}:{3}
+[WarningLvWithFile]=Warning Lv{0}:{1}:{2}
+[WarningLvSimple]=Warning Lv{0}:{1}
+[LogFileOutputSuccess]=※※※Log file has been output to {0}※※※
+[LogFileOutputFailed]=Log files can only be saved in directories under the executable file
+[LogFileOutputFailedTitle]=Log Output Failed
+[UnrecognizedIdentifier]="{0}" is an unrecognized identifier
