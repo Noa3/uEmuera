@@ -20,11 +20,13 @@ public class EmueraMain : MonoBehaviour
     }
 
     /// <summary>
-    /// Starts the Emuera game engine.
+    /// Starts the Emuera game engine on a background thread.
+    /// The game runs independently of the frame rate.
     /// </summary>
     public void Run()
     {
-        EmueraThread.instance.Start(debug, use_coroutine);
+        // Always use background thread for framerate-independent execution
+        EmueraThread.instance.Start(debug, false);
         working_ = true;
     }
 
@@ -93,7 +95,8 @@ public class EmueraMain : MonoBehaviour
         System.GC.Collect();
 
         yield return null;
-        EmueraThread.instance.Start(debug, use_coroutine);
+        // Always use background thread for framerate-independent execution
+        EmueraThread.instance.Start(debug, false);
     }
 
     void Start()
@@ -161,9 +164,11 @@ public class EmueraMain : MonoBehaviour
     public bool debug = false;
     
     /// <summary>
-    /// Use coroutine for game execution.
+    /// Obsolete: Game now always runs on background thread for framerate independence.
+    /// This field is kept for serialization compatibility but has no effect.
     /// </summary>
-    [Tooltip("Use coroutine for game execution")]
+    [Tooltip("Obsolete: Game always uses background thread for framerate independence")]
+    [System.Obsolete("Game now always runs on background thread for framerate independence")]
     public bool use_coroutine = false;
 
 #if UNITY_EDITOR

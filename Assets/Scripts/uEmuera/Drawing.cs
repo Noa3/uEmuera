@@ -60,8 +60,15 @@ namespace uEmuera.Drawing
                     size.Width = ret.texture.width;
                     size.Height = ret.texture.height;
                 });
+            
+            // Use SpinWait for more efficient waiting on other thread
+            var spinWait = new System.Threading.SpinWait();
             while(tiot.mutex == null)
-                System.Threading.Thread.Sleep(10);
+            {
+                spinWait.SpinOnce();
+                if (spinWait.NextSpinWillYield)
+                    System.Threading.Thread.Sleep(1);
+            }
             tiot.mutex.WaitOne();
 
             if(textureinfo == null)
@@ -249,8 +256,17 @@ namespace uEmuera.Drawing
         GraphicsUnit graphicsUnit;
     }
 
-    public struct Color
+    /// <summary>
+    /// Represents an RGBA color with float components.
+    /// Optimized for Unity 6 / .NET Standard 2.1.
+    /// </summary>
+    public readonly struct Color : IEquatable<Color>
     {
+        public readonly float a;
+        public readonly float r;
+        public readonly float g;
+        public readonly float b;
+
         public static Color FromArgb(int argb)
         {
             return FromArgb(
@@ -259,20 +275,15 @@ namespace uEmuera.Drawing
                     ((argb >> 8) & 0xFF),
                     (argb & 0xFF));
         }
-        //public static Color FromArgb(int alpha, Color baseColor);
+        
         public static Color FromArgb(int red, int green, int blue)
         {
             return FromArgb(255, red, green, blue);
         }
+        
         public static Color FromArgb(int alpha, int red, int green, int blue)
         {
-            return new Color
-            {
-                a = alpha / 255.0f,
-                r = red / 255.0f,
-                g = green / 255.0f,
-                b = blue / 255.0f,
-            };
+            return new Color(red / 255.0f, green / 255.0f, blue / 255.0f, alpha / 255.0f);
         }
 
         public Color(int R, int G, int B)
@@ -282,6 +293,7 @@ namespace uEmuera.Drawing
             b = B / 255.0f;
             a = 1.0f;
         }
+        
         public Color(int R, int G, int B, int A)
         {
             r = R / 255.0f;
@@ -289,6 +301,7 @@ namespace uEmuera.Drawing
             b = B / 255.0f;
             a = A / 255.0f;
         }
+        
         public Color(float R, float G, float B, float A)
         {
             r = R;
@@ -297,24 +310,13 @@ namespace uEmuera.Drawing
             a = A;
         }
 
-        //public Color(uColor c) { a = c.a; r = c.r; g = c.g; b = c.b; }
-        public int R { get { return (int)(r * 255); } }
-        public int G { get { return (int)(g * 255); } }
-        public int B { get { return (int)(b * 255); } }
-        public int A { get { return (int)(a * 255); } }
-        public int ToArgb()
-        {
-            return (A << 24) + (R << 16) + (G << 8) + B;
-        }
-        public int ToRGBA()
-        {
-            return (R << 24) + (G << 16) + (B << 8) + A;
-        }
-
-        public float a;
-        public float r;
-        public float g;
-        public float b;
+        public int R => (int)(r * 255);
+        public int G => (int)(g * 255);
+        public int B => (int)(b * 255);
+        public int A => (int)(a * 255);
+        
+        public int ToArgb() => (A << 24) + (R << 16) + (G << 8) + B;
+        public int ToRGBA() => (R << 24) + (G << 16) + (B << 8) + A;
 
         public static readonly Color Black = new Color(0, 0, 0);
         public static readonly Color White = new Color(255, 255, 255);
@@ -325,66 +327,40 @@ namespace uEmuera.Drawing
         public static readonly Color Gray = Grey;
         public static readonly Color Transparent = new Color(0, 0, 0, 0);
 
-        //public static Color Clear { get { return new Color(uColor.clear); } }
-        //public static Color Cyan { get { return new Color(uColor.cyan); } }
-        //public static Color Magenta { get { return new Color(uColor.magenta); } }
-        //public static Color Yellow { get { return new Color(uColor.yellow); } }
-        public static Color FromName(string name)
+        public static Color FromName(string name) => name switch
         {
-            switch(name)
-            {
-            case "Black":
-                return Black;
-            case "Blue":
-                return Blue;
-        //    case "Clear":
-        //        return Clear;
-        //    case "Cyan":
-        //        return Cyan;
-            case "Gray":
-                return Gray;
-            case "Green":
-                return Green;
-            case "Grey":
-                return Grey;
-        //    case "Magenta":
-        //        return Magenta;
-            case "Red":
-                return Red;
-            case "White":
-                return White;
-        //    case "Yellow":
-        //        return Yellow;
-            }
+            "Black" => Black,
+            "Blue" => Blue,
+            "Gray" => Gray,
+            "Green" => Green,
+            "Grey" => Grey,
+            "Red" => Red,
+            "White" => White,
+            _ => LogAndReturnBlack(name)
+        };
+        
+        private static Color LogAndReturnBlack(string name)
+        {
             uEmuera.Logger.Info("Not Match Color '" + name + "'");
             return Black;
         }
 
-        //public uColor ucolor { get { return new uColor(r, g, b, a); } }
-
-        public static bool operator ==(Color left, Color right)
+        public static bool operator ==(Color left, Color right) => left.Equals(right);
+        public static bool operator !=(Color left, Color right) => !left.Equals(right);
+        
+        public bool Equals(Color other)
         {
-            return  left.A == right.A &&
-                    left.R == right.R &&
-                    left.G == right.G &&
-                    left.B == right.B;
+            return A == other.A && R == other.R && G == other.G && B == other.B;
         }
-        public static bool operator !=(Color left, Color right)
-        {
-            return  left.A != right.A ||
-                    left.R != right.R ||
-                    left.G != right.G ||
-                    left.B != right.B;
-        }
+        
         public override bool Equals(object obj)
         {
-            if(!(obj is Color))
-                return false;
-            return ((Color)obj) == this;
+            return obj is Color color && Equals(color);
         }
+        
         public override int GetHashCode()
         {
-            return 0;
+            return HashCode.Combine(R, G, B, A);
         }
     }
 

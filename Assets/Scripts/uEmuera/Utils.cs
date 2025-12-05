@@ -1,11 +1,13 @@
 ﻿using System;
 using System.IO;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 namespace uEmuera
 {
     /// <summary>
-    /// Logging utility class.
+    /// Logging utility class for debugging errors, warnings, and info messages.
+    /// Messages are output to the Unity console with timestamps and source information.
     /// </summary>
     public static class Logger
     {
@@ -40,6 +42,82 @@ namespace uEmuera
             if(error == null)
                 return;
             error(content);
+        }
+        
+        /// <summary>
+        /// Logs an exception with full details including message, type, and stack trace.
+        /// Use this for catching exceptions to get better debugging information.
+        /// </summary>
+        /// <param name="ex">The exception to log.</param>
+        /// <param name="context">Optional context message describing what was happening when the exception occurred.</param>
+        /// <param name="memberName">Automatically captured - the calling member name.</param>
+        /// <param name="filePath">Automatically captured - the source file path.</param>
+        /// <param name="lineNumber">Automatically captured - the line number.</param>
+        public static void Exception(
+            Exception ex, 
+            string context = null,
+            [CallerMemberName] string memberName = "",
+            [CallerFilePath] string filePath = "",
+            [CallerLineNumber] int lineNumber = 0)
+        {
+            if(error == null)
+                return;
+            
+            // Handle null exception gracefully
+            if (ex == null)
+            {
+                string fileName = Path.GetFileName(filePath);
+                error($"[{fileName}:{lineNumber} {memberName}()] Null exception logged" +
+                      (string.IsNullOrEmpty(context) ? "" : $" [{context}]"));
+                return;
+            }
+                
+            string fileNameEx = Path.GetFileName(filePath);
+            string location = $"{fileNameEx}:{lineNumber} in {memberName}()";
+            string contextInfo = string.IsNullOrEmpty(context) ? "" : $" [{context}]";
+            string message = $"Exception{contextInfo} at {location}\n" +
+                           $"Type: {ex.GetType().FullName}\n" +
+                           $"Message: {ex.Message}\n" +
+                           $"Stack Trace:\n{ex.StackTrace}";
+            
+            // Include full chain of inner exceptions
+            Exception inner = ex.InnerException;
+            int depth = 1;
+            while (inner != null)
+            {
+                message += $"\n--- Inner Exception (Level {depth}) ---\n" +
+                          $"Type: {inner.GetType().FullName}\n" +
+                          $"Message: {inner.Message}\n" +
+                          $"Stack Trace:\n{inner.StackTrace}";
+                inner = inner.InnerException;
+                depth++;
+                
+                // Safety limit to prevent infinite loops in case of circular references
+                if (depth > 10) break;
+            }
+            
+            error(message);
+        }
+        
+        /// <summary>
+        /// Logs a debug message with caller information.
+        /// Useful for tracing code execution flow.
+        /// </summary>
+        /// <param name="content">The content to log.</param>
+        /// <param name="memberName">Automatically captured - the calling member name.</param>
+        /// <param name="filePath">Automatically captured - the source file path.</param>
+        /// <param name="lineNumber">Automatically captured - the line number.</param>
+        public static void Debug(
+            object content,
+            [CallerMemberName] string memberName = "",
+            [CallerFilePath] string filePath = "",
+            [CallerLineNumber] int lineNumber = 0)
+        {
+            if(info == null)
+                return;
+                
+            string fileName = Path.GetFileName(filePath);
+            info($"[{fileName}:{lineNumber} {memberName}()] {content}");
         }
         
         /// <summary>

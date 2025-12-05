@@ -12,30 +12,45 @@ using UnityEngine.UI;
 public static class GenericUtils
 {
     /// <summary>
-    /// Logs an info message to the console.
+    /// Logs an info message to the Unity console with timestamp.
     /// </summary>
     /// <param name="content">The content to log.</param>
     public static void Info(object content)
     {
-        UnityEngine.Debug.Log(content);
+        string message = FormatLogMessage("INFO", content);
+        UnityEngine.Debug.Log(message);
     }
     
     /// <summary>
-    /// Logs a warning message to the console.
+    /// Logs a warning message to the Unity console with timestamp.
     /// </summary>
     /// <param name="content">The content to log.</param>
     public static void Warn(object content)
     {
-        UnityEngine.Debug.LogWarning(content);
+        string message = FormatLogMessage("WARN", content);
+        UnityEngine.Debug.LogWarning(message);
     }
     
     /// <summary>
-    /// Logs an error message to the console.
+    /// Logs an error message to the Unity console with timestamp.
     /// </summary>
     /// <param name="content">The content to log.</param>
     public static void Error(object content)
     {
-        UnityEngine.Debug.LogError(content);
+        string message = FormatLogMessage("ERROR", content);
+        UnityEngine.Debug.LogError(message);
+    }
+    
+    /// <summary>
+    /// Formats a log message with timestamp and level prefix.
+    /// </summary>
+    /// <param name="level">The log level (INFO, WARN, ERROR).</param>
+    /// <param name="content">The content to format.</param>
+    /// <returns>The formatted log message.</returns>
+    private static string FormatLogMessage(string level, object content)
+    {
+        string timestamp = DateTime.Now.ToString("HH:mm:ss.fff");
+        return $"[{timestamp}] [{level}] {content}";
     }
     
     /// <summary>
