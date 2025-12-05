@@ -7,77 +7,83 @@ using MinorShift.Emuera.GameData.Function;
 
 namespace MinorShift.Emuera.GameData.Expression
 {
+    internal enum ArgsEndWith
+    {
+        None,
+        EoL,
+        RightParenthesis,//)終端
+        RightBracket,//]終端
+    }
 
-	internal enum ArgsEndWith
-	{
-		None,
-		EoL,
-		RightParenthesis,//)終端
-		RightBracket,//]終端
-	}
+    internal enum TermEndWith
+    {
+        None = 0x0000,
+        EoL = 0x0001,
+        Comma = 0x0002,//','終端
+        RightParenthesis = 0x0004,//')'終端
+        RightBracket = 0x0008,//')'終端
+        Assignment = 0x0010,//')'終端
 
-	internal enum TermEndWith
-	{
-		None = 0x0000,
-		EoL = 0x0001,
-		Comma = 0x0002,//','終端
-		RightParenthesis = 0x0004,//')'終端
-		RightBracket = 0x0008,//')'終端
-		Assignment = 0x0010,//')'終端
+        RightParenthesis_Comma = RightParenthesis | Comma,//',' or ')'終端
+        RightBracket_Comma = RightBracket | Comma,//',' or ']'終端
+        Comma_Assignment = Comma | Assignment,//',' or '='終端
+        RightParenthesis_Comma_Assignment = RightParenthesis | Comma | Assignment,//',' or ')' or '='終端
+        RightBracket_Comma_Assignment = RightBracket | Comma | Assignment,//',' or ']' or '='終端
+    }
 
-		RightParenthesis_Comma = RightParenthesis | Comma,//',' or ')'終端
-		RightBracket_Comma = RightBracket | Comma,//',' or ']'終端
-		Comma_Assignment = Comma | Assignment,//',' or '='終端
-		RightParenthesis_Comma_Assignment = RightParenthesis | Comma | Assignment,//',' or ')' or '='終端
-		RightBracket_Comma_Assignment = RightBracket | Comma | Assignment,//',' or ']' or '='終端
-	}
-
+    /// <summary>
+    /// Parses ERA expressions into operand terms. Provides argument reduction, integer reduction,
+    /// and identifier resolution for functions and variables. Emits warnings for unknown identifiers
+    /// to aid debugging and avoids duplicate tracking by using GlobalStatic.tempDic.
+    /// </summary>
     internal static class ExpressionParser
-	{
-		#region public Reduce
-		/// <summary>
-		/// カンマで区切られたargumentを一括して取得。
-		/// return時にはendWithの次の文字がCurrentになっているはず。終端の適切さの検証はExpressionParserがが行う。
-		/// 呼び出し元はCodeEEを適切に処理すること
-		/// </summary>
-		/// <returns></returns>
-		public static IOperandTerm[] ReduceArguments(WordCollection wc, ArgsEndWith endWith, bool isDefine)
-		{
-			if(wc == null)
-				throw new ExeEE("空のストリームを渡された");
-			List<IOperandTerm> terms = new List<IOperandTerm>();
-			TermEndWith termEndWith = TermEndWith.EoL;
-			switch (endWith)
-			{
-				case ArgsEndWith.EoL:
-					termEndWith = TermEndWith.Comma;
-					break;
+    {
+        #region public Reduce
+        /// <summary>
+        /// Reduce a comma-separated list of arguments until the specified end token.
+        /// Throws CodeEE for malformed input. Current position is advanced past the end token.
+        /// </summary>
+        /// <param name="wc">Token stream</param>
+        /// <param name="endWith">Terminal token rule</param>
+        /// <param name="isDefine">Indicates function definition style (supports default values)</param>
+        /// <returns>Array of reduced operand terms</returns>
+        public static IOperandTerm[] ReduceArguments(WordCollection wc, ArgsEndWith endWith, bool isDefine)
+        {
+            if(wc == null)
+                throw new ExeEE("空のストリームを渡された");
+            List<IOperandTerm> terms = new List<IOperandTerm>();
+            TermEndWith termEndWith = TermEndWith.EoL;
+            switch (endWith)
+            {
+                case ArgsEndWith.EoL:
+                    termEndWith = TermEndWith.Comma;
+                    break;
                 //case ArgsEndWith.RightBracket:
                 //    termEndWith = TermEndWith.RightBracket_Comma;
                 //    break;
-				case ArgsEndWith.RightParenthesis:
-					termEndWith = TermEndWith.RightParenthesis_Comma;
-					break;
-			}
-			TermEndWith termEndWith_Assignment = termEndWith | TermEndWith.Assignment;
-			while (true)
-			{
-				Word word = wc.Current;
-				switch (word.Type)
-				{
-					case '\0':
+                case ArgsEndWith.RightParenthesis:
+                    termEndWith = TermEndWith.RightParenthesis_Comma;
+                    break;
+            }
+            TermEndWith termEndWith_Assignment = termEndWith | TermEndWith.Assignment;
+            while (true)
+            {
+                Word word = wc.Current;
+                switch (word.Type)
+                {
+                    case '\0':
                         if (endWith == ArgsEndWith.RightBracket)
                             throw new CodeEE("'['に対応する']'が見つかりません");
-						if (endWith == ArgsEndWith.RightParenthesis)
-							throw new CodeEE("'('に対応する')'が見つかりません");
-						goto end;
-					case ')':
-						if (endWith == ArgsEndWith.RightParenthesis)
-						{
-							wc.ShiftNext();
-							goto end;
-						}
-						throw new CodeEE("構文解析中に予期しない')'を発見しました");
+                        if (endWith == ArgsEndWith.RightParenthesis)
+                            throw new CodeEE("'('に対応する')'が見つかりません");
+                        goto end;
+                    case ')':
+                        if (endWith == ArgsEndWith.RightParenthesis)
+                        {
+                            wc.ShiftNext();
+                            goto end;
+                        }
+                        throw new CodeEE("構文解析中に予期しない')'を発見しました");
                     case ']':
                         if (endWith == ArgsEndWith.RightBracket)
                         {
@@ -85,198 +91,205 @@ namespace MinorShift.Emuera.GameData.Expression
                             goto end;
                         }
                         throw new CodeEE("構文解析中に予期しない']'を発見しました");
-				}
-				if(!isDefine)
-					terms.Add(ReduceExpressionTerm(wc, termEndWith));
-				else
-				{
-					terms.Add(ReduceExpressionTerm(wc, termEndWith_Assignment));
+                }
+                if(!isDefine)
+                    terms.Add(ReduceExpressionTerm(wc, termEndWith));
+                else
+                {
+                    terms.Add(ReduceExpressionTerm(wc, termEndWith_Assignment));
                     if (terms[terms.Count - 1] == null)
                         throw new CodeEE("関数定義のargumentは省略できません");
-					if (wc.Current is OperatorWord)
-					{//=がある
-						wc.ShiftNext();
-						IOperandTerm term = reduceTerm(wc, false, termEndWith, VariableCode.__NULL__);
-						if (term == null)
-							throw new CodeEE("'='の後に式がありません");
-						if (term.GetOperandType() != terms[terms.Count - 1].GetOperandType())
-							throw new CodeEE("'='の前後で型が一致しません");
-						terms.Add(term);
-					}
-					else
-					{
-						if (terms[terms.Count - 1].GetOperandType() == typeof(Int64))
-							terms.Add(new NullTerm(0));
-						else
-							terms.Add(new NullTerm(""));
-					}
-				}
-				if (wc.Current.Type == ',')
-					wc.ShiftNext();
-			}
-		end:
+                    if (wc.Current is OperatorWord)
+                    {//=がある
+                        wc.ShiftNext();
+                        IOperandTerm term = reduceTerm(wc, false, termEndWith, VariableCode.__NULL__);
+                        if (term == null)
+                            throw new CodeEE("'='の後に式がありません");
+                        if (term.GetOperandType() != terms[terms.Count - 1].GetOperandType())
+                            throw new CodeEE("'='の前後で型が一致しません");
+                        terms.Add(term);
+                    }
+                    else
+                    {
+                        if (terms[terms.Count - 1].GetOperandType() == typeof(Int64))
+                            terms.Add(new NullTerm(0));
+                        else
+                            terms.Add(new NullTerm(""));
+                    }
+                }
+                if (wc.Current.Type == ',')
+                    wc.ShiftNext();
+            }
+        end:
             IOperandTerm[] ret = new IOperandTerm[terms.Count];
-			terms.CopyTo(ret);
-			return ret;
-		}
+            terms.CopyTo(ret);
+            return ret;
+        }
 
-
-		/// <summary>
-		/// 数式または文字列式。CALLのargumentなどを扱う。nullを返すことがある。
-		/// return時にはendWithの文字がCurrentになっているはず。終端の適切さの検証は呼び出し元が行う。
-		/// </summary>
-		/// <param name="st"></param>
-		/// <returns></returns>
+        /// <summary>
+        /// Reduce a single expression (numeric or string). May return null.
+        /// </summary>
+        /// <param name="wc">Token stream</param>
+        /// <param name="endWith">Terminal token rule</param>
+        /// <returns>Reduced operand term or null</returns>
         public static IOperandTerm ReduceExpressionTerm(WordCollection wc, TermEndWith endWith)
         {
-			IOperandTerm term = reduceTerm(wc, false, endWith, VariableCode.__NULL__);
+            IOperandTerm term = reduceTerm(wc, false, endWith, VariableCode.__NULL__);
             return term;
         }
 
-
-		///// <summary>
-		///// 単純文字列、書式付文字列、文字列式のうち、文字列式を取り扱う。
-		///// 終端記号が正しいかどうかは呼び出し元で調べること
-		///// </summary>
-		///// <param name="st"></param>
-		///// <returns></returns>
-		//public static IOperandTerm ReduceStringTerm(WordCollection wc, TermEndWith endWith)
-		//{
-		//    IOperandTerm term = reduceTerm(wc, false, endWith, VariableCode.__NULL__);
-		//    if (term.GetOperandType() != typeof(string))
-		//        throw new CodeEE("式の結果が文字列ではありません");
-		//    return term;
-		//}
-
-		public static IOperandTerm ReduceIntegerTerm(WordCollection wc, TermEndWith endwith)
-		{
-			IOperandTerm term = reduceTerm(wc, false, endwith, VariableCode.__NULL__);
+        /// <summary>
+        /// Reduce an integer expression. Throws CodeEE when not numeric.
+        /// </summary>
+        /// <param name="wc">Token stream</param>
+        /// <param name="endwith">Terminal token rule</param>
+        /// <returns>Reduced integer operand term</returns>
+        public static IOperandTerm ReduceIntegerTerm(WordCollection wc, TermEndWith endwith)
+        {
+            IOperandTerm term = reduceTerm(wc, false, endwith, VariableCode.__NULL__);
             if (term == null)
                 throw new CodeEE("構文を式として解釈できません");
-			if (term.GetOperandType() != typeof(Int64))
-				throw new CodeEE("式の結果が数値ではありません");
-			return term;
-		}
+            if (term.GetOperandType() != typeof(Int64))
+                throw new CodeEE("式の結果が数値ではありません");
+            return term;
+        }
 
-		
         /// <summary>
-        /// 結果次第ではSingleTermを返すことがある。
+        /// Convert a formatted string token into an operand term. Returns a SingleTerm when constant.
         /// </summary>
-        /// <returns></returns>
-		public static IOperandTerm ToStrFormTerm(StrFormWord sfw)
-		{
-			StrForm strf = StrForm.FromWordToken(sfw);
-			if(strf.IsConst)
-				return new SingleTerm(strf.GetString(null));
-			return new StrFormTerm(strf);
-		}
+        /// <param name="sfw">Formatted string token</param>
+        /// <returns>Operand term representing the string</returns>
+        public static IOperandTerm ToStrFormTerm(StrFormWord sfw)
+        {
+            StrForm strf = StrForm.FromWordToken(sfw);
+            if(strf.IsConst)
+                return new SingleTerm(strf.GetString(null));
+            return new StrFormTerm(strf);
+        }
 
-		/// <summary>
-		/// カンマで区切られたCASEのargumentを一括して取得。行端で終わる。
-		/// </summary>
-		/// <param name="st"></param>
-		/// <returns></returns>
-		public static CaseExpression[] ReduceCaseExpressions(WordCollection wc)
-		{
-			List<CaseExpression> terms = new List<CaseExpression>();
-			while (!wc.EOL)
-			{
-				terms.Add(reduceCaseExpression(wc));
-				wc.ShiftNext();
-			}
-			CaseExpression[] ret = new CaseExpression[terms.Count];
-			terms.CopyTo(ret);
-			return ret;
-		}
+        /// <summary>
+        /// Reduce CASE expression arguments (comma-separated) until end of line.
+        /// </summary>
+        /// <param name="wc">Token stream</param>
+        /// <returns>Array of case expressions</returns>
+        public static CaseExpression[] ReduceCaseExpressions(WordCollection wc)
+        {
+            List<CaseExpression> terms = new List<CaseExpression>();
+            while (!wc.EOL)
+            {
+                terms.Add(reduceCaseExpression(wc));
+                wc.ShiftNext();
+            }
+            CaseExpression[] ret = new CaseExpression[terms.Count];
+            terms.CopyTo(ret);
+            return ret;
+        }
 
-		public static IOperandTerm ReduceVariableArgument(WordCollection wc, VariableCode varCode)
-		{
-			IOperandTerm ret = reduceTerm(wc, false, TermEndWith.EoL, varCode);
-			if(ret == null)
+        /// <summary>
+        /// Reduce a variable's argument following ':' for associative-like access.
+        /// </summary>
+        /// <param name="wc">Token stream</param>
+        /// <param name="varCode">Variable code</param>
+        /// <returns>Operand term for the variable argument</returns>
+        public static IOperandTerm ReduceVariableArgument(WordCollection wc, VariableCode varCode)
+        {
+            IOperandTerm ret = reduceTerm(wc, false, TermEndWith.EoL, varCode);
+            if(ret == null)
                 throw new CodeEE("変数の:の後にargumentがありません");
-			return ret;
-		}
+            return ret;
+        }
 
-		public static VariableToken ReduceVariableIdentifier(WordCollection wc, string idStr)
-		{
-			string subId = null;
-			if (wc.Current.Type == '@')
-			{
-				wc.ShiftNext();
-				IdentifierWord subidWT = wc.Current as IdentifierWord;
-				if (subidWT == null)
-					throw new CodeEE("@の使い方が不正です");
-				wc.ShiftNext();
-				subId = subidWT.Code;
-			}
-			return GlobalStatic.IdentifierDictionary.GetVariableToken(idStr, subId, true);
-		}
+        /// <summary>
+        /// Resolve a variable identifier, handling optional '@' local reference.
+        /// </summary>
+        /// <param name="wc">Token stream</param>
+        /// <param name="idStr">Identifier string</param>
+        /// <returns>Resolved variable token or null</returns>
+        public static VariableToken ReduceVariableIdentifier(WordCollection wc, string idStr)
+        {
+            string subId = null;
+            if (wc.Current.Type == '@')
+            {
+                wc.ShiftNext();
+                IdentifierWord subidWT = wc.Current as IdentifierWord;
+                if (subidWT == null)
+                    throw new CodeEE("@の使い方が不正です");
+                wc.ShiftNext();
+                subId = subidWT.Code;
+            }
+            return GlobalStatic.IdentifierDictionary.GetVariableToken(idStr, subId, true);
+        }
 
+        /// <summary>
+        /// Resolve a single identifier (function or variable). Emits a warning and tracks unknown identifiers.
+        /// </summary>
+        /// <param name="wc">Token stream</param>
+        /// <param name="idStr">Identifier string</param>
+        /// <param name="varCode">Variable code context for associative access</param>
+        /// <returns>Operand term for the identifier</returns>
+        private static IOperandTerm reduceIdentifier(WordCollection wc, string idStr, VariableCode varCode)
+        {
+            wc.ShiftNext();
+            SymbolWord symbol = wc.Current as SymbolWord;
+            if (symbol != null && symbol.Type == '.')
+            {//名前空間
+                throw new NotImplCodeEE();
+            }
+            else if (symbol != null && (symbol.Type == '(' || symbol.Type == '['))
+            {//関数
+                wc.ShiftNext();
+                if (symbol.Type == '[')//1810 多分永久に実装されない
+                    throw new CodeEE("[]を使った機能はまだ実装されていません");
+                //argumentを処理
+                IOperandTerm[] args = ReduceArguments(wc, ArgsEndWith.RightParenthesis, false);
+                IOperandTerm mToken = GlobalStatic.IdentifierDictionary.GetFunctionMethod(GlobalStatic.LabelDictionary, idStr, args, false);
+                if (mToken == null)
+                {
+                    // Warn and track unknown function identifier
+                    ScriptPosition pos = GlobalStatic.Process.GetScaningLine()?.Position ?? new ScriptPosition();
+                    ParserMediator.Warn(string.Format(GameMessages.UnrecognizedIdentifier, idStr), pos, 1);
+                    long t = 0;
+                    if (GlobalStatic.tempDic.TryGetValue(idStr, out t))
+                        GlobalStatic.tempDic[idStr] = t + 1;
+                    else
+                        GlobalStatic.tempDic.Add(idStr, 1);
+                    return new NullTerm(0);
+                }
+                return mToken;
+            }
+            else
+            {//変数 or キーワード
+                VariableToken id = ReduceVariableIdentifier(wc, idStr);
+                if (id != null)//idStrが変数名の場合、
+                {
+                    if (varCode != VariableCode.__NULL__)//変数のargumentがargumentを持つことはない
+                        return VariableParser.ReduceVariable(id, null, null, null);
+                    else
+                        return VariableParser.ReduceVariable(id, wc);
+                }
+                //idStrが変数名でない場合、
+                IOperandTerm refToken = GlobalStatic.IdentifierDictionary.GetFunctionMethod(GlobalStatic.LabelDictionary, idStr, null, false);
+                if (refToken != null)//関数参照と名前が一致したらそれを返す。実際に使うとError
+                    return refToken;
+                if (varCode != VariableCode.__NULL__ && GlobalStatic.ConstantData.isDefined(varCode, idStr))//連想配列的な可能性アリ
+                    return new SingleTerm(idStr);
+                // Warn and track unknown variable/keyword identifier
+                ScriptPosition pos2 = GlobalStatic.Process.GetScaningLine()?.Position ?? new ScriptPosition();
+                ParserMediator.Warn(string.Format(GameMessages.UnrecognizedIdentifier, idStr), pos2, 1);
+                long ct = 0;
+                if (GlobalStatic.tempDic.TryGetValue(idStr, out ct))
+                    GlobalStatic.tempDic[idStr] = ct + 1;
+                else
+                    GlobalStatic.tempDic.Add(idStr, 1);
+                return new NullTerm(0);
+            }
+            throw new ExeEE("Error投げ損ねた");//ここまででthrowかreturnのどちらかをするはず。
+        }
 
-		/// <summary>
-		/// 識別子一つを解決
-		/// </summary>
-		/// <param name="wc"></param>
-		/// <param name="idStr">識別子文字列</param>
-		/// <param name="varCode">変数のargumentの場合はその変数のCode。連想配列的につかう</param>
-		/// <returns></returns>
-		private static IOperandTerm reduceIdentifier(WordCollection wc, string idStr, VariableCode varCode)
-		{
-			wc.ShiftNext();
-			SymbolWord symbol = wc.Current as SymbolWord;
-			if (symbol != null && symbol.Type == '.')
-			{//名前空間
-				throw new NotImplCodeEE();
-			}
-			else if (symbol != null && (symbol.Type == '(' || symbol.Type == '['))
-			{//関数
-				wc.ShiftNext();
-				if (symbol.Type == '[')//1810 多分永久に実装されない
-					throw new CodeEE("[]を使った機能はまだ実装されていません");
-				//argumentを処理
-				IOperandTerm[] args = ReduceArguments(wc, ArgsEndWith.RightParenthesis, false);
-				IOperandTerm mToken = GlobalStatic.IdentifierDictionary.GetFunctionMethod(GlobalStatic.LabelDictionary, idStr, args, false);
-				if (mToken == null)
-				{
-					if (!Program.AnalysisMode)
-						GlobalStatic.IdentifierDictionary.ThrowException(idStr, true);
-					else
-					{
-                        long t = 0;
-						if (GlobalStatic.tempDic.TryGetValue(idStr, out t))
-							GlobalStatic.tempDic[idStr] = t + 1;
-						else
-							GlobalStatic.tempDic.Add(idStr, 1);
-						return new NullTerm(0);
-					}
-				}
-				return mToken;
-			}
-			else
-			{//変数 or キーワード
-				VariableToken id = ReduceVariableIdentifier(wc, idStr);
-				if (id != null)//idStrが変数名の場合、
-				{
-					if (varCode != VariableCode.__NULL__)//変数のargumentがargumentを持つことはない
-						return VariableParser.ReduceVariable(id, null, null, null);
-					else
-						return VariableParser.ReduceVariable(id, wc);
-				}
-				//idStrが変数名でない場合、
-				IOperandTerm refToken = GlobalStatic.IdentifierDictionary.GetFunctionMethod(GlobalStatic.LabelDictionary, idStr, null, false);
-				if (refToken != null)//関数参照と名前が一致したらそれを返す。実際に使うとError
-					return refToken;
-				if (varCode != VariableCode.__NULL__ && GlobalStatic.ConstantData.isDefined(varCode, idStr))//連想配列的な可能性アリ
-					return new SingleTerm(idStr);
-				GlobalStatic.IdentifierDictionary.ThrowException(idStr, false);
-			}
-			throw new ExeEE("Error投げ損ねた");//ここまででthrowかreturnのどちらかをするはず。
-		}
+        #endregion
 
-		#endregion
-
-		#region private reduce
-		private static CaseExpression reduceCaseExpression(WordCollection wc)
+        #region private reduce
+        private static CaseExpression reduceCaseExpression(WordCollection wc)
 		{
 			CaseExpression ret = new CaseExpression();
 			IdentifierWord id = wc.Current as IdentifierWord;
@@ -323,12 +336,13 @@ namespace MinorShift.Emuera.GameData.Expression
 
 
 		/// <summary>
-		/// 解析器の本体
+		/// Core expression reduction engine. Builds a stack of operands and operators and reduces based on precedence.
 		/// </summary>
-		/// <param name="wc"></param>
-		/// <param name="allowKeywordTo">TOキーワードが見つかっても良いか</param>
-		/// <param name="endWith">終端記号</param>
-		/// <returns></returns>
+		/// <param name="wc">Token stream</param>
+		/// <param name="allowKeywordTo">If true, allows the TO keyword as a terminator</param>
+		/// <param name="endWith">Terminal token rule</param>
+		/// <param name="varCode">Variable code context</param>
+		/// <returns>Reduced operand term or null</returns>
         private static IOperandTerm reduceTerm(WordCollection wc, bool allowKeywordTo, TermEndWith endWith, VariableCode varCode)
         {
             TermStack stack = new TermStack();
@@ -442,13 +456,12 @@ namespace MinorShift.Emuera.GameData.Expression
 		#endregion
 
 		/// <summary>
-        /// 式解決用クラス
+        /// Term stack used by the expression reducer. Manages operator precedence and unary/binary/ternary operations.
         /// </summary>
         private class TermStack
         {
             /// <summary>
-            /// 次に来るべきものの種類。
-            /// (前置)単項演算子か値待ちなら0、二項・三項演算子待ちなら1、値待ちなら2、++、--、!に対応する値待ちの場合は3。
+            /// Next expected token type: 0 for unary or value, 1 for binary/ternary, 2 for value (after '+', '-', '~'), 3 for value for '++', '--', '!';
             /// </summary>
             int state = 0;
             bool hasBefore = false;
@@ -584,7 +597,7 @@ namespace MinorShift.Emuera.GameData.Expression
                 
                 IOperandTerm newTerm = OperatorMethodManager.ReduceUnaryAfterTerm(op, operand);
                 stack.Push(newTerm);
-				
+                
             }
             private void reduceLastThree()
             {
@@ -605,7 +618,7 @@ namespace MinorShift.Emuera.GameData.Expression
                 
                 IOperandTerm newTerm = OperatorMethodManager.ReduceBinaryTerm(op, left, right);
                 stack.Push(newTerm);
-			}
+            }
 
             private void reduceTernary(IOperandTerm left, IOperandTerm right)
             {
@@ -616,10 +629,10 @@ namespace MinorShift.Emuera.GameData.Expression
                 stack.Push(newTerm);
             }
 
-/*			SingleTerm GetSingle(IOperandTerm oprand)
-			{
-				return (SingleTerm)oprand;
-			}
+/*            SingleTerm GetSingle(IOperandTerm oprand)
+            {
+                return (SingleTerm)oprand;
+            }
 */        }
 
     }

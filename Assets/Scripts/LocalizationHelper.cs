@@ -138,13 +138,26 @@ public class LocalizationHelper : MonoBehaviour
 
     /// <summary>
     /// Get localized string from table by key.
+    /// Fallback: when not initialized, use MultiLanguage.GetText(key) silently to avoid log spam.
     /// </summary>
     public static string GetLocalizedString(string tableName, string key)
     {
+        if (string.IsNullOrEmpty(key))
+            return string.Empty;
+
+        // If Unity Localization is not ready yet, use legacy MultiLanguage fallback without warning
         if (!isInitialized)
         {
-            Debug.LogWarning($"LocalizationHelper not initialized, returning key: {key}");
-            return key;
+            try
+            {
+                // Try legacy/global localization source to avoid noisy logs
+                var fallback = MultiLanguage.GetText(key);
+                return string.IsNullOrEmpty(fallback) ? key : fallback;
+            }
+            catch
+            {
+                return key;
+            }
         }
 
         string cacheKey = $"{tableName}.{key}";
@@ -167,12 +180,21 @@ public class LocalizationHelper : MonoBehaviour
                 }
             }
         }
-        catch (Exception e)
+        catch (Exception)
         {
-            Debug.LogWarning($"Failed to get localized string for {tableName}.{key}: {e.Message}");
+            // Swallow and fallback to legacy
         }
 
-        return key;
+        // Final fallback: legacy MultiLanguage, else key
+        try
+        {
+            var fallback = MultiLanguage.GetText(key);
+            return string.IsNullOrEmpty(fallback) ? key : fallback;
+        }
+        catch
+        {
+            return key;
+        }
     }
 
     /// <summary>
