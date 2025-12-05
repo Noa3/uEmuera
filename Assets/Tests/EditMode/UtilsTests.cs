@@ -199,5 +199,33 @@ namespace uEmuera.Tests.EditMode
         }
 
         #endregion
+
+        #region ResolveExistingFilePath Tests
+
+        [Test]
+        public void ResolveExistingFilePath_NullPath_ReturnsNull()
+        {
+            string result = uEmuera.Utils.ResolveExistingFilePath(null);
+            
+            Assert.IsNull(result);
+        }
+
+        [Test]
+        public void ResolveExistingFilePath_EmptyPath_ReturnsNull()
+        {
+            string result = uEmuera.Utils.ResolveExistingFilePath("");
+            
+            Assert.IsNull(result);
+        }
+
+        [Test]
+        public void ResolveExistingFilePath_NonExistentFile_ReturnsNull()
+        {
+            string result = uEmuera.Utils.ResolveExistingFilePath("/nonexistent/path/to/file.txt");
+            
+            Assert.IsNull(result);
+        }
+
+        #endregion
     }
 }

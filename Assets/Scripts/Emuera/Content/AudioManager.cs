@@ -103,7 +103,8 @@ namespace MinorShift.Emuera.Content
                 return 0;
 
             string fullPath = GetFullSoundPath(filename);
-            return File.Exists(fullPath) ? 1 : 0;
+            // Use case-insensitive check - FileExistsInsensitive already checks exact path first
+            return uEmuera.Utils.FileExistsInsensitive(fullPath) ? 1 : 0;
         }
 
         /// <summary>
@@ -220,21 +221,40 @@ namespace MinorShift.Emuera.Content
             
             if (!File.Exists(fullPath))
             {
-                // Try with common audio extensions
-                string[] extensions = { ".wav", ".ogg", ".mp3", ".WAV", ".OGG", ".MP3" };
-                bool found = false;
-                foreach (var ext in extensions)
+                // Try case-insensitive resolution first
+                string resolved = uEmuera.Utils.ResolvePathInsensitive(fullPath, expectDirectory: false);
+                if (!string.IsNullOrEmpty(resolved))
                 {
-                    string testPath = fullPath + ext;
-                    if (File.Exists(testPath))
-                    {
-                        fullPath = testPath;
-                        found = true;
-                        break;
-                    }
+                    fullPath = resolved;
                 }
-                if (!found)
-                    return null;
+                else
+                {
+                    // Try with common audio extensions - we only need lowercase variants since
+                    // case-insensitive resolution (ResolvePathInsensitive) will find the file
+                    // regardless of its actual casing on the file system
+                    string[] extensions = { ".wav", ".ogg", ".mp3" };
+                    bool found = false;
+                    foreach (var ext in extensions)
+                    {
+                        string testPath = fullPath + ext;
+                        if (File.Exists(testPath))
+                        {
+                            fullPath = testPath;
+                            found = true;
+                            break;
+                        }
+                        // Try case-insensitive resolution for each extension
+                        resolved = uEmuera.Utils.ResolvePathInsensitive(testPath, expectDirectory: false);
+                        if (!string.IsNullOrEmpty(resolved))
+                        {
+                            fullPath = resolved;
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found)
+                        return null;
+                }
             }
 
             // Load audio using UnityWebRequest (works on all platforms)
