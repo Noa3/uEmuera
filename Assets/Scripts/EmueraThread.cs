@@ -180,9 +180,9 @@ public class EmueraThread
                 }
             }
         }
-        catch (ThreadAbortException)
+        catch (Exception ex) when (ex is ThreadInterruptedException || ex is OperationCanceledException)
         {
-            // Thread was aborted - expected during shutdown
+            // Thread was interrupted or cancelled - expected during shutdown
         }
         catch (Exception ex)
         {
