@@ -80,9 +80,16 @@ namespace MinorShift.Emuera.GameProc
                 if (Config.UseKeyMacro && !Program.AnalysisMode)
                 {
 					string macroPath = Program.ExeDir + "macro.txt";
+					// Try exact path first, then case-insensitive resolution
 					if (!File.Exists(macroPath))
-						macroPath = uEmuera.Utils.ResolvePathInsensitive(macroPath, expectDirectory: false);
-                    if (!string.IsNullOrEmpty(macroPath) && File.Exists(macroPath))
+					{
+						string resolved = uEmuera.Utils.ResolvePathInsensitive(macroPath, expectDirectory: false);
+						if (!string.IsNullOrEmpty(resolved))
+							macroPath = resolved;
+						else
+							macroPath = null;
+					}
+                    if (!string.IsNullOrEmpty(macroPath))
                     {
                         if (Config.DisplayReport)
 							console.PrintSystemLine(GameMessages.LoadingMacroTxt);
@@ -93,9 +100,16 @@ namespace MinorShift.Emuera.GameProc
                 if (Config.UseReplaceFile && !Program.AnalysisMode)
                 {
 					string replacePath = Program.CsvDir + "_Replace.csv";
+					// Try exact path first, then case-insensitive resolution
 					if (!File.Exists(replacePath))
-						replacePath = uEmuera.Utils.ResolvePathInsensitive(replacePath, expectDirectory: false);
-					if (!string.IsNullOrEmpty(replacePath) && File.Exists(replacePath))
+					{
+						string resolved = uEmuera.Utils.ResolvePathInsensitive(replacePath, expectDirectory: false);
+						if (!string.IsNullOrEmpty(resolved))
+							replacePath = resolved;
+						else
+							replacePath = null;
+					}
+					if (!string.IsNullOrEmpty(replacePath))
 					{
 						if (Config.DisplayReport)
 							console.PrintSystemLine(GameMessages.LoadingReplaceCsv);
@@ -120,9 +134,16 @@ namespace MinorShift.Emuera.GameProc
 				if (Config.UseRenameFile)
                 {
 					string renamePath = Program.CsvDir + "_Rename.csv";
+					// Try exact path first, then case-insensitive resolution
 					if (!File.Exists(renamePath))
-						renamePath = uEmuera.Utils.ResolvePathInsensitive(renamePath, expectDirectory: false);
-					if (!string.IsNullOrEmpty(renamePath) && File.Exists(renamePath))
+					{
+						string resolved = uEmuera.Utils.ResolvePathInsensitive(renamePath, expectDirectory: false);
+						if (!string.IsNullOrEmpty(resolved))
+							renamePath = resolved;
+						else
+							renamePath = null;
+					}
+					if (!string.IsNullOrEmpty(renamePath))
                     {
                         if (Config.DisplayReport || Program.AnalysisMode)
 							console.PrintSystemLine(GameMessages.LoadingRenameCsv);

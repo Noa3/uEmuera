@@ -103,8 +103,8 @@ namespace MinorShift.Emuera.Content
                 return 0;
 
             string fullPath = GetFullSoundPath(filename);
-            // Use case-insensitive check for non-Windows systems
-            return (File.Exists(fullPath) || uEmuera.Utils.FileExistsInsensitive(fullPath)) ? 1 : 0;
+            // Use case-insensitive check - FileExistsInsensitive already checks exact path first
+            return uEmuera.Utils.FileExistsInsensitive(fullPath) ? 1 : 0;
         }
 
         /// <summary>
