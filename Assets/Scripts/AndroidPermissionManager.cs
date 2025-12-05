@@ -79,23 +79,51 @@ public static class AndroidPermissionManager
             return;
         }
         
+        // Track permission responses to ensure callback is invoked once
+        int pendingResponses = 2; // READ and WRITE permissions
+        bool anyDenied = false;
+        bool callbackInvoked = false;
+        object lockObj = new object();
+        
+        System.Action checkAndInvokeCallback = () =>
+        {
+            lock (lockObj)
+            {
+                if (callbackInvoked)
+                    return;
+                    
+                pendingResponses--;
+                if (pendingResponses <= 0)
+                {
+                    callbackInvoked = true;
+                    // Final check: are all permissions now granted?
+                    bool allGranted = HasStoragePermissions();
+                    callback?.Invoke(allGranted && !anyDenied);
+                }
+            }
+        };
+        
         // Create a callbacks object to handle permission results
         var callbacks = new PermissionCallbacks();
         callbacks.PermissionGranted += (permission) =>
         {
-            // Check if all required permissions are now granted
-            if (HasStoragePermissions())
-            {
-                callback?.Invoke(true);
-            }
+            checkAndInvokeCallback();
         };
         callbacks.PermissionDenied += (permission) =>
         {
-            callback?.Invoke(false);
+            lock (lockObj)
+            {
+                anyDenied = true;
+            }
+            checkAndInvokeCallback();
         };
         callbacks.PermissionDeniedAndDontAskAgain += (permission) =>
         {
-            callback?.Invoke(false);
+            lock (lockObj)
+            {
+                anyDenied = true;
+            }
+            checkAndInvokeCallback();
         };
         
         // Request both read and write permissions
@@ -191,7 +219,7 @@ public static class AndroidPermissionManager
     /// Checks if the device is running Android 10 (API 29) or higher,
     /// which uses scoped storage by default.
     /// </summary>
-    /// <returns>True if running Android 10+ or not on Android.</returns>
+    /// <returns>True if running Android 10+, false otherwise (including non-Android platforms).</returns>
     public static bool IsAndroid10OrHigher()
     {
 #if UNITY_ANDROID && !UNITY_EDITOR
@@ -205,7 +233,7 @@ public static class AndroidPermissionManager
     /// Checks if the device is running Android 11 (API 30) or higher,
     /// which enforces scoped storage more strictly.
     /// </summary>
-    /// <returns>True if running Android 11+ or not on Android.</returns>
+    /// <returns>True if running Android 11+, false otherwise (including non-Android platforms).</returns>
     public static bool IsAndroid11OrHigher()
     {
 #if UNITY_ANDROID && !UNITY_EDITOR

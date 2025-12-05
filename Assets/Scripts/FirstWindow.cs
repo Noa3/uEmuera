@@ -226,18 +226,27 @@ public class FirstWindow : MonoBehaviour
     }
     
     /// <summary>
+    /// Predefined Android external storage paths where emuera games may be located.
+    /// </summary>
+    static readonly string[] AndroidStoragePaths = new string[]
+    {
+        "/storage/emulated/0/emuera",
+        "/storage/emulated/1/emuera",
+        "/storage/emulated/2/emuera",
+        "/storage/sdcard0/emuera",
+        "/storage/sdcard1/emuera",
+        "/storage/sdcard2/emuera"
+    };
+    
+    /// <summary>
     /// Loads the game list from Android external storage paths.
     /// </summary>
     void LoadAndroidGameList()
     {
-        // Use predefined Android storage paths
-        GetList("/storage/emulated/0/emuera");
-        GetList("/storage/emulated/1/emuera");
-        GetList("/storage/emulated/2/emuera");
-
-        GetList("/storage/sdcard0/emuera");
-        GetList("/storage/sdcard1/emuera");
-        GetList("/storage/sdcard2/emuera");
+        foreach (var path in AndroidStoragePaths)
+        {
+            GetList(path);
+        }
     }
 #endif
     
