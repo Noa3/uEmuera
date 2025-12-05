@@ -31,3 +31,90 @@ FirstWindow.Titlebar.title=游戏列表
 [DirectoryPlaceholder]=输入游戏目录路径...
 [DirectoryNotFound]=目录不存在！
 [Error]=错误
+; Game Messages - Loading/Initialization
+[LoadingMacroTxt]=正在加载macro.txt...
+[LoadingReplaceCsv]=正在加载_Replace.csv...
+[LoadingRenameCsv]=正在加载_Rename.csv...
+[ConfigFileError]=配置文件存在问题\n是否退出Emuera？
+[ConfigFileErrorTitle]=配置错误
+[ConfigExitSelected]=配置文件存在问题，已选择退出，处理终止
+[ResourcesLoadError]=加载资源文件夹时发现问题，处理终止
+[ReplaceCsvError]=_Replace.csv存在问题\n是否退出Emuera？
+[ReplaceCsvErrorTitle]=_Replace.csv错误
+[ReplaceCsvExitSelected]=_Replace.csv存在问题，已选择退出，处理终止
+[RenameCsvNotFound]=未找到csv\_Rename.csv
+[GamebaseLoadError]=加载GAMEBASE.CSV时发生问题，处理终止
+[ErhLoadError]=加载ERH时发生错误，处理终止
+[FatalInitError]=初始化时发生致命错误，处理终止
+; Game Messages - Analysis mode
+[FileAnalysisComplete]=文件解析完成：输出到Analysis.log
+[PressEnterToExit]=按回车键或点击退出
+[ErbCodeError]=ERB代码包含无法解析的行，Emuera将退出
+[CompatibilityOptionHint]=※兼容性选项可强制运行
+[OutputLogToFile]=输出日志到emuera.log
+; Game Messages - Error messages
+[ErrorAtFunctionEnd]=函数末端发生错误:
+[EmueraErrorAtFunctionEnd]=函数末端发生Emuera错误:
+[UnexpectedErrorAtFunctionEnd]=函数末端发生意外错误:
+[ThrowOccurred]=发生THROW
+[ThrowContent]=THROW内容:
+[ErrorOccurred]=发生错误:
+[ErrorContent]=错误内容:
+[CurrentFunction]=当前函数:
+[FunctionCallStack]=函数调用栈:
+[EmueraErrorOccurred]=发生Emuera错误:
+[UnexpectedErrorOccurred]=发生意外错误:
+; Game Messages - Game flow
+[InvalidValue]=无效的值
+[CommandExecutionFailed]=无法执行命令
+[AutoSaveError]=自动保存时发生意外错误
+[AutoSaveSkipped]=跳过自动保存
+[NotEnoughMoney]=钱不够。
+[NotForSale]=不出售。
+[SaveError]=保存时发生意外错误
+[NoData]=没有数据
+; Game Messages - Save/Load
+[WhichNumberToSave]=保存到几号？
+[WhichNumberToLoad]=加载几号？
+[Back]=返回
+[ShowSaveData]=显示存档{0}～{1}
+[DataExistsOverwrite]=数据已存在。是否覆盖？
+[Yes]=是
+[No]=否
+; Game Messages - Infinite loop detection
+[InfiniteLoopDetected]=可能检测到无限循环
+[InfiniteLoopMessage]=当前正在执行{0}的第{1}行。\n自上次输入已过{3}毫秒，已执行{2}行。\n是否中止并强制退出？
+; Game Messages - Continuous command execution
+[ContinuousCommandFormat]=＜连续命令执行：{0}/{1}＞; ERB Loading messages
+[ElapsedTime]=已用时间: {0}ms
+[LoadingFile]=正在加载{0}...
+[BuildingUserFunctionList]=正在构建用户定义函数列表...
+[CheckingSyntax]=正在检查脚本语法...
+[LoadComplete]=加载完成
+[UnexpectedError]=发生意外错误:
+[FileOpenFailed]=打开{0}失败
+[CallformUsedNoCheck]=由于使用了CALLFORM系列指令，未调用函数检查已跳过。
+[FunctionNotFoundWarning]=・未找到的函数: 如果在其他文件中定义，可以忽略此警告
+[GeneralFunctions]=　○一般函数:
+[InlineFunctions]=　○内联函数:
+[TimesCount]=次
+[WarningLv1Ignored]=警告Lv1: 忽略了{0}条关于已定义但从未调用的函数的警告
+[WarningLv2Ignored]=警告Lv2: 忽略了{0}条关于调用未定义函数的警告
+[ErbStatistics]=非注释行数:{0}, 函数总计:{1}, 被调用函数:{2}
+[WarningBanner]=＊＊＊＊＊警告＊＊＊＊＊
+[SystemFunctionOverwritten]=  系统函数"{0}"已被用户定义函数覆盖
+[ScriptMayNotWorkAsIntended]=  使用上述函数的脚本可能无法按预期工作
+[WarningForEmueraScripts]=  ※此警告针对使用这些表达式函数的Emuera专用脚本。
+[NoEffectOnEramaker]=  对eramaker脚本无影响。
+[DisableWarningHint]=  如果不需要此警告，请在配置中关闭"系统函数被覆盖时显示警告"。
+[WarningBannerEnd]=＊＊＊＊＊＊＊＊＊＊＊＊
+; Header file loading
+[LoadingHeader]=正在加载{0}...
+; Warning and log messages
+[WarningLvWithLineNo]=警告Lv{0}:{1}:第{2}行:{3}
+[WarningLvWithFile]=警告Lv{0}:{1}:{2}
+[WarningLvSimple]=警告Lv{0}:{1}
+[LogFileOutputSuccess]=※※※日志文件已输出到{0}※※※
+[LogFileOutputFailed]=日志文件只能保存在可执行文件所在目录下
+[LogFileOutputFailedTitle]=日志输出失败
+[UnrecognizedIdentifier]="{0}"是无法识别的标识符

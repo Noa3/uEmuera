@@ -32,3 +32,90 @@ FirstWindow.Titlebar.title=Game List
 [DirectoryPlaceholder]=Enter game directory path...
 [DirectoryNotFound]=Directory not found!
 [Error]=Error
+; Game Messages - Loading/Initialization
+[LoadingMacroTxt]=Loading macro.txt...
+[LoadingReplaceCsv]=Loading _Replace.csv...
+[LoadingRenameCsv]=Loading _Rename.csv...
+[ConfigFileError]=Config file has issues\nDo you want to exit Emuera?
+[ConfigFileErrorTitle]=Config Error
+[ConfigExitSelected]=Config file had issues and exit was selected, processing terminated
+[ResourcesLoadError]=Issues found while loading resources folder, processing terminated
+[ReplaceCsvError]=_Replace.csv has issues\nDo you want to exit Emuera?
+[ReplaceCsvErrorTitle]=_Replace.csv Error
+[ReplaceCsvExitSelected]=_Replace.csv had issues and exit was selected, processing terminated
+[RenameCsvNotFound]=csv\_Rename.csv not found
+[GamebaseLoadError]=Problem occurred while loading GAMEBASE.CSV, processing terminated
+[ErhLoadError]=Error occurred while loading ERH, processing terminated
+[FatalInitError]=A fatal Error occurred during initialization, processing terminated
+; Game Messages - Analysis mode
+[FileAnalysisComplete]=File analysis complete: Outputting to Analysis.log
+[PressEnterToExit]=Press Enter key or click to exit
+[ErbCodeError]=ERB code contains uninterpretable lines, Emuera will exit
+[CompatibilityOptionHint]=※Compatibility option can force operation
+[OutputLogToFile]=Outputting log to emuera.log
+; Game Messages - Error messages
+[ErrorAtFunctionEnd]=Error occurred at end of function:
+[EmueraErrorAtFunctionEnd]=Emuera Error occurred at end of function:
+[UnexpectedErrorAtFunctionEnd]=Unexpected Error occurred at end of function:
+[ThrowOccurred]=THROW occurred
+[ThrowContent]=THROW content:
+[ErrorOccurred]=Error occurred:
+[ErrorContent]=Error content:
+[CurrentFunction]=Current function:
+[FunctionCallStack]=Function call stack:
+[EmueraErrorOccurred]=Emuera Error occurred:
+[UnexpectedErrorOccurred]=Unexpected Error occurred:
+; Game Messages - Game flow
+[InvalidValue]=Invalid value
+[CommandExecutionFailed]=Command could not be executed
+[AutoSaveError]=Unexpected Error occurred during auto save
+[AutoSaveSkipped]=Skipping auto save
+[NotEnoughMoney]=Not enough money.
+[NotForSale]=Not for sale.
+[SaveError]=Unexpected Error occurred during save
+[NoData]=No data
+; Game Messages - Save/Load
+[WhichNumberToSave]=Which number do you want to save to?
+[WhichNumberToLoad]=Which number do you want to load?
+[Back]=Back
+[ShowSaveData]=Show save data {0}～{1}
+[DataExistsOverwrite]=Data already exists. Overwrite?
+[Yes]=Yes
+[No]=No
+; Game Messages - Infinite loop detection
+[InfiniteLoopDetected]=Possible infinite loop detected
+[InfiniteLoopMessage]=Currently executing line {1} of {0}.\n{3} milliseconds have passed since last input and {2} lines have been executed.\nDo you want to abort and force quit?
+; Game Messages - Continuous command execution
+[ContinuousCommandFormat]=<Continuous command execution: {0}/{1}>; ERB Loading messages
+[ElapsedTime]=Elapsed time: {0}ms
+[LoadingFile]=Loading {0}...
+[BuildingUserFunctionList]=Building user-defined function list...
+[CheckingSyntax]=Checking script syntax...
+[LoadComplete]=Load complete
+[UnexpectedError]=Unexpected Error occurred:
+[FileOpenFailed]=Failed to open {0}
+[CallformUsedNoCheck]=CALLFORM-type instructions were used, so uncalled function check is skipped.
+[FunctionNotFoundWarning]=・Functions not found: If defined in other files, this warning can be ignored
+[GeneralFunctions]=　○General functions:
+[InlineFunctions]=　○Inline functions:
+[TimesCount]= times
+[WarningLv1Ignored]=Warning Lv1: Ignored {0} warnings about defined functions that were never called
+[WarningLv2Ignored]=Warning Lv2: Ignored {0} warnings about calling undefined functions
+[ErbStatistics]=Non-comment lines: {0}, Total functions: {1}, Called functions: {2}
+[WarningBanner]=＊＊＊＊＊WARNING＊＊＊＊＊
+[SystemFunctionOverwritten]=  System function "{0}" has been overwritten by user-defined function
+[ScriptMayNotWorkAsIntended]=  Scripts using the above functions may not work as intended
+[WarningForEmueraScripts]=  ※This warning is for Emuera-specific scripts using these expression functions.
+[NoEffectOnEramaker]=  It does not affect eramaker scripts.
+[DisableWarningHint]=  To disable this warning, turn off "Show warning when system function is overwritten" in config.
+[WarningBannerEnd]=＊＊＊＊＊＊＊＊＊＊＊＊
+; Header file loading
+[LoadingHeader]=Loading {0}...
+; Warning and log messages
+[WarningLvWithLineNo]=Warning Lv{0}:{1}:Line {2}:{3}
+[WarningLvWithFile]=Warning Lv{0}:{1}:{2}
+[WarningLvSimple]=Warning Lv{0}:{1}
+[LogFileOutputSuccess]=※※※Log file has been output to {0}※※※
+[LogFileOutputFailed]=Log files can only be saved in directories under the executable file
+[LogFileOutputFailedTitle]=Log Output Failed
+[UnrecognizedIdentifier]="{0}" is an unrecognized identifier

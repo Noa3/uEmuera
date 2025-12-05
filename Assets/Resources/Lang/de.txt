@@ -1,0 +1,122 @@
+;DE - German
+Options.MenuPad.Menu1.resolution.Text=Auflösung
+Options.MenuPad.Menu1.language.Text=Sprache
+Options.MenuPad.Menu1.exit.Text=Beenden
+Options.MenuPad.Menu2.back.Text=Zurück zum Menü
+Options.MenuPad.Menu2.savelog.Text=Log speichern
+Options.MenuPad.Menu2.intent.Text=Einrückung
+Options.MenuPad.Menu2.gototitle.Text=Zum Titel
+Options.MenuPad.Menu2.restart.Text=Neu laden
+Options.MenuPad.Menu2.exit.Text=Beenden
+Options.LanguageBox.border.titlebar.title=Sprache wählen
+Options.IntentBox.border.titlebar.title=Einrückung
+Options.IntentBox.border.close.Text=Schließen
+Options.IntentBox.border.reset.Text=Zurücksetzen
+FirstWindow.Titlebar.title=Spielliste
+<Menu1>=220
+<Menu2>=260
+[Wait]=Warten
+[WaitContent]=Bitte warten Sie auf die Verarbeitung!
+[ReloadGame]=Spiel neu laden
+[ReloadGameContent]=Spiel neu laden. Sind Sie sicher?
+[BackMenu]=Zurück zum Menü
+[BackMenuContent]=Zurück zum Menü. Sind Sie sicher?
+[BackTitle]=Zurück zum Titel
+[BackTitleContent]=Zurück zum Titel. Sind Sie sicher?
+[SaveLog]=Log speichern
+[SavePath]=Log-Pfad
+[Failure]=Fehlgeschlagen
+[Exit]=Beenden
+[ExitContent]=Beenden. Sind Sie sicher?
+[SetDirectory]=Verzeichnis festlegen
+[DirectoryPlaceholder]=Spielverzeichnis eingeben...
+[DirectoryNotFound]=Verzeichnis nicht gefunden!
+[Error]=Fehler
+; Game Messages - Loading/Initialization
+[LoadingMacroTxt]=Lade macro.txt...
+[LoadingReplaceCsv]=Lade _Replace.csv...
+[LoadingRenameCsv]=Lade _Rename.csv...
+[ConfigFileError]=Konfigurationsdatei hat Probleme\nMöchten Sie Emuera beenden?
+[ConfigFileErrorTitle]=Konfigurationsfehler
+[ConfigExitSelected]=Konfigurationsdatei hatte Probleme und Beenden wurde gewählt, Verarbeitung abgebrochen
+[ResourcesLoadError]=Probleme beim Laden des Ressourcenordners gefunden, Verarbeitung abgebrochen
+[ReplaceCsvError]=_Replace.csv hat Probleme\nMöchten Sie Emuera beenden?
+[ReplaceCsvErrorTitle]=_Replace.csv Fehler
+[ReplaceCsvExitSelected]=_Replace.csv hatte Probleme und Beenden wurde gewählt, Verarbeitung abgebrochen
+[RenameCsvNotFound]=csv\_Rename.csv nicht gefunden
+[GamebaseLoadError]=Problem beim Laden von GAMEBASE.CSV aufgetreten, Verarbeitung abgebrochen
+[ErhLoadError]=Fehler beim Laden von ERH aufgetreten, Verarbeitung abgebrochen
+[FatalInitError]=Ein schwerwiegender Fehler ist bei der Initialisierung aufgetreten, Verarbeitung abgebrochen
+; Game Messages - Analysis mode
+[FileAnalysisComplete]=Dateianalyse abgeschlossen: Ausgabe in Analysis.log
+[PressEnterToExit]=Drücken Sie Enter oder klicken Sie zum Beenden
+[ErbCodeError]=ERB-Code enthält nicht interpretierbare Zeilen, Emuera wird beendet
+[CompatibilityOptionHint]=※Kompatibilitätsoption kann Betrieb erzwingen
+[OutputLogToFile]=Log wird in emuera.log ausgegeben
+; Game Messages - Error messages
+[ErrorAtFunctionEnd]=Fehler am Funktionsende aufgetreten:
+[EmueraErrorAtFunctionEnd]=Emuera-Fehler am Funktionsende aufgetreten:
+[UnexpectedErrorAtFunctionEnd]=Unerwarteter Fehler am Funktionsende aufgetreten:
+[ThrowOccurred]=THROW aufgetreten
+[ThrowContent]=THROW-Inhalt:
+[ErrorOccurred]=Fehler aufgetreten:
+[ErrorContent]=Fehlerinhalt:
+[CurrentFunction]=Aktuelle Funktion:
+[FunctionCallStack]=Funktionsaufruf-Stack:
+[EmueraErrorOccurred]=Emuera-Fehler aufgetreten:
+[UnexpectedErrorOccurred]=Unerwarteter Fehler aufgetreten:
+; Game Messages - Game flow
+[InvalidValue]=Ungültiger Wert
+[CommandExecutionFailed]=Befehl konnte nicht ausgeführt werden
+[AutoSaveError]=Unerwarteter Fehler beim automatischen Speichern
+[AutoSaveSkipped]=Automatisches Speichern übersprungen
+[NotEnoughMoney]=Nicht genug Geld.
+[NotForSale]=Nicht zu verkaufen.
+[SaveError]=Unerwarteter Fehler beim Speichern
+[NoData]=Keine Daten
+; Game Messages - Save/Load
+[WhichNumberToSave]=Unter welcher Nummer speichern?
+[WhichNumberToLoad]=Welche Nummer laden?
+[Back]=Zurück
+[ShowSaveData]=Speicherdaten {0}～{1} anzeigen
+[DataExistsOverwrite]=Daten existieren bereits. Überschreiben?
+[Yes]=Ja
+[No]=Nein
+; Game Messages - Infinite loop detection
+[InfiniteLoopDetected]=Mögliche Endlosschleife erkannt
+[InfiniteLoopMessage]=Derzeit wird Zeile {1} von {0} ausgeführt.\n{3} Millisekunden seit der letzten Eingabe vergangen und {2} Zeilen wurden ausgeführt.\nAbbrechen und zwangsweise beenden?
+; Game Messages - Continuous command execution
+[ContinuousCommandFormat]=<Kontinuierliche Befehlsausführung: {0}/{1}>
+; ERB Loading messages
+[ElapsedTime]=Verstrichene Zeit: {0}ms
+[LoadingFile]=Lade {0}...
+[BuildingUserFunctionList]=Erstelle Liste benutzerdefinierter Funktionen...
+[CheckingSyntax]=Prüfe Skript-Syntax...
+[LoadComplete]=Laden abgeschlossen
+[UnexpectedError]=Unerwarteter Fehler aufgetreten:
+[FileOpenFailed]=Öffnen von {0} fehlgeschlagen
+[CallformUsedNoCheck]=CALLFORM-Befehle wurden verwendet, daher wird die Prüfung nicht aufgerufener Funktionen übersprungen.
+[FunctionNotFoundWarning]=・Nicht gefundene Funktionen: Wenn in anderen Dateien definiert, kann diese Warnung ignoriert werden
+[GeneralFunctions]=　○Allgemeine Funktionen:
+[InlineFunctions]=　○Inline-Funktionen:
+[TimesCount]= Mal
+[WarningLv1Ignored]=Warnung Lv1: {0} Warnungen über definierte, aber nie aufgerufene Funktionen ignoriert
+[WarningLv2Ignored]=Warnung Lv2: {0} Warnungen über Aufrufe undefinierter Funktionen ignoriert
+[ErbStatistics]=Nicht-Kommentarzeilen: {0}, Funktionen gesamt: {1}, Aufgerufene Funktionen: {2}
+[WarningBanner]=＊＊＊＊＊WARNUNG＊＊＊＊＊
+[SystemFunctionOverwritten]=  Systemfunktion "{0}" wurde von benutzerdefinierter Funktion überschrieben
+[ScriptMayNotWorkAsIntended]=  Skripte, die obige Funktionen verwenden, funktionieren möglicherweise nicht wie beabsichtigt
+[WarningForEmueraScripts]=  ※Diese Warnung gilt für Emuera-spezifische Skripte, die diese Ausdrucksfunktionen verwenden.
+[NoEffectOnEramaker]=  Hat keinen Einfluss auf eramaker-Skripte.
+[DisableWarningHint]=  Um diese Warnung zu deaktivieren, schalten Sie "Warnung anzeigen, wenn Systemfunktion überschrieben wird" in der Konfiguration aus.
+[WarningBannerEnd]=＊＊＊＊＊＊＊＊＊＊＊＊
+; Header file loading
+[LoadingHeader]=Lade {0}...
+; Warning and log messages
+[WarningLvWithLineNo]=Warnung Lv{0}:{1}:Zeile {2}:{3}
+[WarningLvWithFile]=Warnung Lv{0}:{1}:{2}
+[WarningLvSimple]=Warnung Lv{0}:{1}
+[LogFileOutputSuccess]=※※※Logdatei wurde nach {0} ausgegeben※※※
+[LogFileOutputFailed]=Logdateien können nur in Verzeichnissen unter der ausführbaren Datei gespeichert werden
+[LogFileOutputFailedTitle]=Log-Ausgabe fehlgeschlagen
+[UnrecognizedIdentifier]="{0}" ist ein nicht erkannter Bezeichner
