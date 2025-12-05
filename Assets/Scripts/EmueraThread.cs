@@ -129,7 +129,6 @@ public class EmueraThread
             GC.Collect();
 
             input_ = null;
-            var console = MinorShift.Emuera.GlobalStatic.Console;
             
             while (running_)
             {
@@ -153,8 +152,12 @@ public class EmueraThread
                     uEmuera.Forms.Timer.Update();
                 }
 
-                // Process input if console is ready
-                if (console.IsWaitingInput)
+                // Get fresh console reference each iteration (may be disposed during game exit)
+                var console = MinorShift.Emuera.GlobalStatic.Console;
+                
+                // Process input if console is ready and not disposed
+                // Use null-conditional to avoid race condition where console could be disposed between checks
+                if (console?.IsWaitingInput == true)
                 {
                     string current_input;
                     bool current_skip;
