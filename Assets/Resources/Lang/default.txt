@@ -40,6 +40,13 @@ Options.IntentBox.border.R=0
 Options.IntentBox.border.close.Text=关闭
 Options.IntentBox.border.reset.Text=重置
 EmueraMain.Template.template_text=uEmuera
+; Android Storage Permissions
+[StoragePermissionTitle]=需要存储权限
+[StoragePermissionRationale]=此应用需要访问外部存储才能从emuera文件夹读取游戏文件。\n\n请授予存储权限以继续。
+[StoragePermissionDeniedTitle]=权限被拒绝
+[StoragePermissionDenied]=存储权限被拒绝。如果没有此权限，应用无法访问游戏文件。\n\n您可以点击"授权"来授予权限，或打开设置手动启用。
+[Grant]=授权
+[OpenSettings]=设置
 ; Game Messages - Loading/Initialization
 [LoadingMacroTxt]=正在加载macro.txt...
 [LoadingReplaceCsv]=正在加载_Replace.csv...

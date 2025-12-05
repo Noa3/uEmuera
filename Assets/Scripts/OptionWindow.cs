@@ -618,6 +618,57 @@ public class OptionWindow : MonoBehaviour
     }
     
     #endregion
+    
+    #region Storage Permission Dialog
+    
+    /// <summary>
+    /// Shows a dialog for storage permission requests on Android.
+    /// Provides two actions: one for granting permission and one for opening settings.
+    /// </summary>
+    /// <param name="title">The title of the dialog.</param>
+    /// <param name="content">The content message explaining why permission is needed.</param>
+    /// <param name="grantCallback">Callback when user wants to grant permission.</param>
+    /// <param name="settingsCallback">Callback when user wants to open app settings.</param>
+    public void ShowStoragePermissionDialog(string title, string content, 
+        System.Action grantCallback, System.Action settingsCallback)
+    {
+        storage_permission_grant_callback_ = grantCallback;
+        storage_permission_settings_callback_ = settingsCallback;
+        
+        // Use the standard message box infrastructure
+        msg_confirm_callback = () =>
+        {
+            storage_permission_grant_callback_?.Invoke();
+            storage_permission_grant_callback_ = null;
+            storage_permission_settings_callback_ = null;
+        };
+        msg_cancel_callback = () =>
+        {
+            storage_permission_settings_callback_?.Invoke();
+            storage_permission_grant_callback_ = null;
+            storage_permission_settings_callback_ = null;
+        };
+        
+        msg_cancel.SetActive(true);
+        msg_title.text = title;
+        msg_content.text = content;
+        
+        // Update button labels for permission dialog
+        var confirmText = GenericUtils.FindChildByName<Text>(msg_confirm, "Text");
+        var cancelText = GenericUtils.FindChildByName<Text>(msg_cancel, "Text");
+        
+        if (confirmText != null)
+            confirmText.text = MultiLanguage.GetText("[Grant]");
+        if (cancelText != null)
+            cancelText.text = MultiLanguage.GetText("[OpenSettings]");
+        
+        msg_box.SetActive(true);
+    }
+    
+    private System.Action storage_permission_grant_callback_;
+    private System.Action storage_permission_settings_callback_;
+    
+    #endregion
 
     #region UI References
     

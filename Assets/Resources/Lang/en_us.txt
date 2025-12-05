@@ -32,6 +32,12 @@ FirstWindow.Titlebar.title=Game List
 [DirectoryPlaceholder]=Enter game directory path...
 [DirectoryNotFound]=Directory not found!
 [Error]=Error
+[StoragePermissionTitle]=Storage Permission Required
+[StoragePermissionRationale]=This app needs access to external storage to read game files from the emuera folder.\n\nPlease grant storage permission to continue.
+[StoragePermissionDeniedTitle]=Permission Denied
+[StoragePermissionDenied]=Storage permission was denied. The app cannot access game files without this permission.\n\nYou can grant permission by tapping "Grant" or open app settings to enable it manually.
+[Grant]=Grant
+[OpenSettings]=Settings
 ; Game Messages - Loading/Initialization
 [LoadingMacroTxt]=Loading macro.txt...
 [LoadingReplaceCsv]=Loading _Replace.csv...
