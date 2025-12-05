@@ -43,8 +43,15 @@ namespace MinorShift.Emuera
 				RenameDic.Clear();
 			//とにかく辞書を作る。辞書がnullのときは UseRenameFileがNOの時のみ
 			RenameDic = new Dictionary<string, string>();
+			
+			// Try exact path first, then case-insensitive resolution for non-Windows systems
+			string resolvedPath = filepath;
+			if (!File.Exists(filepath))
+			{
+				resolvedPath = uEmuera.Utils.ResolvePathInsensitive(filepath, expectDirectory: false);
+			}
 			EraStreamReader eReader = new EraStreamReader(false);
-			if ((!File.Exists(filepath)) || (!eReader.Open(filepath)))
+			if ((string.IsNullOrEmpty(resolvedPath)) || (!eReader.Open(resolvedPath)))
 			{
 				return;
 			}
