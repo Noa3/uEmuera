@@ -229,7 +229,9 @@ namespace MinorShift.Emuera.Content
                 }
                 else
                 {
-                    // Try with common audio extensions (lowercase only since case-insensitive resolution handles casing)
+                    // Try with common audio extensions - we only need lowercase variants since
+                    // case-insensitive resolution (ResolvePathInsensitive) will find the file
+                    // regardless of its actual casing on the file system
                     string[] extensions = { ".wav", ".ogg", ".mp3" };
                     bool found = false;
                     foreach (var ext in extensions)
@@ -241,7 +243,7 @@ namespace MinorShift.Emuera.Content
                             found = true;
                             break;
                         }
-                        // Also try case-insensitive for each extension
+                        // Try case-insensitive resolution for each extension
                         resolved = uEmuera.Utils.ResolvePathInsensitive(testPath, expectDirectory: false);
                         if (!string.IsNullOrEmpty(resolved))
                         {
