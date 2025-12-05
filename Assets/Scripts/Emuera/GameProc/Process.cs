@@ -79,16 +79,7 @@ namespace MinorShift.Emuera.GameProc
 				//Load key macros
                 if (Config.UseKeyMacro && !Program.AnalysisMode)
                 {
-					string macroPath = Program.ExeDir + "macro.txt";
-					// Try exact path first, then case-insensitive resolution
-					if (!File.Exists(macroPath))
-					{
-						string resolved = uEmuera.Utils.ResolvePathInsensitive(macroPath, expectDirectory: false);
-						if (!string.IsNullOrEmpty(resolved))
-							macroPath = resolved;
-						else
-							macroPath = null;
-					}
+					string macroPath = uEmuera.Utils.ResolveExistingFilePath(Program.ExeDir + "macro.txt");
                     if (!string.IsNullOrEmpty(macroPath))
                     {
                         if (Config.DisplayReport)
@@ -99,16 +90,7 @@ namespace MinorShift.Emuera.GameProc
 				//_replace.csv読み込み
                 if (Config.UseReplaceFile && !Program.AnalysisMode)
                 {
-					string replacePath = Program.CsvDir + "_Replace.csv";
-					// Try exact path first, then case-insensitive resolution
-					if (!File.Exists(replacePath))
-					{
-						string resolved = uEmuera.Utils.ResolvePathInsensitive(replacePath, expectDirectory: false);
-						if (!string.IsNullOrEmpty(resolved))
-							replacePath = resolved;
-						else
-							replacePath = null;
-					}
+					string replacePath = uEmuera.Utils.ResolveExistingFilePath(Program.CsvDir + "_Replace.csv");
 					if (!string.IsNullOrEmpty(replacePath))
 					{
 						if (Config.DisplayReport)
@@ -133,16 +115,7 @@ namespace MinorShift.Emuera.GameProc
 				//Load _rename.csv
 				if (Config.UseRenameFile)
                 {
-					string renamePath = Program.CsvDir + "_Rename.csv";
-					// Try exact path first, then case-insensitive resolution
-					if (!File.Exists(renamePath))
-					{
-						string resolved = uEmuera.Utils.ResolvePathInsensitive(renamePath, expectDirectory: false);
-						if (!string.IsNullOrEmpty(resolved))
-							renamePath = resolved;
-						else
-							renamePath = null;
-					}
+					string renamePath = uEmuera.Utils.ResolveExistingFilePath(Program.CsvDir + "_Rename.csv");
 					if (!string.IsNullOrEmpty(renamePath))
                     {
                         if (Config.DisplayReport || Program.AnalysisMode)
@@ -552,28 +525,16 @@ namespace MinorShift.Emuera.GameProc
 			string extents = position.Filename.Substring(position.Filename.Length - 4).ToLower();
 			if (extents == ".erb")
 			{
-				string path = Program.ErbDir + position.Filename;
-				if (!File.Exists(path))
-				{
-					string resolved = uEmuera.Utils.ResolvePathInsensitive(path, expectDirectory: false);
-					if (!string.IsNullOrEmpty(resolved))
-						path = resolved;
-					else
-						return "";
-				}
+				string path = uEmuera.Utils.ResolveExistingFilePath(Program.ErbDir + position.Filename);
+				if (string.IsNullOrEmpty(path))
+					return "";
 				return position.LineNo > 0 ? File.ReadLines(path, Config.Encode).Skip(position.LineNo - 1).First() : "";
 			}
 			else if (extents == ".csv")
 			{
-				string path = Program.CsvDir + position.Filename;
-				if (!File.Exists(path))
-				{
-					string resolved = uEmuera.Utils.ResolvePathInsensitive(path, expectDirectory: false);
-					if (!string.IsNullOrEmpty(resolved))
-						path = resolved;
-					else
-						return "";
-				}
+				string path = uEmuera.Utils.ResolveExistingFilePath(Program.CsvDir + position.Filename);
+				if (string.IsNullOrEmpty(path))
+					return "";
 				return position.LineNo > 0 ? File.ReadLines(path, Config.Encode).Skip(position.LineNo - 1).First() : "";
 			}
 			else

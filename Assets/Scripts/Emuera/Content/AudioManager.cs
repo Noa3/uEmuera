@@ -229,8 +229,8 @@ namespace MinorShift.Emuera.Content
                 }
                 else
                 {
-                    // Try with common audio extensions
-                    string[] extensions = { ".wav", ".ogg", ".mp3", ".WAV", ".OGG", ".MP3" };
+                    // Try with common audio extensions (lowercase only since case-insensitive resolution handles casing)
+                    string[] extensions = { ".wav", ".ogg", ".mp3" };
                     bool found = false;
                     foreach (var ext in extensions)
                     {

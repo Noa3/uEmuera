@@ -347,6 +347,23 @@ namespace uEmuera
         }
 
         /// <summary>
+        /// Resolves a file path using case-insensitive matching if the exact path doesn't exist.
+        /// Returns the resolved path if found, or null if the file doesn't exist.
+        /// On Windows (case-insensitive FS), returns the original path if the file exists.
+        /// </summary>
+        /// <param name="path">The file path to resolve.</param>
+        /// <returns>The resolved path if file exists, null otherwise.</returns>
+        public static string ResolveExistingFilePath(string path)
+        {
+            if (string.IsNullOrEmpty(path))
+                return null;
+            if (File.Exists(path))
+                return path;
+            var resolved = ResolvePathInsensitive(path, expectDirectory: false);
+            return string.IsNullOrEmpty(resolved) ? null : resolved;
+        }
+
+        /// <summary>
         /// Gets the file extension from a filename.
         /// </summary>
         /// <param name="filename">The filename.</param>

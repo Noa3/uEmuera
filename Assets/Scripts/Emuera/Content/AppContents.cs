@@ -169,9 +169,9 @@ namespace MinorShift.Emuera.Content
 		{
 			if(tokens.Length < 2)
 				return null;
-			string name = tokens[0].Trim().ToUpper();//
-			string arg2Original = tokens[1].Trim();//Image file name - preserve original case for file access
-			string arg2 = arg2Original.ToUpper();//Uppercase version for dictionary keys and comparison
+			string name = tokens[0].Trim().ToUpper();
+			string arg2Original = tokens[1].Trim(); // Image file name - preserve original case for file access
+			string arg2 = arg2Original.ToUpper(); // Uppercase version for dictionary keys and comparison
 			if (name.Length == 0 || arg2.Length == 0)
 				return null;
 			//Animation sprite declaration

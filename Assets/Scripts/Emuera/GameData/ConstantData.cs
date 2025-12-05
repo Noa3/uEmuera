@@ -183,14 +183,10 @@ namespace MinorShift.Emuera.GameData
 
 		private void loadVariableSizeData(string csvPath, bool disp)
 		{
-			// Try exact path first, then case-insensitive resolution for non-Windows systems
-			string resolvedPath = csvPath;
-			if (!File.Exists(csvPath))
-			{
-				resolvedPath = uEmuera.Utils.ResolvePathInsensitive(csvPath, expectDirectory: false);
-				if (string.IsNullOrEmpty(resolvedPath))
-					return;
-			}
+			// Use case-insensitive file resolution for non-Windows systems
+			string resolvedPath = uEmuera.Utils.ResolveExistingFilePath(csvPath);
+			if (string.IsNullOrEmpty(resolvedPath))
+				return;
 			EraStreamReader eReader = new EraStreamReader(false);
 			if (!eReader.Open(resolvedPath))
 			{
@@ -1371,14 +1367,10 @@ check1break:
 		private void loadDataTo(string csvPath, int targetIndex, Int64[] targetI, bool disp)
 		{
 
-			// Try exact path first, then case-insensitive resolution for non-Windows systems
-			string resolvedPath = csvPath;
-			if (!File.Exists(csvPath))
-			{
-				resolvedPath = uEmuera.Utils.ResolvePathInsensitive(csvPath, expectDirectory: false);
-				if (string.IsNullOrEmpty(resolvedPath))
-					return;
-			}
+			// Use case-insensitive file resolution for non-Windows systems
+			string resolvedPath = uEmuera.Utils.ResolveExistingFilePath(csvPath);
+			if (string.IsNullOrEmpty(resolvedPath))
+				return;
 			string[] target = names[targetIndex];
             HashSet<int> defined = new HashSet<int>();
 			EraStreamReader eReader = new EraStreamReader(false);
