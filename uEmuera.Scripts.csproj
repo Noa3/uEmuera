@@ -162,6 +162,7 @@
     <Compile Include="Assets\Scripts\Emuera\GameView\ConsoleShapePart.cs" />
     <Compile Include="Assets\Scripts\Emuera\GameProc\Function\ArgumentBuilder.cs" />
     <Compile Include="Assets\Scripts\EmueraLine.cs" />
+    <Compile Include="Assets\Scripts\Emuera\GameMessages.cs" />
     <Compile Include="Assets\Scripts\Emuera\GameProc\UserDefinedVariable.cs" />
     <Compile Include="Assets\Scripts\Emuera\GameProc\UserDefinedFunction.cs" />
     <Compile Include="Assets\Scripts\Emuera\Content\AudioManager.cs" />
