@@ -144,8 +144,9 @@ internal static class SpriteManager
                 if (rect.width <= 0 || rect.height <= 0 || rect.x < 0 || rect.y < 0 ||
                     rect.x + rect.width > texture.width || rect.y + rect.height > texture.height)
                 {
-                    Debug.LogError($"SpriteManager: Invalid sprite rectangle for '{src?.Name}' on '{imagename}'. Rect=({rect.x},{rect.y},{rect.width},{rect.height}), Texture=({texture.width},{texture.height})");
-                    return null;
+                    Debug.LogWarning($"SpriteManager: Invalid sprite rectangle for '{src?.Name}' on '{imagename}'. Rect=({rect.x},{rect.y},{rect.width},{rect.height}), Texture=({texture.width},{texture.height}). Creating placeholder sprite.");
+                    // Create a placeholder sprite using the full texture instead of returning null
+                    rect = new Rect(0, 0, texture.width, texture.height);
                 }
                 try
                 {
