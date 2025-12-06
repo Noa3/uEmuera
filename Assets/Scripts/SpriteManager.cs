@@ -154,15 +154,16 @@ internal static class SpriteManager
             SpriteInfo sprite = null;
             if(!sprites.TryGetValue(src.Name, out sprite))
             {
-                // Convert rectangle to Unity coordinates with proper clipping
+                // Convert rectangle to Unity coordinates
                 var rect = GenericUtils.ToUnityRect(src.Rectangle, texture.width, texture.height);
                 
-                // If clipping results in zero dimensions, create a minimal 1x1 sprite to avoid crashes
-                if (rect.width <= 0 || rect.height <= 0)
+                // Validate rectangle - negative coords or out of bounds are silently skipped
+                // (This is normal in ERA games for sprites with positioning offsets)
+                if (rect.width <= 0 || rect.height <= 0 || rect.x < 0 || rect.y < 0 ||
+                    rect.x + rect.width > texture.width || rect.y + rect.height > texture.height)
                 {
-                    Debug.LogWarning($"SpriteManager: Sprite rectangle clipped to zero dimensions for '{src?.Name}' on '{imagename}'. Using 1x1 fallback. Original Rect=({rect.x},{rect.y},{rect.width},{rect.height}), Texture=({texture.width},{texture.height})");
-                    // Use a 1x1 pixel from top-left corner as fallback
-                    rect = new Rect(0, 0, 1, 1);
+                    // Return null - this sprite region is not displayable
+                    return null;
                 }
                 
                 try
