@@ -51,6 +51,21 @@ internal static class SpriteManager
         return ti;
     }
 
+    /// <summary>
+    /// Creates a placeholder SpriteInfo directly without storing in texture dictionary.
+    /// Used for cases where we need a sprite but don't have valid texture data.
+    /// </summary>
+    /// <param name="name">The sprite name for logging purposes</param>
+    /// <returns>A SpriteInfo with a grey placeholder sprite</returns>
+    static SpriteInfo CreatePlaceholderSpriteInfo(string name)
+    {
+        var placeholderTex = CreatePlaceholderTexture();
+        var ti = new TextureInfo($"_placeholder_{name}", placeholderTex);
+        var rect = new Rect(0, 0, placeholderTex.width, placeholderTex.height);
+        var sprite = Sprite.Create(placeholderTex, rect, Vector2.zero);
+        return new SpriteInfo(ti, sprite);
+    }
+
     // Attempts to resolve a full path in a case-insensitive manner by walking each segment.
     // Useful on case-sensitive file systems or when asset references use inconsistent casing.
     static string ResolvePathCaseInsensitive(string originalPath)
@@ -249,9 +264,13 @@ internal static class SpriteManager
         }
         if(src.Bitmap == null)
         {
-            Debug.LogError($"SpriteManager: ASprite '{src?.Name}' has null Bitmap");
+            Debug.LogWarning($"SpriteManager: ASprite '{src?.Name}' has null Bitmap. Creating placeholder sprite.");
+            // Create a placeholder sprite instead of passing null
             if(callback != null)
-                callback(null, null);
+            {
+                var placeholderSprite = CreatePlaceholderSpriteInfo(src.Name);
+                callback(obj, placeholderSprite);
+            }
             return;
         }
 
