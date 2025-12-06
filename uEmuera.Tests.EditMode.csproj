@@ -49,6 +49,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Tests\EditMode\FontTests.cs" />
+    <Compile Include="Assets\Tests\EditMode\AndroidPermissionManagerTests.cs" />
     <Compile Include="Assets\Tests\EditMode\DrawingPrimitivesTests.cs" />
     <Compile Include="Assets\Tests\EditMode\StringStreamTests.cs" />
     <Compile Include="Assets\Tests\EditMode\ColorTests.cs" />

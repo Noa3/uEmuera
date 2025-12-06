@@ -72,6 +72,7 @@
     <Compile Include="Assets\Scripts\Emuera\GlobalStatic.cs" />
     <Compile Include="Assets\Scripts\Emuera\GameData\Variable\VariableTerm.cs" />
     <Compile Include="Assets\Scripts\Emuera\GameData\Expression\Term.cs" />
+    <Compile Include="Assets\Scripts\AndroidPermissionManager.cs" />
     <Compile Include="Assets\Scripts\EmueraBehaviour.cs" />
     <Compile Include="Assets\Scripts\uEmuera\VisualBasic.cs" />
     <Compile Include="Assets\Scripts\uEmuera\Application.cs" />
