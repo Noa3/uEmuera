@@ -79,21 +79,23 @@ namespace MinorShift.Emuera.GameProc
 				//Load key macros
                 if (Config.UseKeyMacro && !Program.AnalysisMode)
                 {
-                    if (File.Exists(Program.ExeDir + "macro.txt"))
+					string macroPath = uEmuera.Utils.ResolveExistingFilePath(Program.ExeDir + "macro.txt");
+                    if (!string.IsNullOrEmpty(macroPath))
                     {
                         if (Config.DisplayReport)
 							console.PrintSystemLine(GameMessages.LoadingMacroTxt);
-                        KeyMacro.LoadMacroFile(Program.ExeDir + "macro.txt");
+                        KeyMacro.LoadMacroFile(macroPath);
                     }
 				}
 				//_replace.csv読み込み
                 if (Config.UseReplaceFile && !Program.AnalysisMode)
                 {
-					if (File.Exists(Program.CsvDir + "_Replace.csv"))
+					string replacePath = uEmuera.Utils.ResolveExistingFilePath(Program.CsvDir + "_Replace.csv");
+					if (!string.IsNullOrEmpty(replacePath))
 					{
 						if (Config.DisplayReport)
 							console.PrintSystemLine(GameMessages.LoadingReplaceCsv);
-						ConfigData.Instance.LoadReplaceFile(Program.CsvDir + "_Replace.csv");
+						ConfigData.Instance.LoadReplaceFile(replacePath);
 						if (ParserMediator.HasWarning)
 						{
 							ParserMediator.FlushWarningList();
@@ -113,11 +115,12 @@ namespace MinorShift.Emuera.GameProc
 				//Load _rename.csv
 				if (Config.UseRenameFile)
                 {
-					if (File.Exists(Program.CsvDir + "_Rename.csv"))
+					string renamePath = uEmuera.Utils.ResolveExistingFilePath(Program.CsvDir + "_Rename.csv");
+					if (!string.IsNullOrEmpty(renamePath))
                     {
                         if (Config.DisplayReport || Program.AnalysisMode)
 							console.PrintSystemLine(GameMessages.LoadingRenameCsv);
-						ParserMediator.LoadEraExRenameFile(Program.CsvDir + "_Rename.csv");
+						ParserMediator.LoadEraExRenameFile(renamePath);
                     }
                     else
                         console.PrintError(GameMessages.RenameCsvNotFound);
@@ -522,15 +525,17 @@ namespace MinorShift.Emuera.GameProc
 			string extents = position.Filename.Substring(position.Filename.Length - 4).ToLower();
 			if (extents == ".erb")
 			{
-				return File.Exists(Program.ErbDir + position.Filename)
-					? position.LineNo > 0 ? File.ReadLines(Program.ErbDir + position.Filename, Config.Encode).Skip(position.LineNo - 1).First() : ""
-					: "";
+				string path = uEmuera.Utils.ResolveExistingFilePath(Program.ErbDir + position.Filename);
+				if (string.IsNullOrEmpty(path))
+					return "";
+				return position.LineNo > 0 ? File.ReadLines(path, Config.Encode).Skip(position.LineNo - 1).First() : "";
 			}
 			else if (extents == ".csv")
 			{
-				return File.Exists(Program.CsvDir + position.Filename)
-					? position.LineNo > 0 ? File.ReadLines(Program.CsvDir + position.Filename, Config.Encode).Skip(position.LineNo - 1).First() : ""
-					: "";
+				string path = uEmuera.Utils.ResolveExistingFilePath(Program.CsvDir + position.Filename);
+				if (string.IsNullOrEmpty(path))
+					return "";
+				return position.LineNo > 0 ? File.ReadLines(path, Config.Encode).Skip(position.LineNo - 1).First() : "";
 			}
 			else
 				return "";
