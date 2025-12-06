@@ -151,7 +151,7 @@ public class FirstWindow : MonoBehaviour
     
     /// <summary>
     /// Shows a dialog explaining why storage permissions are needed.
-    /// Provides options to grant permissions or open app settings.
+    /// Provides options to grant permissions or cancel.
     /// </summary>
     void ShowStoragePermissionRationale()
     {
@@ -166,11 +166,6 @@ public class FirstWindow : MonoBehaviour
             {
                 // User wants to grant permissions
                 GenericUtils.StartCoroutine(RequestStoragePermissionsWithUI());
-            },
-            () =>
-            {
-                // User wants to open app settings
-                AndroidPermissionManager.OpenAppSettings();
             }
         );
     }
@@ -201,7 +196,7 @@ public class FirstWindow : MonoBehaviour
     
     /// <summary>
     /// Shows a message when storage permissions are denied.
-    /// Provides an option to open app settings.
+    /// Provides an option to try again.
     /// </summary>
     void ShowPermissionDeniedMessage()
     {
@@ -216,11 +211,6 @@ public class FirstWindow : MonoBehaviour
             {
                 // Try requesting permissions again
                 GenericUtils.StartCoroutine(RequestStoragePermissionsWithUI());
-            },
-            () =>
-            {
-                // Open app settings
-                AndroidPermissionManager.OpenAppSettings();
             }
         );
     }

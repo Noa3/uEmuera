@@ -35,9 +35,9 @@ FirstWindow.Titlebar.title=Spielliste
 [StoragePermissionTitle]=Speicherberechtigung erforderlich
 [StoragePermissionRationale]=Diese App benötigt Zugriff auf den externen Speicher, um Spieldateien aus dem emuera-Ordner zu lesen.\n\nBitte erteilen Sie die Speicherberechtigung, um fortzufahren.
 [StoragePermissionDeniedTitle]=Berechtigung verweigert
-[StoragePermissionDenied]=Die Speicherberechtigung wurde verweigert. Ohne diese Berechtigung kann die App nicht auf Spieldateien zugreifen.\n\nSie können die Berechtigung durch Tippen auf "Gewähren" erteilen oder die Einstellungen öffnen, um sie manuell zu aktivieren.
+[StoragePermissionDenied]=Die Speicherberechtigung wurde verweigert. Ohne diese Berechtigung kann die App nicht auf Spieldateien zugreifen.\n\nTippen Sie auf "Gewähren", um es erneut zu versuchen.
 [Grant]=Gewähren
-[OpenSettings]=Einstellungen
+[Cancel]=Abbrechen
 ; Game Messages - Loading/Initialization
 [LoadingMacroTxt]=Lade macro.txt...
 [LoadingReplaceCsv]=Lade _Replace.csv...

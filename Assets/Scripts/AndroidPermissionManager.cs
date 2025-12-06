@@ -8,6 +8,7 @@ using UnityEngine.Android;
 /// <summary>
 /// Manages Android storage permissions for accessing external storage.
 /// Provides methods to check and request read/write permissions.
+/// Handles both legacy storage permissions and Android 11+ All Files Access.
 /// </summary>
 public static class AndroidPermissionManager
 {
@@ -20,6 +21,12 @@ public static class AndroidPermissionManager
     /// The external storage write permission string for Android.
     /// </summary>
     public const string ExternalStorageWrite = "android.permission.WRITE_EXTERNAL_STORAGE";
+    
+    /// <summary>
+    /// The MANAGE_EXTERNAL_STORAGE permission for Android 11+ (API 30+).
+    /// Required for broad access to external storage on newer Android versions.
+    /// </summary>
+    public const string ManageExternalStorage = "android.permission.MANAGE_EXTERNAL_STORAGE";
     
     /// <summary>
     /// Callback type for permission request results.
@@ -56,17 +63,63 @@ public static class AndroidPermissionManager
     }
     
     /// <summary>
-    /// Checks if the app has both read and write permissions for external storage.
+    /// Checks if the app has MANAGE_EXTERNAL_STORAGE permission (Android 11+).
+    /// This grants access to all files on external storage.
+    /// On non-Android platforms or Android below 11, this always returns true.
+    /// </summary>
+    /// <returns>True if the app has all files access permission.</returns>
+    public static bool HasManageExternalStoragePermission()
+    {
+#if UNITY_ANDROID && !UNITY_EDITOR
+        if (GetAndroidSDKVersion() < 30)
+            return true; // Not needed before Android 11
+        
+        try
+        {
+            using (var environment = new AndroidJavaClass("android.os.Environment"))
+            {
+                return environment.CallStatic<bool>("isExternalStorageManager");
+            }
+        }
+        catch (Exception ex)
+        {
+            uEmuera.Logger.Exception(ex, "Failed to check MANAGE_EXTERNAL_STORAGE permission");
+            return false;
+        }
+#else
+        return true;
+#endif
+    }
+    
+    /// <summary>
+    /// Checks if the app has appropriate storage permissions for the current Android version.
+    /// For Android 11+, this checks for MANAGE_EXTERNAL_STORAGE.
+    /// For older versions, this checks for READ/WRITE_EXTERNAL_STORAGE.
     /// On non-Android platforms, this always returns true.
     /// </summary>
-    /// <returns>True if the app has both read and write permissions.</returns>
+    /// <returns>True if the app has the necessary storage permissions.</returns>
     public static bool HasStoragePermissions()
     {
-        return HasStorageReadPermission() && HasStorageWritePermission();
+#if UNITY_ANDROID && !UNITY_EDITOR
+        if (GetAndroidSDKVersion() >= 30)
+        {
+            // Android 11+ requires MANAGE_EXTERNAL_STORAGE for broad access
+            return HasManageExternalStoragePermission();
+        }
+        else
+        {
+            // Legacy permissions for Android 10 and below
+            return HasStorageReadPermission() && HasStorageWritePermission();
+        }
+#else
+        return true;
+#endif
     }
     
     /// <summary>
     /// Requests storage permissions from the user.
+    /// For Android 11+, opens the All Files Access settings page.
+    /// For older versions, uses the standard permission dialog.
     /// On non-Android platforms, the callback is immediately invoked with true.
     /// </summary>
     /// <param name="callback">Callback invoked with the result of the permission request.</param>
@@ -79,6 +132,17 @@ public static class AndroidPermissionManager
             return;
         }
         
+        if (GetAndroidSDKVersion() >= 30)
+        {
+            // Android 11+ requires special handling - open the All Files Access settings
+            RequestManageExternalStoragePermission();
+            // We can't directly get a callback from the settings intent,
+            // so the caller should check HasStoragePermissions() when resuming
+            callback?.Invoke(false);
+            return;
+        }
+        
+        // Legacy permission request for Android 10 and below
         // Track permission responses to ensure callback is invoked once
         int pendingResponses = 2; // READ and WRITE permissions
         bool anyDenied = false;
@@ -135,6 +199,63 @@ public static class AndroidPermissionManager
     }
     
     /// <summary>
+    /// Opens the "All Files Access" settings page for Android 11+.
+    /// This is required to get MANAGE_EXTERNAL_STORAGE permission.
+    /// </summary>
+    public static void RequestManageExternalStoragePermission()
+    {
+#if UNITY_ANDROID && !UNITY_EDITOR
+        if (GetAndroidSDKVersion() < 30)
+            return; // Not applicable for older Android versions
+        
+        try
+        {
+            using (var unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
+            using (var currentActivity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity"))
+            using (var intent = new AndroidJavaObject("android.content.Intent",
+                "android.settings.MANAGE_APP_ALL_FILES_ACCESS_PERMISSION"))
+            using (var uri = new AndroidJavaClass("android.net.Uri"))
+            using (var packageUri = uri.CallStatic<AndroidJavaObject>("parse",
+                "package:" + Application.identifier))
+            {
+                intent.Call<AndroidJavaObject>("setData", packageUri);
+                currentActivity.Call("startActivity", intent);
+            }
+        }
+        catch (Exception ex)
+        {
+            uEmuera.Logger.Exception(ex, "Failed to open All Files Access settings");
+            // Fallback to general storage settings if specific intent fails
+            OpenStorageSettings();
+        }
+#endif
+    }
+    
+    /// <summary>
+    /// Opens the storage settings page (fallback for MANAGE_EXTERNAL_STORAGE).
+    /// </summary>
+    public static void OpenStorageSettings()
+    {
+#if UNITY_ANDROID && !UNITY_EDITOR
+        try
+        {
+            using (var unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
+            using (var currentActivity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity"))
+            using (var intent = new AndroidJavaObject("android.content.Intent",
+                "android.settings.MANAGE_ALL_FILES_ACCESS_PERMISSION"))
+            {
+                currentActivity.Call("startActivity", intent);
+            }
+        }
+        catch (Exception)
+        {
+            // If that fails too, open app settings as last resort
+            OpenAppSettings();
+        }
+#endif
+    }
+    
+    /// <summary>
     /// Requests storage permissions and waits for the result using a coroutine.
     /// Yields until the permission dialog is dismissed.
     /// </summary>
@@ -177,6 +298,10 @@ public static class AndroidPermissionManager
     public static bool ShouldShowPermissionRationale()
     {
 #if UNITY_ANDROID && !UNITY_EDITOR
+        // For Android 11+, we always show rationale since it requires special handling
+        if (GetAndroidSDKVersion() >= 30)
+            return !HasManageExternalStoragePermission();
+        
         // Check if we should show rationale for read permission
         return Permission.ShouldShowRequestPermissionRationale(ExternalStorageRead) ||
                Permission.ShouldShowRequestPermissionRationale(ExternalStorageWrite);

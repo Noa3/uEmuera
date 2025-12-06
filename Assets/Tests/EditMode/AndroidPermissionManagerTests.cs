@@ -37,6 +37,15 @@ namespace uEmuera.Tests.EditMode
             
             Assert.IsTrue(result);
         }
+        
+        [Test]
+        public void HasManageExternalStoragePermission_OnNonAndroid_ReturnsTrue()
+        {
+            // On non-Android platforms, permissions are always granted
+            bool result = AndroidPermissionManager.HasManageExternalStoragePermission();
+            
+            Assert.IsTrue(result);
+        }
 
         #endregion
 
@@ -147,6 +156,13 @@ namespace uEmuera.Tests.EditMode
         {
             Assert.AreEqual("android.permission.WRITE_EXTERNAL_STORAGE", 
                 AndroidPermissionManager.ExternalStorageWrite);
+        }
+        
+        [Test]
+        public void ManageExternalStorage_HasCorrectValue()
+        {
+            Assert.AreEqual("android.permission.MANAGE_EXTERNAL_STORAGE", 
+                AndroidPermissionManager.ManageExternalStorage);
         }
 
         #endregion
