@@ -230,7 +230,18 @@ namespace uEmuera
 
                 // Handle absolute vs relative roots
                 string root = Path.GetPathRoot(normalized);
-                string current = string.IsNullOrEmpty(root) ? Directory.GetCurrentDirectory() : root.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+                string current;
+                if (string.IsNullOrEmpty(root))
+                {
+                    current = Directory.GetCurrentDirectory();
+                }
+                else
+                {
+                    // On Unix, root is "/" - don't trim it to empty string
+                    current = root.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+                    if (string.IsNullOrEmpty(current))
+                        current = root; // Preserve "/" as the root directory
+                }
 
                 // Build parts excluding root
                 string relative = string.IsNullOrEmpty(root) ? normalized : normalized.Substring(root.Length);
