@@ -247,31 +247,11 @@ public static class GenericUtils
         var x = rect.X;
         var y = height - rect.Height - rect.Y;
         var w = rect.Width;
-        var h = rect.Height;
-        
-        // Clip rectangle to texture bounds
-        // Handle negative X/Y by adjusting to start at 0 and reducing width/height
-        if (x < 0)
-        {
-            w += x;  // Reduce width by the amount X is negative
-            x = 0;
-        }
-        if (y < 0)
-        {
-            h += y;  // Reduce height by the amount Y is negative
-            y = 0;
-        }
-        
-        // Clamp to texture bounds on the right/bottom
-        if (x + w > width)
+        if(x + w > width)
             w = width - x;
-        if (y + h > height)
+        var h = rect.Height;
+        if(y + h > height)
             h = height - y;
-            
-        // Ensure non-negative dimensions
-        if (w < 0) w = 0;
-        if (h < 0) h = 0;
-        
         return new Rect(x, y, w, h);
     }
 
