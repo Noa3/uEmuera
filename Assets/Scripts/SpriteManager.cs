@@ -154,15 +154,17 @@ internal static class SpriteManager
             SpriteInfo sprite = null;
             if(!sprites.TryGetValue(src.Name, out sprite))
             {
-                // Validate rectangle before creating sprite to provide deterministic errors
+                // Convert rectangle to Unity coordinates with proper clipping
                 var rect = GenericUtils.ToUnityRect(src.Rectangle, texture.width, texture.height);
-                if (rect.width <= 0 || rect.height <= 0 || rect.x < 0 || rect.y < 0 ||
-                    rect.x + rect.width > texture.width || rect.y + rect.height > texture.height)
+                
+                // If clipping results in zero dimensions, create a minimal 1x1 sprite to avoid crashes
+                if (rect.width <= 0 || rect.height <= 0)
                 {
-                    Debug.LogWarning($"SpriteManager: Invalid sprite rectangle for '{src?.Name}' on '{imagename}'. Rect=({rect.x},{rect.y},{rect.width},{rect.height}), Texture=({texture.width},{texture.height}). Creating placeholder sprite.");
-                    // Create a placeholder sprite using the full texture instead of returning null
-                    rect = new Rect(0, 0, texture.width, texture.height);
+                    Debug.LogWarning($"SpriteManager: Sprite rectangle clipped to zero dimensions for '{src?.Name}' on '{imagename}'. Using 1x1 fallback. Original Rect=({rect.x},{rect.y},{rect.width},{rect.height}), Texture=({texture.width},{texture.height})");
+                    // Use a 1x1 pixel from top-left corner as fallback
+                    rect = new Rect(0, 0, 1, 1);
                 }
+                
                 try
                 {
                     sprite = new SpriteInfo(this, 
