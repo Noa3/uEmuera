@@ -20,8 +20,8 @@ internal static class SpriteManager
     static Texture2D CreatePlaceholderTexture(int width = 64, int height = 64)
     {
         var tex = new Texture2D(width, height, TextureFormat.RGBA32, false);
-        var greyColor = new Color(0.5f, 0.5f, 0.5f, 1f);
-        var pixels = new Color[width * height];
+        var greyColor = new UnityEngine.Color(0.5f, 0.5f, 0.5f, 1f);
+        var pixels = new UnityEngine.Color[width * height];
         for (int i = 0; i < pixels.Length; i++)
         {
             pixels[i] = greyColor;
