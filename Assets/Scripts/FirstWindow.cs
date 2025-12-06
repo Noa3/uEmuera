@@ -109,14 +109,8 @@ public class FirstWindow : MonoBehaviour
         InitStandaloneDirectory();
 #endif
 #if UNITY_ANDROID && !UNITY_EDITOR
-        // Android: Use predefined paths only
-        GetList("storage/emulated/0/emuera");
-        GetList("storage/emulated/1/emuera");
-        GetList("storage/emulated/2/emuera");
-
-        GetList("storage/sdcard0/emuera");
-        GetList("storage/sdcard1/emuera");
-        GetList("storage/sdcard2/emuera");
+        // Android: Check and request storage permissions before accessing external storage
+        GenericUtils.StartCoroutine(InitAndroidStorage());
 #endif
 #if UNITY_STANDALONE && !UNITY_EDITOR
         // Standalone (Windows, Linux, macOS): Allow custom directory selection
@@ -124,6 +118,127 @@ public class FirstWindow : MonoBehaviour
         InitStandaloneDirectory();
 #endif
     }
+    
+#if UNITY_ANDROID && !UNITY_EDITOR
+    /// <summary>
+    /// Initializes Android storage access with proper permission handling.
+    /// Checks for storage permissions and requests them if not granted.
+    /// </summary>
+    IEnumerator InitAndroidStorage()
+    {
+        // Check if we already have permissions
+        if (AndroidPermissionManager.HasStoragePermissions())
+        {
+            // Permissions already granted, load game list
+            LoadAndroidGameList();
+            yield break;
+        }
+        
+        // Show a dialog explaining why we need permissions
+        bool shouldShowRationale = AndroidPermissionManager.ShouldShowPermissionRationale();
+        
+        if (shouldShowRationale)
+        {
+            // User previously denied permission, show explanation
+            ShowStoragePermissionRationale();
+        }
+        else
+        {
+            // First time asking or user didn't select "Don't ask again"
+            yield return RequestStoragePermissionsWithUI();
+        }
+    }
+    
+    /// <summary>
+    /// Shows a dialog explaining why storage permissions are needed.
+    /// Provides options to grant permissions or cancel.
+    /// </summary>
+    void ShowStoragePermissionRationale()
+    {
+        var ow = EmueraContent.instance.option_window;
+        if (ow == null)
+            return;
+            
+        ow.ShowStoragePermissionDialog(
+            MultiLanguage.GetText("[StoragePermissionTitle]"),
+            MultiLanguage.GetText("[StoragePermissionRationale]"),
+            () =>
+            {
+                // User wants to grant permissions
+                GenericUtils.StartCoroutine(RequestStoragePermissionsWithUI());
+            }
+        );
+    }
+    
+    /// <summary>
+    /// Requests storage permissions and handles the result.
+    /// </summary>
+    IEnumerator RequestStoragePermissionsWithUI()
+    {
+        bool? permissionResult = null;
+        
+        yield return AndroidPermissionManager.RequestStoragePermissionsCoroutine((granted) =>
+        {
+            permissionResult = granted;
+        });
+        
+        if (permissionResult == true)
+        {
+            // Permissions granted, load game list
+            LoadAndroidGameList();
+        }
+        else
+        {
+            // Permissions denied, show message with option to open settings
+            ShowPermissionDeniedMessage();
+        }
+    }
+    
+    /// <summary>
+    /// Shows a message when storage permissions are denied.
+    /// Provides an option to try again.
+    /// </summary>
+    void ShowPermissionDeniedMessage()
+    {
+        var ow = EmueraContent.instance.option_window;
+        if (ow == null)
+            return;
+            
+        ow.ShowStoragePermissionDialog(
+            MultiLanguage.GetText("[StoragePermissionDeniedTitle]"),
+            MultiLanguage.GetText("[StoragePermissionDenied]"),
+            () =>
+            {
+                // Try requesting permissions again
+                GenericUtils.StartCoroutine(RequestStoragePermissionsWithUI());
+            }
+        );
+    }
+    
+    /// <summary>
+    /// Predefined Android external storage paths where emuera games may be located.
+    /// </summary>
+    static readonly string[] AndroidStoragePaths = new string[]
+    {
+        "/storage/emulated/0/emuera",
+        "/storage/emulated/1/emuera",
+        "/storage/emulated/2/emuera",
+        "/storage/sdcard0/emuera",
+        "/storage/sdcard1/emuera",
+        "/storage/sdcard2/emuera"
+    };
+    
+    /// <summary>
+    /// Loads the game list from Android external storage paths.
+    /// </summary>
+    void LoadAndroidGameList()
+    {
+        foreach (var path in AndroidStoragePaths)
+        {
+            GetList(path);
+        }
+    }
+#endif
     
     /// <summary>
     /// Initializes the directory system for standalone platforms.
