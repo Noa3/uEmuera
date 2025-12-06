@@ -169,8 +169,9 @@ namespace MinorShift.Emuera.Content
 		{
 			if(tokens.Length < 2)
 				return null;
-			string name = tokens[0].Trim().ToUpper();//
-		string arg2 = tokens[1].ToUpper();//Image file name
+			string name = tokens[0].Trim().ToUpper();
+			string arg2Original = tokens[1].Trim(); // Image file name - preserve original case for file access
+			string arg2 = arg2Original.ToUpper(); // Uppercase version for dictionary keys and comparison
 			if (name.Length == 0 || arg2.Length == 0)
 				return null;
 			//Animation sprite declaration
@@ -199,24 +200,34 @@ namespace MinorShift.Emuera.Content
 
 			if(arg2.IndexOf('.') < 0)
 			{
-				ParserMediator.Warn("Second argument has no file extension:" + arg2, sp, 1);
+				ParserMediator.Warn("Second argument has no file extension:" + arg2Original, sp, 1);
 				return null;
 			}
-			string parentName = dir + arg2;
+			// Use original casing for file path, but uppercase for dictionary key
+			string parentNameKey = dir + arg2;
+			string parentNamePath = dir + arg2Original;
 
 			//Load parent image ConstImage
-			if (!resourceDic.ContainsKey(parentName))
+			if (!resourceDic.ContainsKey(parentNameKey))
 			{
-				string filepath = parentName;
+				// Try exact path first, then case-insensitive resolution
+				string filepath = parentNamePath;
+				string resolvedPath = null;
 				if (!File.Exists(filepath))
 				{
-					ParserMediator.Warn("Specified image file was not found:" + arg2, sp, 1);
-					return null;
+					// Try case-insensitive resolution
+					resolvedPath = uEmuera.Utils.ResolvePathInsensitive(filepath, expectDirectory: false);
+					if (string.IsNullOrEmpty(resolvedPath))
+					{
+						ParserMediator.Warn("Specified image file was not found:" + arg2Original, sp, 1);
+						return null;
+					}
+					filepath = resolvedPath;
 				}
 				Bitmap bmp = new Bitmap(filepath);
 				if (bmp == null)
 				{
-					ParserMediator.Warn("Failed to load the specified file:" + arg2, sp, 1);
+					ParserMediator.Warn("Failed to load the specified file:" + arg2Original, sp, 1);
 					return null;
 				}
                 bmp.name = name;
@@ -224,22 +235,22 @@ namespace MinorShift.Emuera.Content
 				{
 					//1824-2 Variants using images with width over 8192 already existed, so changed to warn but allow
 					//	bmp.Dispose();
-					ParserMediator.Warn("Specified image file is too large (strongly recommended to keep width and height to " + AbstractImage.MAX_IMAGESIZE.ToString() + " or less):" + arg2, sp, 1);
+					ParserMediator.Warn("Specified image file is too large (strongly recommended to keep width and height to " + AbstractImage.MAX_IMAGESIZE.ToString() + " or less):" + arg2Original, sp, 1);
 					//return null;
 				}
-				ConstImage img = new ConstImage(parentName);
+				ConstImage img = new ConstImage(parentNameKey);
 				img.CreateFrom(bmp, Config.TextDrawingMode == TextDrawingMode.WINAPI);
 				if (!img.IsCreated)
 				{
-					ParserMediator.Warn("Failed to create image resource:" + arg2, sp, 1);
+					ParserMediator.Warn("Failed to create image resource:" + arg2Original, sp, 1);
 					return null;
 				}
-				resourceDic.Add(parentName, img);
+				resourceDic.Add(parentNameKey, img);
 			}
-			ConstImage parentImage = resourceDic[parentName] as ConstImage;
+			ConstImage parentImage = resourceDic[parentNameKey] as ConstImage;
 			if (parentImage == null || !parentImage.IsCreated)
 			{
-				ParserMediator.Warn("Attempted to create sprite from a resource that failed to create:" + arg2, sp, 1);
+				ParserMediator.Warn("Attempted to create sprite from a resource that failed to create:" + arg2Original, sp, 1);
 				return null;
 			}
 			Rectangle rect = new Rectangle(new Point(0, 0), parentImage.Bitmap.Size);
@@ -292,7 +303,7 @@ namespace MinorShift.Emuera.Content
 			{
 				if(!currentAnime.AddFrame(parentImage, rect, pos, delay))
 				{
-					ParserMediator.Warn("Failed to add frame to animation sprite:" + arg2, sp, 1);
+					ParserMediator.Warn("Failed to add frame to animation sprite:" + arg2Original, sp, 1);
 					return null;
 				}
 				return null;

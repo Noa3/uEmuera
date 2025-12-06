@@ -230,7 +230,18 @@ namespace uEmuera
 
                 // Handle absolute vs relative roots
                 string root = Path.GetPathRoot(normalized);
-                string current = string.IsNullOrEmpty(root) ? Directory.GetCurrentDirectory() : root.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+                string current;
+                if (string.IsNullOrEmpty(root))
+                {
+                    current = Directory.GetCurrentDirectory();
+                }
+                else
+                {
+                    // On Unix, root is "/" - don't trim it to empty string
+                    current = root.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+                    if (string.IsNullOrEmpty(current))
+                        current = root; // Preserve "/" as the root directory
+                }
 
                 // Build parts excluding root
                 string relative = string.IsNullOrEmpty(root) ? normalized : normalized.Substring(root.Length);
@@ -344,6 +355,23 @@ namespace uEmuera
             var normalized = NormalizePath(path);
             var resolved = ResolvePathInsensitive(normalized, expectDirectory: true);
             return string.IsNullOrEmpty(resolved) ? normalized : NormalizePath(resolved);
+        }
+
+        /// <summary>
+        /// Resolves a file path using case-insensitive matching if the exact path doesn't exist.
+        /// Returns the resolved path if found, or null if the file doesn't exist.
+        /// On Windows (case-insensitive FS), returns the original path if the file exists.
+        /// </summary>
+        /// <param name="path">The file path to resolve.</param>
+        /// <returns>The resolved path if file exists, null otherwise.</returns>
+        public static string ResolveExistingFilePath(string path)
+        {
+            if (string.IsNullOrEmpty(path))
+                return null;
+            if (File.Exists(path))
+                return path;
+            var resolved = ResolvePathInsensitive(path, expectDirectory: false);
+            return string.IsNullOrEmpty(resolved) ? null : resolved;
         }
 
         /// <summary>

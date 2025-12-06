@@ -85,13 +85,13 @@ namespace MinorShift.Emuera.GameData
 		/// <returns>読み込み続行するなら真、Error終了なら偽</returns>
 		public bool LoadGameBaseCsv(string basePath)
 		{
-            if (!File.Exists(basePath))
-            {
-                return true;
-            }
+			// Use case-insensitive file resolution for non-Windows systems
+			string resolvedPath = uEmuera.Utils.ResolveExistingFilePath(basePath);
+			if (string.IsNullOrEmpty(resolvedPath))
+				return true;
 			ScriptPosition pos = null;
 			EraStreamReader eReader = new EraStreamReader(false);
-			if (!eReader.Open(basePath))
+			if (!eReader.Open(resolvedPath))
 			{
 				//output.PrintLine(eReader.Filename + "のオープンに失敗しました");
 				return true;
