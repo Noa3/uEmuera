@@ -31,6 +31,26 @@ internal static class SpriteManager
         return tex;
     }
 
+    /// <summary>
+    /// Helper method to create and store a placeholder TextureInfo for a missing or failed image.
+    /// Also updates the bitmap size if provided.
+    /// </summary>
+    /// <param name="name">The texture name/key for storage</param>
+    /// <param name="baseimage">Optional Bitmap to update with placeholder dimensions</param>
+    /// <returns>The created TextureInfo with placeholder texture</returns>
+    static TextureInfo CreateAndStorePlaceholder(string name, Bitmap baseimage = null)
+    {
+        var placeholderTex = CreatePlaceholderTexture();
+        var ti = new TextureInfo(name, placeholderTex);
+        texture_dict.Add(name, ti);
+        if (baseimage != null)
+        {
+            baseimage.size.Width = placeholderTex.width;
+            baseimage.size.Height = placeholderTex.height;
+        }
+        return ti;
+    }
+
     // Attempts to resolve a full path in a case-insensitive manner by walking each segment.
     // Useful on case-sensitive file systems or when asset references use inconsistent casing.
     static string ResolvePathCaseInsensitive(string originalPath)
@@ -298,11 +318,7 @@ internal static class SpriteManager
                 else
                 {
                     Debug.LogWarning($"SpriteManager: File not found for texture '{name}': {filename}. Creating grey placeholder.");
-                    // Create a placeholder grey texture
-                    var placeholderTex = CreatePlaceholderTexture();
-                    ti = new TextureInfo(name, placeholderTex);
-                    texture_dict.Add(name, ti);
-                    return ti;
+                    return CreateAndStorePlaceholder(name);
                 }
             }
         }
@@ -313,10 +329,7 @@ internal static class SpriteManager
             if (content == null || content.Length == 0)
             {
                 Debug.LogWarning($"SpriteManager: Empty content while reading '{pathToLoad}'. Creating grey placeholder.");
-                var placeholderTex = CreatePlaceholderTexture();
-                ti = new TextureInfo(name, placeholderTex);
-                texture_dict.Add(name, ti);
-                return ti;
+                return CreateAndStorePlaceholder(name);
             }
 
             // Use a safe default format for runtime-loaded images
@@ -331,10 +344,7 @@ internal static class SpriteManager
                 if (err != Error.Success)
                 {
                     Debug.LogWarning($"SpriteManager: Failed to decode WEBP '{pathToLoad}'. Error={err}. Creating grey placeholder.");
-                    var placeholderTex = CreatePlaceholderTexture();
-                    ti = new TextureInfo(name, placeholderTex);
-                    texture_dict.Add(name, ti);
-                    return ti;
+                    return CreateAndStorePlaceholder(name);
                 }
                 ti = new TextureInfo(name, tex);
                 texture_dict.Add(name, ti);
@@ -350,20 +360,14 @@ internal static class SpriteManager
                 else
                 {
                     Debug.LogWarning($"SpriteManager: Failed to load image '{pathToLoad}' (ext={extname}). Creating grey placeholder.");
-                    var placeholderTex = CreatePlaceholderTexture();
-                    ti = new TextureInfo(name, placeholderTex);
-                    texture_dict.Add(name, ti);
-                    return ti;
+                    return CreateAndStorePlaceholder(name);
                 }
             }
         }
         catch (Exception ex)
         {
             Debug.LogWarning($"SpriteManager: Exception while reading texture '{name}' from '{pathToLoad}'. Error={ex.GetType().Name}: {ex.Message}. Creating grey placeholder.");
-            var placeholderTex = CreatePlaceholderTexture();
-            ti = new TextureInfo(name, placeholderTex);
-            texture_dict.Add(name, ti);
-            return ti;
+            return CreateAndStorePlaceholder(name);
         }
         return ti;
     }
@@ -473,26 +477,15 @@ internal static class SpriteManager
             catch (Exception ex)
             {
                 Debug.LogWarning($"SpriteManager: Exception while reading image '{pathToLoad}'. Error={ex.GetType().Name}: {ex.Message}. Creating grey placeholder.");
-                var placeholderTex = CreatePlaceholderTexture();
-                ti = new TextureInfo(baseimage.filename, placeholderTex);
-                texture_dict.Add(baseimage.filename, ti);
-                baseimage.size.Width = placeholderTex.width;
-                baseimage.size.Height = placeholderTex.height;
+                ti = CreateAndStorePlaceholder(baseimage.filename, baseimage);
             }
 
-            if (content == null || content.Length == 0)
+            if (ti == null && (content == null || content.Length == 0))
             {
                 Debug.LogWarning($"SpriteManager: Empty content after reading '{pathToLoad}'. Creating grey placeholder.");
-                if (ti == null)
-                {
-                    var placeholderTex = CreatePlaceholderTexture();
-                    ti = new TextureInfo(baseimage.filename, placeholderTex);
-                    texture_dict.Add(baseimage.filename, ti);
-                    baseimage.size.Width = placeholderTex.width;
-                    baseimage.size.Height = placeholderTex.height;
-                }
+                ti = CreateAndStorePlaceholder(baseimage.filename, baseimage);
             }
-            else
+            else if (ti == null)
             {
                 // Use a safe default format for runtime-loaded images
                 TextureFormat format = TextureFormat.RGBA32;
@@ -506,11 +499,7 @@ internal static class SpriteManager
                     if (err != Error.Success)
                     {
                         Debug.LogWarning($"SpriteManager: Failed to decode WEBP '{pathToLoad}'. Error={err}. Creating grey placeholder.");
-                        var placeholderTex = CreatePlaceholderTexture();
-                        ti = new TextureInfo(baseimage.filename, placeholderTex);
-                        texture_dict.Add(baseimage.filename, ti);
-                        baseimage.size.Width = placeholderTex.width;
-                        baseimage.size.Height = placeholderTex.height;
+                        ti = CreateAndStorePlaceholder(baseimage.filename, baseimage);
                     }
                     else
                     {
@@ -535,11 +524,7 @@ internal static class SpriteManager
                     else
                     {
                         Debug.LogWarning($"SpriteManager: Failed to load image '{pathToLoad}' (ext={extname}). Creating grey placeholder.");
-                        var placeholderTex = CreatePlaceholderTexture();
-                        ti = new TextureInfo(baseimage.filename, placeholderTex);
-                        texture_dict.Add(baseimage.filename, ti);
-                        baseimage.size.Width = placeholderTex.width;
-                        baseimage.size.Height = placeholderTex.height;
+                        ti = CreateAndStorePlaceholder(baseimage.filename, baseimage);
                     }
                 }
             }
@@ -547,11 +532,7 @@ internal static class SpriteManager
         else
         {
             Debug.LogWarning($"SpriteManager: File not found '{pathToLoad}' for bitmap '{baseimage.filename}'. Creating grey placeholder.");
-            var placeholderTex = CreatePlaceholderTexture();
-            ti = new TextureInfo(baseimage.filename, placeholderTex);
-            texture_dict.Add(baseimage.filename, ti);
-            baseimage.size.Width = placeholderTex.width;
-            baseimage.size.Height = placeholderTex.height;
+            ti = CreateAndStorePlaceholder(baseimage.filename, baseimage);
         }
         List<CallbackInfo> list = null;
         if(loading_set.TryGetValue(baseimage.filename, out list))
