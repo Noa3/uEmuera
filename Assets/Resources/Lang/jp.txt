@@ -32,6 +32,12 @@ FirstWindow.Titlebar.title=ゲームリスト
 [DirectoryPlaceholder]=ゲームディレクトリパスを入力...
 [DirectoryNotFound]=ディレクトリが見つかりません！
 [Error]=エラー
+[StoragePermissionTitle]=ストレージのアクセス許可が必要です
+[StoragePermissionRationale]=このアプリはemueraフォルダからゲームファイルを読み込むため、外部ストレージへのアクセスが必要です。\n\n続行するにはストレージのアクセス許可を付与してください。
+[StoragePermissionDeniedTitle]=アクセスが拒否されました
+[StoragePermissionDenied]=ストレージのアクセス許可が拒否されました。このアクセス許可がないと、アプリはゲームファイルにアクセスできません。\n\n「許可」をタップして再試行してください。
+[Grant]=許可
+[Cancel]=キャンセル
 ; Game Messages - Loading/Initialization
 [LoadingMacroTxt]=macro.txt読み込み中・・・
 [LoadingReplaceCsv]=_Replace.csv読み込み中・・・
