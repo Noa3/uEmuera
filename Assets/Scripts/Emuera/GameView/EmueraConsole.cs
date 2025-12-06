@@ -941,6 +941,10 @@ namespace MinorShift.Emuera.GameView
 #if UEMUERA_DEBUG
 			if (state != ConsoleState.WaitInput || inputReq == null)
 				throw new ExeEE("");
+#else
+			// Guard against null inputReq in production builds
+			if (state != ConsoleState.WaitInput || inputReq == null)
+				return;
 #endif
 			KillMacro = false;
 			try
