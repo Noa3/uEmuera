@@ -20,14 +20,14 @@ namespace MinorShift.Emuera.GameView
     /// Manages display output, user input, printing, colors, buttons, and graphics rendering.
     /// Acts as the primary view layer between the game engine and the Unity UI.
     /// </summary>
-    //?????????
-    //Obfuscation attribute. Set (Exclude=true) when using enum.ToString() or enum.Parse().
-    [global::System.Reflection.Obfuscation(Exclude=false)]
-    internal enum ConsoleState
-    {
+    // Obfuscation
+	//Obfuscation attribute. Set (Exclude=true) when using enum.ToString() or enum.Parse().
+	[global::System.Reflection.Obfuscation(Exclude=false)]
+	internal enum ConsoleState
+	{
 		Initializing = 0,
 		Quit = 5,//QUIT
-		Error = 6,//Exception???????
+		Error = 6,//Exception occurred
 		Running = 7,
 		WaitInput = 20,
         Sleep = 21,//DoEvents
@@ -153,14 +153,14 @@ namespace MinorShift.Emuera.GameView
 			timer.Enabled = false;
 			timer.Tick += new EventHandler(tickTimer);
 			timer.Interval = 10;
-			CBG_Clear();//???????????
+			CBG_Clear();//initialize background graphics
 
 			redrawTimer = new Timer();
 			redrawTimer.Enabled = false;//TODO:1824???????????????????
 			redrawTimer.Tick += new EventHandler(tickRedrawTimer);
 			redrawTimer.Interval = 10;
         }
-#region 1823 cbg??
+#region 1823 cbg implementation
 		private readonly List<ClientBackGroundImage> cbgList = new List<ClientBackGroundImage>();
 		private GraphicsImage cbgButtonMap = null;
 #pragma warning disable CS0414 // Field is assigned but its value is never used
@@ -172,7 +172,7 @@ namespace MinorShift.Emuera.GameView
 		class ClientBackGroundImage : IComparable<ClientBackGroundImage>
 		{
 			/// <summary>
-			/// zdepth == 0?????????????????????
+			/// zdepth == 0 reserved for background layer
 			/// </summary>
 			/// <param name="zdepth"></param>
 			internal ClientBackGroundImage(int zdepth)
@@ -189,7 +189,7 @@ namespace MinorShift.Emuera.GameView
 			{
 				if (other == null)
 					return -1;
-				//???Sort
+				//descending sort by zdepth
 				return -zdepth.CompareTo(other.zdepth);
 			}
 		}
@@ -198,7 +198,7 @@ namespace MinorShift.Emuera.GameView
 			for(var i=0; i<cbgList.Count; ++i)
 			{
                 ClientBackGroundImage cimg = cbgList[i];
-                //??????Image???dispose????
+                //Dispose only unnamed (temporary) images
                 if (cimg.Img != null && cimg.Img.Name.Length == 0)
 					cimg.Img.Dispose();
 			}
@@ -214,10 +214,10 @@ namespace MinorShift.Emuera.GameView
 			for (int i = 0; i < cbgList.Count;i++)
 			{
 				ClientBackGroundImage cimg = cbgList[i];
-				if (cimg.zdepth < zmin || cimg.zdepth > zmax || cimg.zdepth == 0)//0????????????
+				if (cimg.zdepth < zmin || cimg.zdepth > zmax || cimg.zdepth == 0)//0 is reserved for background
 					continue;
 
-				//??????Image???dispose????
+				//Dispose only unnamed (temporary) images
 				if (cimg.Img != null && cimg.Img.Name.Length == 0)
 					cimg.Img.Dispose();
 				cbgList.RemoveAt(i);
@@ -1817,7 +1817,7 @@ namespace MinorShift.Emuera.GameView
 			else
 			{
 				if (max > window.ScrollBar.Value)
-					window.ScrollBar.Value = max;
+				(window.ScrollBar.Value) = max;
 				window.ScrollBar.Maximum = max;
 			}
 			window.ScrollBar.Enabled = max > 0;

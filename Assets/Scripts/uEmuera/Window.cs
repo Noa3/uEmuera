@@ -121,7 +121,7 @@ namespace uEmuera.Window
                 return;
             }
 
-            uEmuera.Logger.Info("MainWindow.Update Dirty");
+            //uEmuera.Logger.Info("MainWindow.Update Dirty");
             dirty_ = false;
 
             GenericUtils.SetBackgroundColor(console_.bgColor);

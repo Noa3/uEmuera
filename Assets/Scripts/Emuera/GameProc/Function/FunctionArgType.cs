@@ -1,75 +1,74 @@
-﻿
-namespace MinorShift.Emuera.GameProc.Function
+﻿namespace MinorShift.Emuera.GameProc.Function
 {
 	/// <summary>
-	/// 命令のargumentタイプ
+	/// Argument type for instructions
 	/// </summary>
 	//Obfuscation attribute. Set (Exclude=true) when using enum.ToString() or enum.Parse().
 	[global::System.Reflection.Obfuscation(Exclude=false)]
 	enum FunctionArgType
-	{//数値不要
-		__NULL__ = 0x0000,//未設定。Error。argumentがないならばVOIDを指定すること。
-		METHOD,//式中関数。
+	{//No numeric values required
+		__NULL__ = 0x0000,//Not set. Error. If there are no arguments, specify VOID.
+		METHOD,//Expression function.
 
-		VOID,//argumentなし
-		INT_EXPRESSION,//数式型。省略可能
-		INT_EXPRESSION_NULLABLE,//数式型
-		STR_EXPRESSION,//文字列式型
+		VOID,//No arguments
+		INT_EXPRESSION,//Numeric expression type. Can be omitted
+		INT_EXPRESSION_NULLABLE,//Numeric expression type
+		STR_EXPRESSION,//String expression type
         STR_EXPRESSION_NULLABLE,
-		STR,//単純文字列型
-		KEYWORD,//単純文字列型。特定の文字のみ有効
-		STR_NULLABLE,//単純文字列型、省略可能
-		FORM_STR,//書式付文字列型。
-		FORM_STR_NULLABLE,//書式付文字列型。省略可能
-		SP_PRINTV,//複数数式型。'～～,文字列可
-		SP_TIMES,//<数値型変数>,<実数定数>
-		SP_BAR,//<数値>,<数値>,<数値>
-		SP_SET,//可変数値変数・数式型。
-		SP_SETS,//可変文字列変数・単純又は複合文字列型。
-		SP_SWAP,//<数値>,<数値>
-		SP_VAR,//<変数>
-		SP_SAVEDATA,//<数値>,<文字列式>
-        SP_INPUT,//(<数値>) //argumentはオプションでないのがデフォ、INT_EXPRESSION_NULLABLEとは処理が違う
-        SP_INPUTS,//(<FORM文字列>) //argumentはオプションでないのがデフォ、STR_EXPRESSION_NULLABLEとは処理が違う
-        SP_ONEINPUT,//(<数値>, <数値>) //argumentはオプションでないのがデフォ、第2argumentはマウス入力時の2桁以上の値時の処理指定
-        SP_ONEINPUTS,//(<FORM文字列>, <数値>) //argumentはオプションでないのがデフォ、第2argumentはマウス入力時の2文字以上の文字列時の処理指定
-        SP_TINPUT,//<数値>,<数値>(,<数値>,<文字列>)
-        SP_TINPUTS,//<数値>,<文字列式>(,<数値>,<文字列>)
-		SP_SORTCHARA,//<キャラクタ変数>,<ソート順序>(両方省略可能)
-		SP_CALL,//<文字列>,<argument>,... //argumentは省略可能
+		STR,//Simple string type
+		KEYWORD,//Simple string type. Only specific characters are valid
+		STR_NULLABLE,//Simple string type, can be omitted
+		FORM_STR,//Formatted string type.
+		FORM_STR_NULLABLE,//Formatted string type. Can be omitted
+		SP_PRINTV,//Multiple numeric expression type. '~~, strings allowed
+		SP_TIMES,//<numeric variable>,<real number constant>
+		SP_BAR,//<number>,<number>,<number>
+		SP_SET,//Variable numeric variable/numeric expression type.
+		SP_SETS,//Variable string variable/simple or compound string type.
+		SP_SWAP,//<number>,<number>
+		SP_VAR,//<variable>
+		SP_SAVEDATA,//<number>,<string expression>
+        SP_INPUT,//(<number>) //Arguments are not optional by default, processing differs from INT_EXPRESSION_NULLABLE
+        SP_INPUTS,//(<FORM string>) //Arguments are not optional by default, processing differs from STR_EXPRESSION_NULLABLE
+        SP_ONEINPUT,//(<number>, <number>) //Arguments are not optional by default, second argument specifies handling for values with 2+ digits during mouse input
+        SP_ONEINPUTS,//(<FORM string>, <number>) //Arguments are not optional by default, second argument specifies handling for strings with 2+ characters during mouse input
+        SP_TINPUT,//<number>,<number>(,<number>,<string>)
+        SP_TINPUTS,//<number>,<string expression>(,<number>,<string>)
+		SP_SORTCHARA,//<character variable>,<sort order>(both can be omitted)
+		SP_CALL,//<string>,<arguments>,... //Arguments can be omitted
 		SP_CALLF,
-		SP_CALLFORM,//<書式付文字列>,<argument>,... //argumentは省略可能
-		SP_CALLFORMF,//<書式付文字列>,<argument>,... //argumentは省略可能
-		SP_FOR_NEXT,//<可変数値変数>,<数値>,<数値>,<数値> //argumentは省略可能
-		SP_POWER,//<可変数値変数>,<数値>,<数値>
-		SP_SWAPVAR,//<可変変数>,<可変変数>(同型のみ)
-		EXPRESSION,//<式>、変数の型は不問
-		EXPRESSION_NULLABLE,//<式>、変数の型は不問
-		CASE,//<CASE条件式>(, <CASE条件式>...)
+		SP_CALLFORM,//<formatted string>,<arguments>,... //Arguments can be omitted
+		SP_CALLFORMF,//<formatted string>,<arguments>,... //Arguments can be omitted
+		SP_FOR_NEXT,//<variable numeric variable>,<number>,<number>,<number> //Arguments can be omitted
+		SP_POWER,//<variable numeric variable>,<number>,<number>
+		SP_SWAPVAR,//<variable variable>,<variable variable>(same type only)
+		EXPRESSION,//<expression>, variable type doesn't matter
+		EXPRESSION_NULLABLE,//<expression>, variable type doesn't matter
+		CASE,//<CASE condition expression>(, <CASE condition expression>...)
 		
 
-        //TODO　省略時の処理に違いがあるが統合可能なはず
-		VAR_INT,//<可変数値変数> //argumentは省略可
-        SP_GETINT,//<可変数値変数>(今までこれがないことに驚いた)
+        //TODO: There are differences in processing when omitted but they should be able to be unified
+		VAR_INT,//<variable numeric variable> //Arguments can be omitted
+        SP_GETINT,//<variable numeric variable>(surprised this didn't exist before)
 
-		VAR_STR,//<可変数値変数> //argumentは省略可
-		BIT_ARG,//<可変数値変数>,<数値>*n (SP_SETが使えないため新設)
-		SP_VAR_SET,//<可変変数>,<数式 or 文字列式 or null>(,<範囲初値>, <範囲終値>)
-		SP_BUTTON,//<文字列式>,<数式>
-		SP_SET_ARRAY,//可変数値変数・<数式配列型>。未使用
-		SP_SETS_ARRAY,//可変文字列変数・<文字列配列型>。未使用
+		VAR_STR,//<variable numeric variable> //Arguments can be omitted
+		BIT_ARG,//<variable numeric variable>,<number>*n (newly created because SP_SET cannot be used)
+		SP_VAR_SET,//<variable variable>,<numeric expression or string expression or null>(,<range start value>, <range end value>)
+		SP_BUTTON,//<string expression>,<numeric expression>
+		SP_SET_ARRAY,//Variable numeric variable/<numeric array type>. Unused
+		SP_SETS_ARRAY,//Variable string variable/<string array type>. Unused
 		SP_COLOR,
-		SP_SPLIT,//<文字列式>, <文字列式>, <可変文字変数>
-		SP_CVAR_SET,//<可変変数>,<式>,<数式 or 文字列式 or null>(,<範囲初値>, <範囲終値>)
-		SP_CONTROL_ARRAY,//<可変変数>,<数値>,<数値>
-		SP_SHIFT_ARRAY,//<可変変数>,<数値>,<数値or文字列>(,<数値>,<数値>)
-        SP_SORTARRAY,//<対象変数>, (<ソート順序>, <範囲初値>, <範囲終値>)
-        INT_ANY,//1つ以上の数値を任意数
-		FORM_STR_ANY,//1つ以上のFORM文字列を任意数  
-		SP_COPYCHARA,//<数値>(, <数値)第二argument省略可
-		SP_COPY_ARRAY,//<文字列式>,<文字列式>
-		SP_SAVEVAR,//<数値>,<文字列式>, <変数>（, <変数>...）
-		SP_SAVECHARA,//<数値>, <文字列式>, <数値>（, <数値>...）第二argument省略可
+		SP_SPLIT,//<string expression>, <string expression>, <variable char variable>
+		SP_CVAR_SET,//<variable variable>,<expression>,<numeric expression or string expression or null>(,<range start value>, <range end value>)
+		SP_CONTROL_ARRAY,//<variable variable>,<number>,<number>
+		SP_SHIFT_ARRAY,//<variable variable>,<number>,<number or string>(,<number>,<number>)
+        SP_SORTARRAY,//<target variable>, (<sort order>, <range start value>, <range end value>)
+        INT_ANY,//One or more numbers in any quantity
+		FORM_STR_ANY,//One or more FORM strings in any quantity  
+		SP_COPYCHARA,//<number>(, <number>) second argument can be omitted
+		SP_COPY_ARRAY,//<string expression>,<string expression>
+		SP_SAVEVAR,//<number>,<string expression>, <variable>(, <variable>...)
+		SP_SAVECHARA,//<number>, <string expression>, <number>(, <number>...) second argument can be omitted
 		SP_REF,
 		SP_REFBYNAME,
 		SP_HTMLSPLIT,
