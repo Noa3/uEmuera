@@ -30,7 +30,11 @@ public class Inputpad : MonoBehaviour
         switch(lastinputtype)
         {
         case MinorShift.Emuera.GameProc.InputType.IntValue:
-            inputfield.contentType = InputField.ContentType.IntegerNumber;
+            // Allow text input in debug mode to enable debug commands like @talent:5 =1
+            if (MinorShift.Emuera.Config.UseDebugCommand)
+                inputfield.contentType = InputField.ContentType.Standard;
+            else
+                inputfield.contentType = InputField.ContentType.IntegerNumber;
             inputfield.gameObject.SetActive(true);
             break;
         case MinorShift.Emuera.GameProc.InputType.StrValue:

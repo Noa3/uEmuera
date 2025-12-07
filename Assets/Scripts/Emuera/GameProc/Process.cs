@@ -177,7 +177,8 @@ namespace MinorShift.Emuera.GameProc
 				}
 				LexicalAnalyzer.UseMacro = idDic.UseMacro();
 
-				//TODO: Apply csv for user-defined variables
+				//Load CSV data for user-defined variables (if available)
+				LoadUserDefinedVariablesFromCsv(Program.CsvDir, console, Config.DisplayReport);
 
 				//Load ERB
 				ErbLoader loader = new ErbLoader(console, exm, this);
@@ -542,6 +543,160 @@ namespace MinorShift.Emuera.GameProc
 			}
 			else
 				return "";
+		}
+
+		/// <summary>
+		/// Loads CSV data for user-defined variables.
+		/// Searches for CSV files named after user-defined variables (e.g., MyVar.CSV)
+		/// and initializes the variables with values from the CSV.
+		/// CSV format: Each line contains values for array elements, comma-separated.
+		/// Lines starting with semicolon (;) are treated as comments and skipped.
+		/// </summary>
+		/// <param name="csvDir">Directory containing CSV files</param>
+		/// <param name="console">Console for output messages</param>
+		/// <param name="displayReport">Whether to display loading reports</param>
+		private void LoadUserDefinedVariablesFromCsv(string csvDir, EmueraConsole console, bool displayReport)
+		{
+			if (!Directory.Exists(csvDir))
+				return;
+
+			// Get all user-defined variables from the identifier dictionary
+			var userVars = idDic.GetAllUserDefinedVariables();
+			if (userVars == null || userVars.Count == 0)
+				return;
+
+			foreach (var varToken in userVars)
+			{
+				// Look for a CSV file matching the variable name
+				string csvPath = Path.Combine(csvDir, varToken.Name + ".CSV");
+				csvPath = uEmuera.Utils.ResolveExistingFilePath(csvPath);
+				if (string.IsNullOrEmpty(csvPath) || !File.Exists(csvPath))
+					continue;
+
+				try
+				{
+					if (displayReport)
+						console.PrintSystemLine($"Loading user variable data: {varToken.Name}.CSV");
+
+					LoadUserVariableFromCsv(csvPath, varToken);
+				}
+				catch (Exception ex)
+				{
+					ParserMediator.Warn($"Failed to load CSV for variable {varToken.Name}: {ex.Message}", 
+						new ScriptPosition(csvPath, 0), 1);
+				}
+			}
+		}
+
+		/// <summary>
+		/// Loads data from a CSV file into a user-defined variable.
+		/// Supports integer and string arrays (1D, 2D).
+		/// Note: 3D arrays not currently supported due to complexity of CSV representation.
+		/// </summary>
+		/// <param name="csvPath">Path to the CSV file</param>
+		/// <param name="varToken">Variable token to initialize</param>
+		private void LoadUserVariableFromCsv(string csvPath, VariableToken varToken)
+		{
+			const char CSV_COMMENT_CHAR = ';';
+			
+			using (EraStreamReader reader = new EraStreamReader(false))
+			{
+				if (!reader.Open(csvPath))
+					return;
+
+				List<string> lines = new List<string>();
+				string line;
+				while ((line = reader.ReadLine()) != null)
+				{
+					// Skip comment lines (starting with semicolon) and empty lines
+					if (string.IsNullOrWhiteSpace(line) || line.TrimStart().StartsWith(CSV_COMMENT_CHAR.ToString()))
+						continue;
+					lines.Add(line);
+				}
+
+				if (lines.Count == 0)
+					return;
+
+				// Initialize the variable based on its type and dimensionality
+				if (varToken.IsString)
+					LoadStringVariableFromLines(lines, varToken);
+				else
+					LoadIntegerVariableFromLines(lines, varToken);
+			}
+		}
+
+		/// <summary>
+		/// Loads string variable data from CSV lines.
+		/// Supports 1D and 2D string arrays.
+		/// Note: 3D arrays not supported - CSV format would be overly complex for 3D data representation.
+		/// </summary>
+		private void LoadStringVariableFromLines(List<string> lines, VariableToken varToken)
+		{
+			int lineCount = lines.Count;
+			
+			if (varToken.Dimension == 1)
+			{
+				// 1D array: each line is one element
+				int length = varToken.GetLength();
+				for (int i = 0; i < Math.Min(lineCount, length); i++)
+				{
+					varToken.SetValue(lines[i], new long[] { i });
+				}
+			}
+			else if (varToken.Dimension == 2)
+			{
+				// 2D array: comma-separated values per line
+				int length1 = varToken.GetLength(0);
+				int length2 = varToken.GetLength(1);
+				for (int i = 0; i < Math.Min(lineCount, length1); i++)
+				{
+					string[] values = lines[i].Split(',');
+					for (int j = 0; j < Math.Min(values.Length, length2); j++)
+					{
+						varToken.SetValue(values[j].Trim(), new long[] { i, j });
+					}
+				}
+			}
+		}
+
+		/// <summary>
+		/// Loads integer variable data from CSV lines.
+		/// Supports 1D and 2D integer arrays.
+		/// Note: 3D arrays not supported - CSV format would be overly complex for 3D data representation.
+		/// </summary>
+		private void LoadIntegerVariableFromLines(List<string> lines, VariableToken varToken)
+		{
+			int lineCount = lines.Count;
+			
+			if (varToken.Dimension == 1)
+			{
+				// 1D array: parse each line as integer
+				int length = varToken.GetLength();
+				for (int i = 0; i < Math.Min(lineCount, length); i++)
+				{
+					if (long.TryParse(lines[i].Trim(), out long value))
+					{
+						varToken.SetValue(value, new long[] { i });
+					}
+				}
+			}
+			else if (varToken.Dimension == 2)
+			{
+				// 2D array: comma-separated integer values per line
+				int length1 = varToken.GetLength(0);
+				int length2 = varToken.GetLength(1);
+				for (int i = 0; i < Math.Min(lineCount, length1); i++)
+				{
+					string[] values = lines[i].Split(',');
+					for (int j = 0; j < Math.Min(values.Length, length2); j++)
+					{
+						if (long.TryParse(values[j].Trim(), out long value))
+						{
+							varToken.SetValue(value, new long[] { i, j });
+						}
+					}
+				}
+			}
 		}
 
 	}

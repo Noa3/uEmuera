@@ -646,6 +646,7 @@ public static class GenericUtils
     }
     /// <summary>
     /// Calculates MD5 hashes for configuration data with colon separators.
+    /// Skips lines without colons (such as comments or section headers).
     /// </summary>
     /// <param name="data">The byte array to process.</param>
     /// <returns>A list of MD5 hash strings.</returns>
@@ -658,38 +659,49 @@ public static class GenericUtils
 
         do
         {
-            while (data[start + count] != ':')
+            // Search for colon, but stop at line end or data end to avoid index out of range
+            int pos = start + count;
+            while (pos < data.Length && 
+                   data[pos] != ':' &&
+                   data[pos] != '\xd' &&
+                   data[pos] != '\xa')
             {
                 count += 1;
+                pos = start + count;
             }
-            md5s.Add(CalcMd5(data, start, count));
+            
+            // Only process lines that have a colon (skip comment lines and section headers)
+            if (pos < data.Length && data[pos] == ':')
+            {
+                md5s.Add(CalcMd5(data, start, count));
+            }
 
             start += count;
             count = 0;
 
-            while (data[start] != '\xd' &&
-                    data[start] != '\xa')
+            // Skip to end of line
+            while (start < data.Length &&
+                   data[start] != '\xd' &&
+                   data[start] != '\xa')
             {
                 start += 1;
-                if (start >= data.Length)
-                    break;
             }
             if (start >= data.Length)
                 break;
 
-            while (data[start] == '\xd' ||
-                    data[start] == '\xa')
+            // Skip newline characters
+            while (start < data.Length &&
+                   (data[start] == '\xd' ||
+                    data[start] == '\xa'))
             {
                 start += 1;
-
-                if (start >= data.Length)
-                    break;
             }
 
             if (start >= data.Length)
                 break;
 
-        } while (data[start] != 0);
+        // Check bounds and null terminator (data may be C-style null-terminated string from file read)
+        } while (start < data.Length && data[start] != 0);
 
         return md5s;
     }
