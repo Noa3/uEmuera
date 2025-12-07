@@ -683,15 +683,17 @@ namespace MinorShift.Emuera.GameProc.Function
 				req.OneInput = true;
 				if (arg.Term != null)
 				{
-					//TODO:二文字以上セットできるようにするかError停止するか
-					//少なくともONETINPUTとの仕様を統一すべき
+					// Unify default value handling with ONETINPUT for consistency
 					Int64 def;
 					if (arg.IsConst)
 						def = arg.ConstInt;
 					else
 						def = arg.Term.GetIntValue(exm);
 					if (def > 9)
-						def = Int64.Parse(def.ToString().Remove(1));
+					{
+						// Extract first digit using the same method as ONETINPUT
+						def = def / (long)(Math.Pow(10.0, Math.Log10((double)def)));
+					}
 					if (def >= 0)
 					{
 						req.HasDefValue = true;
@@ -754,7 +756,7 @@ namespace MinorShift.Emuera.GameProc.Function
 				req.OneInput = isOne;
 				Int64 x = tinputarg.Time.GetIntValue(exm);
 				Int64 y = tinputarg.Def.GetIntValue(exm);
-				//TODO:ONEINPUTと標準の値を統一
+				// Unified default value handling with ONEINPUT
 				if (isOne)
 				{
 					if (y < 0)
