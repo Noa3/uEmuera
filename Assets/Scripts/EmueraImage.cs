@@ -124,12 +124,25 @@ public class EmueraImage : EmueraBehaviour
             image_infos_.Add(imageinfo);
 
             var image_rect = image_part.dest_rect;
-            rt.anchoredPosition = new Vector2(image_part.PointX - ud.posx, miny - image_rect.Top);
+            
+            // Apply DestBasePosition offset for proper sprite layering
+            var sprite_x_offset = 0;
+            var sprite_y_offset = 0;
+            if (image_part.Image != null)
+            {
+                sprite_x_offset = image_part.Image.DestBasePosition.X;
+                sprite_y_offset = image_part.Image.DestBasePosition.Y;
+            }
+            
+            // Position includes both the image's position in the line and the sprite's offset
+            rt.anchoredPosition = new Vector2(
+                image_part.PointX - ud.posx + sprite_x_offset, 
+                miny - image_rect.Top + sprite_y_offset);
             rt.sizeDelta = new Vector2(image_rect.Width, image_rect.Height);
             rt.localScale = Vector3.one;
             logic_height = Mathf.Max(logic_height, image_rect.Height);
 
-            width = Mathf.Max(image_part.PointX - ud.posx + image_rect.Width, width);
+            width = Mathf.Max(image_part.PointX - ud.posx + sprite_x_offset + image_rect.Width, width);
         }
 
         prt.sizeDelta = new Vector2(width, logic_height);
