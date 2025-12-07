@@ -1,15 +1,18 @@
 ﻿using MinorShift.Emuera.Sub;
 using System;
 using System.Collections.Generic;
-//using System.Drawing;
 using System.IO;
 using System.Text;
 using uEmuera.Drawing;
 
 namespace MinorShift.Emuera.Content
 {
-	static class AppContents
-	{
+    /// <summary>
+    /// Manages application content including images, graphics, and resource files.
+    /// Provides centralized access to game assets loaded from the resources directory.
+    /// </summary>
+    static class AppContents
+    {
 		static AppContents()
 		{
 			gList = new Dictionary<int, GraphicsImage>();

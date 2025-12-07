@@ -6,8 +6,12 @@ using uEmuera.Drawing;
 
 namespace MinorShift.Emuera.Content
 {
-	internal abstract class AbstractImage : AContentFile
-	{
+    /// <summary>
+    /// Base class for image content loaded from files.
+    /// Provides bitmap management and basic image operations.
+    /// </summary>
+    internal abstract class AbstractImage : AContentFile
+    {
         //public Bitmap Bitmap;
         //public IntPtr GDIhDC { get; protected set; }
         //protected Graphics g;
