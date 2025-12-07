@@ -1,4 +1,4 @@
-uEmuera
+uEmuera - Noa Version
 =======
 
 <img src="Assets/splash/icon.png" width="256"/>
@@ -88,6 +88,9 @@ This fork includes significant improvements and modernizations:
 
 ### Screenshots
 ----
+
+<img width="1381" height="691" alt="grafik" src="https://github.com/user-attachments/assets/25ab5fa1-3a88-4ef9-a0b9-bf2d8584782a" />
+<img width="1377" height="773" alt="grafik" src="https://github.com/user-attachments/assets/042375f2-8ff3-478c-8548-3e116ce2736e" />
 
 Start Screen
 ![Screenshot1](Screenshot/screenshot1.png)
