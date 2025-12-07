@@ -646,6 +646,7 @@ public static class GenericUtils
     }
     /// <summary>
     /// Calculates MD5 hashes for configuration data with colon separators.
+    /// Skips lines without colons (such as comments or section headers).
     /// </summary>
     /// <param name="data">The byte array to process.</param>
     /// <returns>A list of MD5 hash strings.</returns>
@@ -658,32 +659,38 @@ public static class GenericUtils
 
         do
         {
-            while (data[start + count] != ':')
+            // Search for colon, but stop at line end or data end to avoid index out of range
+            while (start + count < data.Length && 
+                   data[start + count] != ':' &&
+                   data[start + count] != '\xd' &&
+                   data[start + count] != '\xa')
             {
                 count += 1;
             }
-            md5s.Add(CalcMd5(data, start, count));
+            
+            // Only process lines that have a colon (skip comment lines and section headers)
+            if (start + count < data.Length && data[start + count] == ':')
+            {
+                md5s.Add(CalcMd5(data, start, count));
+            }
 
             start += count;
             count = 0;
 
-            while (data[start] != '\xd' &&
-                    data[start] != '\xa')
+            while (start < data.Length &&
+                   data[start] != '\xd' &&
+                   data[start] != '\xa')
             {
                 start += 1;
-                if (start >= data.Length)
-                    break;
             }
             if (start >= data.Length)
                 break;
 
-            while (data[start] == '\xd' ||
-                    data[start] == '\xa')
+            while (start < data.Length &&
+                   (data[start] == '\xd' ||
+                    data[start] == '\xa'))
             {
                 start += 1;
-
-                if (start >= data.Length)
-                    break;
             }
 
             if (start >= data.Length)
