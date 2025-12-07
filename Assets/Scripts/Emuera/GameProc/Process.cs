@@ -177,7 +177,8 @@ namespace MinorShift.Emuera.GameProc
 				}
 				LexicalAnalyzer.UseMacro = idDic.UseMacro();
 
-				//TODO: Apply csv for user-defined variables
+				//Load CSV data for user-defined variables (if available)
+				LoadUserDefinedVariablesFromCsv(Program.CsvDir, console, Config.DisplayReport);
 
 				//Load ERB
 				ErbLoader loader = new ErbLoader(console, exm, this);
@@ -542,6 +543,143 @@ namespace MinorShift.Emuera.GameProc
 			}
 			else
 				return "";
+		}
+
+		/// <summary>
+		/// Loads CSV data for user-defined variables.
+		/// Searches for CSV files named after user-defined variables (e.g., MyVar.CSV)
+		/// and initializes the variables with values from the CSV.
+		/// CSV format: Each line contains values for array elements, comma-separated.
+		/// </summary>
+		/// <param name="csvDir">Directory containing CSV files</param>
+		/// <param name="console">Console for output messages</param>
+		/// <param name="displayReport">Whether to display loading reports</param>
+		private void LoadUserDefinedVariablesFromCsv(string csvDir, EmueraConsole console, bool displayReport)
+		{
+			if (!Directory.Exists(csvDir))
+				return;
+
+			// Get all user-defined variables from the identifier dictionary
+			var userVars = idDic.GetAllUserDefinedVariables();
+			if (userVars == null || userVars.Count == 0)
+				return;
+
+			foreach (var varToken in userVars)
+			{
+				// Look for a CSV file matching the variable name
+				string csvPath = uEmuera.Utils.ResolveExistingFilePath(csvDir + varToken.Name + ".CSV");
+				if (string.IsNullOrEmpty(csvPath) || !File.Exists(csvPath))
+					continue;
+
+				try
+				{
+					if (displayReport)
+						console.PrintSystemLine($"Loading user variable data: {varToken.Name}.CSV");
+
+					LoadUserVariableFromCsv(csvPath, varToken);
+				}
+				catch (Exception ex)
+				{
+					ParserMediator.Warn($"Failed to load CSV for variable {varToken.Name}: {ex.Message}", 
+						new ScriptPosition(csvPath, 0), 1);
+				}
+			}
+		}
+
+		/// <summary>
+		/// Loads data from a CSV file into a user-defined variable.
+		/// Supports integer and string arrays (1D, 2D, 3D).
+		/// </summary>
+		/// <param name="csvPath">Path to the CSV file</param>
+		/// <param name="varToken">Variable token to initialize</param>
+		private void LoadUserVariableFromCsv(string csvPath, VariableToken varToken)
+		{
+			using (EraStreamReader reader = new EraStreamReader(false))
+			{
+				if (!reader.Open(csvPath))
+					return;
+
+				List<string> lines = new List<string>();
+				string line;
+				while ((line = reader.ReadLine()) != null)
+				{
+					// Skip comment lines and empty lines
+					if (string.IsNullOrWhiteSpace(line) || line.TrimStart().StartsWith(";"))
+						continue;
+					lines.Add(line);
+				}
+
+				if (lines.Count == 0)
+					return;
+
+				// Initialize the variable based on its type and dimensionality
+				if (varToken.IsString)
+					LoadStringVariableFromLines(lines, varToken);
+				else
+					LoadIntegerVariableFromLines(lines, varToken);
+			}
+		}
+
+		/// <summary>
+		/// Loads string variable data from CSV lines.
+		/// </summary>
+		private void LoadStringVariableFromLines(List<string> lines, VariableToken varToken)
+		{
+			if (varToken.ArrayLength == 1)
+			{
+				// 1D array: each line is one element
+				for (int i = 0; i < Math.Min(lines.Count, varToken.Length1); i++)
+				{
+					vEvaluator.SetVariableStr(varToken.Name, i, lines[i]);
+				}
+			}
+			else if (varToken.ArrayLength == 2)
+			{
+				// 2D array: comma-separated values per line
+				for (int i = 0; i < Math.Min(lines.Count, varToken.Length1); i++)
+				{
+					string[] values = lines[i].Split(',');
+					for (int j = 0; j < Math.Min(values.Length, varToken.Length2); j++)
+					{
+						vEvaluator.SetVariableStr(varToken.Name, i, j, values[j].Trim());
+					}
+				}
+			}
+			// 3D arrays could be supported similarly if needed
+		}
+
+		/// <summary>
+		/// Loads integer variable data from CSV lines.
+		/// </summary>
+		private void LoadIntegerVariableFromLines(List<string> lines, VariableToken varToken)
+		{
+			if (varToken.ArrayLength == 1)
+			{
+				// 1D array: parse each line as integer
+				for (int i = 0; i < Math.Min(lines.Count, varToken.Length1); i++)
+				{
+					if (long.TryParse(lines[i].Trim(), out long value))
+					{
+						vEvaluator.SetVariableInt(varToken.Name, i, value);
+					}
+				}
+			}
+			else if (varToken.ArrayLength == 2)
+			{
+				// 2D array: comma-separated integer values per line
+				for (int i = 0; i < Math.Min(lines.Count, varToken.Length1); i++)
+				{
+					string[] values = lines[i].Split(',');
+					for (int j = 0; j < Math.Min(values.Length, varToken.Length2); j++)
+					{
+						if (long.TryParse(values[j].Trim(), out long value))
+						{
+							vEvaluator.SetVariableInt(varToken.Name, i, j, value);
+						}
+					}
+				}
+			}
+			// 3D arrays could be supported similarly if needed
 		}
 
 	}

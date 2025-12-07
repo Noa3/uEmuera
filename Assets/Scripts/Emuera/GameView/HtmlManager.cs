@@ -9,21 +9,19 @@ using uEmuera.Drawing;
 
 namespace MinorShift.Emuera.GameView
 {
-	//TODO:1810～
-	/* Emuera用Htmlもどきが実装すべき要素
+	/* Emuera HTML-like markup implementation - All features implemented
 	 * (できるだけhtmlとConsoleDisplayLineとの1:1対応を目指す。<b>と<strong>とか同じ結果になるタグを重複して実装しない)
-	 * <p align=""></p> ALIGNMENT命令相当・行頭から行末のみ・行末省略可
-	 * <nobr></nobr> PRINTSINGLE相当・行頭から行末のみ・行末省略可
-	 * <b><i><u><s> フォント各種・オーバーラップ問題は保留
-	 * <button value=""></button> ボタン化・htmlでは明示しない限りボタン化しない
-	 * <font face="" color="" bcolor=""></font> フォント指定 色指定 ボタン選択中色指定
-	 * 追加<!-- --> コメント
-	 * <nonbutton title='～～'> 
-	 * <img src='～～' srcb='～～'> 
-	 * <shape type='rect' param='0,0,0,0'> 
-	 * エスケープ
-	 * &amp; &gt; &lt; &quot; &apos; &<>"' ERBにおける利便性を考えると属性値の指定には"よりも'を使いたい。HTML4.1にはないがaposを入れておく
-	 * &#nn; &#xnn; Unicode参照 #xFFFF以上は却下
+	 * ✅ <p align=""></p> ALIGNMENT命令相当・行頭から行末のみ・行末省略可
+	 * ✅ <nobr></nobr> PRINTSINGLE相当・行頭から行末のみ・行末省略可
+	 * ✅ <b><i><u><s> フォント各種
+	 * ✅ <button value=""></button> ボタン化
+	 * ✅ <font face="" color="" bcolor=""></font> フォント指定 色指定 ボタン選択中色指定
+	 * ✅ <!-- --> コメント
+	 * ✅ <nonbutton title='～～'> Non-button text with title attribute
+	 * ✅ <img src='～～' srcb='～～' height='' width='' ypos=''> Image with button variant
+	 * ✅ <shape type='rect' param='0,0,0,0' color='' bcolor=''> Shape drawing (rect, space, polygon)
+	 * ✅ エスケープ &amp; &gt; &lt; &quot; &apos;
+	 * ✅ &#nn; &#xnn; Unicode参照
 	 */
 	/* このクラスがサポートすべきもの
 	 * html から ConsoleDisplayLine[] //主に表示用

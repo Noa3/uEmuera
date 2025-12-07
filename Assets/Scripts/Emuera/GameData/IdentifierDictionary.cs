@@ -682,6 +682,25 @@ namespace MinorShift.Emuera
                 return var.IsForbid;
             return true;
         }
+
+		/// <summary>
+		/// Gets all user-defined variable tokens.
+		/// Returns only variables defined in ERH files (not system variables).
+		/// </summary>
+		/// <returns>List of user-defined variable tokens</returns>
+		public List<VariableToken> GetAllUserDefinedVariables()
+		{
+			List<VariableToken> userVars = new List<VariableToken>();
+			foreach (var kvp in varTokenDic)
+			{
+				// Filter to only user-defined variables (not system variables)
+				if (kvp.Value is UserDefinedVariableToken)
+				{
+					userVars.Add(kvp.Value);
+				}
+			}
+			return userVars;
+		}
         #endregion
 
 
