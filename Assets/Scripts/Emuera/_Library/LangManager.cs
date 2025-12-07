@@ -1,10 +1,11 @@
-﻿//using System;
-//using System.Collections.Generic;
-using System.Text;
+﻿using System.Text;
 
 namespace MinorShift._Library
 {
-    //マルチ言語に対応可能な形式に変更
+    /// <summary>
+    /// Manages language encoding and string length calculations for multi-language support.
+    /// Provides UTF-8 encoding utilities and byte count calculations for ERA script text.
+    /// </summary>
     internal static class LangManager
     {
         static Encoding lang;

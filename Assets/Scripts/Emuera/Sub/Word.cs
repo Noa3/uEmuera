@@ -3,8 +3,12 @@ using MinorShift.Emuera.GameData.Expression;
 
 namespace MinorShift.Emuera.Sub
 {
-	internal abstract class Word
-	{
+    /// <summary>
+    /// Base class for lexical tokens (words) used in ERA script parsing.
+    /// Represents different types of tokens including identifiers, operators, strings, and literals.
+    /// </summary>
+    internal abstract class Word
+    {
 		public abstract char Type { get; }
 		public bool IsMacro = false;
 		public virtual void SetIsMacro()
