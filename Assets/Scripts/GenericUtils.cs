@@ -677,6 +677,7 @@ public static class GenericUtils
             start += count;
             count = 0;
 
+            // Skip to end of line
             while (start < data.Length &&
                    data[start] != '\xd' &&
                    data[start] != '\xa')
@@ -686,6 +687,7 @@ public static class GenericUtils
             if (start >= data.Length)
                 break;
 
+            // Skip newline characters
             while (start < data.Length &&
                    (data[start] == '\xd' ||
                     data[start] == '\xa'))
@@ -696,7 +698,7 @@ public static class GenericUtils
             if (start >= data.Length)
                 break;
 
-        } while (data[start] != 0);
+        } while (start < data.Length && data[start] != 0);
 
         return md5s;
     }
