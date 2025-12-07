@@ -630,7 +630,7 @@ namespace MinorShift.Emuera.GameProc
 				// 1D array: each line is one element
 				for (int i = 0; i < Math.Min(lines.Count, varToken.Length1); i++)
 				{
-					vEvaluator.SetVariableStr(varToken.Name, i, lines[i]);
+					varToken.SetValue(lines[i], new long[] { i });
 				}
 			}
 			else if (varToken.ArrayLength == 2)
@@ -641,7 +641,7 @@ namespace MinorShift.Emuera.GameProc
 					string[] values = lines[i].Split(',');
 					for (int j = 0; j < Math.Min(values.Length, varToken.Length2); j++)
 					{
-						vEvaluator.SetVariableStr(varToken.Name, i, j, values[j].Trim());
+						varToken.SetValue(values[j].Trim(), new long[] { i, j });
 					}
 				}
 			}
@@ -660,7 +660,7 @@ namespace MinorShift.Emuera.GameProc
 				{
 					if (long.TryParse(lines[i].Trim(), out long value))
 					{
-						vEvaluator.SetVariableInt(varToken.Name, i, value);
+						varToken.SetValue(value, new long[] { i });
 					}
 				}
 			}
@@ -674,7 +674,7 @@ namespace MinorShift.Emuera.GameProc
 					{
 						if (long.TryParse(values[j].Trim(), out long value))
 						{
-							vEvaluator.SetVariableInt(varToken.Name, i, j, value);
+							varToken.SetValue(value, new long[] { i, j });
 						}
 					}
 				}
