@@ -3,10 +3,15 @@ using System.Collections.Generic;
 using MinorShift.Emuera.Sub;
 using MinorShift.Emuera.GameData.Variable;
 using MinorShift.Emuera.GameData.Function;
-//using System.Windows.Forms;
 
 namespace MinorShift.Emuera.GameData.Expression
 {
+    /// <summary>
+    /// Expression parser for ERA script language.
+    /// Converts token sequences into evaluable expression trees,
+    /// handling operators, function calls, variable references, and literals.
+    /// Supports complex expressions with proper operator precedence and type checking.
+    /// </summary>
     internal enum ArgsEndWith
     {
         None,

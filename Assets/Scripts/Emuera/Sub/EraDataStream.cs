@@ -5,11 +5,15 @@ using System.IO;
 
 namespace MinorShift.Emuera.Sub
 {
-
-	//Obfuscation attribute. Set (Exclude=true) when using enum.ToString() or enum.Parse().
-	[global::System.Reflection.Obfuscation(Exclude = false)]
-	internal enum EraDataState
-	{
+    /// <summary>
+    /// Save data stream management for Emuera game saves.
+    /// Handles reading and writing binary save data including game state,
+    /// variables, character data, and metadata.
+    /// </summary>
+    //Obfuscation attribute. Set (Exclude=true) when using enum.ToString() or enum.Parse().
+    [global::System.Reflection.Obfuscation(Exclude = false)]
+    internal enum EraDataState
+    {
 		OK = 0,//ロード可能
 		FILENOTFOUND = 1,//ファイルが存在せず
 		GAME_ERROR = 2,//ゲームが違う
