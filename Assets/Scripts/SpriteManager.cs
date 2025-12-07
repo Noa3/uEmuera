@@ -154,14 +154,36 @@ internal static class SpriteManager
             SpriteInfo sprite = null;
             if(!sprites.TryGetValue(src.Name, out sprite))
             {
-                // Validate rectangle before creating sprite to provide deterministic errors
+                // Get the converted Unity rect
                 var rect = GenericUtils.ToUnityRect(src.Rectangle, texture.width, texture.height);
-                if (rect.width <= 0 || rect.height <= 0 || rect.x < 0 || rect.y < 0 ||
+                
+                // Check if the conversion resulted in an invalid/empty rectangle
+                if (rect.width <= 0 || rect.height <= 0)
+                {
+                    Debug.LogWarning($"SpriteManager: Invalid sprite rectangle for '{src?.Name}' on '{imagename}'. " +
+                        $"Original=({src.Rectangle.X},{src.Rectangle.Y},{src.Rectangle.Width},{src.Rectangle.Height}), " +
+                        $"Converted=({rect.x},{rect.y},{rect.width},{rect.height}), " +
+                        $"Texture=({texture.width},{texture.height}). Creating placeholder sprite.");
+                    
+                    // Create and return a placeholder sprite instead of null
+                    var placeholderTex = CreatePlaceholderTexture();
+                    var placeholderRect = new Rect(0, 0, placeholderTex.width, placeholderTex.height);
+                    var placeholderSprite = Sprite.Create(placeholderTex, placeholderRect, Vector2.zero);
+                    sprite = new SpriteInfo(this, placeholderSprite);
+                    sprites[src.Name] = sprite;
+                    refcount += 1;
+                    return sprite;
+                }
+                
+                // Validate final rectangle bounds (should be guaranteed by clamping, but double-check)
+                if (rect.x < 0 || rect.y < 0 || 
                     rect.x + rect.width > texture.width || rect.y + rect.height > texture.height)
                 {
-                    Debug.LogError($"SpriteManager: Invalid sprite rectangle for '{src?.Name}' on '{imagename}'. Rect=({rect.x},{rect.y},{rect.width},{rect.height}), Texture=({texture.width},{texture.height})");
+                    Debug.LogError($"SpriteManager: Rectangle validation failed for '{src?.Name}' on '{imagename}'. " +
+                        $"Rect=({rect.x},{rect.y},{rect.width},{rect.height}), Texture=({texture.width},{texture.height})");
                     return null;
                 }
+                
                 try
                 {
                     sprite = new SpriteInfo(this, 
