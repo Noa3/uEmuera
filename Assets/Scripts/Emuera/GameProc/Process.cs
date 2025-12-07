@@ -550,6 +550,7 @@ namespace MinorShift.Emuera.GameProc
 		/// Searches for CSV files named after user-defined variables (e.g., MyVar.CSV)
 		/// and initializes the variables with values from the CSV.
 		/// CSV format: Each line contains values for array elements, comma-separated.
+		/// Lines starting with semicolon (;) are treated as comments and skipped.
 		/// </summary>
 		/// <param name="csvDir">Directory containing CSV files</param>
 		/// <param name="console">Console for output messages</param>
@@ -567,7 +568,8 @@ namespace MinorShift.Emuera.GameProc
 			foreach (var varToken in userVars)
 			{
 				// Look for a CSV file matching the variable name
-				string csvPath = uEmuera.Utils.ResolveExistingFilePath(csvDir + varToken.Name + ".CSV");
+				string csvPath = Path.Combine(csvDir, varToken.Name + ".CSV");
+				csvPath = uEmuera.Utils.ResolveExistingFilePath(csvPath);
 				if (string.IsNullOrEmpty(csvPath) || !File.Exists(csvPath))
 					continue;
 
@@ -588,12 +590,15 @@ namespace MinorShift.Emuera.GameProc
 
 		/// <summary>
 		/// Loads data from a CSV file into a user-defined variable.
-		/// Supports integer and string arrays (1D, 2D, 3D).
+		/// Supports integer and string arrays (1D, 2D).
+		/// Note: 3D arrays not currently supported due to complexity of CSV representation.
 		/// </summary>
 		/// <param name="csvPath">Path to the CSV file</param>
 		/// <param name="varToken">Variable token to initialize</param>
 		private void LoadUserVariableFromCsv(string csvPath, VariableToken varToken)
 		{
+			const char CSV_COMMENT_CHAR = ';';
+			
 			using (EraStreamReader reader = new EraStreamReader(false))
 			{
 				if (!reader.Open(csvPath))
@@ -603,8 +608,8 @@ namespace MinorShift.Emuera.GameProc
 				string line;
 				while ((line = reader.ReadLine()) != null)
 				{
-					// Skip comment lines and empty lines
-					if (string.IsNullOrWhiteSpace(line) || line.TrimStart().StartsWith(";"))
+					// Skip comment lines (starting with semicolon) and empty lines
+					if (string.IsNullOrWhiteSpace(line) || line.TrimStart().StartsWith(CSV_COMMENT_CHAR.ToString()))
 						continue;
 					lines.Add(line);
 				}
@@ -622,6 +627,8 @@ namespace MinorShift.Emuera.GameProc
 
 		/// <summary>
 		/// Loads string variable data from CSV lines.
+		/// Supports 1D and 2D string arrays.
+		/// Note: 3D arrays not supported - CSV format would be overly complex for 3D data representation.
 		/// </summary>
 		private void LoadStringVariableFromLines(List<string> lines, VariableToken varToken)
 		{
@@ -645,11 +652,12 @@ namespace MinorShift.Emuera.GameProc
 					}
 				}
 			}
-			// 3D arrays could be supported similarly if needed
 		}
 
 		/// <summary>
 		/// Loads integer variable data from CSV lines.
+		/// Supports 1D and 2D integer arrays.
+		/// Note: 3D arrays not supported - CSV format would be overly complex for 3D data representation.
 		/// </summary>
 		private void LoadIntegerVariableFromLines(List<string> lines, VariableToken varToken)
 		{
@@ -679,7 +687,6 @@ namespace MinorShift.Emuera.GameProc
 					}
 				}
 			}
-			// 3D arrays could be supported similarly if needed
 		}
 
 	}

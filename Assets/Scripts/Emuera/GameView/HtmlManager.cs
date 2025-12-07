@@ -792,8 +792,8 @@ namespace MinorShift.Emuera.GameView
 								throw new CodeEE($"<{tag}> tag: attribute name '{word.Code}' cannot be interpreted");
 						}
 						if (src == null)
-							throw new CodeEE($"<{tag}> tag: 'src' attribute is required but not specified");
-						// Create ConsoleImagePart which will load the image from resources
+							throw new CodeEE($"<{tag}> tag requires 'src' attribute to specify image resource name");
+						// Create ConsoleImagePart which will load the image from resources folder via AppContents.GetSprite()
 						return new ConsoleImagePart(src, srcb, height, width, ypos);
 					}
 
