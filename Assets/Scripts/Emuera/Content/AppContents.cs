@@ -47,9 +47,18 @@ namespace MinorShift.Emuera.Content
 				return null;
             
             name = name.ToUpper();
-            ASprite result = null;
-            imageDictionary.TryGetValue(name, out result);
-            return result;
+			ASprite result = null;
+			imageDictionary.TryGetValue(name, out result);
+			
+			// Debug logging to help diagnose image loading issues
+			if (result == null)
+			{
+				UnityEngine.Debug.LogWarning($"AppContents.GetSprite: Image '{name}' not found in imageDictionary. " +
+					$"Available images count: {imageDictionary.Count}. " +
+					$"Make sure the image is registered in a CSV file in the Resources folder.");
+			}
+			
+			return result;
 		}
 
 		static public void SpriteDispose(string name)
@@ -94,7 +103,10 @@ namespace MinorShift.Emuera.Content
 #if(UNITY_ANDROID || UNITY_IOS) && !UNITY_EDITOR
                 csvFiles.AddRange(Directory.GetFiles(Program.ContentDir, "*.CSV", SearchOption.TopDirectoryOnly));
 #endif
+                UnityEngine.Debug.Log($"AppContents.LoadContents: Found {csvFiles.Count} CSV files in Resources folder");
+                
                 var count = csvFiles.Count;
+                int totalImagesLoaded = 0;
                 for(var i=0; i<count; ++i)
 				{
                     var filepath = csvFiles[i];
@@ -122,7 +134,10 @@ namespace MinorShift.Emuera.Content
 						{
 							currentAnime = item as SpriteAnime;
 							if (!imageDictionary.ContainsKey(item.Name))
+							{
 								imageDictionary.Add(item.Name, item);
+								totalImagesLoaded++;
+							}
 							else
 							{
 								ParserMediator.Warn("A resource with the same name has already been created:" + item.Name, sp, 0);
@@ -131,9 +146,24 @@ namespace MinorShift.Emuera.Content
 						}
 					}
 				}
+				
+				UnityEngine.Debug.Log($"AppContents.LoadContents: Successfully loaded {totalImagesLoaded} images from CSV files");
+				
+				// Log first few image names for debugging
+				if (imageDictionary.Count > 0)
+				{
+					UnityEngine.Debug.Log("Sample of loaded images (first 10):");
+					int sampleCount = 0;
+					foreach (var key in imageDictionary.Keys)
+					{
+						UnityEngine.Debug.Log($"  - {key}");
+						if (++sampleCount >= 10) break;
+					}
+				}
 			}
-			catch(Exception )
+			catch(Exception ex)
 			{
+				UnityEngine.Debug.LogError($"AppContents.LoadContents: Exception during loading - {ex.GetType().Name}: {ex.Message}");
 				return false;
 				//throw new CodeEE("An error occurred while loading the resource file");
 			}

@@ -525,25 +525,47 @@ namespace MinorShift.Emuera.GameProc
 		}
 
 		public string getRawTextFormFilewithLine(ScriptPosition position)
-        {
-			string extents = position.Filename.Substring(position.Filename.Length - 4).ToLower();
-			if (extents == ".erb")
+    {
+		string extents = position.Filename.Substring(position.Filename.Length - 4).ToLower();
+		if (extents == ".erb")
+		{
+			string path = uEmuera.Utils.ResolveExistingFilePath(Program.ErbDir + position.Filename);
+			if (string.IsNullOrEmpty(path))
 			{
-				string path = uEmuera.Utils.ResolveExistingFilePath(Program.ErbDir + position.Filename);
-				if (string.IsNullOrEmpty(path))
-					return "";
-				return position.LineNo > 0 ? File.ReadLines(path, Config.Encode).Skip(position.LineNo - 1).First() : "";
-			}
-			else if (extents == ".csv")
-			{
-				string path = uEmuera.Utils.ResolveExistingFilePath(Program.CsvDir + position.Filename);
-				if (string.IsNullOrEmpty(path))
-					return "";
-				return position.LineNo > 0 ? File.ReadLines(path, Config.Encode).Skip(position.LineNo - 1).First() : "";
-			}
-			else
+				UnityEngine.Debug.LogWarning($"File not found: {Program.ErbDir + position.Filename}");
 				return "";
+			}
+			try
+			{
+				return position.LineNo > 0 ? File.ReadLines(path, Config.Encode).Skip(position.LineNo - 1).First() : "";
+			}
+			catch (System.Exception ex)
+			{
+				UnityEngine.Debug.LogWarning($"Error reading file {path}: {ex.Message}");
+				return "";
+			}
 		}
+		else if (extents == ".csv")
+		{
+			string path = uEmuera.Utils.ResolveExistingFilePath(Program.CsvDir + position.Filename);
+			if (string.IsNullOrEmpty(path))
+			{
+				UnityEngine.Debug.LogWarning($"File not found: {Program.CsvDir + position.Filename}");
+				return "";
+			}
+			try
+			{
+				return position.LineNo > 0 ? File.ReadLines(path, Config.Encode).Skip(position.LineNo - 1).First() : "";
+			}
+			catch (System.Exception ex)
+			{
+				UnityEngine.Debug.LogWarning($"Error reading file {path}: {ex.Message}");
+				return "";
+			}
+		}
+		else
+			return "";
+	}
 
 		/// <summary>
 		/// Loads CSV data for user-defined variables.

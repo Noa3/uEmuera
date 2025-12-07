@@ -30,59 +30,60 @@ namespace MinorShift.Emuera.GameView
 		/// <param name="raw_ypos">Vertical position offset - number=percentage of font size, number with px=absolute pixels</param>
 		public ConsoleImagePart(string resName, string resNameb, MixedNum raw_height, MixedNum raw_width, MixedNum raw_ypos)
 		{
-			top = 0;
-			bottom = Config.FontSize;
-			Str = "";
 			ResourceName = resName ?? "";
 			ButtonResourceName = resNameb;
 
             cImage = AppContents.GetSprite(ResourceName);
-#if !UNITY_EDITOR
-            if(cImage == null)
-            {
-#endif
-                StringBuilder sb = new StringBuilder();
-                sb.Append("<img src='");
-                sb.Append(ResourceName);
-                if(ButtonResourceName != null)
-                {
-                    sb.Append("' srcb='");
-                    sb.Append(ButtonResourceName);
-                }
-			if(raw_height.num != 0)
+		
+			// If image loading failed, create alt text and return early
+			if(cImage == null)
 			{
-				sb.Append("' height='");
-				sb.Append(raw_height.num.ToString());
-				if (raw_height.isPx)
-					sb.Append("px");
+				// Initialize fields for failed image load
+				top = 0;
+				bottom = Config.FontSize;
+				Width = 0;
+				XsubPixel = 0;
+				destRect = new Rectangle(0, 0, 0, 0);
+				
+				// Create alt text showing the img tag
+				StringBuilder sb = new StringBuilder();
+				sb.Append("<img src='");
+				sb.Append(ResourceName);
+				if(ButtonResourceName != null)
+				{
+					sb.Append("' srcb='");
+					sb.Append(ButtonResourceName);
+				}
+				if(raw_height.num != 0)
+				{
+					sb.Append("' height='");
+					sb.Append(raw_height.num.ToString());
+					if (raw_height.isPx)
+						sb.Append("px");
+				}
+				if(raw_width.num != 0)
+				{
+					sb.Append("' width='");
+					sb.Append(raw_width.num.ToString());
+					if (raw_width.isPx)
+						sb.Append("px");
+				}
+				if(raw_ypos.num != 0)
+				{
+					sb.Append("' ypos='");
+					sb.Append(raw_ypos.num.ToString());
+					if (raw_ypos.isPx)
+						sb.Append("px");
+				}
+				sb.Append("'>");
+				AltText = sb.ToString();
+				Str = AltText;
+				return;
 			}
-			if(raw_width.num != 0)
-			{
-				sb.Append("' width='");
-				sb.Append(raw_width.num.ToString());
-				if (raw_width.isPx)
-					sb.Append("px");
-			}
-			if(raw_ypos.num != 0)
-			{
-				sb.Append("' ypos='");
-				sb.Append(raw_ypos.num.ToString());
-				if (raw_ypos.isPx)
-					sb.Append("px");
-			}
-                sb.Append("'>");
-                AltText = sb.ToString();
-#if !UNITY_EDITOR
-                Str = AltText;
-                return;
-            }
-#else
-            if(cImage == null)
-            {
-                Str = AltText;
-                return;
-            }
-#endif  
+		
+			// Image loaded successfully - set Str to empty and calculate dimensions
+			Str = "";
+			
 			int height = 0;
 			if (raw_height.num == 0) // If height not specified in HTML or 0 is specified, use font size directly as height (in px units)
 				height = Config.FontSize;
@@ -123,20 +124,20 @@ namespace MinorShift.Emuera.GameView
 			//	bottom = Config.FontSize;
 			if (ButtonResourceName != null)
 			{
-                if(ButtonResourceName == ResourceName)
-                    cImageB = cImage;
-                else
-                {
-                    cImageB = AppContents.GetSprite(ButtonResourceName);
-                    if(cImageB != null)
-                        cImageB = null;
-                }
+				if(ButtonResourceName == ResourceName)
+					cImageB = cImage;
+				else
+				{
+					cImageB = AppContents.GetSprite(ButtonResourceName);
+					if(cImageB == null)
+						cImageB = null;
+				}
 			}
 		}
 
         public ASprite Image { get { return cImage; } }
         public ASprite ImageBackground { get { return cImageB; } }
-        public Rectangle rect { get { return cImage.Rectangle; } }
+        public Rectangle rect { get { return cImage != null ? cImage.Rectangle : new Rectangle(0, 0, 0, 0); } }
         public Rectangle dest_rect { get { return destRect; } }
 
 		private readonly ASprite cImage;
