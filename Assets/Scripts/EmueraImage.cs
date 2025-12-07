@@ -93,14 +93,16 @@ public class EmueraImage : EmueraBehaviour
         }
 
         int miny = int.MaxValue;
+        int maxy = int.MinValue;
         for(int i = 0; i < image_indices.Count; ++i)
         {
             var str_index = image_indices[i];
             var image_part = cb.StrArray[str_index] as ConsoleImagePart;
             miny = System.Math.Min(miny, image_part.Top);
+            maxy = System.Math.Max(maxy, image_part.Bottom);
         }
         logic_y = line_desc.position_y + miny;
-        logic_height = 0;
+        logic_height = maxy - miny;
 
         var prt = rect_transform;
         int width = 0;
@@ -125,22 +127,37 @@ public class EmueraImage : EmueraBehaviour
 
             var image_rect = image_part.dest_rect;
             
-            // Apply DestBasePosition offset for proper sprite layering
-            var sprite_x_offset = 0;
-            var sprite_y_offset = 0;
-            if (image_part.Image != null)
+            // Calculate scaled sprite offset based on display size vs source size
+            // Matches the original GDI drawing logic where offsets are scaled proportionally
+            int sprite_x_offset = 0;
+            int sprite_y_offset = 0;
+            if (image_part.Image != null && !image_part.Image.DestBasePosition.IsEmpty)
             {
-                sprite_x_offset = image_part.Image.DestBasePosition.X;
-                sprite_y_offset = image_part.Image.DestBasePosition.Y;
+                var sprite = image_part.Image;
+                var src_rect = sprite.Rectangle;
+                
+                // Scale the offset by the ratio of destination size to source size
+                // This ensures proper layering when sprites are scaled
+                if (src_rect.Width > 0)
+                    sprite_x_offset = sprite.DestBasePosition.X * image_rect.Width / src_rect.Width;
+                if (src_rect.Height > 0)
+                    sprite_y_offset = sprite.DestBasePosition.Y * image_rect.Height / src_rect.Height;
             }
             
-            // Position includes both the image's position in the line and the sprite's offset
+            // Position calculation:
+            // - X: horizontal position from button start + scaled sprite offset
+            // - Y: In console coordinates (Y down), image_part.Top is the ypos offset from baseline
+            //   - miny is the minimum Top value, used as the container's top edge
+            //   - Position relative to container top: (image_part.Top - miny)
+            //   - Unity uses bottom-up Y, and anchors are at bottom-left by default
+            //   - Container height is (maxy - miny)
+            //   - Y position from bottom = container_height - (Top - miny) - image_height - scaled_sprite_y_offset
+            //   - Simplified: maxy - image_part.Top - image_rect.Height - sprite_y_offset
             rt.anchoredPosition = new Vector2(
                 image_part.PointX - ud.posx + sprite_x_offset, 
-                miny - image_rect.Top + sprite_y_offset);
+                maxy - image_part.Top - image_rect.Height - sprite_y_offset);
             rt.sizeDelta = new Vector2(image_rect.Width, image_rect.Height);
             rt.localScale = Vector3.one;
-            logic_height = Mathf.Max(logic_height, image_rect.Height);
 
             width = Mathf.Max(image_part.PointX - ud.posx + sprite_x_offset + image_rect.Width, width);
         }

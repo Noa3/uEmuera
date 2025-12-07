@@ -57,8 +57,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Tests\EditMode\uEmuera.Tests.EditMode.asmdef" />
-    <None Include="fix_inputreq.patch" />
-    <None Include="fix_inputreq.ps1" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
