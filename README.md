@@ -88,8 +88,9 @@ This fork includes significant improvements and modernizations:
 
 ### Screenshots
 ----
-
+- Game: EraMakakaiRanch
 <img width="1381" height="691" alt="grafik" src="https://github.com/user-attachments/assets/25ab5fa1-3a88-4ef9-a0b9-bf2d8584782a" />
+- Game: EraAkumaMaid
 <img width="1377" height="773" alt="grafik" src="https://github.com/user-attachments/assets/042375f2-8ff3-478c-8548-3e116ce2736e" />
 
 Start Screen
