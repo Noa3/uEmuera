@@ -5,8 +5,13 @@ using System.IO;
 
 namespace MinorShift.Emuera.Sub
 {
-	internal sealed class EraStreamReader : IDisposable
-	{
+    /// <summary>
+    /// Stream reader for ERA script files with UTF-8 encoding support.
+    /// Handles line-by-line reading of ERB and ERH files with proper text encoding
+    /// and optional file renaming support for loaded scripts.
+    /// </summary>
+    internal sealed class EraStreamReader : IDisposable
+    {
 		public EraStreamReader(bool useRename)
 		{
 			this.useRename = useRename;

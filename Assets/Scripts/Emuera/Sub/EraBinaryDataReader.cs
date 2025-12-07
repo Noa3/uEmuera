@@ -5,9 +5,14 @@ using System.IO;
 
 namespace MinorShift.Emuera.Sub
 {
-	#region reader/writer共通データ
-	public enum EraSaveFileType : byte
-	{
+    /// <summary>
+    /// Binary data reader for Emuera save files.
+    /// Provides efficient deserialization of game save data including
+    /// integers, strings, arrays, and character data.
+    /// </summary>
+    #region reader/writer共通データ
+    public enum EraSaveFileType : byte
+    {
 		Normal = 0x00,
 		Global = 0x01,
 		Var = 0x02,

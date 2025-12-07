@@ -8,10 +8,15 @@ using MinorShift.Emuera.GameData.Variable;
 
 namespace MinorShift.Emuera.GameData
 {
-	//Obfuscation attribute. Set (Exclude=true) when using enum.ToString() or enum.Parse().
-	[global::System.Reflection.Obfuscation(Exclude = false)]
-	internal enum CharacterStrData
-	{
+    /// <summary>
+    /// Defines constant data structures for character attributes and game constants.
+    /// Manages enumerations for character string data (NAME, CALLNAME, etc.)
+    /// and integer data (BASE, ABL, TALENT, etc.) used throughout the game.
+    /// </summary>
+    //Obfuscation attribute. Set (Exclude=true) when using enum.ToString() or enum.Parse().
+    [global::System.Reflection.Obfuscation(Exclude = false)]
+    internal enum CharacterStrData
+    {
 		NAME = 0,
 		CALLNAME = 1,
 		NICKNAME = 2,

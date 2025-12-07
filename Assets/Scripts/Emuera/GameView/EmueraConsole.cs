@@ -1,16 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-//using System.Drawing;
 using System.Text;
-//using System.Windows.Forms;
 using System.IO;
 using MinorShift._Library;
 using MinorShift.Emuera.Sub;
-//using MinorShift.Emuera.GameData;
 using MinorShift.Emuera.GameProc;
-//using System.Drawing.Imaging;
-//using MinorShift.Emuera.Forms;
 using MinorShift.Emuera.Content;
 using MinorShift.Emuera.GameData.Expression;
 using MinorShift.Emuera.GameProc.Function;
@@ -20,11 +15,16 @@ using uEmuera.Window;
 
 namespace MinorShift.Emuera.GameView
 {
-	//?????????
-	//Obfuscation attribute. Set (Exclude=true) when using enum.ToString() or enum.Parse().
-	[global::System.Reflection.Obfuscation(Exclude=false)]
-	internal enum ConsoleState
-	{
+    /// <summary>
+    /// Main console interface for the Emuera game engine.
+    /// Manages display output, user input, printing, colors, buttons, and graphics rendering.
+    /// Acts as the primary view layer between the game engine and the Unity UI.
+    /// </summary>
+    //?????????
+    //Obfuscation attribute. Set (Exclude=true) when using enum.ToString() or enum.Parse().
+    [global::System.Reflection.Obfuscation(Exclude=false)]
+    internal enum ConsoleState
+    {
 		Initializing = 0,
 		Quit = 5,//QUIT
 		Error = 6,//Exception???????
@@ -1709,7 +1709,7 @@ namespace MinorShift.Emuera.GameView
 		//		canSelect = true;
 		//	else if (state == ConsoleState.WaitInput && inputReq.NeedValue)
 		//		canSelect = true;
-		//	//???????????//??·?????????
+		//	//???????????//??ï¿½?????????
 		//	if(this.IsInProcess)
 		//		goto end;
 		//	//????????
@@ -1873,7 +1873,7 @@ namespace MinorShift.Emuera.GameView
             prevState = state;
 			prevReq = inputReq;
 			state = ConsoleState.Initializing;
-			PrintSingleLine("ERB??????……", true);
+			PrintSingleLine("ERB??????ï¿½ï¿½", true);
 			force_temporary = true;
 			emuera.ReloadErb();
 			force_temporary = false;
@@ -1923,7 +1923,7 @@ namespace MinorShift.Emuera.GameView
 			prevState = state;
 			prevReq = inputReq;
 			state = ConsoleState.Initializing;
-            PrintSingleLine("ERB??????……", true);
+            PrintSingleLine("ERB??????ï¿½ï¿½", true);
 			force_temporary = true;
 			emuera.ReloadPartialErb(path);
 			force_temporary = false;
@@ -1974,7 +1974,7 @@ namespace MinorShift.Emuera.GameView
 			prevState = state;
 			prevReq = inputReq;
 			state = ConsoleState.Initializing;
-            PrintSingleLine("ERB??????……", true);
+            PrintSingleLine("ERB??????ï¿½ï¿½", true);
 			force_temporary = true;
             emuera.ReloadPartialErb(paths);
 			force_temporary = false;

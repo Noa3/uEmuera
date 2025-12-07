@@ -7,6 +7,11 @@ using MinorShift.Emuera.Content;
 using uEmuera.Drawing;
 using WebP;
 
+/// <summary>
+/// Manages sprite and texture loading, caching, and lifecycle for the Emuera engine.
+/// Provides case-insensitive file resolution, placeholder generation for missing assets,
+/// and memory-efficient sprite management with automatic cleanup.
+/// </summary>
 internal static class SpriteManager
 {
     static float kPastTime = 300.0f;
@@ -61,9 +66,33 @@ internal static class SpriteManager
     {
         var placeholderTex = CreatePlaceholderTexture();
         var ti = new TextureInfo($"_placeholder_{name}", placeholderTex);
-        var rect = new Rect(0, 0, placeholderTex.width, placeholderTex.height);
-        var sprite = Sprite.Create(placeholderTex, rect, Vector2.zero);
-        return new SpriteInfo(ti, sprite);
+        return CreateSpriteInfoFromTexture(ti, placeholderTex);
+    }
+    
+    /// <summary>
+    /// Creates a placeholder SpriteInfo for an existing TextureInfo.
+    /// Used when sprite creation fails for a valid texture.
+    /// </summary>
+    /// <param name="parentTexture">The parent TextureInfo to associate with</param>
+    /// <returns>A SpriteInfo with a grey placeholder sprite</returns>
+    static SpriteInfo CreatePlaceholderSpriteInfoForTexture(TextureInfo parentTexture)
+    {
+        var placeholderTex = CreatePlaceholderTexture();
+        return CreateSpriteInfoFromTexture(parentTexture, placeholderTex);
+    }
+    
+    /// <summary>
+    /// Helper method to create a SpriteInfo from a texture.
+    /// Centralizes the sprite creation logic used by placeholder methods.
+    /// </summary>
+    /// <param name="textureInfo">The TextureInfo to associate with</param>
+    /// <param name="texture">The texture to create sprite from</param>
+    /// <returns>A SpriteInfo with the created sprite</returns>
+    static SpriteInfo CreateSpriteInfoFromTexture(TextureInfo textureInfo, Texture2D texture)
+    {
+        var rect = new Rect(0, 0, texture.width, texture.height);
+        var sprite = Sprite.Create(texture, rect, Vector2.zero);
+        return new SpriteInfo(textureInfo, sprite);
     }
 
     // Attempts to resolve a full path in a case-insensitive manner by walking each segment.
@@ -178,11 +207,8 @@ internal static class SpriteManager
                         $"Converted=({rect.x},{rect.y},{rect.width},{rect.height}), " +
                         $"Texture=({texture.width},{texture.height}). Creating placeholder sprite.");
                     
-                    // Create and return a placeholder sprite instead of null
-                    var placeholderTex = CreatePlaceholderTexture();
-                    var placeholderRect = new Rect(0, 0, placeholderTex.width, placeholderTex.height);
-                    var placeholderSprite = Sprite.Create(placeholderTex, placeholderRect, Vector2.zero);
-                    sprite = new SpriteInfo(this, placeholderSprite);
+                    // Use the centralized placeholder creation method
+                    sprite = CreatePlaceholderSpriteInfoForTexture(this);
                     sprites[src.Name] = sprite;
                     refcount += 1;
                     return sprite;

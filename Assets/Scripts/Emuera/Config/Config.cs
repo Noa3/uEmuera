@@ -1,19 +1,21 @@
 ﻿using System.Text;
-//using System.Drawing;
 using System.Collections.Generic;
 using System.IO;
 using System;
-//using System.Windows.Forms;
 using MinorShift._Library;
-
 using uEmuera.Forms;
 using uEmuera.Drawing;
 
 namespace MinorShift.Emuera
 {
-
-	internal static class Config
-	{
+    /// <summary>
+    /// Configuration management system for Emuera.
+    /// Handles loading, saving, and accessing game configuration settings
+    /// including display options, colors, fonts, and game-specific parameters.
+    /// Uses UTF-8 encoding for all text operations.
+    /// </summary>
+    internal static class Config
+    {
 
         #region config
 
