@@ -10,28 +10,29 @@ using uEmuera.Drawing;
 namespace MinorShift.Emuera.GameView
 {
 	/* Emuera HTML-like markup implementation - All features implemented
-	 * (できるだけhtmlとConsoleDisplayLineとの1:1対応を目指す。<b>と<strong>とか同じ結果になるタグを重複して実装しない)
-	 * ✅ <p align=""></p> ALIGNMENT命令相当・行頭から行末のみ・行末省略可
-	 * ✅ <nobr></nobr> PRINTSINGLE相当・行頭から行末のみ・行末省略可
-	 * ✅ <b><i><u><s> フォント各種
-	 * ✅ <button value=""></button> ボタン化
-	 * ✅ <font face="" color="" bcolor=""></font> フォント指定 色指定 ボタン選択中色指定
-	 * ✅ <!-- --> コメント
+	 * (Aim for 1:1 correspondence between HTML and ConsoleDisplayLine. Don't duplicate tags that produce the same result like <b> and <strong>)
+	 * ✅ <p align=""></p> Equivalent to ALIGNMENT command - line start to line end only, end tag can be omitted
+	 * ✅ <nobr></nobr> Equivalent to PRINTSINGLE - line start to line end only, end tag can be omitted
+	 * ✅ <b><i><u><s> Various font styles
+	 * ✅ <button value=""></button> Button creation
+	 * ✅ <font face="" color="" bcolor=""></font> Font specification, color specification, button selection color specification
+	 * ✅ <!-- --> Comment
 	 * ✅ <nonbutton title='～～'> Non-button text with title attribute
 	 * ✅ <img src='～～' srcb='～～' height='' width='' ypos=''> Image with button variant
 	 * ✅ <shape type='rect' param='0,0,0,0' color='' bcolor=''> Shape drawing (rect, space, polygon)
-	 * ✅ エスケープ &amp; &gt; &lt; &quot; &apos;
-	 * ✅ &#nn; &#xnn; Unicode参照
+	 * ✅ Escape sequences: &amp; &gt; &lt; &quot; &apos;
+	 * ✅ &#nn; &#xnn; Unicode character references
 	 */
-	/* このクラスがサポートすべきもの
-	 * html から ConsoleDisplayLine[] //主に表示用
-	 * ConsoleDisplayLine[] から html //現在の表示をstr化して保存？
-	 * html から ConsoleDisplayLine[] を経て html //表示を行わずに改行が入る位置のチェックができるかも
-	 * html から PlainText(非エスケープ)//
-	 * Text から エスケープ済Text
+	/* What this class should support:
+	 * HTML to ConsoleDisplayLine[] - Mainly for display
+	 * ConsoleDisplayLine[] to HTML - Convert current display to string for saving?
+	 * HTML to ConsoleDisplayLine[] to HTML - Check where line breaks occur without displaying
+	 * HTML to PlainText (unescaped)
+	 * Text to escaped Text
 	 */
 	/// <summary>
-	/// EmueraConsoleのなんちゃってHtml解決用クラス
+	/// HTML-like markup parser for EmueraConsole.
+	/// Handles parsing of HTML-like tags for text formatting, buttons, images, and shapes.
 	/// </summary>
 	internal static class HtmlManager
 	{
@@ -721,7 +722,7 @@ namespace MinorShift.Emuera.GameView
 				case "img":
 					{
 						if (wc == null)
-							throw new CodeEE("<" + tag + ">タグに属性が設定されていません");
+							throw new CodeEE($"<{tag}> tag has no attributes specified");
 						string attrValue = null;
 						string src = null;
 						string srcb = null;
@@ -742,56 +743,57 @@ namespace MinorShift.Emuera.GameView
 							if (word.Code.Equals("src", StringComparison.OrdinalIgnoreCase))
 							{
 								if (src != null)
-									throw new CodeEE("<" + tag + ">タグに" + word.Code + "属性が2度以上指定されています");
+									throw new CodeEE($"<{tag}> tag: '{word.Code}' attribute specified more than once");
 								src = attrValue;
 							}
 							else if (word.Code.Equals("srcb", StringComparison.OrdinalIgnoreCase))
 							{
 								if (srcb != null)
-									throw new CodeEE("<" + tag + ">タグに" + word.Code + "属性が2度以上指定されています");
+									throw new CodeEE($"<{tag}> tag: '{word.Code}' attribute specified more than once");
 								srcb = attrValue;
 							}
 							else if (word.Code.Equals("height", StringComparison.OrdinalIgnoreCase))
 							{
 								if (height.num != 0)
-									throw new CodeEE("<" + tag + ">タグに" + word.Code + "属性が2度以上指定されています");
+									throw new CodeEE($"<{tag}> tag: '{word.Code}' attribute specified more than once");
 								if (attrValue.EndsWith("px", StringComparison.OrdinalIgnoreCase))
 								{
 									height.isPx = true;
 									attrValue = attrValue.Substring(0, attrValue.Length - 2);
 								}
 								if (!int.TryParse(attrValue, out height.num))
-									throw new CodeEE("<" + tag + ">タグのheight属性の属性値が数値として解釈できません");
+									throw new CodeEE($"<{tag}> tag: 'height' attribute value cannot be parsed as a number");
 							}
 							else if (word.Code.Equals("width", StringComparison.OrdinalIgnoreCase))
 							{
 								if (width.num != 0)
-									throw new CodeEE("<" + tag + ">タグに" + word.Code + "属性が2度以上指定されています");
+									throw new CodeEE($"<{tag}> tag: '{word.Code}' attribute specified more than once");
 								if (attrValue.EndsWith("px", StringComparison.OrdinalIgnoreCase))
 								{
 									width.isPx = true;
 									attrValue = attrValue.Substring(0, attrValue.Length - 2);
 								}
 								if (!int.TryParse(attrValue, out width.num))
-									throw new CodeEE("<" + tag + ">タグのwidth属性の属性値が数値として解釈できません");
+									throw new CodeEE($"<{tag}> tag: 'width' attribute value cannot be parsed as a number");
 							}
 							else if (word.Code.Equals("ypos", StringComparison.OrdinalIgnoreCase))
 							{
 								if (ypos.num != 0)
-									throw new CodeEE("<" + tag + ">タグに" + word.Code + "属性が2度以上指定されています");
+									throw new CodeEE($"<{tag}> tag: '{word.Code}' attribute specified more than once");
 								if (attrValue.EndsWith("px", StringComparison.OrdinalIgnoreCase))
 								{
 									ypos.isPx = true;
 									attrValue = attrValue.Substring(0, attrValue.Length - 2);
 								}
 								if (!int.TryParse(attrValue, out ypos.num))
-									throw new CodeEE("<" + tag + ">タグのypos属性の属性値が数値として解釈できません");
+									throw new CodeEE($"<{tag}> tag: 'ypos' attribute value cannot be parsed as a number");
 							}
 							else
-								throw new CodeEE("<" + tag + ">タグの属性名" + word.Code + "は解釈できません");
+								throw new CodeEE($"<{tag}> tag: attribute name '{word.Code}' cannot be interpreted");
 						}
 						if (src == null)
-							throw new CodeEE("<" + tag + ">タグにsrc属性が設定されていません");
+							throw new CodeEE($"<{tag}> tag: 'src' attribute is required but not specified");
+						// Create ConsoleImagePart which will load the image from resources
 						return new ConsoleImagePart(src, srcb, height, width, ypos);
 					}
 

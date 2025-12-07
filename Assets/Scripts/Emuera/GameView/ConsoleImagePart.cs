@@ -10,9 +10,24 @@ using uEmuera.Forms;
 
 namespace MinorShift.Emuera.GameView
 {
+	/// <summary>
+	/// Represents an image part in the console display.
+	/// Images are loaded from the resources folder and displayed inline with text.
+	/// Supports sizing (absolute px or relative %), button variants, and vertical positioning.
+	/// </summary>
 	class ConsoleImagePart : AConsoleDisplayPart
 	{
 
+		/// <summary>
+		/// Creates a new console image part.
+		/// Images are loaded via AppContents.GetSprite() from the resources folder.
+		/// If image loading fails, displays alt text with the img tag parameters.
+		/// </summary>
+		/// <param name="resName">Image resource name (src attribute) - required</param>
+		/// <param name="resNameb">Button state image resource name (srcb attribute) - optional</param>
+		/// <param name="raw_height">Image height - 0=font size, positive number=percentage of font size, number with px=absolute pixels</param>
+		/// <param name="raw_width">Image width - 0=maintain aspect ratio, positive number=percentage of font size, number with px=absolute pixels</param>
+		/// <param name="raw_ypos">Vertical position offset - number=percentage of font size, number with px=absolute pixels</param>
 		public ConsoleImagePart(string resName, string resNameb, MixedNum raw_height, MixedNum raw_width, MixedNum raw_ypos)
 		{
 			top = 0;
@@ -69,12 +84,12 @@ namespace MinorShift.Emuera.GameView
             }
 #endif  
 			int height = 0;
-			if (raw_height.num == 0)//HTMLで高さが指定されていない又は0が指定された場合、フォントサイズをそのまま高さ(px単位)として使用する。
+			if (raw_height.num == 0) // If height not specified in HTML or 0 is specified, use font size directly as height (in px units)
 				height = Config.FontSize;
-			else//HTMLで高さが指定された場合、フォントサイズの100分率と解釈する。
+			else // If height is specified in HTML, interpret it as a percentage of font size
 				height = raw_height.isPx ? raw_height.num : (Config.FontSize * raw_height.num / 100);
-			//幅が指定されていない又は0が指定された場合、元画像の縦横比を維持するように幅(px単位)を設定する。1未満は端数としてXsubpixelに記録。
-			//負の値が指定される可能性があるが、最終的なWidthは正の値になるようにあとで調整する。
+			// If width not specified or 0 is specified, set width (in px units) to maintain original image aspect ratio. Fractional parts less than 1 are recorded in XsubPixel.
+			// Negative values are possible, but final Width is adjusted to be positive later.
 			if (raw_width.num == 0)
 			{
 				Width = cImage.DestBaseSize.Width * height / cImage.DestBaseSize.Height;
