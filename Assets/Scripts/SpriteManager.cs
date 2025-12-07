@@ -66,9 +66,7 @@ internal static class SpriteManager
     {
         var placeholderTex = CreatePlaceholderTexture();
         var ti = new TextureInfo($"_placeholder_{name}", placeholderTex);
-        var rect = new Rect(0, 0, placeholderTex.width, placeholderTex.height);
-        var sprite = Sprite.Create(placeholderTex, rect, Vector2.zero);
-        return new SpriteInfo(ti, sprite);
+        return CreateSpriteInfoFromTexture(ti, placeholderTex);
     }
     
     /// <summary>
@@ -80,9 +78,21 @@ internal static class SpriteManager
     static SpriteInfo CreatePlaceholderSpriteInfoForTexture(TextureInfo parentTexture)
     {
         var placeholderTex = CreatePlaceholderTexture();
-        var rect = new Rect(0, 0, placeholderTex.width, placeholderTex.height);
-        var sprite = Sprite.Create(placeholderTex, rect, Vector2.zero);
-        return new SpriteInfo(parentTexture, sprite);
+        return CreateSpriteInfoFromTexture(parentTexture, placeholderTex);
+    }
+    
+    /// <summary>
+    /// Helper method to create a SpriteInfo from a texture.
+    /// Centralizes the sprite creation logic used by placeholder methods.
+    /// </summary>
+    /// <param name="textureInfo">The TextureInfo to associate with</param>
+    /// <param name="texture">The texture to create sprite from</param>
+    /// <returns>A SpriteInfo with the created sprite</returns>
+    static SpriteInfo CreateSpriteInfoFromTexture(TextureInfo textureInfo, Texture2D texture)
+    {
+        var rect = new Rect(0, 0, texture.width, texture.height);
+        var sprite = Sprite.Create(texture, rect, Vector2.zero);
+        return new SpriteInfo(textureInfo, sprite);
     }
 
     // Attempts to resolve a full path in a case-insensitive manner by walking each segment.
