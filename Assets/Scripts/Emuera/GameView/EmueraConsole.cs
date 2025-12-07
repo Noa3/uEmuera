@@ -954,6 +954,10 @@ namespace MinorShift.Emuera.GameView
 				{ text = new string[] { str }; }
 				else
 				{
+					// Additional null check guard - inputReq might become null between checks
+					if (inputReq == null)
+						return;
+					
 					if (str.StartsWith("@") && !inputReq.OneInput)
 					{
 						doSystemCommand(str);
