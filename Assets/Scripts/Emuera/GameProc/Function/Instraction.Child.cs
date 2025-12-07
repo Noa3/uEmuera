@@ -689,12 +689,9 @@ namespace MinorShift.Emuera.GameProc.Function
 						def = arg.ConstInt;
 					else
 						def = arg.Term.GetIntValue(exm);
-					// Extract first digit from multi-digit numbers (>= 10 ensures safe Log10 call)
-					if (def >= 10)
-					{
-						// Extract first digit using the same method as ONETINPUT
-						def = def / (long)(Math.Pow(10.0, Math.Log10((double)def)));
-					}
+					// Extract first digit from multi-digit numbers (simpler and more reliable than Log10)
+					while (def >= 10)
+						def /= 10;
 					if (def >= 0)
 					{
 						req.HasDefValue = true;
@@ -762,9 +759,9 @@ namespace MinorShift.Emuera.GameProc.Function
 				{
 					if (y < 0)
 						y = Math.Abs(y);
-					// Extract first digit from multi-digit numbers (>= 10 ensures safe Log10 call)
-					if (y >= 10)
-						y = y / (long)(Math.Pow(10.0, Math.Log10((double)y)));
+					// Extract first digit from multi-digit numbers (simpler and more reliable than Log10)
+					while (y >= 10)
+						y /= 10;
 				}
 				Int64 z = (tinputarg.Disp != null) ? tinputarg.Disp.GetIntValue(exm) : 1;
 				req.Timelimit = x;
