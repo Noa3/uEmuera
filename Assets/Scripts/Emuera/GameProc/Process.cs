@@ -632,21 +632,24 @@ namespace MinorShift.Emuera.GameProc
 		/// </summary>
 		private void LoadStringVariableFromLines(List<string> lines, VariableToken varToken)
 		{
-			if (varToken.ArrayLength == 1)
+			if (varToken.Dimension == 1)
 			{
 				// 1D array: each line is one element
-				for (int i = 0; i < Math.Min(lines.Count, varToken.Length1); i++)
+				int length = varToken.GetLength();
+				for (int i = 0; i < Math.Min(lines.Count, length); i++)
 				{
 					varToken.SetValue(lines[i], new long[] { i });
 				}
 			}
-			else if (varToken.ArrayLength == 2)
+			else if (varToken.Dimension == 2)
 			{
 				// 2D array: comma-separated values per line
-				for (int i = 0; i < Math.Min(lines.Count, varToken.Length1); i++)
+				int length1 = varToken.GetLength(0);
+				int length2 = varToken.GetLength(1);
+				for (int i = 0; i < Math.Min(lines.Count, length1); i++)
 				{
 					string[] values = lines[i].Split(',');
-					for (int j = 0; j < Math.Min(values.Length, varToken.Length2); j++)
+					for (int j = 0; j < Math.Min(values.Length, length2); j++)
 					{
 						varToken.SetValue(values[j].Trim(), new long[] { i, j });
 					}
@@ -661,10 +664,11 @@ namespace MinorShift.Emuera.GameProc
 		/// </summary>
 		private void LoadIntegerVariableFromLines(List<string> lines, VariableToken varToken)
 		{
-			if (varToken.ArrayLength == 1)
+			if (varToken.Dimension == 1)
 			{
 				// 1D array: parse each line as integer
-				for (int i = 0; i < Math.Min(lines.Count, varToken.Length1); i++)
+				int length = varToken.GetLength();
+				for (int i = 0; i < Math.Min(lines.Count, length); i++)
 				{
 					if (long.TryParse(lines[i].Trim(), out long value))
 					{
@@ -672,13 +676,15 @@ namespace MinorShift.Emuera.GameProc
 					}
 				}
 			}
-			else if (varToken.ArrayLength == 2)
+			else if (varToken.Dimension == 2)
 			{
 				// 2D array: comma-separated integer values per line
-				for (int i = 0; i < Math.Min(lines.Count, varToken.Length1); i++)
+				int length1 = varToken.GetLength(0);
+				int length2 = varToken.GetLength(1);
+				for (int i = 0; i < Math.Min(lines.Count, length1); i++)
 				{
 					string[] values = lines[i].Split(',');
-					for (int j = 0; j < Math.Min(values.Length, varToken.Length2); j++)
+					for (int j = 0; j < Math.Min(values.Length, length2); j++)
 					{
 						if (long.TryParse(values[j].Trim(), out long value))
 						{
