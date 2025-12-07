@@ -1,0 +1,141 @@
+﻿		public void PressEnterKey(bool keySkip, string str, bool changedByMouse)
+		{
+			MesSkip = keySkip;
+			if ((state == ConsoleState.Running) || (state == ConsoleState.Initializing))
+				return;
+			else if ((state == ConsoleState.Quit))
+			{
+				window.Close();
+				return;
+			}
+			else if (state == ConsoleState.Error)
+			{
+				if (str == ErrorButtonsText && selectingButton != null && selectingButton.ErrPos != null)
+				{
+					openErrorFile(selectingButton.ErrPos);
+					return;
+				}
+				window.Close();
+				return;
+			}
+#if UEMUERA_DEBUG
+			if (state != ConsoleState.WaitInput || inputReq == null)
+				throw new ExeEE("");
+#else
+			// Guard against null inputReq in production builds
+			if (state != ConsoleState.WaitInput || inputReq == null)
+				return;
+#endif
+			KillMacro = false;
+			try
+			{
+				string[] text;
+				if(changedByMouse)//1823 マウスによって入力されたならマクロ解析を行わない
+				{ text = new string[] { str }; }
+				else
+				{
+					// Additional null check guard - inputReq might become null between checks
+					if (inputReq == null)
+						return;
+					
+					if (str.StartsWith("@") && !inputReq.OneInput)
+					{
+						doSystemCommand(str);
+						return;
+					}
+					if (inputReq.InputType == InputType.Void)
+						return;
+					if (timer.Enabled &&
+						(inputReq.InputType == InputType.AnyKey || inputReq.InputType == InputType.EnterKey))
+						stopTimer();
+					//if((inputReq.InputType == InputType.IntValue || inputReq.InputType == InputType.StrValue)
+					if (str.Contains("("))
+						str = parseInput(new StringStream(str), false);
+					text = str.Split(spliter, StringSplitOptions.None);
+				}
+				
+				inProcess = true;
+				for (int i = 0; i < text.Length; i++)
+				{
+					string inputs = text[i];
+					if (inputs.IndexOf("\\e") >= 0)
+					{
+						inputs = inputs.Replace("\\e", "");//\eの除去
+						MesSkip = true;
+					}
+
+					if (inputReq.OneInput && (!Config.AllowLongInputByMouse || !changedByMouse) && inputs.Length > 1)
+						inputs = inputs.Remove(1);
+					//1819 TODO:入力無効系（強制待ちTWAIT）でスキップとマクロを止めるかそのままか
+					//現在はそのまま。強制待ち中はスキップの開始もできないのにスキップ中なら飛ばせる。
+					if (inputReq.InputType == InputType.Void)
+					{
+						i--;
+						inputs = "";
+					}
+					callEmueraProgram(inputs);
+					RefreshStrings(false);
+					while (MesSkip && state == ConsoleState.WaitInput)
+					{
+						//TODO:入力無効を通していいか？スキップ停止をマクロでは飛ばせていいのか？
+						if (inputReq.NeedValue)
+							break;
+						if (inputReq.StopMesskip)
+							break;
+						callEmueraProgram("");
+						RefreshStrings(false);
+						//DoEventを呼ばないと描画処理すらまったく行われない
+						//Application.DoEvents();
+						//EscがマクロストップかつEscがスキップ開始だからEscでスキップを止められても即開始しちゃったりするからあんまり意味ないよね
+						//if (KillMacro)
+						//	goto endMacro;
+					}
+					MesSkip = false;
+					if (state != ConsoleState.WaitInput)
+						break;
+					//マクロループ時は待ち処理が起こらないのでここでシステムキューを捌く
+					//Application.DoEvents();
+#if UEMUERA_DEBUG
+					if (state != ConsoleState.WaitInput || inputReq == null)
+						throw new ExeEE("");
+#endif
+					if (KillMacro)
+						goto endMacro;
+				}
+			}
+			finally
+			{
+				inProcess = false;
+			}
+			endMacro:
+			if(state == ConsoleState.WaitInput && inputReq.NeedValue)
+			{
+				Point point = window.MainPicBox.PointToClient(Control.MousePosition);
+				if (window.MainPicBox.ClientRectangle.Contains(point))
+					MoveMouse(point);
+			}
+			RefreshStrings(true);
+		}
+
+		private void openErrorFile(ScriptPosition pos)
+		{
+			ProcessStartInfo pInfo = new ProcessStartInfo();
+			pInfo.FileName = Config.TextEditor;
+			string fname = pos.Filename.ToUpper();
+			if (fname.EndsWith(".CSV"))
+			{
+				if (fname.Contains(Program.CsvDir.ToUpper()))
+					fname = fname.Replace(Program.CsvDir.ToUpper(), "");
+				fname = Program.CsvDir + fname;
+			}
+			else
+			{
+				//解析モードの場合は見ているファイルがERB\の下にあるとは限らないかつフルパスを持っているのでこの補正はしなくてよい
+				if (!Program.AnalysisMode)
+				{
+					if (fname.Contains(Program.ErbDir.ToUpper()))
+						fname = fname.Replace(Program.ErbDir.ToUpper(), "");
+					fname = Program.ErbDir + fname;
+				}
+			}
+			switch (Config.EditorType)

@@ -6,8 +6,13 @@ using MinorShift.Emuera.GameData;
 
 namespace MinorShift.Emuera.Sub
 {
-	enum LexEndWith
-	{
+    /// <summary>
+    /// Lexical analyzer for ERA script language.
+    /// Tokenizes ERA script source code into words (identifiers, operators, literals, etc.)
+    /// for parsing and execution by the game engine.
+    /// </summary>
+    enum LexEndWith
+    {
 		//いずれにせよEoLで強制終了
 		None = 0,
 		EoL,//常に最後まで解析

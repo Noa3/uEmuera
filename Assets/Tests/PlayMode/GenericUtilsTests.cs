@@ -106,6 +106,66 @@ namespace uEmuera.Tests.PlayMode
             Assert.AreEqual(50, unityRect.height);
         }
 
+        [Test]
+        public void ToUnityRect_WithNegativeX_ClampsToValidRegion()
+        {
+            // Rectangle that extends beyond left edge of texture
+            var emueraRect = new uEmuera.Drawing.Rectangle(-8, 112, 64, 112);
+            
+            Rect unityRect = GenericUtils.ToUnityRect(emueraRect, 528, 224);
+            
+            // X clamped to 0, width reduced to show visible portion
+            Assert.AreEqual(0, unityRect.x);
+            Assert.AreEqual(56, unityRect.width); // 64 - 8 (clipped 8 pixels)
+            // Y flipped: 224 - 112 - 112 = 0
+            Assert.AreEqual(0, unityRect.y);
+            Assert.AreEqual(112, unityRect.height);
+        }
+
+        [Test]
+        public void ToUnityRect_CompletelyOutOfBounds_ReturnsEmpty()
+        {
+            // Rectangle completely outside texture bounds
+            var emueraRect = new uEmuera.Drawing.Rectangle(300, 300, 64, 64);
+            
+            Rect unityRect = GenericUtils.ToUnityRect(emueraRect, 200, 200);
+            
+            // Should return empty rectangle
+            Assert.AreEqual(0, unityRect.width);
+            Assert.AreEqual(0, unityRect.height);
+        }
+
+        [Test]
+        public void ToUnityRect_PartialOverlap_ClipsToVisible()
+        {
+            // Rectangle partially outside texture bounds
+            var emueraRect = new uEmuera.Drawing.Rectangle(180, 180, 50, 50);
+            
+            Rect unityRect = GenericUtils.ToUnityRect(emueraRect, 200, 200);
+            
+            Assert.AreEqual(180, unityRect.x);
+            // Width clipped to fit within texture
+            Assert.AreEqual(20, unityRect.width);
+            // Y: 200 - 50 - 180 = -30, clamped to 0, height reduced
+            Assert.AreEqual(0, unityRect.y);
+            Assert.AreEqual(20, unityRect.height);
+        }
+
+        [Test]
+        public void ToUnityRect_ValidRect_PreservesAll()
+        {
+            // Completely valid rectangle within bounds
+            var emueraRect = new uEmuera.Drawing.Rectangle(50, 50, 100, 80);
+            
+            Rect unityRect = GenericUtils.ToUnityRect(emueraRect, 300, 300);
+            
+            Assert.AreEqual(50, unityRect.x);
+            Assert.AreEqual(100, unityRect.width);
+            // Y: 300 - 80 - 50 = 170
+            Assert.AreEqual(170, unityRect.y);
+            Assert.AreEqual(80, unityRect.height);
+        }
+
         #endregion
 
         #region GetFilename Tests

@@ -1,15 +1,18 @@
 ﻿using MinorShift.Emuera.Sub;
 using System;
 using System.Collections.Generic;
-//using System.Drawing;
 using System.IO;
 using System.Text;
 using uEmuera.Drawing;
 
 namespace MinorShift.Emuera.Content
 {
-	static class AppContents
-	{
+    /// <summary>
+    /// Manages application content including images, graphics, and resource files.
+    /// Provides centralized access to game assets loaded from the resources directory.
+    /// </summary>
+    static class AppContents
+    {
 		static AppContents()
 		{
 			gList = new Dictionary<int, GraphicsImage>();
@@ -219,10 +222,15 @@ namespace MinorShift.Emuera.Content
 					resolvedPath = uEmuera.Utils.ResolvePathInsensitive(filepath, expectDirectory: false);
 					if (string.IsNullOrEmpty(resolvedPath))
 					{
-						ParserMediator.Warn("Specified image file was not found:" + arg2Original, sp, 1);
-						return null;
+						ParserMediator.Warn("Specified image file was not found:" + arg2Original + ". A grey placeholder will be displayed.", sp, 1);
+						// Create a placeholder bitmap to allow the sprite to be created
+						// The actual texture will be created by SpriteManager when needed
+						filepath = parentNamePath; // Keep the original path, SpriteManager will create placeholder
 					}
-					filepath = resolvedPath;
+					else
+					{
+						filepath = resolvedPath;
+					}
 				}
 				Bitmap bmp = new Bitmap(filepath);
 				if (bmp == null)

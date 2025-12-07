@@ -28,8 +28,9 @@ public class EmueraThread
     private volatile bool skipflag_;
     
     // Performance tracking
-    private const int TIMER_UPDATE_INTERVAL_MS = 1;
+    private const int TIMER_UPDATE_INTERVAL_MS = 15;  // Slightly increased timer update interval
     private const int INPUT_PROCESS_DELAY_MS = 10;
+    private const int IDLE_DELAY_MS = 1;  // Minimal delay when actively processing
 
     private EmueraThread()
     { }
@@ -155,31 +156,49 @@ public class EmueraThread
                 // Get fresh console reference each iteration (may be disposed during game exit)
                 var console = MinorShift.Emuera.GlobalStatic.Console;
                 
-                // Process input if console is ready and not disposed
-                // Use null-conditional to avoid race condition where console could be disposed between checks
-                if (console?.IsWaitingInput == true)
-                {
-                    string current_input;
-                    bool current_skip;
-                    
-                    lock (sync_lock_)
-                    {
-                        current_input = input_;
-                        current_skip = skipflag_;
-                    }
-                    
-                    if (console.IsWaitingEnterKey)
-                        current_input = "";
-                        
-                    console.PressEnterKey(current_skip, current_input, false);
-                }
-                
-                // Small delay to prevent CPU spinning
-                Thread.Sleep(INPUT_PROCESS_DELAY_MS);
-                
+                // Clear input immediately to avoid reprocessing
+                string current_input;
+                bool current_skip;
                 lock (sync_lock_)
                 {
-                    input_ = null;
+                    current_input = input_;
+                    current_skip = skipflag_;
+                    input_ = null;  // Clear immediately after reading
+                }
+                
+                // Skip if no input
+                if (current_input == null)
+                {
+                    Thread.Sleep(IDLE_DELAY_MS);
+                    continue;
+                }
+                
+                // Cache console reference and check if it's ready - use cached reference throughout
+                // to avoid race condition where console could be disposed between checks
+                if (console != null && console.IsWaitingInput)
+                {
+                    // Use cached console reference - even if it becomes invalid, we'll catch the exception
+                    try
+                    {
+                        if (console.IsWaitingEnterKey)
+                            current_input = "";
+                            
+                        console.PressEnterKey(current_skip, current_input, false);
+                        
+                        // Small delay after successful processing to allow console to update
+                        Thread.Sleep(IDLE_DELAY_MS);
+                    }
+                    catch (NullReferenceException)
+                    {
+                        // Console state changed between checks - this is expected during game state transitions
+                        // Log and continue to next iteration
+                        uEmuera.Logger.Warn("Console state changed during input processing (expected during game transitions)");
+                    }
+                }
+                else
+                {
+                    // Console not ready, delay before retry
+                    Thread.Sleep(INPUT_PROCESS_DELAY_MS);
                 }
             }
         }

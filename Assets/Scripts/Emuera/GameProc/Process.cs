@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
-//using System.Windows.Forms;
 using MinorShift.Emuera.GameData;
 using MinorShift.Emuera.Sub;
 using MinorShift.Emuera.GameView;
@@ -15,9 +14,13 @@ using uEmuera.Forms;
 
 namespace MinorShift.Emuera.GameProc
 {
-
-	internal sealed partial class Process
-	{
+    /// <summary>
+    /// Main game process controller for the Emuera engine.
+    /// Manages script execution, function calls, variable evaluation, and game state.
+    /// Coordinates between the game data model, view (console), and script interpreter.
+    /// </summary>
+    internal sealed partial class Process
+    {
 		public Process(EmueraConsole view)
 		{
 			console = view;

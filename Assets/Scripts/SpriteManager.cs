@@ -7,9 +7,93 @@ using MinorShift.Emuera.Content;
 using uEmuera.Drawing;
 using WebP;
 
+/// <summary>
+/// Manages sprite and texture loading, caching, and lifecycle for the Emuera engine.
+/// Provides case-insensitive file resolution, placeholder generation for missing assets,
+/// and memory-efficient sprite management with automatic cleanup.
+/// </summary>
 internal static class SpriteManager
 {
     static float kPastTime = 300.0f;
+
+    /// <summary>
+    /// Creates a placeholder grey texture for missing images
+    /// </summary>
+    /// <param name="width">Width of the placeholder texture</param>
+    /// <param name="height">Height of the placeholder texture</param>
+    /// <returns>A grey placeholder texture</returns>
+    static Texture2D CreatePlaceholderTexture(int width = 64, int height = 64)
+    {
+        var tex = new Texture2D(width, height, TextureFormat.RGBA32, false);
+        var greyColor = new UnityEngine.Color(0.5f, 0.5f, 0.5f, 1f);
+        var pixels = new UnityEngine.Color[width * height];
+        for (int i = 0; i < pixels.Length; i++)
+        {
+            pixels[i] = greyColor;
+        }
+        tex.SetPixels(pixels);
+        tex.Apply();
+        return tex;
+    }
+
+    /// <summary>
+    /// Helper method to create and store a placeholder TextureInfo for a missing or failed image.
+    /// Also updates the bitmap size if provided.
+    /// </summary>
+    /// <param name="name">The texture name/key for storage</param>
+    /// <param name="baseimage">Optional Bitmap to update with placeholder dimensions</param>
+    /// <returns>The created TextureInfo with placeholder texture</returns>
+    static TextureInfo CreateAndStorePlaceholder(string name, Bitmap baseimage = null)
+    {
+        var placeholderTex = CreatePlaceholderTexture();
+        var ti = new TextureInfo(name, placeholderTex);
+        texture_dict.Add(name, ti);
+        if (baseimage != null)
+        {
+            baseimage.size.Width = placeholderTex.width;
+            baseimage.size.Height = placeholderTex.height;
+        }
+        return ti;
+    }
+
+    /// <summary>
+    /// Creates a placeholder SpriteInfo directly without storing in texture dictionary.
+    /// Used for cases where we need a sprite but don't have valid texture data.
+    /// </summary>
+    /// <param name="name">The sprite name for logging purposes</param>
+    /// <returns>A SpriteInfo with a grey placeholder sprite</returns>
+    static SpriteInfo CreatePlaceholderSpriteInfo(string name)
+    {
+        var placeholderTex = CreatePlaceholderTexture();
+        var ti = new TextureInfo($"_placeholder_{name}", placeholderTex);
+        return CreateSpriteInfoFromTexture(ti, placeholderTex);
+    }
+    
+    /// <summary>
+    /// Creates a placeholder SpriteInfo for an existing TextureInfo.
+    /// Used when sprite creation fails for a valid texture.
+    /// </summary>
+    /// <param name="parentTexture">The parent TextureInfo to associate with</param>
+    /// <returns>A SpriteInfo with a grey placeholder sprite</returns>
+    static SpriteInfo CreatePlaceholderSpriteInfoForTexture(TextureInfo parentTexture)
+    {
+        var placeholderTex = CreatePlaceholderTexture();
+        return CreateSpriteInfoFromTexture(parentTexture, placeholderTex);
+    }
+    
+    /// <summary>
+    /// Helper method to create a SpriteInfo from a texture.
+    /// Centralizes the sprite creation logic used by placeholder methods.
+    /// </summary>
+    /// <param name="textureInfo">The TextureInfo to associate with</param>
+    /// <param name="texture">The texture to create sprite from</param>
+    /// <returns>A SpriteInfo with the created sprite</returns>
+    static SpriteInfo CreateSpriteInfoFromTexture(TextureInfo textureInfo, Texture2D texture)
+    {
+        var rect = new Rect(0, 0, texture.width, texture.height);
+        var sprite = Sprite.Create(texture, rect, Vector2.zero);
+        return new SpriteInfo(textureInfo, sprite);
+    }
 
     // Attempts to resolve a full path in a case-insensitive manner by walking each segment.
     // Useful on case-sensitive file systems or when asset references use inconsistent casing.
@@ -99,14 +183,46 @@ internal static class SpriteManager
             SpriteInfo sprite = null;
             if(!sprites.TryGetValue(src.Name, out sprite))
             {
-                // Validate rectangle before creating sprite to provide deterministic errors
-                var rect = GenericUtils.ToUnityRect(src.Rectangle, texture.width, texture.height);
-                if (rect.width <= 0 || rect.height <= 0 || rect.x < 0 || rect.y < 0 ||
+                // For ASpriteSingle, use SrcRectangle (texture coordinates) instead of Rectangle (destination coords)
+                Rectangle sourceRect;
+                if (src is ASpriteSingle spriteSingle)
+                {
+                    sourceRect = spriteSingle.SrcRectangle;
+                }
+                else
+                {
+                    // For other sprite types (like SpriteAnime), fall back to Rectangle
+                    // This may need adjustment if SpriteAnime has similar requirements
+                    sourceRect = src.Rectangle;
+                }
+                
+                // Convert source rectangle to Unity coordinates
+                var rect = GenericUtils.ToUnityRect(sourceRect, texture.width, texture.height);
+                
+                // Check if the conversion resulted in an invalid/empty rectangle
+                if (rect.width <= 0 || rect.height <= 0)
+                {
+                    Debug.LogWarning($"SpriteManager: Invalid sprite rectangle for '{src?.Name}' on '{imagename}'. " +
+                        $"Source=({sourceRect.X},{sourceRect.Y},{sourceRect.Width},{sourceRect.Height}), " +
+                        $"Converted=({rect.x},{rect.y},{rect.width},{rect.height}), " +
+                        $"Texture=({texture.width},{texture.height}). Creating placeholder sprite.");
+                    
+                    // Use the centralized placeholder creation method
+                    sprite = CreatePlaceholderSpriteInfoForTexture(this);
+                    sprites[src.Name] = sprite;
+                    refcount += 1;
+                    return sprite;
+                }
+                
+                // Validate final rectangle bounds (should be guaranteed by clamping, but double-check)
+                if (rect.x < 0 || rect.y < 0 || 
                     rect.x + rect.width > texture.width || rect.y + rect.height > texture.height)
                 {
-                    Debug.LogError($"SpriteManager: Invalid sprite rectangle for '{src?.Name}' on '{imagename}'. Rect=({rect.x},{rect.y},{rect.width},{rect.height}), Texture=({texture.width},{texture.height})");
+                    Debug.LogError($"SpriteManager: Rectangle validation failed for '{src?.Name}' on '{imagename}'. " +
+                        $"Rect=({rect.x},{rect.y},{rect.width},{rect.height}), Texture=({texture.width},{texture.height})");
                     return null;
                 }
+                
                 try
                 {
                     sprite = new SpriteInfo(this, 
@@ -208,9 +324,13 @@ internal static class SpriteManager
         }
         if(src.Bitmap == null)
         {
-            Debug.LogError($"SpriteManager: ASprite '{src?.Name}' has null Bitmap");
+            Debug.LogWarning($"SpriteManager: ASprite '{src?.Name}' has null Bitmap. Creating placeholder sprite.");
+            // Create a placeholder sprite instead of passing null
             if(callback != null)
-                callback(null, null);
+            {
+                var placeholderSprite = CreatePlaceholderSpriteInfo(src.Name);
+                callback(obj, placeholderSprite);
+            }
             return;
         }
 
@@ -277,8 +397,8 @@ internal static class SpriteManager
                 }
                 else
                 {
-                    Debug.LogError($"SpriteManager: File not found for texture '{name}': {filename}");
-                    return null;
+                    Debug.LogWarning($"SpriteManager: File not found for texture '{name}': {filename}. Creating grey placeholder.");
+                    return CreateAndStorePlaceholder(name);
                 }
             }
         }
@@ -487,7 +607,12 @@ internal static class SpriteManager
         }
         else
         {
-            Debug.LogError($"SpriteManager: File not found '{pathToLoad}' for bitmap '{baseimage.filename}'");
+            Debug.LogWarning($"SpriteManager: File not found '{pathToLoad}' for bitmap '{baseimage.filename}'. Creating grey placeholder.");
+            var placeholderTex = CreatePlaceholderTexture();
+            ti = new TextureInfo(baseimage.filename, placeholderTex);
+            texture_dict.Add(baseimage.filename, ti);
+            baseimage.size.Width = placeholderTex.width;
+            baseimage.size.Height = placeholderTex.height;
         }
         List<CallbackInfo> list = null;
         if(loading_set.TryGetValue(baseimage.filename, out list))

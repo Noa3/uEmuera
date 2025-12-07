@@ -7,7 +7,13 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 /// <summary>
-/// Static utility class with helper methods for Unity operations.
+/// Static utility class providing helper methods for Unity operations including:
+/// - Logging utilities with timestamps
+/// - Component finding and management
+/// - Event listener registration (click, drag, pointer events)
+/// - Color conversion utilities
+/// - MD5 hash calculations
+/// - Coroutine management for non-MonoBehaviour objects
 /// </summary>
 public static class GenericUtils
 {
@@ -247,14 +253,60 @@ public static class GenericUtils
         var x = rect.X;
         var y = height - rect.Height - rect.Y;
         var w = rect.Width;
-        if(x + w > width)
-            w = width - x;
         var h = rect.Height;
-        if(y + h > height)
+        
+        // Clamp to texture bounds
+        if (x < 0)
+        {
+            w += x; // Reduce width by negative offset
+            x = 0;
+        }
+        if (x >= width)
+            return new Rect(0, 0, 0, 0); // Completely out of bounds
+            
+        if (x + w > width)
+            w = width - x;
+        
+        if (y < 0)
+        {
+            h += y; // Reduce height by negative offset
+            y = 0;
+        }
+        if (y >= height)
+            return new Rect(0, 0, 0, 0); // Completely out of bounds
+            
+        if (y + h > height)
             h = height - y;
+        
+        // Ensure positive dimensions
+        if (w <= 0 || h <= 0)
+            return new Rect(0, 0, 0, 0);
+        
         return new Rect(x, y, w, h);
     }
 
+    /// <summary>
+    /// Base class for event listeners with common callback management.
+    /// Reduces code duplication across different event handler types.
+    /// </summary>
+    /// <typeparam name="T">The MonoBehaviour type implementing this base.</typeparam>
+    private abstract class BaseEventListener<T> : MonoBehaviour where T : MonoBehaviour
+    {
+        public HashSet<Action<PointerEventData>> callbacks = new HashSet<Action<PointerEventData>>();
+        
+        protected void OnDestroy()
+        {
+            callbacks.Clear();
+        }
+        
+        protected void InvokeCallbacks(PointerEventData eventData)
+        {
+            var iter = callbacks.GetEnumerator();
+            while(iter.MoveNext())
+                iter.Current(eventData);
+        }
+    }
+    
     public class PointerClickListener : MonoBehaviour, IPointerClickHandler
     {
         public virtual void OnPointerClick(PointerEventData eventData)
@@ -277,11 +329,12 @@ public static class GenericUtils
         public HashSet<Action> callbacks1 = new HashSet<Action>();
         public HashSet<Action<PointerEventData>> callbacks2 = new HashSet<Action<PointerEventData>>();
     }
+    
     /// <summary>
-    /// 设置OnClick回调
+    /// Sets an OnClick callback on a GameObject.
     /// </summary>
-    /// <param name="obj">设置回调的目标UI</param>
-    /// <param name="callback">回调函数</param>
+    /// <param name="obj">The target UI GameObject.</param>
+    /// <param name="callback">The callback function.</param>
     public static void SetListenerOnClick(GameObject obj, Action callback)
     {
         if(!obj || callback == null)
@@ -291,6 +344,12 @@ public static class GenericUtils
             l = obj.AddComponent<PointerClickListener>();
         l.callbacks1.Add(callback);
     }
+    
+    /// <summary>
+    /// Sets an OnClick callback on a GameObject.
+    /// </summary>
+    /// <param name="obj">The target UI GameObject.</param>
+    /// <param name="callback">The callback function with PointerEventData parameter.</param>
     public static void SetListenerOnClick(GameObject obj, Action<PointerEventData> callback)
     {
         if(!obj || callback == null)
@@ -329,19 +388,12 @@ public static class GenericUtils
         l.callbacks2 = new HashSet<Action<PointerEventData>>();
     }
 
-    class PointerDownListener : MonoBehaviour, IPointerDownHandler
+    class PointerDownListener : BaseEventListener<PointerDownListener>, IPointerDownHandler
     {
-        public virtual void OnPointerDown(PointerEventData eventData)
+        public void OnPointerDown(PointerEventData eventData)
         {
-            var iter = callbacks.GetEnumerator();
-            while(iter.MoveNext())
-                iter.Current(eventData);
+            InvokeCallbacks(eventData);
         }
-        void OnDestroy()
-        {
-            callbacks.Clear();
-        }
-        public HashSet<Action<PointerEventData>> callbacks = new HashSet<Action<PointerEventData>>();
     }
     public static void SetListenerOnPointerDown(GameObject obj, Action<PointerEventData> callback)
     {
@@ -371,19 +423,12 @@ public static class GenericUtils
         l.callbacks.Clear();
     }
 
-    class PointerUpListener : MonoBehaviour, IPointerUpHandler
+    class PointerUpListener : BaseEventListener<PointerUpListener>, IPointerUpHandler
     {
-        public virtual void OnPointerUp(PointerEventData eventData)
+        public void OnPointerUp(PointerEventData eventData)
         {
-            var iter = callbacks.GetEnumerator();
-            while(iter.MoveNext())
-                iter.Current(eventData);
+            InvokeCallbacks(eventData);
         }
-        void OnDestroy()
-        {
-            callbacks.Clear();
-        }
-        public HashSet<Action<PointerEventData>> callbacks = new HashSet<Action<PointerEventData>>();
     }
     public static void SetListenerOnPointerUp(GameObject obj, Action<PointerEventData> callback)
     {
@@ -413,55 +458,35 @@ public static class GenericUtils
         l.callbacks.Clear();
     }
 
-    //监听类
-    class BeginDragListener : MonoBehaviour, IBeginDragHandler
+    class BeginDragListener : BaseEventListener<BeginDragListener>, IBeginDragHandler
     {
-        public virtual void OnBeginDrag(PointerEventData eventData)
+        public void OnBeginDrag(PointerEventData eventData)
         {
-            var iter = callbacks.GetEnumerator();
-            while(iter.MoveNext())
-                iter.Current(eventData);
+            InvokeCallbacks(eventData);
         }
-        void OnDestroy()
-        {
-            callbacks.Clear();
-        }
-        public HashSet<Action<PointerEventData>> callbacks = new HashSet<Action<PointerEventData>>();
     }
-    class DragListener : MonoBehaviour, IDragHandler
+    
+    class DragListener : BaseEventListener<DragListener>, IDragHandler
     {
-        public virtual void OnDrag(PointerEventData eventData)
+        public void OnDrag(PointerEventData eventData)
         {
-            var iter = callbacks.GetEnumerator();
-            while(iter.MoveNext())
-                iter.Current(eventData);
+            InvokeCallbacks(eventData);
         }
-        void OnDestroy()
-        {
-            callbacks.Clear();
-        }
-        public HashSet<Action<PointerEventData>> callbacks = new HashSet<Action<PointerEventData>>();
     }
-    class EndDragListener : MonoBehaviour, IEndDragHandler
+    
+    class EndDragListener : BaseEventListener<EndDragListener>, IEndDragHandler
     {
-        public virtual void OnEndDrag(PointerEventData eventData)
+        public void OnEndDrag(PointerEventData eventData)
         {
-            var iter = callbacks.GetEnumerator();
-            while(iter.MoveNext())
-                iter.Current(eventData);
+            InvokeCallbacks(eventData);
         }
-        void OnDestroy()
-        {
-            callbacks.Clear();
-        }
-        public HashSet<Action<PointerEventData>> callbacks = new HashSet<Action<PointerEventData>>();
     }
 
     /// <summary>
-    /// 设置OnDrag回调
+    /// Sets an OnDrag callback on a GameObject.
     /// </summary>
-    /// <param name="obj">设置回调的目标UI</param>
-    /// <param name="callback">回调函数</param>
+    /// <param name="obj">The target UI GameObject.</param>
+    /// <param name="callback">The callback function.</param>
     public static void SetListenerOnDrag(GameObject obj, Action<PointerEventData> callback)
     {
         if(!obj || callback == null)
@@ -490,10 +515,10 @@ public static class GenericUtils
         l.callbacks.Clear();
     }
     /// <summary>
-    /// 设置OnBeginDrag回调
+    /// Sets an OnBeginDrag callback on a GameObject.
     /// </summary>
-    /// <param name="obj">设置回调的目标UI</param>
-    /// <param name="callback">回调函数</param>
+    /// <param name="obj">The target UI GameObject.</param>
+    /// <param name="callback">The callback function.</param>
     public static void SetListenerOnBeginDrag(GameObject obj, Action<PointerEventData> callback)
     {
         if(!obj || callback == null)
@@ -620,10 +645,10 @@ public static class GenericUtils
         return md5s;
     }
     /// <summary>
-    /// 处理中间的‘：’
+    /// Calculates MD5 hashes for configuration data with colon separators.
     /// </summary>
-    /// <param name="data"></param>
-    /// <returns></returns>
+    /// <param name="data">The byte array to process.</param>
+    /// <returns>A list of MD5 hash strings.</returns>
     public static List<string> CalcMd5ListForConfig(byte[] data)
     {
         var md5s = new List<string>();
@@ -693,70 +718,140 @@ public static class GenericUtils
         }
     }
     /// <summary>
-    /// 开启协程，方便在非MonoBehaviour对象中使用协程
+    /// Starts a coroutine, allowing coroutine usage in non-MonoBehaviour objects.
     /// </summary>
+    /// <param name="e">The enumerator to execute as a coroutine.</param>
+    /// <returns>The started Coroutine.</returns>
     public static Coroutine StartCoroutine(System.Collections.IEnumerator e)
     {
         return CoroutineHelper.instance.DoCoroutine(e);
     }
+    
+    /// <summary>
+    /// Stops all coroutines running on the CoroutineHelper.
+    /// </summary>
     public static void StopAllCoroutines()
     {
         CoroutineHelper.instance.StopAllCoroutines();
     }
+    
+    /// <summary>
+    /// Stops the specified coroutine.
+    /// </summary>
+    /// <param name="co">The coroutine to stop.</param>
     public static void StopCoroutine(Coroutine co)
     {
         CoroutineHelper.instance.StopCoroutine(co);
     }
 
+    /// <summary>
+    /// Sets the background color for the text content.
+    /// </summary>
+    /// <param name="color">The background color.</param>
     public static void SetBackgroundColor(uEmuera.Drawing.Color color)
     {
         text_content.SetBackgroundColor(color);
     }
+    
+    /// <summary>
+    /// Clears the text content display.
+    /// </summary>
     public static void ClearText()
     {
         //text_content.Clear();
         text_content.RemoveLine(text_content.max_log_count);
     }
+    
+    /// <summary>
+    /// Adds a text line to the content display.
+    /// </summary>
+    /// <param name="console_line">The console line object to add.</param>
+    /// <param name="roll_to_bottom">Whether to scroll to bottom after adding.</param>
     public static void AddText(object console_line, bool roll_to_bottom)
     {
         text_content.AddLine(console_line, roll_to_bottom);
     }
+    
+    /// <summary>
+    /// Gets a text line at the specified index.
+    /// </summary>
+    /// <param name="index">The line index.</param>
+    /// <returns>The console line object.</returns>
     public static object GetText(int index)
     {
         return text_content.GetLine(index);
     }
+    
+    /// <summary>
+    /// Gets the total number of text lines.
+    /// </summary>
+    /// <returns>The line count.</returns>
     public static int GetTextCount()
     {
         return text_content.GetLineCount();
     }
+    
+    /// <summary>
+    /// Gets the maximum line number in the text content.
+    /// </summary>
+    /// <returns>The maximum line number.</returns>
     public static int GetTextMaxLineNo()
     {
         return text_content.GetMaxLineNo();
     }
+    
+    /// <summary>
+    /// Gets the minimum line number in the text content.
+    /// </summary>
+    /// <returns>The minimum line number.</returns>
     public static int GetTextMinLineNo()
     {
         return text_content.GetMinLineNo();
     }
+    
+    /// <summary>
+    /// Removes a specified number of text lines.
+    /// </summary>
+    /// <param name="count">The number of lines to remove.</param>
     public static void RemoveTextCount(int count)
     {
         text_content.RemoveLine(count);
     }
+    
+    /// <summary>
+    /// Scrolls the text content to the bottom.
+    /// </summary>
     public static void ToBottom()
     {
         text_content.ToBottom();
     }
+    
+    /// <summary>
+    /// Updates the text content display.
+    /// </summary>
     public static void TextUpdate()
     {
         text_content.Update();
     }
+    
+    /// <summary>
+    /// Sets the last button generation number.
+    /// </summary>
+    /// <param name="generation">The generation number.</param>
     public static void SetLastButtonGeneration(int generation)
     {
         text_content.SetLastButtonGeneration(generation);
     }
+    
+    /// <summary>
+    /// Shows or hides the "in process" indicator.
+    /// </summary>
+    /// <param name="value">True to show, false to hide.</param>
     public static void ShowIsInProcess(bool value)
     {
         text_content.ShowIsInProcess(value);
     }
+    
     static EmueraContent text_content
     {
         get

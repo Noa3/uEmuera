@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-//using Microsoft.VisualBasic;
 using MinorShift.Emuera.Sub;
 using MinorShift.Emuera.GameView;
 using MinorShift.Emuera.GameData.Expression;
@@ -12,8 +11,13 @@ using uEmuera.VisualBasic;
 
 namespace MinorShift.Emuera.GameProc
 {
-	internal sealed class ErbLoader
-	{
+    /// <summary>
+    /// Loads and parses ERB (ERA script) files into executable game functions.
+    /// Handles script file reading, function definition parsing, label management,
+    /// and conversion of script text into LogicalLine objects for execution.
+    /// </summary>
+    internal sealed class ErbLoader
+    {
 		public ErbLoader(EmueraConsole main, ExpressionMediator exm, Process proc)
 		{
 			output = main;

@@ -4,9 +4,13 @@ using System.Text;
 
 namespace MinorShift.Emuera.Sub
 {
-	[Serializable]
+    /// <summary>
+    /// Base exception class for all Emuera-specific exceptions.
+    /// Captures script position information for better error reporting.
+    /// </summary>
+    [Serializable]
     internal abstract class EmueraException : ApplicationException
-	{
+    {
 		protected EmueraException(string errormes, ScriptPosition position)
 			: base(errormes)
 		{
@@ -21,7 +25,7 @@ namespace MinorShift.Emuera.Sub
 	}
 
 	/// <summary>
-	/// emuera本体に起因すると思われるError
+	/// Error originating from the Emuera engine itself.
 	/// </summary>
     [Serializable]
     internal sealed class ExeEE : EmueraException
