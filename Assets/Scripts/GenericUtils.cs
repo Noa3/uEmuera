@@ -249,39 +249,30 @@ public static class GenericUtils
         var w = rect.Width;
         var h = rect.Height;
         
-        // Clamp X to valid range [0, width)
+        // Clamp to texture bounds
         if (x < 0)
         {
-            w += x; // Reduce width by the negative offset
+            w += x; // Reduce width by negative offset
             x = 0;
         }
         if (x >= width)
-        {
-            // Rectangle starts beyond texture bounds
-            return new Rect(0, 0, 0, 0);
-        }
-        
-        // Clamp width to not exceed texture bounds
+            return new Rect(0, 0, 0, 0); // Completely out of bounds
+            
         if (x + w > width)
             w = width - x;
         
-        // Clamp Y to valid range [0, height)
         if (y < 0)
         {
-            h += y; // Reduce height by the negative offset
+            h += y; // Reduce height by negative offset
             y = 0;
         }
         if (y >= height)
-        {
-            // Rectangle starts beyond texture bounds
-            return new Rect(0, 0, 0, 0);
-        }
-        
-        // Clamp height to not exceed texture bounds
+            return new Rect(0, 0, 0, 0); // Completely out of bounds
+            
         if (y + h > height)
             h = height - y;
         
-        // Ensure final dimensions are positive
+        // Ensure positive dimensions
         if (w <= 0 || h <= 0)
             return new Rect(0, 0, 0, 0);
         

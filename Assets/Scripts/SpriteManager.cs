@@ -154,14 +154,27 @@ internal static class SpriteManager
             SpriteInfo sprite = null;
             if(!sprites.TryGetValue(src.Name, out sprite))
             {
-                // Get the converted Unity rect
-                var rect = GenericUtils.ToUnityRect(src.Rectangle, texture.width, texture.height);
+                // For ASpriteSingle, use SrcRectangle (texture coordinates) instead of Rectangle (destination coords)
+                Rectangle sourceRect;
+                if (src is ASpriteSingle spriteSingle)
+                {
+                    sourceRect = spriteSingle.SrcRectangle;
+                }
+                else
+                {
+                    // For other sprite types (like SpriteAnime), fall back to Rectangle
+                    // This may need adjustment if SpriteAnime has similar requirements
+                    sourceRect = src.Rectangle;
+                }
+                
+                // Convert source rectangle to Unity coordinates
+                var rect = GenericUtils.ToUnityRect(sourceRect, texture.width, texture.height);
                 
                 // Check if the conversion resulted in an invalid/empty rectangle
                 if (rect.width <= 0 || rect.height <= 0)
                 {
                     Debug.LogWarning($"SpriteManager: Invalid sprite rectangle for '{src?.Name}' on '{imagename}'. " +
-                        $"Original=({src.Rectangle.X},{src.Rectangle.Y},{src.Rectangle.Width},{src.Rectangle.Height}), " +
+                        $"Source=({sourceRect.X},{sourceRect.Y},{sourceRect.Width},{sourceRect.Height}), " +
                         $"Converted=({rect.x},{rect.y},{rect.width},{rect.height}), " +
                         $"Texture=({texture.width},{texture.height}). Creating placeholder sprite.");
                     
