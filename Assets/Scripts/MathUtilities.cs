@@ -103,14 +103,16 @@ namespace uEmuera
 
         /// <summary>
         /// Performs a binary search to find a line index by line number.
+        /// NOTE: This is a placeholder for future implementation when line storage
+        /// is converted to NativeArray. Currently not used.
         /// </summary>
+        [System.Obsolete("Not yet implemented - requires NativeArray-based line storage")]
         [BurstCompile]
         public static int BinarySearchLineNo(int lineNo, int beginIndex, int endIndex, int maxLogCount)
         {
-            // Note: This would need access to console_lines_ array, which would require
-            // restructuring to use NativeArray. For now, this is a placeholder showing
-            // the pattern for Burst-compiled binary search.
-            return -1;
+            // This requires access to console_lines_ array converted to NativeArray
+            // Left as placeholder for future optimization when line storage is refactored
+            throw new NotImplementedException("Binary search requires NativeArray-based line storage");
         }
     }
 }

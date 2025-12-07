@@ -255,7 +255,7 @@ Run Unity Profiler to validate:
 
 ### Unity Versions
 - Minimum: Unity 6000.0.0f1
-- Recommended: Unity 6000.3.0f1+
+- Recommended: Unity 6000.3.0f1 or later
 - Future: Compatible with Unity 6 LTS
 
 ### Build Configurations

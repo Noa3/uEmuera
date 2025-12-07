@@ -125,12 +125,17 @@ namespace uEmuera.Collections
         }
 
         /// <summary>
+        /// Maximum number of items to add in a single expansion.
+        /// </summary>
+        private const int MAX_EXPANSION_SIZE = 1000;
+
+        /// <summary>
         /// Attempts to expand the pool by doubling its capacity.
         /// </summary>
         /// <returns>True if expansion was successful.</returns>
         private bool TryExpand()
         {
-            int newCapacity = math.min(capacity_ * 2, capacity_ + 1000); // Limit growth
+            int newCapacity = math.min(capacity_ * 2, capacity_ + MAX_EXPANSION_SIZE);
             if (newCapacity <= capacity_)
                 return false;
 

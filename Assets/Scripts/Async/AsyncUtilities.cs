@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -197,7 +198,7 @@ namespace uEmuera.Async
     public class UnityMainThreadDispatcher : MonoBehaviour
     {
         private static UnityMainThreadDispatcher instance_;
-        private static readonly System.Collections.Generic.Queue<Action> executionQueue_ = new();
+        private static readonly ConcurrentQueue<Action> executionQueue_ = new();
 
         /// <summary>
         /// Gets or creates the singleton instance.
@@ -225,27 +226,20 @@ namespace uEmuera.Async
             // Ensure instance exists
             _ = Instance;
 
-            lock (executionQueue_)
-            {
-                executionQueue_.Enqueue(action);
-            }
+            executionQueue_.Enqueue(action);
         }
 
         void Update()
         {
-            lock (executionQueue_)
+            while (executionQueue_.TryDequeue(out var action))
             {
-                while (executionQueue_.Count > 0)
+                try
                 {
-                    var action = executionQueue_.Dequeue();
-                    try
-                    {
-                        action?.Invoke();
-                    }
-                    catch (Exception ex)
-                    {
-                        Debug.LogError($"Error executing main thread action: {ex}");
-                    }
+                    action?.Invoke();
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogError($"Error executing main thread action: {ex}");
                 }
             }
         }
