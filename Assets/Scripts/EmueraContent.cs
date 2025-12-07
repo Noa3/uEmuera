@@ -5,10 +5,12 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using MinorShift.Emuera;
 using MinorShift.Emuera.GameView;
+using Unity.Mathematics;
 
 /// <summary>
 /// Main content display manager for the Emuera console.
 /// Handles text and image rendering, scrolling, and user input.
+/// Optimized with Unity.Mathematics for better performance.
 /// </summary>
 public class EmueraContent : MonoBehaviour
 {
@@ -196,17 +198,18 @@ public class EmueraContent : MonoBehaviour
 
     public void Update()
     {
-        if(!dirty_ && drag_delta == Vector2.zero)
+        if(!dirty_ && math.all(drag_delta == float2.zero))
             return;
         dirty_ = false;
 
         float display_width = DISPLAY_WIDTH;
         float display_height = DISPLAY_HEIGHT;
 
-        if(drag_delta != Vector2.zero)
+        if(math.any(drag_delta != float2.zero))
         {
-            float t = drag_delta.magnitude;
-            drag_delta *= (Mathf.Max(0, t - 300.0f * Time.deltaTime) / t);
+            float t = math.length(drag_delta);
+            drag_delta = MathUtilities.ApplyDragDamping(drag_delta, 300.0f, Time.deltaTime);
+            
             local_position = GetLimitPosition(local_position + drag_delta,
                                             display_width, display_height);
             if((local_position.x <= display_width - content_width && drag_delta.x < 0) ||
@@ -292,7 +295,7 @@ public class EmueraContent : MonoBehaviour
             UpdateLine(pos, display_height, index + 1, +1);
         }
     }
-    void UpdateLine(Vector2 local, float display_height, int index, int delta)
+    void UpdateLine(float2 local, float display_height, int index, int delta)
     {
         var zero = begin_index;
         while(zero <= index && index < end_index)
@@ -338,38 +341,15 @@ public class EmueraContent : MonoBehaviour
     }
     /// <summary>
     /// Limits the scroll position within valid bounds.
+    /// Optimized with Unity.Mathematics for better performance.
     /// </summary>
-    Vector2 GetLimitPosition(Vector2 local,
+    float2 GetLimitPosition(float2 local,
         float display_width, float display_height)
     {
-        if(content_width > display_width)
-        {
-            // Horizontal scrolling
-            if(local.x > 0)
-                local.x = 0;
-            else if(local.x < display_width - content_width)
-                local.x = display_width - content_width;
-        }
-        else
-            local.x = 0;
-
-        var valid_height = content_height - offset_height;
-        if(offset_height > 0 && valid_height < display_height)
-        {
-            local.y = offset_height;
-        }
-        else
-        {
-            var display_delta = content_height - display_height;
-            if(content_height <= display_height)
-                local.y = display_delta;
-            else if(local.y > display_delta)
-                local.y = display_delta;
-            else if(local.y < offset_height)
-                local.y = offset_height;
-        }
-
-        return local;
+        float2 displaySize = new float2(display_width, display_height);
+        float2 contentSize = new float2(content_width, content_height);
+        
+        return MathUtilities.LimitPosition(local, displaySize, contentSize, offset_height);
     }
     /// <summary>
     /// Marks the content as needing update.
@@ -398,28 +378,30 @@ public class EmueraContent : MonoBehaviour
     uint last_click_tic = 0;
     void OnBeginDrag(PointerEventData e)
     {
-        drag_begin_position = e.position;
-        drag_curr_position = e.position;
-        drag_delta = Vector3.zero;
+        drag_begin_position = new float2(e.position.x, e.position.y);
+        drag_curr_position = drag_begin_position;
+        drag_delta = float2.zero;
     }
     void OnDrag(PointerEventData e)
     {
         SetDirtyInternal(true);
-        drag_curr_position = e.position;
-        drag_delta = Vector3.zero;
+        drag_curr_position = new float2(e.position.x, e.position.y);
+        drag_delta = float2.zero;
     }
     void OnEndDrag(PointerEventData e)
     {
         SetDirtyInternal(true);
         float display_width = DISPLAY_WIDTH;
         float display_height = DISPLAY_HEIGHT;
+        
+        float2 endPos = new float2(e.position.x, e.position.y);
         local_position = GetLimitPosition(
-            local_position + (e.position - drag_begin_position),
+            local_position + (endPos - drag_begin_position),
             display_width, display_height);
 
-        drag_delta = e.position - drag_curr_position;
-        drag_begin_position = Vector2.zero;
-        drag_curr_position = Vector2.zero;
+        drag_delta = endPos - drag_curr_position;
+        drag_begin_position = float2.zero;
+        drag_curr_position = float2.zero;
     }
     void OnClick()
     {
@@ -428,9 +410,9 @@ public class EmueraContent : MonoBehaviour
         EmueraThread.instance.Input("", false, skipflag);
         last_click_tic = nowtick;
     }
-    Vector2 drag_begin_position = Vector2.zero;
-    Vector2 drag_curr_position = Vector2.zero;
-    Vector2 drag_delta = Vector2.zero;
+    float2 drag_begin_position = float2.zero;
+    float2 drag_curr_position = float2.zero;
+    float2 drag_delta = float2.zero;
 
     public void SetBackgroundColor(uEmuera.Drawing.Color color)
     {
@@ -501,8 +483,8 @@ public class EmueraContent : MonoBehaviour
 
         content_height = 0;
         offset_height = 0;
-        local_position = Vector2.zero;
-        drag_delta = Vector2.zero;
+        local_position = float2.zero;
+        drag_delta = float2.zero;
         SetDirtyInternal(true);
     }
     /// <summary>
@@ -667,7 +649,7 @@ public class EmueraContent : MonoBehaviour
     public void ToBottom()
     {
         local_position.y = content_height - rect_transform.rect.height;
-        drag_delta = Vector2.zero;
+        drag_delta = float2.zero;
         SetDirtyInternal(true);
         Update();
     }
@@ -781,7 +763,7 @@ public class EmueraContent : MonoBehaviour
     /// <summary>
     /// Current scroll position.
     /// </summary>
-    Vector2 local_position = Vector2.zero;
+    float2 local_position = float2.zero;
 
     List<EmueraLine> display_lines_ = new List<EmueraLine>();
     Dictionary<int, EmueraImage> display_images_ = new Dictionary<int, EmueraImage>();

@@ -258,14 +258,16 @@ namespace uEmuera.Drawing
 
     /// <summary>
     /// Represents an RGBA color with float components.
-    /// Optimized for Unity 6 / .NET Standard 2.1.
+    /// Optimized for Unity 6 / .NET Standard 2.1 with Unity.Mathematics.
     /// </summary>
     public readonly struct Color : IEquatable<Color>
     {
-        public readonly float a;
-        public readonly float r;
-        public readonly float g;
-        public readonly float b;
+        private readonly Unity.Mathematics.float4 rgba;
+
+        private Color(Unity.Mathematics.float4 rgba)
+        {
+            this.rgba = rgba;
+        }
 
         public static Color FromArgb(int argb)
         {
@@ -283,37 +285,47 @@ namespace uEmuera.Drawing
         
         public static Color FromArgb(int alpha, int red, int green, int blue)
         {
-            return new Color(red / 255.0f, green / 255.0f, blue / 255.0f, alpha / 255.0f);
+            // Use Unity.Mathematics for efficient SIMD operations
+            return new Color(new Unity.Mathematics.float4(
+                red / 255.0f, 
+                green / 255.0f, 
+                blue / 255.0f, 
+                alpha / 255.0f));
         }
 
         public Color(int R, int G, int B)
         {
-            r = R / 255.0f;
-            g = G / 255.0f;
-            b = B / 255.0f;
-            a = 1.0f;
+            rgba = new Unity.Mathematics.float4(
+                R / 255.0f,
+                G / 255.0f,
+                B / 255.0f,
+                1.0f);
         }
         
         public Color(int R, int G, int B, int A)
         {
-            r = R / 255.0f;
-            g = G / 255.0f;
-            b = B / 255.0f;
-            a = A / 255.0f;
+            rgba = new Unity.Mathematics.float4(
+                R / 255.0f,
+                G / 255.0f,
+                B / 255.0f,
+                A / 255.0f);
         }
         
         public Color(float R, float G, float B, float A)
         {
-            r = R;
-            g = G;
-            b = B;
-            a = A;
+            rgba = new Unity.Mathematics.float4(R, G, B, A);
         }
 
-        public int R => (int)(r * 255);
-        public int G => (int)(g * 255);
-        public int B => (int)(b * 255);
-        public int A => (int)(a * 255);
+        // Expose individual components for compatibility
+        public float r => rgba.x;
+        public float g => rgba.y;
+        public float b => rgba.z;
+        public float a => rgba.w;
+
+        public int R => (int)(rgba.x * 255);
+        public int G => (int)(rgba.y * 255);
+        public int B => (int)(rgba.z * 255);
+        public int A => (int)(rgba.w * 255);
         
         public int ToArgb() => (A << 24) + (R << 16) + (G << 8) + B;
         public int ToRGBA() => (R << 24) + (G << 16) + (B << 8) + A;
