@@ -155,9 +155,9 @@ public class EmueraThread
                 // Get fresh console reference each iteration (may be disposed during game exit)
                 var console = MinorShift.Emuera.GlobalStatic.Console;
                 
-                // Process input if console is ready and not disposed
-                // Use null-conditional to avoid race condition where console could be disposed between checks
-                if (console?.IsWaitingInput == true)
+                // Cache console reference and check if it's ready - use cached reference throughout
+                // to avoid race condition where console could be disposed between checks
+                if (console != null && console.IsWaitingInput)
                 {
                     string current_input;
                     bool current_skip;
@@ -168,10 +168,20 @@ public class EmueraThread
                         current_skip = skipflag_;
                     }
                     
-                    if (console.IsWaitingEnterKey)
-                        current_input = "";
-                        
-                    console.PressEnterKey(current_skip, current_input, false);
+                    // Use cached console reference - even if it becomes invalid, we'll catch the exception
+                    try
+                    {
+                        if (console.IsWaitingEnterKey)
+                            current_input = "";
+                            
+                        console.PressEnterKey(current_skip, current_input, false);
+                    }
+                    catch (NullReferenceException)
+                    {
+                        // Console state changed between checks - this is expected during game state transitions
+                        // Log and continue to next iteration
+                        uEmuera.Logger.Warn("Console state changed during input processing (expected during game transitions)");
+                    }
                 }
                 
                 // Small delay to prevent CPU spinning

@@ -30,6 +30,7 @@ namespace MinorShift.Emuera.GameView
         {
             get {
                 return state == ConsoleState.WaitInput &&
+                          inputReq != null &&
                           (inputReq.InputType == GameProc.InputType.IntValue || 
                           inputReq.InputType == GameProc.InputType.StrValue);
             }
