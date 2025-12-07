@@ -632,11 +632,13 @@ namespace MinorShift.Emuera.GameProc
 		/// </summary>
 		private void LoadStringVariableFromLines(List<string> lines, VariableToken varToken)
 		{
+			int lineCount = lines.Count;
+			
 			if (varToken.Dimension == 1)
 			{
 				// 1D array: each line is one element
 				int length = varToken.GetLength();
-				for (int i = 0; i < Math.Min(lines.Count, length); i++)
+				for (int i = 0; i < Math.Min(lineCount, length); i++)
 				{
 					varToken.SetValue(lines[i], new long[] { i });
 				}
@@ -646,7 +648,7 @@ namespace MinorShift.Emuera.GameProc
 				// 2D array: comma-separated values per line
 				int length1 = varToken.GetLength(0);
 				int length2 = varToken.GetLength(1);
-				for (int i = 0; i < Math.Min(lines.Count, length1); i++)
+				for (int i = 0; i < Math.Min(lineCount, length1); i++)
 				{
 					string[] values = lines[i].Split(',');
 					for (int j = 0; j < Math.Min(values.Length, length2); j++)
@@ -664,11 +666,13 @@ namespace MinorShift.Emuera.GameProc
 		/// </summary>
 		private void LoadIntegerVariableFromLines(List<string> lines, VariableToken varToken)
 		{
+			int lineCount = lines.Count;
+			
 			if (varToken.Dimension == 1)
 			{
 				// 1D array: parse each line as integer
 				int length = varToken.GetLength();
-				for (int i = 0; i < Math.Min(lines.Count, length); i++)
+				for (int i = 0; i < Math.Min(lineCount, length); i++)
 				{
 					if (long.TryParse(lines[i].Trim(), out long value))
 					{
@@ -681,7 +685,7 @@ namespace MinorShift.Emuera.GameProc
 				// 2D array: comma-separated integer values per line
 				int length1 = varToken.GetLength(0);
 				int length2 = varToken.GetLength(1);
-				for (int i = 0; i < Math.Min(lines.Count, length1); i++)
+				for (int i = 0; i < Math.Min(lineCount, length1); i++)
 				{
 					string[] values = lines[i].Split(',');
 					for (int j = 0; j < Math.Min(values.Length, length2); j++)
