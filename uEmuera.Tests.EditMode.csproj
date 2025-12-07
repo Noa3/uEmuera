@@ -52,6 +52,7 @@
     <Compile Include="Assets\Tests\EditMode\AndroidPermissionManagerTests.cs" />
     <Compile Include="Assets\Tests\EditMode\DrawingPrimitivesTests.cs" />
     <Compile Include="Assets\Tests\EditMode\StringStreamTests.cs" />
+    <Compile Include="Assets\Tests\EditMode\MathUtilitiesTests.cs" />
     <Compile Include="Assets\Tests\EditMode\ColorTests.cs" />
     <Compile Include="Assets\Tests\EditMode\UtilsTests.cs" />
   </ItemGroup>
@@ -1137,6 +1138,14 @@
     </Reference>
     <Reference Include="UnityEditor.TestRunner">
       <HintPath>Library\ScriptAssemblies\UnityEditor.TestRunner.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Unity.Mathematics">
+      <HintPath>Library\ScriptAssemblies\Unity.Mathematics.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Unity.Burst">
+      <HintPath>Library\ScriptAssemblies\Unity.Burst.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEditor.UI">

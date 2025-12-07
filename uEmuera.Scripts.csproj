@@ -64,6 +64,7 @@
     <Compile Include="Assets\Scripts\Emuera\GameData\Variable\VariableLocal.cs" />
     <Compile Include="Assets\Scripts\Emuera\GameData\StrForm.cs" />
     <Compile Include="Assets\Scripts\Emuera\Config\KeyMacro.cs" />
+    <Compile Include="Assets\Scripts\Data\ModernDataStructures.cs" />
     <Compile Include="Assets\Scripts\Emuera\GameData\Variable\VariableParser.cs" />
     <Compile Include="Assets\Scripts\Emuera\GameView\EmueraConsole.Print.cs" />
     <Compile Include="Assets\Scripts\Emuera\GameView\StringMeasure.cs" />
@@ -79,6 +80,7 @@
     <Compile Include="Assets\Scripts\Emuera\Config\Config.cs" />
     <Compile Include="Assets\Scripts\QuickButtons.cs" />
     <Compile Include="Assets\Scripts\Emuera\Sub\LexicalAnalyzer.cs" />
+    <Compile Include="Assets\Scripts\Collections\NativeCollections.cs" />
     <Compile Include="Assets\Scripts\GenericUtils.cs" />
     <Compile Include="Assets\Scripts\Emuera\GameProc\Function\Instraction.Child.cs" />
     <Compile Include="Assets\Scripts\uEmuera\Drawing.cs" />
@@ -88,6 +90,7 @@
     <Compile Include="Assets\Scripts\Emuera\GameData\Function\FunctionMethodTerm.cs" />
     <Compile Include="Assets\Scripts\Emuera\Config\ConfigData.cs" />
     <Compile Include="Assets\Scripts\uEmuera\partial\AConsoleColoredPart.cs" />
+    <Compile Include="Assets\Scripts\Jobs\BurstJobs.cs" />
     <Compile Include="Assets\Scripts\Emuera\Sub\StringStream.cs" />
     <Compile Include="Assets\Scripts\Emuera\Content\ConstImage.cs" />
     <Compile Include="Assets\Scripts\Emuera\GameData\Expression\OperatorCode.cs" />
@@ -102,6 +105,7 @@
     <Compile Include="Assets\Scripts\Emuera\GameData\Variable\VariableIdentifier.cs" />
     <Compile Include="Assets\Scripts\Emuera\GameData\IdentifierDictionary.cs" />
     <Compile Include="Assets\Scripts\FirstWindow.cs" />
+    <Compile Include="Assets\Scripts\Async\AsyncUtilities.cs" />
     <Compile Include="Assets\Scripts\EmueraImage.cs" />
     <Compile Include="Assets\Scripts\Emuera\GameProc\InputRequest.cs" />
     <Compile Include="Assets\Scripts\Emuera\GameData\Variable\VariableData.cs" />
@@ -139,6 +143,7 @@
     <Compile Include="Assets\Scripts\Emuera\GameData\Variable\VariableEvaluator.cs" />
     <Compile Include="Assets\Scripts\Emuera\GameData\ParserMediator.cs" />
     <Compile Include="Assets\Scripts\LocalizedTextComponent.cs" />
+    <Compile Include="Assets\Scripts\MathUtilities.cs" />
     <Compile Include="Assets\Scripts\Emuera\Sub\EmueraException.cs" />
     <Compile Include="Assets\Scripts\uEmuera\Properties.cs" />
     <Compile Include="Assets\Scripts\uEmuera\Utils.cs" />
@@ -185,10 +190,6 @@
       <HintPath>C:\Program Files\Unity\Hub\Editor\6000.3.0f1\Editor\Data\Managed\UnityEngine\UnityEngine.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="UnityEngine.AIModule">
-      <HintPath>C:\Program Files\Unity\Hub\Editor\6000.3.0f1\Editor\Data\Managed\UnityEngine\UnityEngine.AIModule.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="UnityEngine.ARModule">
       <HintPath>C:\Program Files\Unity\Hub\Editor\6000.3.0f1\Editor\Data\Managed\UnityEngine\UnityEngine.ARModule.dll</HintPath>
       <Private>False</Private>
@@ -215,10 +216,6 @@
     </Reference>
     <Reference Include="UnityEngine.AudioModule">
       <HintPath>C:\Program Files\Unity\Hub\Editor\6000.3.0f1\Editor\Data\Managed\UnityEngine\UnityEngine.AudioModule.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="UnityEngine.ClothModule">
-      <HintPath>C:\Program Files\Unity\Hub\Editor\6000.3.0f1\Editor\Data\Managed\UnityEngine\UnityEngine.ClothModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.ContentLoadModule">
@@ -309,10 +306,6 @@
       <HintPath>C:\Program Files\Unity\Hub\Editor\6000.3.0f1\Editor\Data\Managed\UnityEngine\UnityEngine.MultiplayerModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="UnityEngine.ParticleSystemModule">
-      <HintPath>C:\Program Files\Unity\Hub\Editor\6000.3.0f1\Editor\Data\Managed\UnityEngine\UnityEngine.ParticleSystemModule.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="UnityEngine.PerformanceReportingModule">
       <HintPath>C:\Program Files\Unity\Hub\Editor\6000.3.0f1\Editor\Data\Managed\UnityEngine\UnityEngine.PerformanceReportingModule.dll</HintPath>
       <Private>False</Private>
@@ -339,10 +332,6 @@
     </Reference>
     <Reference Include="UnityEngine.RuntimeInitializeOnLoadManagerInitializerModule">
       <HintPath>C:\Program Files\Unity\Hub\Editor\6000.3.0f1\Editor\Data\Managed\UnityEngine\UnityEngine.RuntimeInitializeOnLoadManagerInitializerModule.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="UnityEngine.ScreenCaptureModule">
-      <HintPath>C:\Program Files\Unity\Hub\Editor\6000.3.0f1\Editor\Data\Managed\UnityEngine\UnityEngine.ScreenCaptureModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.ShaderRuntimeModule">
@@ -381,14 +370,6 @@
       <HintPath>C:\Program Files\Unity\Hub\Editor\6000.3.0f1\Editor\Data\Managed\UnityEngine\UnityEngine.TLSModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="UnityEngine.TerrainModule">
-      <HintPath>C:\Program Files\Unity\Hub\Editor\6000.3.0f1\Editor\Data\Managed\UnityEngine\UnityEngine.TerrainModule.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="UnityEngine.TerrainPhysicsModule">
-      <HintPath>C:\Program Files\Unity\Hub\Editor\6000.3.0f1\Editor\Data\Managed\UnityEngine\UnityEngine.TerrainPhysicsModule.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="UnityEngine.TextCoreFontEngineModule">
       <HintPath>C:\Program Files\Unity\Hub\Editor\6000.3.0f1\Editor\Data\Managed\UnityEngine\UnityEngine.TextCoreFontEngineModule.dll</HintPath>
       <Private>False</Private>
@@ -411,10 +392,6 @@
     </Reference>
     <Reference Include="UnityEngine.UIElementsModule">
       <HintPath>C:\Program Files\Unity\Hub\Editor\6000.3.0f1\Editor\Data\Managed\UnityEngine\UnityEngine.UIElementsModule.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="UnityEngine.UmbraModule">
-      <HintPath>C:\Program Files\Unity\Hub\Editor\6000.3.0f1\Editor\Data\Managed\UnityEngine\UnityEngine.UmbraModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.UnityAnalyticsModule">
@@ -461,28 +438,8 @@
       <HintPath>C:\Program Files\Unity\Hub\Editor\6000.3.0f1\Editor\Data\Managed\UnityEngine\UnityEngine.VFXModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="UnityEngine.VRModule">
-      <HintPath>C:\Program Files\Unity\Hub\Editor\6000.3.0f1\Editor\Data\Managed\UnityEngine\UnityEngine.VRModule.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="UnityEngine.VectorGraphicsModule">
       <HintPath>C:\Program Files\Unity\Hub\Editor\6000.3.0f1\Editor\Data\Managed\UnityEngine\UnityEngine.VectorGraphicsModule.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="UnityEngine.VehiclesModule">
-      <HintPath>C:\Program Files\Unity\Hub\Editor\6000.3.0f1\Editor\Data\Managed\UnityEngine\UnityEngine.VehiclesModule.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="UnityEngine.VideoModule">
-      <HintPath>C:\Program Files\Unity\Hub\Editor\6000.3.0f1\Editor\Data\Managed\UnityEngine\UnityEngine.VideoModule.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="UnityEngine.WindModule">
-      <HintPath>C:\Program Files\Unity\Hub\Editor\6000.3.0f1\Editor\Data\Managed\UnityEngine\UnityEngine.WindModule.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="UnityEngine.XRModule">
-      <HintPath>C:\Program Files\Unity\Hub\Editor\6000.3.0f1\Editor\Data\Managed\UnityEngine\UnityEngine.XRModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEditor">
@@ -1259,6 +1216,18 @@
     </Reference>
     <Reference Include="Unity.ResourceManager">
       <HintPath>Library\ScriptAssemblies\Unity.ResourceManager.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Unity.Mathematics">
+      <HintPath>Library\ScriptAssemblies\Unity.Mathematics.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Unity.Collections">
+      <HintPath>Library\ScriptAssemblies\Unity.Collections.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Unity.Burst">
+      <HintPath>Library\ScriptAssemblies\Unity.Burst.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEditor.UI">

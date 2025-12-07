@@ -6,6 +6,7 @@ using UnityEngine.UI;
 using MinorShift.Emuera;
 using MinorShift.Emuera.GameView;
 using Unity.Mathematics;
+using uEmuera;
 
 /// <summary>
 /// Main content display manager for the Emuera console.

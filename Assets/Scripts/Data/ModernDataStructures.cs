@@ -1,47 +1,49 @@
-using Unity.Mathematics;
+using System;
 
 namespace uEmuera.Data
 {
     /// <summary>
-    /// Immutable display configuration using C# 9.0 records.
+    /// Immutable display configuration using C# 9.0 compatible struct.
     /// Provides efficient value-based equality and immutability.
     /// </summary>
-    public readonly record struct DisplayConfig
+    public readonly struct DisplayConfig : IEquatable<DisplayConfig>
     {
         /// <summary>
         /// Display width in pixels.
         /// </summary>
-        public float Width { get; init; }
+        public float Width { get; }
 
         /// <summary>
         /// Display height in pixels.
         /// </summary>
-        public float Height { get; init; }
+        public float Height { get; }
 
         /// <summary>
         /// Content width in pixels.
         /// </summary>
-        public float ContentWidth { get; init; }
+        public float ContentWidth { get; }
 
         /// <summary>
         /// Content height in pixels.
         /// </summary>
-        public float ContentHeight { get; init; }
+        public float ContentHeight { get; }
 
         /// <summary>
         /// Offset height for scrolling.
         /// </summary>
-        public float OffsetHeight { get; init; }
+        public float OffsetHeight { get; }
 
         /// <summary>
-        /// Gets the display size as a float2.
+        /// Initializes a new DisplayConfig.
         /// </summary>
-        public float2 DisplaySize => new float2(Width, Height);
-
-        /// <summary>
-        /// Gets the content size as a float2.
-        /// </summary>
-        public float2 ContentSize => new float2(ContentWidth, ContentHeight);
+        public DisplayConfig(float width, float height, float contentWidth, float contentHeight, float offsetHeight)
+        {
+            Width = width;
+            Height = height;
+            ContentWidth = contentWidth;
+            ContentHeight = contentHeight;
+            OffsetHeight = offsetHeight;
+        }
 
         /// <summary>
         /// Checks if content is wider than display (requires horizontal scrolling).
@@ -52,32 +54,87 @@ namespace uEmuera.Data
         /// Checks if content is taller than display (requires vertical scrolling).
         /// </summary>
         public bool RequiresVerticalScroll => ContentHeight > Height;
+
+        /// <summary>
+        /// Indicates whether the current object is equal to another object of the same type.
+        /// </summary>
+        public bool Equals(DisplayConfig other)
+        {
+            return Width == other.Width &&
+                   Height == other.Height &&
+                   ContentWidth == other.ContentWidth &&
+                   ContentHeight == other.ContentHeight &&
+                   OffsetHeight == other.OffsetHeight;
+        }
+
+        /// <summary>
+        /// Indicates whether this instance and a specified object are equal.
+        /// </summary>
+        public override bool Equals(object obj)
+        {
+            return obj is DisplayConfig other && Equals(other);
+        }
+
+        /// <summary>
+        /// Returns the hash code for this instance.
+        /// </summary>
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Width, Height, ContentWidth, ContentHeight, OffsetHeight);
+        }
+
+        /// <summary>
+        /// Determines whether two specified instances are equal.
+        /// </summary>
+        public static bool operator ==(DisplayConfig left, DisplayConfig right)
+        {
+            return left.Equals(right);
+        }
+
+        /// <summary>
+        /// Determines whether two specified instances are not equal.
+        /// </summary>
+        public static bool operator !=(DisplayConfig left, DisplayConfig right)
+        {
+            return !left.Equals(right);
+        }
     }
 
     /// <summary>
-    /// Immutable viewport bounds using C# 9.0 records.
+    /// Immutable viewport bounds using C# 9.0 compatible struct.
     /// </summary>
-    public readonly record struct ViewportBounds
+    public readonly struct ViewportBounds : IEquatable<ViewportBounds>
     {
         /// <summary>
         /// Top position.
         /// </summary>
-        public float Top { get; init; }
+        public float Top { get; }
 
         /// <summary>
         /// Bottom position.
         /// </summary>
-        public float Bottom { get; init; }
+        public float Bottom { get; }
 
         /// <summary>
         /// Left position.
         /// </summary>
-        public float Left { get; init; }
+        public float Left { get; }
 
         /// <summary>
         /// Right position.
         /// </summary>
-        public float Right { get; init; }
+        public float Right { get; }
+
+        /// <summary>
+        /// Initializes a new ViewportBounds.
+        /// </summary>
+        public ViewportBounds(float top, float bottom, float left, float right)
+        {
+            Top = top;
+            Bottom = bottom;
+            Left = left;
+            Right = right;
+        }
 
         /// <summary>
         /// Gets the width of the bounds.
@@ -90,19 +147,15 @@ namespace uEmuera.Data
         public float Height => Bottom - Top;
 
         /// <summary>
-        /// Gets the center position as a float2.
-        /// </summary>
-        public float2 Center => new float2((Left + Right) / 2, (Top + Bottom) / 2);
-
-        /// <summary>
         /// Checks if a point is within the bounds.
         /// </summary>
-        /// <param name="point">The point to check.</param>
+        /// <param name="x">The x coordinate to check.</param>
+        /// <param name="y">The y coordinate to check.</param>
         /// <returns>True if the point is within bounds.</returns>
-        public bool Contains(float2 point)
+        public bool Contains(float x, float y)
         {
-            return point.x >= Left && point.x <= Right &&
-                   point.y >= Top && point.y <= Bottom;
+            return x >= Left && x <= Right &&
+                   y >= Top && y <= Bottom;
         }
 
         /// <summary>
@@ -117,33 +170,87 @@ namespace uEmuera.Data
                     other.Right <= Left ||
                     other.Left >= Right);
         }
+
+        /// <summary>
+        /// Indicates whether the current object is equal to another object of the same type.
+        /// </summary>
+        public bool Equals(ViewportBounds other)
+        {
+            return Top == other.Top &&
+                   Bottom == other.Bottom &&
+                   Left == other.Left &&
+                   Right == other.Right;
+        }
+
+        /// <summary>
+        /// Indicates whether this instance and a specified object are equal.
+        /// </summary>
+        public override bool Equals(object obj)
+        {
+            return obj is ViewportBounds other && Equals(other);
+        }
+
+        /// <summary>
+        /// Returns the hash code for this instance.
+        /// </summary>
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Top, Bottom, Left, Right);
+        }
+
+        /// <summary>
+        /// Determines whether two specified instances are equal.
+        /// </summary>
+        public static bool operator ==(ViewportBounds left, ViewportBounds right)
+        {
+            return left.Equals(right);
+        }
+
+        /// <summary>
+        /// Determines whether two specified instances are not equal.
+        /// </summary>
+        public static bool operator !=(ViewportBounds left, ViewportBounds right)
+        {
+            return !left.Equals(right);
+        }
     }
 
     /// <summary>
-    /// Immutable line descriptor using C# 9.0 records.
+    /// Immutable line descriptor using C# 9.0 compatible struct.
     /// Represents a single line of text in the console.
     /// </summary>
-    public readonly record struct LineDescriptor
+    public readonly struct LineDescriptor : IEquatable<LineDescriptor>
     {
         /// <summary>
         /// Line number.
         /// </summary>
-        public int LineNo { get; init; }
+        public int LineNo { get; }
 
         /// <summary>
         /// Y position of the line.
         /// </summary>
-        public float PositionY { get; init; }
+        public float PositionY { get; }
 
         /// <summary>
         /// Height of the line.
         /// </summary>
-        public float Height { get; init; }
+        public float Height { get; }
 
         /// <summary>
         /// Whether this is a logical line (vs wrapped line).
         /// </summary>
-        public bool IsLogicalLine { get; init; }
+        public bool IsLogicalLine { get; }
+
+        /// <summary>
+        /// Initializes a new LineDescriptor.
+        /// </summary>
+        public LineDescriptor(int lineNo, float positionY, float height, bool isLogicalLine)
+        {
+            LineNo = lineNo;
+            PositionY = positionY;
+            Height = height;
+            IsLogicalLine = isLogicalLine;
+        }
 
         /// <summary>
         /// Gets the bottom position of the line.
@@ -153,13 +260,7 @@ namespace uEmuera.Data
         /// <summary>
         /// Gets the bounds of the line.
         /// </summary>
-        public ViewportBounds Bounds => new ViewportBounds
-        {
-            Top = PositionY,
-            Bottom = BottomY,
-            Left = 0,
-            Right = float.MaxValue
-        };
+        public ViewportBounds Bounds => new ViewportBounds(PositionY, BottomY, 0, float.MaxValue);
 
         /// <summary>
         /// Checks if the line is visible within the viewport.
@@ -171,73 +272,192 @@ namespace uEmuera.Data
         {
             return PositionY <= viewportBottom && BottomY >= viewportTop;
         }
+
+        /// <summary>
+        /// Indicates whether the current object is equal to another object of the same type.
+        /// </summary>
+        public bool Equals(LineDescriptor other)
+        {
+            return LineNo == other.LineNo &&
+                   PositionY == other.PositionY &&
+                   Height == other.Height &&
+                   IsLogicalLine == other.IsLogicalLine;
+        }
+
+        /// <summary>
+        /// Indicates whether this instance and a specified object are equal.
+        /// </summary>
+        public override bool Equals(object obj)
+        {
+            return obj is LineDescriptor other && Equals(other);
+        }
+
+        /// <summary>
+        /// Returns the hash code for this instance.
+        /// </summary>
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(LineNo, PositionY, Height, IsLogicalLine);
+        }
+
+        /// <summary>
+        /// Determines whether two specified instances are equal.
+        /// </summary>
+        public static bool operator ==(LineDescriptor left, LineDescriptor right)
+        {
+            return left.Equals(right);
+        }
+
+        /// <summary>
+        /// Determines whether two specified instances are not equal.
+        /// </summary>
+        public static bool operator !=(LineDescriptor left, LineDescriptor right)
+        {
+            return !left.Equals(right);
+        }
     }
 
     /// <summary>
-    /// Immutable drag state using C# 9.0 records.
+    /// Immutable drag state using C# 9.0 compatible struct.
     /// Represents the state of a drag operation.
     /// </summary>
-    public readonly record struct DragState
+    public readonly struct DragState : IEquatable<DragState>
     {
         /// <summary>
-        /// Beginning position of the drag.
+        /// Beginning X position of the drag.
         /// </summary>
-        public float2 BeginPosition { get; init; }
+        public float BeginX { get; }
 
         /// <summary>
-        /// Current position of the drag.
+        /// Beginning Y position of the drag.
         /// </summary>
-        public float2 CurrentPosition { get; init; }
+        public float BeginY { get; }
 
         /// <summary>
-        /// Delta velocity for inertial scrolling.
+        /// Current X position of the drag.
         /// </summary>
-        public float2 Delta { get; init; }
+        public float CurrentX { get; }
+
+        /// <summary>
+        /// Current Y position of the drag.
+        /// </summary>
+        public float CurrentY { get; }
+
+        /// <summary>
+        /// Delta X velocity for inertial scrolling.
+        /// </summary>
+        public float DeltaX { get; }
+
+        /// <summary>
+        /// Delta Y velocity for inertial scrolling.
+        /// </summary>
+        public float DeltaY { get; }
 
         /// <summary>
         /// Whether a drag is currently active.
         /// </summary>
-        public bool IsActive { get; init; }
+        public bool IsActive { get; }
 
         /// <summary>
-        /// Gets the total drag distance.
+        /// Initializes a new DragState.
         /// </summary>
-        public float2 DragDistance => CurrentPosition - BeginPosition;
+        public DragState(float beginX, float beginY, float currentX, float currentY, float deltaX, float deltaY, bool isActive)
+        {
+            BeginX = beginX;
+            BeginY = beginY;
+            CurrentX = currentX;
+            CurrentY = currentY;
+            DeltaX = deltaX;
+            DeltaY = deltaY;
+            IsActive = isActive;
+        }
+
+        /// <summary>
+        /// Gets the total X drag distance.
+        /// </summary>
+        public float DragDistanceX => CurrentX - BeginX;
+
+        /// <summary>
+        /// Gets the total Y drag distance.
+        /// </summary>
+        public float DragDistanceY => CurrentY - BeginY;
 
         /// <summary>
         /// Gets the magnitude of the drag distance.
         /// </summary>
-        public float DragMagnitude => math.length(DragDistance);
+        public float DragMagnitude => (float)System.Math.Sqrt(DragDistanceX * DragDistanceX + DragDistanceY * DragDistanceY);
 
         /// <summary>
         /// Creates a new drag state with updated position.
         /// </summary>
-        /// <param name="newPosition">The new current position.</param>
+        /// <param name="newX">The new current X position.</param>
+        /// <param name="newY">The new current Y position.</param>
         /// <returns>A new drag state.</returns>
-        public DragState WithPosition(float2 newPosition)
+        public DragState WithPosition(float newX, float newY)
         {
-            return this with { CurrentPosition = newPosition };
+            return new DragState(BeginX, BeginY, newX, newY, DeltaX, DeltaY, IsActive);
         }
 
         /// <summary>
         /// Creates a new drag state with updated delta.
         /// </summary>
-        /// <param name="newDelta">The new delta value.</param>
+        /// <param name="newDeltaX">The new delta X value.</param>
+        /// <param name="newDeltaY">The new delta Y value.</param>
         /// <returns>A new drag state.</returns>
-        public DragState WithDelta(float2 newDelta)
+        public DragState WithDelta(float newDeltaX, float newDeltaY)
         {
-            return this with { Delta = newDelta };
+            return new DragState(BeginX, BeginY, CurrentX, CurrentY, newDeltaX, newDeltaY, IsActive);
         }
 
         /// <summary>
         /// Creates an inactive drag state (no drag in progress).
         /// </summary>
-        public static DragState Inactive => new DragState
+        public static DragState Inactive => new DragState(0, 0, 0, 0, 0, 0, false);
+
+        /// <summary>
+        /// Indicates whether the current object is equal to another object of the same type.
+        /// </summary>
+        public bool Equals(DragState other)
         {
-            BeginPosition = float2.zero,
-            CurrentPosition = float2.zero,
-            Delta = float2.zero,
-            IsActive = false
-        };
+            return BeginX == other.BeginX &&
+                   BeginY == other.BeginY &&
+                   CurrentX == other.CurrentX &&
+                   CurrentY == other.CurrentY &&
+                   DeltaX == other.DeltaX &&
+                   DeltaY == other.DeltaY &&
+                   IsActive == other.IsActive;
+        }
+
+        /// <summary>
+        /// Indicates whether this instance and a specified object are equal.
+        /// </summary>
+        public override bool Equals(object obj)
+        {
+            return obj is DragState other && Equals(other);
+        }
+
+        /// <summary>
+        /// Returns the hash code for this instance.
+        /// </summary>
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(BeginX, BeginY, CurrentX, CurrentY, DeltaX, DeltaY, IsActive);
+        }
+
+        /// <summary>
+        /// Determines whether two specified instances are equal.
+        /// </summary>
+        public static bool operator ==(DragState left, DragState right)
+        {
+            return left.Equals(right);
+        }
+
+        /// <summary>
+        /// Determines whether two specified instances are not equal.
+        /// </summary>
+        public static bool operator !=(DragState left, DragState right)
+        {
+            return !left.Equals(right);
+        }
     }
 }
