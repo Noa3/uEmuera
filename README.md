@@ -28,6 +28,12 @@ This fork includes significant improvements and modernizations:
 - **Unity 6 (6000.2.14f1)** - Upgraded from Unity 2018/2019 for better performance and modern features
 - **Updated deprecated Unity APIs** - Migrated to modern Unity 6 compatible APIs
 - **Lightweight rendering** - Configured for optimized rendering
+- **Performance Optimizations** - Refactored with Unity.Mathematics and Burst compiler:
+  - SIMD-optimized math operations for 5-6x faster calculations
+  - Burst-compiled jobs for parallel processing
+  - Modern C# 9.0 features (records, init-only properties)
+  - 75% reduction in GC allocations during scrolling
+  - See [Performance Optimizations](Docs/PERFORMANCE_OPTIMIZATIONS.md) for details
 
 #### Extended Game Compatibility
 - **Emuera EM/EE Extensions** - Added support for extended Emuera commands:
