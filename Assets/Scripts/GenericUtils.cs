@@ -660,16 +660,18 @@ public static class GenericUtils
         do
         {
             // Search for colon, but stop at line end or data end to avoid index out of range
-            while (start + count < data.Length && 
-                   data[start + count] != ':' &&
-                   data[start + count] != '\xd' &&
-                   data[start + count] != '\xa')
+            int pos = start + count;
+            while (pos < data.Length && 
+                   data[pos] != ':' &&
+                   data[pos] != '\xd' &&
+                   data[pos] != '\xa')
             {
                 count += 1;
+                pos = start + count;
             }
             
             // Only process lines that have a colon (skip comment lines and section headers)
-            if (start + count < data.Length && data[start + count] == ':')
+            if (pos < data.Length && data[pos] == ':')
             {
                 md5s.Add(CalcMd5(data, start, count));
             }
@@ -698,6 +700,7 @@ public static class GenericUtils
             if (start >= data.Length)
                 break;
 
+        // Check bounds and null terminator (data may be C-style null-terminated string from file read)
         } while (start < data.Length && data[start] != 0);
 
         return md5s;
