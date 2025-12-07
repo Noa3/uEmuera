@@ -339,7 +339,6 @@ internal static class SpriteManager
                     Debug.LogWarning($"SpriteManager: File not found for texture '{name}': {filename}. Creating grey placeholder.");
                     return CreateAndStorePlaceholder(name);
                 }
-                }
             }
         }
 
