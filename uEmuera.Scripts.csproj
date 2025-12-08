@@ -166,6 +166,7 @@
     <Compile Include="Assets\Scripts\Emuera\GameProc\LogicalLineParser.cs" />
     <Compile Include="Assets\Scripts\Emuera\GameData\GameBase.cs" />
     <Compile Include="Assets\Scripts\Emuera\GameView\HtmlManager.cs" />
+    <Compile Include="Assets\Scripts\SettingsUIBuilder.cs" />
     <Compile Include="Assets\Scripts\Emuera\GameView\ConsoleImagePart.cs" />
     <Compile Include="Assets\Scripts\Emuera\GameData\Function\FunctionMethod.cs" />
     <Compile Include="Assets\Scripts\Emuera\GameView\ConsoleShapePart.cs" />
