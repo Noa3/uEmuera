@@ -278,7 +278,7 @@ public abstract class EmueraBehaviour : MonoBehaviour
             return;
         }
         var unit_desc = behaviour.unit_desc;
-        if(!unit_desc.isbutton)
+        if(unit_desc == null || !unit_desc.isbutton)
             return;
         if(unit_desc.generation < EmueraContent.instance.button_generation)
             return; // Ignore clicks on outdated buttons instead of sending empty input
