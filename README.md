@@ -58,6 +58,16 @@ This fork includes significant improvements and modernizations:
 - **Copilot Instructions** - Project-specific AI development guidelines
 - **Gothic Fonts Support** - Additional font options
 
+#### UI/UX Improvements
+- **Modern Dark Theme UI** - Professional dark color scheme for reduced eye strain
+  - Carefully crafted color palette with ERA game aesthetics
+  - Applied to main menu, settings, and all dialogs
+  - Better contrast and readability
+- **CRT Post-Processing Effect** - Optional retro CRT monitor visual effect
+  - Vignette, chromatic aberration, and film grain
+  - Configurable through Settings menu
+  - Optimized for mobile devices
+
 #### Bug Fixes
 - Fixed image loading issues
 - Fixed WebP format errors
@@ -157,6 +167,16 @@ Emuera是Emulator of Eramaker的缩写，是Windows平台下文字游戏平台�
 - **Copilot指南** - 项目特定的AI开发指南
 - **哥特字体支持** - 额外的字体选项
 
+#### UI/UX改进
+- **现代深色主题UI** - 专业的深色配色方案减少眼睛疲劳
+  - 精心设计的ERA游戏美学配色
+  - 应用于主菜单、设置和所有对话框
+  - 更好的对比度和可读性
+- **CRT后处理效果** - 可选的复古CRT显示器视觉效果
+  - 晕影、色差和胶片颗粒效果
+  - 可通过设置菜单配置
+  - 针对移动设备优化
+
 #### 错误修复
 - 修复图片加载问题
 - 修复WebP格式错误
@@ -251,6 +271,16 @@ Dieser Fork enthält bedeutende Verbesserungen und Modernisierungen:
 - **Unit-Test-Framework** - Integriertes Unity Test Framework mit EditMode- und PlayMode-Tests
 - **Copilot-Anweisungen** - Projektspezifische KI-Entwicklungsrichtlinien
 - **Gothic-Schriftarten-Unterstützung** - Zusätzliche Schriftoptionen
+
+#### UI/UX-Verbesserungen
+- **Modernes dunkles Theme** - Professionelles dunkles Farbschema zur Reduzierung der Augenbelastung
+  - Sorgfältig gestaltete Farbpalette mit ERA-Spielästhetik
+  - Angewendet auf Hauptmenü, Einstellungen und alle Dialoge
+  - Besserer Kontrast und Lesbarkeit
+- **CRT-Nachbearbeitungseffekt** - Optionaler Retro-CRT-Monitor-Effekt
+  - Vignette, chromatische Aberration und Filmkorn
+  - Konfigurierbar über das Einstellungsmenü
+  - Optimiert für mobile Geräte
 
 #### Fehlerbehebungen
 - Bildladeproblem behoben
