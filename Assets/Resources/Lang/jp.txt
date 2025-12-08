@@ -16,6 +16,7 @@ Options.IntentBox.border.reset.Text=リセット
 Options.SettingsBox.border.titlebar.title=設定
 Options.SettingsBox.border.close.Text=閉じる
 Options.SettingsBox.postprocessing.Text=CRTモニター効果
+Options.SettingsBox.pixelperfect.Text=ピクセルパーフェクト
 FirstWindow.Titlebar.title=ゲームリスト
 <Menu1>=310
 <Menu2>=280
@@ -44,6 +45,8 @@ FirstWindow.Titlebar.title=ゲームリスト
 [Cancel]=キャンセル
 [PostProcessingOn]=オン
 [PostProcessingOff]=オフ
+[PixelPerfectOn]=オン
+[PixelPerfectOff]=オフ
 ; Game Messages - Loading/Initialization
 [LoadingMacroTxt]=macro.txt読み込み中・・・
 [LoadingReplaceCsv]=_Replace.csv読み込み中・・・

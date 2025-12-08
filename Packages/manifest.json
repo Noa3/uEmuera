@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "com.unity.2d.pixel-perfect": "5.0.3",
     "com.unity.burst": "1.8.21",
     "com.unity.collections": "2.6.3",
     "com.unity.feature.development": "1.0.2",

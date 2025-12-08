@@ -1,6 +1,6 @@
 # UI Modernization and Post-Processing
 
-This document describes the dark theme UI modernization and CRT post-processing features added to uEmuera.
+This document describes the dark theme UI modernization, CRT post-processing, and Pixel Perfect rendering features added to uEmuera.
 
 ## Dark Theme UI
 
@@ -89,8 +89,80 @@ All new UI strings are fully localized:
 - `Options.MenuPad.Menu1.settings.Text` - Settings menu button
 - `Options.SettingsBox.border.titlebar.title` - Settings dialog title
 - `Options.SettingsBox.postprocessing.Text` - Post-processing option label
+- `Options.SettingsBox.pixelperfect.Text` - Pixel Perfect option label
 - `[PostProcessingOn]` - ON state text
 - `[PostProcessingOff]` - OFF state text
+- `[PixelPerfectOn]` - ON state text
+- `[PixelPerfectOff]` - OFF state text
+
+## Pixel Perfect Rendering
+
+### Overview
+The Pixel Perfect Camera system ensures crisp, sharp rendering of images and text by aligning rendering to exact pixel boundaries. This eliminates blurriness and maintains visual clarity at any resolution.
+
+### Features
+1. **Pixel Snapping**: UI elements align to pixel grid for crisp edges
+2. **Reference Resolution**: Maintains consistent scaling across devices
+3. **Upscale Render Texture**: Ensures sharp rendering at any screen resolution
+4. **Stretch Fill**: Maintains aspect ratio while filling the screen
+
+### Usage
+
+#### Enabling/Disabling Pixel Perfect
+Users can toggle Pixel Perfect rendering through the Settings menu:
+1. Open the main menu (⚙️ icon)
+2. Select "Settings"
+3. Click the "Pixel Perfect Rendering" toggle
+
+The setting persists between sessions via PlayerPrefs. **Default: Enabled** (for best visual quality).
+
+#### Programmatic Access
+```csharp
+// Check if pixel perfect is enabled
+bool isEnabled = PixelPerfectManager.instance.IsEnabled();
+
+// Toggle pixel perfect
+PixelPerfectManager.instance.TogglePixelPerfect();
+
+// Set specific state
+PixelPerfectManager.instance.SetPixelPerfectEnabled(true);
+
+// Update reference resolution (e.g., on screen rotation)
+PixelPerfectManager.instance.UpdateReferenceResolution(1920, 1080);
+
+// Get current pixel ratio
+int ratio = PixelPerfectManager.instance.GetPixelRatio();
+```
+
+### Technical Details
+
+#### PixelPerfectManager
+The `PixelPerfectManager` singleton handles all pixel perfect rendering:
+- Automatic initialization on startup
+- Unity 2D Pixel Perfect Camera integration
+- Settings persistence
+- Camera configuration
+
+#### Configuration
+- **Reference Resolution**: 1920x1080 (default, matches typical game design)
+- **Pixels Per Unit**: 100 (standard for sprite-based games)
+- **Pixel Snapping**: Enabled (ensures crisp edges)
+- **Upscale RT**: Enabled (maintains sharpness at all resolutions)
+- **Stretch Fill**: Enabled (fills screen while maintaining aspect ratio)
+
+#### Compatibility with Post-Processing
+Pixel Perfect Camera works seamlessly with Post-Processing Stack:
+- Both systems can be enabled simultaneously
+- Pixel Perfect ensures crisp rendering
+- Post-Processing adds visual effects on top
+- Combined result: Sharp, stylized visuals with CRT authenticity
+
+### Performance
+The Pixel Perfect Camera has minimal performance impact:
+- One-time setup cost at initialization
+- No per-frame overhead for calculations
+- Compatible with mobile devices
+- Works efficiently with On-Demand Rendering system
 
 ## Integration
 
@@ -115,14 +187,33 @@ All menu dialogs apply dark theme styling:
 - Message boxes
 
 ### MainEntry
-PostProcessingManager is initialized early in the application lifecycle:
+Both PostProcessingManager and PixelPerfectManager are initialized early in the application lifecycle:
 ```csharp
 void Awake()
 {
     // ... existing code ...
+    InitializePixelPerfect();
     InitializePostProcessing();
 }
 ```
+
+## Combined Effects
+
+### Using Both Systems Together
+For the best visual experience, enable both systems:
+1. **Pixel Perfect Rendering** - Ensures crisp, sharp text and images
+2. **CRT Post-Processing** - Adds authentic retro visual effects
+
+This combination provides:
+- Sharp, readable text and UI elements
+- Crisp sprite rendering without blur
+- Authentic CRT monitor aesthetics
+- Professional retro gaming experience
+
+### Recommended Settings
+- **For Modern Look**: Pixel Perfect ON, Post-Processing OFF
+- **For Retro Authenticity**: Pixel Perfect ON, Post-Processing ON
+- **For Performance**: Both OFF (uses default Unity rendering)
 
 ## Future Enhancements
 
@@ -132,3 +223,5 @@ Potential future improvements:
 3. Custom scanline patterns
 4. More color grading options
 5. Per-game post-processing preferences
+6. Dynamic reference resolution adjustment
+7. Aspect ratio presets for different display types

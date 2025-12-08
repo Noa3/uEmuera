@@ -447,6 +447,7 @@ public class OptionWindow : MonoBehaviour
         {
             settings_box.SetActive(true);
             UpdatePostProcessingToggle();
+            UpdatePixelPerfectToggle();
         }
     }
     
@@ -468,6 +469,11 @@ public class OptionWindow : MonoBehaviour
         if (settings_postprocessing_toggle != null)
         {
             GenericUtils.SetListenerOnClick(settings_postprocessing_toggle, OnPostProcessingToggle);
+        }
+        
+        if (settings_pixelperfect_toggle != null)
+        {
+            GenericUtils.SetListenerOnClick(settings_pixelperfect_toggle, OnPixelPerfectToggle);
         }
     }
     
@@ -495,6 +501,29 @@ public class OptionWindow : MonoBehaviour
     }
     
     /// <summary>
+    /// Updates the pixel perfect toggle visual state.
+    /// </summary>
+    void UpdatePixelPerfectToggle()
+    {
+        if (PixelPerfectManager.instance == null)
+            return;
+            
+        bool isEnabled = PixelPerfectManager.instance.IsEnabled();
+        
+        if (settings_pixelperfect_icon != null)
+        {
+            settings_pixelperfect_icon.SetActive(isEnabled);
+        }
+        
+        if (settings_pixelperfect_text != null)
+        {
+            settings_pixelperfect_text.text = isEnabled ? 
+                MultiLanguage.GetText("[PixelPerfectOn]") : 
+                MultiLanguage.GetText("[PixelPerfectOff]");
+        }
+    }
+    
+    /// <summary>
     /// Called when the settings close button is clicked.
     /// </summary>
     void OnSettingsClose()
@@ -514,6 +543,18 @@ public class OptionWindow : MonoBehaviour
         {
             PostProcessingManager.instance.TogglePostProcessing();
             UpdatePostProcessingToggle();
+        }
+    }
+    
+    /// <summary>
+    /// Called when the pixel perfect toggle button is clicked.
+    /// </summary>
+    void OnPixelPerfectToggle()
+    {
+        if (PixelPerfectManager.instance != null)
+        {
+            PixelPerfectManager.instance.TogglePixelPerfect();
+            UpdatePixelPerfectToggle();
         }
     }
     
@@ -1038,6 +1079,12 @@ public class OptionWindow : MonoBehaviour
     public GameObject settings_postprocessing_icon;
     [Tooltip("Post-processing toggle text")]
     public Text settings_postprocessing_text;
+    [Tooltip("Pixel Perfect toggle button")]
+    public GameObject settings_pixelperfect_toggle;
+    [Tooltip("Pixel Perfect enabled icon")]
+    public GameObject settings_pixelperfect_icon;
+    [Tooltip("Pixel Perfect toggle text")]
+    public Text settings_pixelperfect_text;
     
     #endregion
 

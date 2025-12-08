@@ -15,6 +15,7 @@ Options.IntentBox.border.reset.Text=重置
 Options.SettingsBox.border.titlebar.title=设置
 Options.SettingsBox.border.close.Text=关闭
 Options.SettingsBox.postprocessing.Text=CRT 显示器效果
+Options.SettingsBox.pixelperfect.Text=像素完美渲染
 FirstWindow.Titlebar.title=游戏列表
 <Menu1>=200
 <Menu2>=200
@@ -43,6 +44,8 @@ FirstWindow.Titlebar.title=游戏列表
 [Cancel]=取消
 [PostProcessingOn]=开
 [PostProcessingOff]=关
+[PixelPerfectOn]=开
+[PixelPerfectOff]=关
 ; Game Messages - Loading/Initialization
 [LoadingMacroTxt]=正在加载macro.txt...
 [LoadingReplaceCsv]=正在加载_Replace.csv...

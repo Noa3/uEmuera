@@ -16,6 +16,7 @@ Options.IntentBox.border.reset.Text=Zurücksetzen
 Options.SettingsBox.border.titlebar.title=Einstellungen
 Options.SettingsBox.border.close.Text=Schließen
 Options.SettingsBox.postprocessing.Text=CRT-Monitor-Effekt
+Options.SettingsBox.pixelperfect.Text=Pixel Perfect Rendering
 FirstWindow.Titlebar.title=Spielliste
 <Menu1>=220
 <Menu2>=260
@@ -44,6 +45,8 @@ FirstWindow.Titlebar.title=Spielliste
 [Cancel]=Abbrechen
 [PostProcessingOn]=AN
 [PostProcessingOff]=AUS
+[PixelPerfectOn]=AN
+[PixelPerfectOff]=AUS
 ; Game Messages - Loading/Initialization
 [LoadingMacroTxt]=Lade macro.txt...
 [LoadingReplaceCsv]=Lade _Replace.csv...
