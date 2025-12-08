@@ -19,6 +19,9 @@ public class MainEntry : MonoBehaviour
         
         // Initialize on-demand rendering manager
         InitializeOnDemandRendering();
+        
+        // Initialize post-processing manager
+        InitializePostProcessing();
     }
     
     /// <summary>
@@ -54,6 +57,21 @@ public class MainEntry : MonoBehaviour
             var renderManagerObj = new GameObject("OnDemandRenderManager");
             renderManagerObj.AddComponent<OnDemandRenderManager>();
             DontDestroyOnLoad(renderManagerObj);
+        }
+    }
+    
+    /// <summary>
+    /// Initializes the post-processing system.
+    /// Creates the PostProcessingManager if it doesn't exist.
+    /// </summary>
+    void InitializePostProcessing()
+    {
+        if (PostProcessingManager.instance == null)
+        {
+            var ppManagerObj = new GameObject("PostProcessingManager");
+            var ppManager = ppManagerObj.AddComponent<PostProcessingManager>();
+            ppManager.targetCamera = Camera.main;
+            DontDestroyOnLoad(ppManagerObj);
         }
     }
 

@@ -97,6 +97,9 @@ public class FirstWindow : MonoBehaviour
 
         GenericUtils.FindChildByName<Text>(gameObject, "version")
             .text = Application.version + " ";
+        
+        // Apply dark theme styling
+        ApplyDarkTheme();
 
         GetList(Application.persistentDataPath);
         setting_.SetActive(true);
@@ -345,6 +348,43 @@ public class FirstWindow : MonoBehaviour
     {
         var ow = EmueraContent.instance.option_window;
         ow.ShowMenu();
+    }
+    
+    /// <summary>
+    /// Applies dark theme styling to the FirstWindow UI.
+    /// </summary>
+    void ApplyDarkTheme()
+    {
+        // Apply dark theme to the entire window
+        UIStyleManager.ApplyDarkTheme(gameObject);
+        
+        // Specifically style the title bar
+        if (titlebar != null)
+        {
+            titlebar.color = UIStyleManager.DarkTheme.TextPrimary;
+            UIStyleManager.AddTextShadow(titlebar);
+        }
+        
+        // Style the version text
+        var versionText = GenericUtils.FindChildByName<Text>(gameObject, "version");
+        if (versionText != null)
+        {
+            versionText.color = UIStyleManager.DarkTheme.TextSecondary;
+        }
+        
+        // Style the scroll view background
+        var scrollBg = GenericUtils.FindChildByName<UnityEngine.UI.Image>(gameObject, "ScrollRect");
+        if (scrollBg != null)
+        {
+            scrollBg.color = UIStyleManager.DarkTheme.BackgroundDark;
+        }
+        
+        // Style the main background
+        var mainBg = GetComponent<UnityEngine.UI.Image>();
+        if (mainBg != null)
+        {
+            mainBg.color = UIStyleManager.DarkTheme.BackgroundMedium;
+        }
     }
 
     /// <summary>

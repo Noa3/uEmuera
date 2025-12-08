@@ -14,6 +14,7 @@ Options.MsgBox.border.titlebar.title=
 Options.MsgBox.border.content=
 Options.MenuPad.Menu1.resolution.Text=设置分辨率
 Options.MenuPad.Menu1.language.Text=语言选择
+Options.MenuPad.Menu1.settings.Text=设置
 Options.MenuPad.Menu1.github.Text=Github
 Options.MenuPad.Menu1.exit.Text=退出游戏
 Options.MenuPad.Menu2.back.Text=回到选单
@@ -39,6 +40,9 @@ Options.IntentBox.border.R_right.Text=→
 Options.IntentBox.border.R=0
 Options.IntentBox.border.close.Text=关闭
 Options.IntentBox.border.reset.Text=重置
+Options.SettingsBox.border.titlebar.title=设置
+Options.SettingsBox.border.close.Text=关闭
+Options.SettingsBox.postprocessing.Text=CRT 显示器效果
 EmueraMain.Template.template_text=uEmuera
 ; Android Storage Permissions
 [StoragePermissionTitle]=需要存储权限
@@ -47,6 +51,8 @@ EmueraMain.Template.template_text=uEmuera
 [StoragePermissionDenied]=存储权限被拒绝。如果没有此权限，应用无法访问游戏文件。\n\n点击"授权"重试。
 [Grant]=授权
 [Cancel]=取消
+[PostProcessingOn]=开
+[PostProcessingOff]=关
 ; Game Messages - Loading/Initialization
 [LoadingMacroTxt]=正在加载macro.txt...
 [LoadingReplaceCsv]=正在加载_Replace.csv...

@@ -26,6 +26,7 @@ public class OptionWindow : MonoBehaviour
         GenericUtils.SetListenerOnClick(menu_pad, OnMenuPad);
         GenericUtils.SetListenerOnClick(menu_1_resolution, OnMenuResolution);
         GenericUtils.SetListenerOnClick(menu_1_language, ShowLanguageBox);
+        GenericUtils.SetListenerOnClick(menu_1_settings, ShowSettingsBox);
         // Only show directory option on standalone platforms (Windows, Linux, macOS)
         // Hide on Android
         if(menu_1_directory != null)
@@ -65,8 +66,14 @@ public class OptionWindow : MonoBehaviour
         GenericUtils.SetListenerOnClick(intentbox_close, OnIntentClose);
         GenericUtils.SetListenerOnClick(intentbox_reset, OnIntentReset);
 
+        // Initialize settings box
+        InitSettingsBox();
+        
         // Initialize directory input box for standalone platforms
         InitDirectoryInputBox();
+        
+        // Apply dark theme to menus
+        ApplyDarkThemeToMenus();
 
         HideResolutionIcon();
         switch(ResolutionHelper.resolution_index)
@@ -429,6 +436,204 @@ public class OptionWindow : MonoBehaviour
         MultiLanguage.SetLanguage(e.pointerPress.name);
         language_box.SetActive(false);
     }
+    
+    /// <summary>
+    /// Shows the settings dialog box.
+    /// </summary>
+    public void ShowSettingsBox()
+    {
+        HideMenu();
+        if (settings_box != null)
+        {
+            settings_box.SetActive(true);
+            UpdatePostProcessingToggle();
+        }
+    }
+    
+    /// <summary>
+    /// Initializes the settings box by wiring up button events.
+    /// </summary>
+    void InitSettingsBox()
+    {
+        if (settings_box == null)
+            return;
+            
+        settings_box.SetActive(false);
+        
+        if (settings_close != null)
+        {
+            GenericUtils.SetListenerOnClick(settings_close, OnSettingsClose);
+        }
+        
+        if (settings_postprocessing_toggle != null)
+        {
+            GenericUtils.SetListenerOnClick(settings_postprocessing_toggle, OnPostProcessingToggle);
+        }
+    }
+    
+    /// <summary>
+    /// Updates the post-processing toggle visual state.
+    /// </summary>
+    void UpdatePostProcessingToggle()
+    {
+        if (PostProcessingManager.instance == null)
+            return;
+            
+        bool isEnabled = PostProcessingManager.instance.IsEnabled();
+        
+        if (settings_postprocessing_icon != null)
+        {
+            settings_postprocessing_icon.SetActive(isEnabled);
+        }
+        
+        if (settings_postprocessing_text != null)
+        {
+            settings_postprocessing_text.text = isEnabled ? 
+                MultiLanguage.GetText("[PostProcessingOn]") : 
+                MultiLanguage.GetText("[PostProcessingOff]");
+        }
+    }
+    
+    /// <summary>
+    /// Called when the settings close button is clicked.
+    /// </summary>
+    void OnSettingsClose()
+    {
+        if (settings_box != null)
+        {
+            settings_box.SetActive(false);
+        }
+    }
+    
+    /// <summary>
+    /// Called when the post-processing toggle button is clicked.
+    /// </summary>
+    void OnPostProcessingToggle()
+    {
+        if (PostProcessingManager.instance != null)
+        {
+            PostProcessingManager.instance.TogglePostProcessing();
+            UpdatePostProcessingToggle();
+        }
+    }
+    
+    /// <summary>
+    /// Applies dark theme styling to all menu elements.
+    /// </summary>
+    void ApplyDarkThemeToMenus()
+    {
+        // Style menu pad (background overlay)
+        if (menu_pad != null)
+        {
+            var image = menu_pad.GetComponent<Image>();
+            if (image != null)
+            {
+                // Semi-transparent dark overlay
+                image.color = new Color(0f, 0f, 0f, 0.85f);
+            }
+        }
+        
+        // Style Menu 1
+        if (menu_1 != null)
+        {
+            UIStyleManager.ApplyDarkTheme(menu_1);
+            StyleMenuPanel(menu_1);
+        }
+        
+        // Style Menu 2
+        if (menu_2 != null)
+        {
+            UIStyleManager.ApplyDarkTheme(menu_2);
+            StyleMenuPanel(menu_2);
+        }
+        
+        // Style resolution panel
+        if (resolution_pad != null)
+        {
+            var image = resolution_pad.GetComponent<Image>();
+            if (image != null)
+            {
+                image.color = new Color(0f, 0f, 0f, 0.85f);
+            }
+            
+            var contentPanel = GenericUtils.FindChildByName(resolution_pad, "border");
+            if (contentPanel != null)
+            {
+                UIStyleManager.ApplyDarkTheme(contentPanel);
+                StyleMenuPanel(contentPanel);
+            }
+        }
+        
+        // Style language box
+        if (language_box != null)
+        {
+            UIStyleManager.ApplyDarkTheme(language_box);
+            var border = GenericUtils.FindChildByName(language_box, "border");
+            if (border != null)
+            {
+                StyleMenuPanel(border);
+            }
+        }
+        
+        // Style intent box
+        if (intentbox != null)
+        {
+            UIStyleManager.ApplyDarkTheme(intentbox);
+        }
+        
+        // Style message box
+        if (msg_box != null)
+        {
+            UIStyleManager.ApplyDarkTheme(msg_box);
+            var border = GenericUtils.FindChildByName(msg_box, "border");
+            if (border != null)
+            {
+                StyleMenuPanel(border);
+            }
+        }
+        
+        // Style directory input box
+        if (directoryInputBox != null)
+        {
+            UIStyleManager.ApplyDarkTheme(directoryInputBox);
+        }
+        
+        // Style settings box
+        if (settings_box != null)
+        {
+            UIStyleManager.ApplyDarkTheme(settings_box);
+            var border = GenericUtils.FindChildByName(settings_box, "border");
+            if (border != null)
+            {
+                StyleMenuPanel(border);
+            }
+        }
+    }
+    
+    /// <summary>
+    /// Styles a menu panel with dark theme colors.
+    /// </summary>
+    /// <param name="panel">The panel GameObject to style.</param>
+    void StyleMenuPanel(GameObject panel)
+    {
+        if (panel == null)
+            return;
+            
+        var image = panel.GetComponent<Image>();
+        if (image != null)
+        {
+            image.color = UIStyleManager.DarkTheme.BackgroundMedium;
+        }
+        
+        // Add subtle outline/border effect
+        var outline = panel.GetComponent<Outline>();
+        if (outline == null)
+        {
+            outline = panel.gameObject.AddComponent<Outline>();
+        }
+        outline.effectColor = UIStyleManager.DarkTheme.Border;
+        outline.effectDistance = new Vector2(2f, -2f);
+    }
 
     void OnGithub()
     {
@@ -763,6 +968,7 @@ public class OptionWindow : MonoBehaviour
     public GameObject menu_1;
     public GameObject menu_1_resolution;
     public GameObject menu_1_language;
+    public GameObject menu_1_settings;
     public GameObject menu_1_directory;
     public GameObject menu_1_github;
     public GameObject menu_1_exit;
@@ -813,6 +1019,18 @@ public class OptionWindow : MonoBehaviour
     public GameObject directoryInputConfirm;
     [Tooltip("Cancel button for directory input")]
     public GameObject directoryInputCancel;
+    
+    [Header("Settings Box")]
+    [Tooltip("Settings dialog container")]
+    public GameObject settings_box;
+    [Tooltip("Close button for settings dialog")]
+    public GameObject settings_close;
+    [Tooltip("Post-processing toggle button")]
+    public GameObject settings_postprocessing_toggle;
+    [Tooltip("Post-processing enabled icon")]
+    public GameObject settings_postprocessing_icon;
+    [Tooltip("Post-processing toggle text")]
+    public Text settings_postprocessing_text;
     
     #endregion
 

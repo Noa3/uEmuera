@@ -1,6 +1,7 @@
 ;DE - German
 Options.MenuPad.Menu1.resolution.Text=Auflösung
 Options.MenuPad.Menu1.language.Text=Sprache
+Options.MenuPad.Menu1.settings.Text=Einstellungen
 Options.MenuPad.Menu1.exit.Text=Beenden
 Options.MenuPad.Menu2.back.Text=Zurück zum Menü
 Options.MenuPad.Menu2.savelog.Text=Log speichern
@@ -12,6 +13,9 @@ Options.LanguageBox.border.titlebar.title=Sprache wählen
 Options.IntentBox.border.titlebar.title=Einrückung
 Options.IntentBox.border.close.Text=Schließen
 Options.IntentBox.border.reset.Text=Zurücksetzen
+Options.SettingsBox.border.titlebar.title=Einstellungen
+Options.SettingsBox.border.close.Text=Schließen
+Options.SettingsBox.postprocessing.Text=CRT-Monitor-Effekt
 FirstWindow.Titlebar.title=Spielliste
 <Menu1>=220
 <Menu2>=260
@@ -38,6 +42,8 @@ FirstWindow.Titlebar.title=Spielliste
 [StoragePermissionDenied]=Die Speicherberechtigung wurde verweigert. Ohne diese Berechtigung kann die App nicht auf Spieldateien zugreifen.\n\nTippen Sie auf "Gewähren", um es erneut zu versuchen.
 [Grant]=Gewähren
 [Cancel]=Abbrechen
+[PostProcessingOn]=AN
+[PostProcessingOff]=AUS
 ; Game Messages - Loading/Initialization
 [LoadingMacroTxt]=Lade macro.txt...
 [LoadingReplaceCsv]=Lade _Replace.csv...
