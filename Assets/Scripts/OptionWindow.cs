@@ -26,7 +26,13 @@ public class OptionWindow : MonoBehaviour
         GenericUtils.SetListenerOnClick(menu_pad, OnMenuPad);
         GenericUtils.SetListenerOnClick(menu_1_resolution, OnMenuResolution);
         GenericUtils.SetListenerOnClick(menu_1_language, ShowLanguageBox);
-        GenericUtils.SetListenerOnClick(menu_1_settings, ShowSettingsBox);
+        
+        // Settings button - set listener only if it exists
+        if (menu_1_settings != null)
+        {
+            GenericUtils.SetListenerOnClick(menu_1_settings, ShowSettingsBox);
+        }
+        
         // Only show directory option on standalone platforms (Windows, Linux, macOS)
         // Hide on Android
         if(menu_1_directory != null)
@@ -66,6 +72,9 @@ public class OptionWindow : MonoBehaviour
         GenericUtils.SetListenerOnClick(intentbox_close, OnIntentClose);
         GenericUtils.SetListenerOnClick(intentbox_reset, OnIntentReset);
 
+        // Ensure settings UI exists (create at runtime if not in prefab)
+        SettingsUIBuilder.EnsureSettingsUIExists(this);
+        
         // Initialize settings box
         InitSettingsBox();
         
@@ -166,6 +175,81 @@ public class OptionWindow : MonoBehaviour
     {
         menu_pad.SetActive(true);
         menu_1.SetActive(true);
+        
+        // Add Settings menu item if it doesn't exist
+        if (menu_1_settings == null && menu_1 != null)
+        {
+            AddSettingsMenuItemToMenu1();
+        }
+    }
+    
+    /// <summary>
+    /// Dynamically adds a Settings menu item to Menu1 if it doesn't exist in the prefab.
+    /// </summary>
+    void AddSettingsMenuItemToMenu1()
+    {
+        // Find the border element in Menu1 to add the settings button
+        Transform menu1Transform = menu_1.transform;
+        Transform borderTransform = menu1Transform.Find("border");
+        
+        if (borderTransform == null)
+        {
+            // If no border, use menu1 itself
+            borderTransform = menu1Transform;
+        }
+        
+        // Find language button as a reference for positioning
+        Transform languageBtn = borderTransform.Find("language");
+        
+        if (languageBtn != null)
+        {
+            // Create settings button below language button
+            GameObject settingsBtn = new GameObject("settings");
+            settingsBtn.transform.SetParent(borderTransform, false);
+            
+            RectTransform settingsRect = settingsBtn.AddComponent<RectTransform>();
+            RectTransform langRect = languageBtn.GetComponent<RectTransform>();
+            
+            // Copy positioning from language button and offset downwards
+            settingsRect.anchorMin = langRect.anchorMin;
+            settingsRect.anchorMax = langRect.anchorMax;
+            settingsRect.pivot = langRect.pivot;
+            settingsRect.anchoredPosition = langRect.anchoredPosition + new Vector2(0, -60); // Below language
+            settingsRect.sizeDelta = langRect.sizeDelta;
+            
+            // Add Image component
+            Image img = settingsBtn.AddComponent<Image>();
+            img.color = UIStyleManager.DarkTheme.ButtonNormal;
+            
+            // Add Button component
+            Button btn = settingsBtn.AddComponent<Button>();
+            var colors = btn.colors;
+            colors.normalColor = UIStyleManager.DarkTheme.ButtonNormal;
+            colors.highlightedColor = UIStyleManager.DarkTheme.ButtonHighlight;
+            colors.pressedColor = UIStyleManager.DarkTheme.ButtonPressed;
+            btn.colors = colors;
+            btn.onClick.AddListener(ShowSettingsBox);
+            
+            // Add Text
+            GameObject textObj = new GameObject("Text");
+            textObj.transform.SetParent(settingsBtn.transform, false);
+            
+            RectTransform textRect = textObj.AddComponent<RectTransform>();
+            textRect.anchorMin = Vector2.zero;
+            textRect.anchorMax = Vector2.one;
+            textRect.offsetMin = Vector2.zero;
+            textRect.offsetMax = Vector2.zero;
+            
+            Text text = textObj.AddComponent<Text>();
+            text.text = MultiLanguage.GetText("Options.MenuPad.Menu1.settings.Text");
+            text.fontSize = 18;
+            text.color = UIStyleManager.DarkTheme.TextPrimary;
+            text.alignment = TextAnchor.MiddleCenter;
+            text.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+            
+            // Save reference
+            menu_1_settings = settingsBtn;
+        }
     }
 
     void OnShowMenu2()
