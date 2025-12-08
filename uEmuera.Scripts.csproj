@@ -64,6 +64,7 @@
     <Compile Include="Assets\Scripts\Emuera\GameData\Variable\VariableLocal.cs" />
     <Compile Include="Assets\Scripts\Emuera\GameData\StrForm.cs" />
     <Compile Include="Assets\Scripts\Emuera\Config\KeyMacro.cs" />
+    <Compile Include="Assets\Scripts\PostProcessingManager.cs" />
     <Compile Include="Assets\Scripts\Data\ModernDataStructures.cs" />
     <Compile Include="Assets\Scripts\Emuera\GameData\Variable\VariableParser.cs" />
     <Compile Include="Assets\Scripts\Emuera\GameView\EmueraConsole.Print.cs" />
@@ -90,6 +91,7 @@
     <Compile Include="Assets\Scripts\Emuera\GameData\Function\FunctionMethodTerm.cs" />
     <Compile Include="Assets\Scripts\Emuera\Config\ConfigData.cs" />
     <Compile Include="Assets\Scripts\uEmuera\partial\AConsoleColoredPart.cs" />
+    <Compile Include="Assets\Scripts\PixelPerfectManager.cs" />
     <Compile Include="Assets\Scripts\Jobs\BurstJobs.cs" />
     <Compile Include="Assets\Scripts\Emuera\Sub\StringStream.cs" />
     <Compile Include="Assets\Scripts\Emuera\Content\ConstImage.cs" />
@@ -160,6 +162,7 @@
     <Compile Include="Assets\Scripts\Emuera\GameProc\Function\Instruction.cs" />
     <Compile Include="Assets\Scripts\Emuera\Sub\EraDataStream.cs" />
     <Compile Include="Assets\Scripts\Emuera\Sub\WordCollection.cs" />
+    <Compile Include="Assets\Scripts\UIStyleManager.cs" />
     <Compile Include="Assets\Scripts\Emuera\GameProc\LogicalLineParser.cs" />
     <Compile Include="Assets\Scripts\Emuera\GameData\GameBase.cs" />
     <Compile Include="Assets\Scripts\Emuera\GameView\HtmlManager.cs" />

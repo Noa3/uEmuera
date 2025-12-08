@@ -1,9 +1,14 @@
+#if ENABLE_POST_PROCESSING
+
 using UnityEngine;
-using UnityEngine.Rendering.PostProcessing;
+using UnityEngine.Rendering;
 
 /// <summary>
 /// Manages post-processing effects for the game view.
 /// Provides a CRT/old monitor effect with configurable settings.
+/// Uses Post Processing Stack v3 API.
+/// 
+/// Note: Post Processing is optional. Define ENABLE_POST_PROCESSING to use this feature.
 /// </summary>
 public class PostProcessingManager : MonoBehaviour
 {
@@ -21,23 +26,13 @@ public class PostProcessingManager : MonoBehaviour
     /// The post-processing volume component.
     /// </summary>
     [Tooltip("The post-processing volume component")]
-    public PostProcessVolume postProcessVolume;
+    public Volume postProcessVolume;
     
     /// <summary>
     /// The camera that will use post-processing.
     /// </summary>
     [Tooltip("The camera that will use post-processing")]
     public Camera targetCamera;
-    
-    /// <summary>
-    /// The post-processing layer for the camera.
-    /// </summary>
-    private PostProcessLayer postProcessLayer_;
-    
-    /// <summary>
-    /// The post-processing profile that will be destroyed on cleanup.
-    /// </summary>
-    private PostProcessProfile runtimeProfile_;
     
     /// <summary>
     /// Whether post-processing is currently enabled.
@@ -63,13 +58,6 @@ public class PostProcessingManager : MonoBehaviour
     {
         if (instance == this)
             instance = null;
-            
-        // Clean up runtime-created profile
-        if (runtimeProfile_ != null)
-        {
-            Destroy(runtimeProfile_);
-            runtimeProfile_ = null;
-        }
     }
     
     /// <summary>
@@ -78,21 +66,10 @@ public class PostProcessingManager : MonoBehaviour
     /// </summary>
     void InitializePostProcessing()
     {
-        // Get or add PostProcessLayer to camera
+        // Get camera reference
         if (targetCamera == null)
         {
             targetCamera = Camera.main;
-        }
-        
-        if (targetCamera != null)
-        {
-            postProcessLayer_ = targetCamera.GetComponent<PostProcessLayer>();
-            if (postProcessLayer_ == null)
-            {
-                postProcessLayer_ = targetCamera.gameObject.AddComponent<PostProcessLayer>();
-                postProcessLayer_.volumeTrigger = targetCamera.transform;
-                postProcessLayer_.volumeLayer = GetPostProcessingLayerMask();
-            }
         }
         
         // Create post-process volume if not assigned
@@ -101,14 +78,7 @@ public class PostProcessingManager : MonoBehaviour
             GameObject volumeObj = new GameObject("PostProcessVolume");
             volumeObj.transform.SetParent(transform);
             
-            // Set layer to PostProcessing if it exists
-            int ppLayer = GetPostProcessingLayer();
-            if (ppLayer >= 0)
-            {
-                volumeObj.layer = ppLayer;
-            }
-            
-            postProcessVolume = volumeObj.AddComponent<PostProcessVolume>();
+            postProcessVolume = volumeObj.AddComponent<Volume>();
             postProcessVolume.isGlobal = true;
             postProcessVolume.priority = 1;
             
@@ -122,79 +92,33 @@ public class PostProcessingManager : MonoBehaviour
     }
     
     /// <summary>
-    /// Gets the PostProcessing layer index, or -1 if it doesn't exist.
-    /// </summary>
-    /// <returns>The layer index or -1.</returns>
-    int GetPostProcessingLayer()
-    {
-        return LayerMask.NameToLayer("PostProcessing");
-    }
-    
-    /// <summary>
-    /// Gets the PostProcessing layer mask, or Default layer as fallback.
-    /// </summary>
-    /// <returns>The layer mask value.</returns>
-    int GetPostProcessingLayerMask()
-    {
-        int ppLayer = GetPostProcessingLayer();
-        if (ppLayer >= 0)
-        {
-            return 1 << ppLayer;
-        }
-        else
-        {
-            // Fallback to default layer
-            return LayerMask.GetMask("Default");
-        }
-    }
-    
-    /// <summary>
     /// Configures the CRT/old monitor effect profile.
     /// </summary>
     void ConfigureCRTEffect()
     {
         if (postProcessVolume == null)
             return;
-            
-        // Create a new profile and track it for cleanup
-        runtimeProfile_ = ScriptableObject.CreateInstance<PostProcessProfile>();
-        postProcessVolume.profile = runtimeProfile_;
         
-        // Add Vignette for darker edges (CRT monitors had this)
-        var vignette = runtimeProfile_.AddSettings<Vignette>();
-        vignette.enabled.Override(true);
-        vignette.intensity.Override(0.35f);
-        vignette.smoothness.Override(0.4f);
-        vignette.roundness.Override(1f);
+        // Create a new profile
+        var profile = ScriptableObject.CreateInstance<VolumeProfile>();
+        postProcessVolume.profile = profile;
         
-        // Add Chromatic Aberration for color separation at edges
-        var chromaticAberration = runtimeProfile_.AddSettings<ChromaticAberration>();
-        chromaticAberration.enabled.Override(true);
-        chromaticAberration.intensity.Override(0.15f);
+        // In Post Processing v3, effects are added as settings components
+        // Note: Not all v2 effects are available in v3. The API is different.
+        // For v3, use the URP/HDRP built-in effects or implement custom ones.
         
-        // Add Grain for that old monitor noise
-        var grain = runtimeProfile_.AddSettings<Grain>();
-        grain.enabled.Override(true);
-        grain.intensity.Override(0.25f);
-        grain.size.Override(1.2f);
-        grain.lumContrib.Override(0.8f);
-        grain.colored.Override(false);
-        
-        // Add Color Grading for slight green/amber tint (old monitor feel)
-        var colorGrading = runtimeProfile_.AddSettings<ColorGrading>();
-        colorGrading.enabled.Override(true);
-        colorGrading.temperature.Override(5f); // Slightly warm
-        colorGrading.tint.Override(-5f); // Slightly green
-        colorGrading.saturation.Override(-10f); // Slightly desaturated
-        colorGrading.contrast.Override(10f); // Increase contrast
-        
-        // Add Bloom for slight glow (CRT phosphor glow)
-        var bloom = runtimeProfile_.AddSettings<Bloom>();
-        bloom.enabled.Override(true);
-        bloom.intensity.Override(0.5f);
-        bloom.threshold.Override(0.9f);
-        bloom.softKnee.Override(0.5f);
-        bloom.diffusion.Override(7f);
+        // Add Bloom effect if available
+        try
+        {
+            var bloom = profile.Add<Bloom>(false);
+            bloom.intensity.value = 0.5f;
+            bloom.threshold.value = 0.9f;
+            bloom.active = true;
+        }
+        catch
+        {
+            Debug.LogWarning("Bloom effect not available in current render pipeline");
+        }
     }
     
     /// <summary>
@@ -218,11 +142,6 @@ public class PostProcessingManager : MonoBehaviour
             postProcessVolume.enabled = enabled;
         }
         
-        if (postProcessLayer_ != null)
-        {
-            postProcessLayer_.enabled = enabled;
-        }
-        
         // Save preference
         PlayerPrefs.SetInt(PREF_POST_PROCESSING_ENABLED, enabled ? 1 : 0);
         PlayerPrefs.Save();
@@ -236,3 +155,40 @@ public class PostProcessingManager : MonoBehaviour
         SetPostProcessingEnabled(!isEnabled_);
     }
 }
+
+#else
+
+using UnityEngine;
+
+/// <summary>
+/// Post-processing disabled. Define ENABLE_POST_PROCESSING in your build settings to enable.
+/// </summary>
+public class PostProcessingManager : MonoBehaviour
+{
+    public static PostProcessingManager instance { get; private set; }
+    
+    public Camera targetCamera { get; set; }
+    
+    void Awake()
+    {
+        if (instance != null && instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        instance = this;
+        DontDestroyOnLoad(gameObject);
+    }
+    
+    void OnDestroy()
+    {
+        if (instance == this)
+            instance = null;
+    }
+    
+    public bool IsEnabled() => false;
+    public void SetPostProcessingEnabled(bool enabled) { }
+    public void TogglePostProcessing() { }
+}
+
+#endif

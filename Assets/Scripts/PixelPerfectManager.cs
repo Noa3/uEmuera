@@ -1,3 +1,5 @@
+#if ENABLE_PIXEL_PERFECT
+
 using UnityEngine;
 using UnityEngine.U2D;
 
@@ -5,6 +7,8 @@ using UnityEngine.U2D;
 /// Manages Pixel Perfect Camera for crisp rendering of images and text.
 /// Works in conjunction with PostProcessingManager to provide both crisp rendering
 /// and optional CRT effects.
+/// 
+/// Note: Pixel Perfect rendering is optional. Define ENABLE_PIXEL_PERFECT to use this feature.
 /// </summary>
 public class PixelPerfectManager : MonoBehaviour
 {
@@ -201,3 +205,42 @@ public class PixelPerfectManager : MonoBehaviour
         return 1;
     }
 }
+
+#else
+
+using UnityEngine;
+
+/// <summary>
+/// Pixel Perfect rendering disabled. Define ENABLE_PIXEL_PERFECT in your build settings to enable.
+/// </summary>
+public class PixelPerfectManager : MonoBehaviour
+{
+    public static PixelPerfectManager instance { get; private set; }
+    
+    public Camera targetCamera { get; set; }
+    
+    void Awake()
+    {
+        if (instance != null && instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        instance = this;
+        DontDestroyOnLoad(gameObject);
+    }
+    
+    void OnDestroy()
+    {
+        if (instance == this)
+            instance = null;
+    }
+    
+    public bool IsEnabled() => false;
+    public void SetPixelPerfectEnabled(bool enabled) { }
+    public void TogglePixelPerfect() { }
+    public void UpdateReferenceResolution(int width, int height) { }
+    public int GetPixelRatio() => 1;
+}
+
+#endif
