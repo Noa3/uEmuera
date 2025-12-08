@@ -8,7 +8,9 @@
         "Unity.Mathematics",
         "Unity.Collections",
         "Unity.Burst",
-        "Unity.Jobs"
+        "Unity.Jobs",
+        "Unity.Postprocessing",
+        "Unity.2D.Pixel-Perfect"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

@@ -4841,6 +4841,7 @@ MonoBehaviour:
   menu_1: {fileID: 1002723272378495}
   menu_1_resolution: {fileID: 1557001357665409}
   menu_1_language: {fileID: 1877315621962623}
+  menu_1_settings: {fileID: 0}
   menu_1_directory: {fileID: 4253839813389816515}
   menu_1_github: {fileID: 1848159208450519}
   menu_1_exit: {fileID: 1011834201534261}
@@ -4877,6 +4878,14 @@ MonoBehaviour:
   directoryInputField: {fileID: 3784326086714143946}
   directoryInputConfirm: {fileID: 7162048117465582938}
   directoryInputCancel: {fileID: 7160104378911682270}
+  settings_box: {fileID: 0}
+  settings_close: {fileID: 0}
+  settings_postprocessing_toggle: {fileID: 0}
+  settings_postprocessing_icon: {fileID: 0}
+  settings_postprocessing_text: {fileID: 0}
+  settings_pixelperfect_toggle: {fileID: 0}
+  settings_pixelperfect_icon: {fileID: 0}
+  settings_pixelperfect_text: {fileID: 0}
 --- !u!114 &114304645743600073
 MonoBehaviour:
   m_ObjectHideFlags: 0
