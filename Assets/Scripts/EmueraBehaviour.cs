@@ -278,12 +278,12 @@ public abstract class EmueraBehaviour : MonoBehaviour
             return;
         }
         var unit_desc = behaviour.unit_desc;
-        if(!unit_desc.isbutton)
+        if(unit_desc == null || !unit_desc.isbutton)
             return;
         if(unit_desc.generation < EmueraContent.instance.button_generation)
-            EmueraThread.instance.Input("", false);
-        else
-            EmueraThread.instance.Input(unit_desc.code, true);
+            return; // Ignore clicks on outdated buttons instead of sending empty input
+        
+        EmueraThread.instance.Input(unit_desc.code, true);
     }
 
     public abstract void UpdateContent();
