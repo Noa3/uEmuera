@@ -625,14 +625,21 @@ public class OptionWindow : MonoBehaviour
             image.color = UIStyleManager.DarkTheme.BackgroundMedium;
         }
         
-        // Add subtle outline/border effect
+        // Check if outline already exists before adding
         var outline = panel.GetComponent<Outline>();
         if (outline == null)
         {
+            // Only add if not present - prefab should ideally have this pre-configured
             outline = panel.gameObject.AddComponent<Outline>();
+            outline.effectColor = UIStyleManager.DarkTheme.Border;
+            outline.effectDistance = new Vector2(2f, -2f);
         }
-        outline.effectColor = UIStyleManager.DarkTheme.Border;
-        outline.effectDistance = new Vector2(2f, -2f);
+        else
+        {
+            // Update existing outline
+            outline.effectColor = UIStyleManager.DarkTheme.Border;
+            outline.effectDistance = new Vector2(2f, -2f);
+        }
     }
 
     void OnGithub()

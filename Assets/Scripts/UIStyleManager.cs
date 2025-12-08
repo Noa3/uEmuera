@@ -94,19 +94,20 @@ public class UIStyleManager : MonoBehaviour
     }
     
     /// <summary>
-    /// Applies a subtle gradient effect to an Image component.
+    /// Applies a solid color to an Image component.
+    /// Note: Unity UI doesn't support gradients natively without custom shaders.
+    /// This method applies a blended color as a placeholder.
+    /// For true gradient support, implement a custom shader material.
     /// </summary>
-    /// <param name="image">The Image to apply gradient to.</param>
+    /// <param name="image">The Image to apply color to.</param>
     /// <param name="topColor">Top gradient color.</param>
     /// <param name="bottomColor">Bottom gradient color.</param>
-    public static void ApplyGradient(Image image, Color topColor, Color bottomColor)
+    public static void ApplyColorBlend(Image image, Color topColor, Color bottomColor)
     {
         if (image == null)
             return;
             
-        // Unity UI doesn't support gradients directly without a shader
-        // For now, just apply the average color
-        // In a full implementation, you'd use a custom shader material
+        // Apply the average color as a simple approximation
         Color avgColor = Color.Lerp(topColor, bottomColor, 0.5f);
         image.color = avgColor;
     }

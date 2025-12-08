@@ -35,6 +35,11 @@ public class PostProcessingManager : MonoBehaviour
     private PostProcessLayer postProcessLayer_;
     
     /// <summary>
+    /// The post-processing profile that will be destroyed on cleanup.
+    /// </summary>
+    private PostProcessProfile runtimeProfile_;
+    
+    /// <summary>
     /// Whether post-processing is currently enabled.
     /// </summary>
     private bool isEnabled_;
@@ -58,6 +63,13 @@ public class PostProcessingManager : MonoBehaviour
     {
         if (instance == this)
             instance = null;
+            
+        // Clean up runtime-created profile
+        if (runtimeProfile_ != null)
+        {
+            Destroy(runtimeProfile_);
+            runtimeProfile_ = null;
+        }
     }
     
     /// <summary>
@@ -79,18 +91,7 @@ public class PostProcessingManager : MonoBehaviour
             {
                 postProcessLayer_ = targetCamera.gameObject.AddComponent<PostProcessLayer>();
                 postProcessLayer_.volumeTrigger = targetCamera.transform;
-                
-                // Set layer mask to PostProcessing if it exists
-                int ppLayer = LayerMask.NameToLayer("PostProcessing");
-                if (ppLayer >= 0)
-                {
-                    postProcessLayer_.volumeLayer = 1 << ppLayer;
-                }
-                else
-                {
-                    // Fallback to default layer
-                    postProcessLayer_.volumeLayer = LayerMask.GetMask("Default");
-                }
+                postProcessLayer_.volumeLayer = GetPostProcessingLayerMask();
             }
         }
         
@@ -100,8 +101,8 @@ public class PostProcessingManager : MonoBehaviour
             GameObject volumeObj = new GameObject("PostProcessVolume");
             volumeObj.transform.SetParent(transform);
             
-            // Set layer to PostProcessing if it exists, otherwise use default
-            int ppLayer = LayerMask.NameToLayer("PostProcessing");
+            // Set layer to PostProcessing if it exists
+            int ppLayer = GetPostProcessingLayer();
             if (ppLayer >= 0)
             {
                 volumeObj.layer = ppLayer;
@@ -121,6 +122,33 @@ public class PostProcessingManager : MonoBehaviour
     }
     
     /// <summary>
+    /// Gets the PostProcessing layer index, or -1 if it doesn't exist.
+    /// </summary>
+    /// <returns>The layer index or -1.</returns>
+    int GetPostProcessingLayer()
+    {
+        return LayerMask.NameToLayer("PostProcessing");
+    }
+    
+    /// <summary>
+    /// Gets the PostProcessing layer mask, or Default layer as fallback.
+    /// </summary>
+    /// <returns>The layer mask value.</returns>
+    int GetPostProcessingLayerMask()
+    {
+        int ppLayer = GetPostProcessingLayer();
+        if (ppLayer >= 0)
+        {
+            return 1 << ppLayer;
+        }
+        else
+        {
+            // Fallback to default layer
+            return LayerMask.GetMask("Default");
+        }
+    }
+    
+    /// <summary>
     /// Configures the CRT/old monitor effect profile.
     /// </summary>
     void ConfigureCRTEffect()
@@ -128,24 +156,24 @@ public class PostProcessingManager : MonoBehaviour
         if (postProcessVolume == null)
             return;
             
-        // Create a new profile
-        PostProcessProfile profile = ScriptableObject.CreateInstance<PostProcessProfile>();
-        postProcessVolume.profile = profile;
+        // Create a new profile and track it for cleanup
+        runtimeProfile_ = ScriptableObject.CreateInstance<PostProcessProfile>();
+        postProcessVolume.profile = runtimeProfile_;
         
         // Add Vignette for darker edges (CRT monitors had this)
-        var vignette = profile.AddSettings<Vignette>();
+        var vignette = runtimeProfile_.AddSettings<Vignette>();
         vignette.enabled.Override(true);
         vignette.intensity.Override(0.35f);
         vignette.smoothness.Override(0.4f);
         vignette.roundness.Override(1f);
         
         // Add Chromatic Aberration for color separation at edges
-        var chromaticAberration = profile.AddSettings<ChromaticAberration>();
+        var chromaticAberration = runtimeProfile_.AddSettings<ChromaticAberration>();
         chromaticAberration.enabled.Override(true);
         chromaticAberration.intensity.Override(0.15f);
         
         // Add Grain for that old monitor noise
-        var grain = profile.AddSettings<Grain>();
+        var grain = runtimeProfile_.AddSettings<Grain>();
         grain.enabled.Override(true);
         grain.intensity.Override(0.25f);
         grain.size.Override(1.2f);
@@ -153,7 +181,7 @@ public class PostProcessingManager : MonoBehaviour
         grain.colored.Override(false);
         
         // Add Color Grading for slight green/amber tint (old monitor feel)
-        var colorGrading = profile.AddSettings<ColorGrading>();
+        var colorGrading = runtimeProfile_.AddSettings<ColorGrading>();
         colorGrading.enabled.Override(true);
         colorGrading.temperature.Override(5f); // Slightly warm
         colorGrading.tint.Override(-5f); // Slightly green
@@ -161,7 +189,7 @@ public class PostProcessingManager : MonoBehaviour
         colorGrading.contrast.Override(10f); // Increase contrast
         
         // Add Bloom for slight glow (CRT phosphor glow)
-        var bloom = profile.AddSettings<Bloom>();
+        var bloom = runtimeProfile_.AddSettings<Bloom>();
         bloom.enabled.Override(true);
         bloom.intensity.Override(0.5f);
         bloom.threshold.Override(0.9f);
