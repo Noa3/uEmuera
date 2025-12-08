@@ -79,7 +79,18 @@ public class PostProcessingManager : MonoBehaviour
             {
                 postProcessLayer_ = targetCamera.gameObject.AddComponent<PostProcessLayer>();
                 postProcessLayer_.volumeTrigger = targetCamera.transform;
-                postProcessLayer_.volumeLayer = LayerMask.GetMask("PostProcessing");
+                
+                // Set layer mask to PostProcessing if it exists
+                int ppLayer = LayerMask.NameToLayer("PostProcessing");
+                if (ppLayer >= 0)
+                {
+                    postProcessLayer_.volumeLayer = 1 << ppLayer;
+                }
+                else
+                {
+                    // Fallback to default layer
+                    postProcessLayer_.volumeLayer = LayerMask.GetMask("Default");
+                }
             }
         }
         
@@ -88,7 +99,13 @@ public class PostProcessingManager : MonoBehaviour
         {
             GameObject volumeObj = new GameObject("PostProcessVolume");
             volumeObj.transform.SetParent(transform);
-            volumeObj.layer = LayerMask.NameToLayer("PostProcessing");
+            
+            // Set layer to PostProcessing if it exists, otherwise use default
+            int ppLayer = LayerMask.NameToLayer("PostProcessing");
+            if (ppLayer >= 0)
+            {
+                volumeObj.layer = ppLayer;
+            }
             
             postProcessVolume = volumeObj.AddComponent<PostProcessVolume>();
             postProcessVolume.isGlobal = true;
