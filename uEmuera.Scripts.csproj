@@ -162,9 +162,11 @@
     <Compile Include="Assets\Scripts\Emuera\GameProc\Function\Instruction.cs" />
     <Compile Include="Assets\Scripts\Emuera\Sub\EraDataStream.cs" />
     <Compile Include="Assets\Scripts\Emuera\Sub\WordCollection.cs" />
+    <Compile Include="Assets\Scripts\UIStyleManager.cs" />
     <Compile Include="Assets\Scripts\Emuera\GameProc\LogicalLineParser.cs" />
     <Compile Include="Assets\Scripts\Emuera\GameData\GameBase.cs" />
     <Compile Include="Assets\Scripts\Emuera\GameView\HtmlManager.cs" />
+    <Compile Include="Assets\Scripts\SettingsUIBuilder.cs" />
     <Compile Include="Assets\Scripts\Emuera\GameView\ConsoleImagePart.cs" />
     <Compile Include="Assets\Scripts\Emuera\GameData\Function\FunctionMethod.cs" />
     <Compile Include="Assets\Scripts\Emuera\GameView\ConsoleShapePart.cs" />

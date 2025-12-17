@@ -1,6 +1,7 @@
 ;EN-US
 Options.MenuPad.Menu1.resolution.Text=Resolution
 Options.MenuPad.Menu1.language.Text=Language
+Options.MenuPad.Menu1.settings.Text=Settings
 Options.MenuPad.Menu1.exit.Text=Exit
 Options.MenuPad.Menu2.back.Text=Back To Menu
 Options.MenuPad.Menu2.savelog.Text=Save Log
@@ -12,6 +13,10 @@ Options.LanguageBox.border.titlebar.title=Choose Language
 Options.IntentBox.border.titlebar.title=Intent Setting
 Options.IntentBox.border.close.Text=Close
 Options.IntentBox.border.reset.Text=Reset
+Options.SettingsBox.border.titlebar.title=Settings
+Options.SettingsBox.border.close.Text=Close
+Options.SettingsBox.postprocessing.Text=CRT Monitor Effect
+Options.SettingsBox.pixelperfect.Text=Pixel Perfect Rendering
 FirstWindow.Titlebar.title=Game List
 <Menu1>=200
 <Menu2>=240
@@ -38,6 +43,10 @@ FirstWindow.Titlebar.title=Game List
 [StoragePermissionDenied]=Storage permission was denied. The app cannot access game files without this permission.\n\nTap "Grant" to try again.
 [Grant]=Grant
 [Cancel]=Cancel
+[PostProcessingOn]=ON
+[PostProcessingOff]=OFF
+[PixelPerfectOn]=ON
+[PixelPerfectOff]=OFF
 ; Game Messages - Loading/Initialization
 [LoadingMacroTxt]=Loading macro.txt...
 [LoadingReplaceCsv]=Loading _Replace.csv...
