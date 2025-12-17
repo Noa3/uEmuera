@@ -26,13 +26,32 @@ namespace MinorShift.Emuera.GameView
         {
             get { return state == ConsoleState.WaitInput; }
         }
+        /// <summary>
+        /// Returns true if the console is waiting for any value input (including button-only types).
+        /// Non-button inputs should be blocked when this is true.
+        /// </summary>
         internal bool IsWaitingInputSomething
         {
             get {
                 return state == ConsoleState.WaitInput &&
                           inputReq != null &&
                           (inputReq.InputType == GameProc.InputType.IntValue || 
-                          inputReq.InputType == GameProc.InputType.StrValue);
+                          inputReq.InputType == GameProc.InputType.StrValue ||
+                          inputReq.InputType == GameProc.InputType.BIntValue ||
+                          inputReq.InputType == GameProc.InputType.BStrValue);
+            }
+        }
+        /// <summary>
+        /// Returns true if the console is waiting for button-only input (BINPUT/BINPUTS).
+        /// Only button clicks should be accepted, background clicks should be ignored.
+        /// </summary>
+        internal bool IsWaitingButtonOnlyInput
+        {
+            get {
+                return state == ConsoleState.WaitInput &&
+                          inputReq != null &&
+                          (inputReq.InputType == GameProc.InputType.BIntValue ||
+                          inputReq.InputType == GameProc.InputType.BStrValue);
             }
         }
         internal GameProc.InputType InputType

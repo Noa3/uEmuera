@@ -270,20 +270,38 @@ public abstract class EmueraBehaviour : MonoBehaviour
     {
         var obj = e.rawPointerPress;
         if(obj == null)
+        {
+            Debug.Log("[EmueraBehaviour.OnClick] rawPointerPress is null, ignoring click");
             return;
+        }
         var behaviour = obj.GetComponent<EmueraBehaviour>();
         if(behaviour == null)
         {
+            Debug.Log($"[EmueraBehaviour.OnClick] No EmueraBehaviour on '{obj.name}', sending empty input");
             EmueraThread.instance.Input("", false);
             return;
         }
         var unit_desc = behaviour.unit_desc;
-        if(!unit_desc.isbutton)
+        if(unit_desc == null)
+        {
+            Debug.LogWarning($"[EmueraBehaviour.OnClick] unit_desc is null on '{obj.name}' (UnitIdx={behaviour.UnitIdx})");
             return;
-        if(unit_desc.generation < EmueraContent.instance.button_generation)
-            EmueraThread.instance.Input("", false);
-        else
-            EmueraThread.instance.Input(unit_desc.code, true);
+        }
+        if(!unit_desc.isbutton)
+        {
+            Debug.Log($"[EmueraBehaviour.OnClick] Clicked non-button element: '{unit_desc.content}' on '{obj.name}'");
+            return;
+        }
+        
+        var currentGeneration = EmueraContent.instance?.button_generation ?? -1;
+        if(unit_desc.generation < currentGeneration)
+        {
+            Debug.LogWarning($"[EmueraBehaviour.OnClick] Button generation mismatch! Button gen={unit_desc.generation}, current gen={currentGeneration}, content='{unit_desc.content}', code='{unit_desc.code}'");
+            return; // Ignore clicks on outdated buttons instead of sending empty input
+        }
+        
+        Debug.Log($"[EmueraBehaviour.OnClick] Button clicked: content='{unit_desc.content}', code='{unit_desc.code}', generation={unit_desc.generation}");
+        EmueraThread.instance.Input(unit_desc.code, true);
     }
 
     public abstract void UpdateContent();
