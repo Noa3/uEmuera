@@ -44,6 +44,8 @@ public class Inputpad : MonoBehaviour
         case MinorShift.Emuera.GameProc.InputType.Void:
         case MinorShift.Emuera.GameProc.InputType.EnterKey:
         case MinorShift.Emuera.GameProc.InputType.AnyKey:
+        case MinorShift.Emuera.GameProc.InputType.BIntValue:   // Button-only input - hide text input
+        case MinorShift.Emuera.GameProc.InputType.BStrValue:   // Button-only input - hide text input
             inputfield.gameObject.SetActive(false);
             break;
         }

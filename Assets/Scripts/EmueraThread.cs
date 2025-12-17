@@ -97,9 +97,26 @@ public class EmueraThread
     {
         var console = MinorShift.Emuera.GlobalStatic.Console;
         if (console == null)
+        {
+            UnityEngine.Debug.LogWarning($"[EmueraThread.Input] Console is null! input='{c}', from_button={from_button}");
             return;
+        }
+        
+        // Block non-button input when waiting for value input (INPUT/INPUTS/BINPUT/BINPUTS)
         if (!from_button && console.IsWaitingInputSomething)
+        {
+            UnityEngine.Debug.Log($"[EmueraThread.Input] Ignoring non-button input while waiting for value input. input='{c}', InputType={console.InputType}");
             return;
+        }
+        
+        // Block non-button input when waiting for button-only input (BINPUT/BINPUTS)
+        if (!from_button && console.IsWaitingButtonOnlyInput)
+        {
+            UnityEngine.Debug.Log($"[EmueraThread.Input] Ignoring non-button input while waiting for button-only input. input='{c}', InputType={console.InputType}");
+            return;
+        }
+        
+        UnityEngine.Debug.Log($"[EmueraThread.Input] Processing input: '{c}', from_button={from_button}, skip={skip}, IsWaitingInput={console.IsWaitingInput}, InputType={console.InputType}");
             
         lock (sync_lock_)
         {
@@ -181,8 +198,12 @@ public class EmueraThread
                     try
                     {
                         if (console.IsWaitingEnterKey)
+                        {
+                            UnityEngine.Debug.Log($"[EmueraThread.Work] IsWaitingEnterKey=true, overriding input to empty string (was: '{current_input}')");
                             current_input = "";
-                            
+                        }
+                        
+                        UnityEngine.Debug.Log($"[EmueraThread.Work] Calling PressEnterKey with input='{current_input}', skip={current_skip}");
                         console.PressEnterKey(current_skip, current_input, false);
                         
                         // Small delay after successful processing to allow console to update
@@ -197,6 +218,7 @@ public class EmueraThread
                 }
                 else
                 {
+                    UnityEngine.Debug.LogWarning($"[EmueraThread.Work] Console not ready for input! console={console != null}, IsWaitingInput={console?.IsWaitingInput}, input='{current_input}'");
                     // Console not ready, delay before retry
                     Thread.Sleep(INPUT_PROCESS_DELAY_MS);
                 }

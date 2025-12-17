@@ -408,6 +408,7 @@ public class EmueraContent : MonoBehaviour
     {
         var nowtick = MinorShift._Library.WinmmTimer.TickCount;
         var skipflag = (nowtick - last_click_tic < 200);
+        Debug.Log($"[EmueraContent.OnClick] Background click detected, sending empty input with skip={skipflag}");
         EmueraThread.instance.Input("", false, skipflag);
         last_click_tic = nowtick;
     }
