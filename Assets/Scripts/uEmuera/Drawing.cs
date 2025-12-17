@@ -8,7 +8,8 @@ namespace uEmuera.Drawing
         public Bitmap(string path)
         {
             this.path = path;
-            this.filename = GenericUtils.GetFilename(path);
+            // Trim and normalize filename to prevent whitespace issues
+            this.filename = GenericUtils.GetFilename(path).Trim();
         }
 
         public readonly string path;

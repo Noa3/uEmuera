@@ -16,7 +16,8 @@ public class EmueraImage : EmueraBehaviour
                 return;
             }
             var c = obj as ImageInfo;
-            if(!c.gameObject.activeSelf)
+            // Enhanced null/destroyed check: obj could be an ImageInfo that was destroyed
+            if(c == null || c.gameObject == null || !c.gameObject.activeSelf)
             {
                 SpriteManager.GivebackSpriteInfo(spriteinfo);
                 return;
@@ -29,6 +30,12 @@ public class EmueraImage : EmueraBehaviour
         }
         void SetSprite(SpriteManager.SpriteInfo spriteinfo)
         {
+            // Guard against being called after destruction
+            if(gameObject == null || !gameObject.activeSelf)
+            {
+                SpriteManager.GivebackSpriteInfo(spriteinfo);
+                return;
+            }
             if(spriteinfo == null)
             {
                 image.sprite = null;
@@ -44,7 +51,8 @@ public class EmueraImage : EmueraBehaviour
         public void Clear()
         {
             SpriteManager.GivebackSpriteInfo(spriteinfo);
-            EmueraContent.instance.PushImage(image);
+            if(EmueraContent.instance != null && image != null)
+                EmueraContent.instance.PushImage(image);
         }
         
         public SpriteManager.SpriteInfo spriteinfo = null;

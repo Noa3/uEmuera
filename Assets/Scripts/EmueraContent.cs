@@ -466,6 +466,19 @@ public class EmueraContent : MonoBehaviour
         for(int i = 0; i < console_lines_.Count; ++i)
             console_lines_[i] = null;
 
+        // Clear display images first to release sprite references
+        var display_images_iter = display_images_.Values.GetEnumerator();
+        while(display_images_iter.MoveNext())
+        {
+            var image = display_images_iter.Current;
+            if(image != null && image.gameObject != null)
+            {
+                // Mark as no longer active before destruction to signal callbacks
+                image.gameObject.SetActive(false);
+            }
+        }
+        display_images_.Clear();
+
         for(int i = 0; i < display_lines_.Count; ++i)
         {
             PushLine(display_lines_[i]);

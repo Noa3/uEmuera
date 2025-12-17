@@ -11,10 +11,14 @@ using WebP;
 /// Manages sprite and texture loading, caching, and lifecycle for the Emuera engine.
 /// Provides case-insensitive file resolution, placeholder generation for missing assets,
 /// and memory-efficient sprite management with automatic cleanup.
+/// Thread-safe concurrent loading with callback validation.
 /// </summary>
 internal static class SpriteManager
 {
     static float kPastTime = 300.0f;
+    // Thread synchronization for concurrent access
+    static readonly object loading_set_lock = new object();
+    static readonly object texture_dict_lock = new object();
 
     /// <summary>
     /// Creates a placeholder grey texture for missing images
@@ -47,7 +51,10 @@ internal static class SpriteManager
     {
         var placeholderTex = CreatePlaceholderTexture();
         var ti = new TextureInfo(name, placeholderTex);
-        texture_dict.Add(name, ti);
+        lock(texture_dict_lock)
+        {
+            texture_dict.Add(name, ti);
+        }
         if (baseimage != null)
         {
             baseimage.size.Width = placeholderTex.width;
@@ -276,14 +283,34 @@ internal static class SpriteManager
             this.src = src;
             this.obj = obj;
             this.callback = callback;
+            this.target_alive = obj != null ? true : false;
         }
         public void DoCallback(SpriteInfo info)
         {
-            callback(obj, info);
+            // Validate that the target object is still alive (not destroyed)
+            // This prevents callbacks from executing on deleted GameObjects
+            if (obj != null && target_alive)
+            {
+                try
+                {
+                    callback(obj, info);
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogError($"SpriteManager: Exception in sprite callback: {ex.GetType().Name}: {ex.Message}");
+                }
+            }
+            else if (info != null)
+            {
+                // Target is gone, clean up the sprite
+                GivebackSpriteInfo(info);
+            }
         }
-        public ASprite src;
-        object obj;
+        // Made internal for deduplication checks in GetSprite
+        internal ASprite src;
+        internal object obj;
         Action<object, SpriteInfo> callback;
+        bool target_alive;
     }
 
     public static void Init()
@@ -298,7 +325,7 @@ internal static class SpriteManager
         {
             kPastTime = 300.0f;
             GenericUtils.StartCoroutine(Update());
-            GenericUtils.StartCoroutine(UpdateRenderOP());
+
         }
         else if(memorysize <= 8192)
         {
@@ -336,18 +363,39 @@ internal static class SpriteManager
 
         var basename = src.Bitmap.filename;
         TextureInfo ti = null;
-        texture_dict.TryGetValue(basename, out ti);
+        lock(texture_dict_lock)
+        {
+            texture_dict.TryGetValue(basename, out ti);
+        }
         if(ti == null)
         {
             var item = new CallbackInfo(src, obj, callback);
-            List<CallbackInfo> list = null;
-            if(loading_set.TryGetValue(basename, out list))
-                list.Add(item);
-            else
+            lock(loading_set_lock)
             {
-                list = new List<CallbackInfo> { item };
-                loading_set.Add(basename, list);
-                GenericUtils.StartCoroutine(Loading(src.Bitmap));
+                List<CallbackInfo> list = null;
+                if(loading_set.TryGetValue(basename, out list))
+                {
+                    // Check if this exact callback is already pending (deduplication)
+                    bool already_queued = false;
+                    for (int i = 0; i < list.Count; i++)
+                    {
+                        if (list[i].obj == obj && list[i].src == src)
+                        {
+                            already_queued = true;
+                            break;
+                        }
+                    }
+                    if (!already_queued)
+                    {
+                        list.Add(item);
+                    }
+                }
+                else
+                {
+                    list = new List<CallbackInfo> { item };
+                    loading_set.Add(basename, list);
+                    GenericUtils.StartCoroutine(Loading(src.Bitmap));
+                }
             }
         }
         else
@@ -356,9 +404,15 @@ internal static class SpriteManager
 
     public static TextureInfo GetTextureInfo(string name, string filename)
     {
+        // Normalize names by trimming whitespace
+        name = name?.Trim() ?? "";
+        
         TextureInfo ti = null;
-        if(texture_dict.TryGetValue(name, out ti))
-            return ti;
+        lock(texture_dict_lock)
+        {
+            if(texture_dict.TryGetValue(name, out ti))
+                return ti;
+        }
         if(string.IsNullOrEmpty(filename))
         {
             Debug.LogError($"SpriteManager: Empty filename for texture '{name}'");
@@ -427,7 +481,10 @@ internal static class SpriteManager
                     return null;
                 }
                 ti = new TextureInfo(name, tex);
-                texture_dict.Add(name, ti);
+                lock(texture_dict_lock)
+                {
+                    texture_dict.Add(name, ti);
+                }
             }
             else
             {
@@ -435,7 +492,10 @@ internal static class SpriteManager
                 if (tex.LoadImage(content))
                 {
                     ti = new TextureInfo(name, tex);
-                    texture_dict.Add(name, ti);
+                    lock(texture_dict_lock)
+                    {
+                        texture_dict.Add(name, ti);
+                    }
                 }
                 else
                 {
@@ -497,6 +557,7 @@ internal static class SpriteManager
 
     ///public static RenderTextureDoSomething RenderTexture
     ///
+
 
     public class RenderTextureDoSomething
     {
@@ -581,10 +642,13 @@ internal static class SpriteManager
                     else
                     {
                         ti = new TextureInfo(baseimage.filename, tex);
-                        texture_dict.Add(baseimage.filename, ti);
+                        lock(texture_dict_lock)
+                        {
+                            texture_dict.Add(baseimage.filename, ti);
 
-                        baseimage.size.Width = tex.width;
-                        baseimage.size.Height = tex.height;
+                            baseimage.size.Width = tex.width;
+                            baseimage.size.Height = tex.height;
+                        }
                     }
                 }
                 else
@@ -593,10 +657,13 @@ internal static class SpriteManager
                     if (tex.LoadImage(content))
                     {
                         ti = new TextureInfo(baseimage.filename, tex);
-                        texture_dict.Add(baseimage.filename, ti);
+                        lock(texture_dict_lock)
+                        {
+                            texture_dict.Add(baseimage.filename, ti);
 
-                        baseimage.size.Width = tex.width;
-                        baseimage.size.Height = tex.height;
+                            baseimage.size.Width = tex.width;
+                            baseimage.size.Height = tex.height;
+                        }
                     }
                     else
                     {
@@ -610,22 +677,30 @@ internal static class SpriteManager
             Debug.LogWarning($"SpriteManager: File not found '{pathToLoad}' for bitmap '{baseimage.filename}'. Creating grey placeholder.");
             var placeholderTex = CreatePlaceholderTexture();
             ti = new TextureInfo(baseimage.filename, placeholderTex);
-            texture_dict.Add(baseimage.filename, ti);
+            lock(texture_dict_lock)
+            {
+                texture_dict.Add(baseimage.filename, ti);
+            }
             baseimage.size.Width = placeholderTex.width;
             baseimage.size.Height = placeholderTex.height;
         }
-        List<CallbackInfo> list = null;
-        if(loading_set.TryGetValue(baseimage.filename, out list))
+        
+        // Process callbacks with thread-safe access to loading_set
+        lock(loading_set_lock)
         {
-            var count = list.Count;
-            CallbackInfo item = null;
-            for(int i=0; i<count; ++i)
+            List<CallbackInfo> list = null;
+            if(loading_set.TryGetValue(baseimage.filename, out list))
             {
-                item = list[i];
-                item.DoCallback(GetSpriteInfo(ti, item.src));
+                var count = list.Count;
+                CallbackInfo item = null;
+                for(int i=0; i<count; ++i)
+                {
+                    item = list[i];
+                    item.DoCallback(GetSpriteInfo(ti, item.src));
+                }
+                list.Clear();
+                loading_set.Remove(baseimage.filename);
             }
-            list.Clear();
-            loading_set.Remove(baseimage.filename);
         }
         yield break;
     }
@@ -661,14 +736,17 @@ internal static class SpriteManager
             var now = Time.unscaledTime;
             TextureInfo tinfo = null;
             TextureInfo ti = null;
-            var iter = texture_dict.Values.GetEnumerator();
-            while(iter.MoveNext())
+            lock(texture_dict_lock)
             {
-                ti = iter.Current;
-                if(ti.refcount == 0 && now > ti.pasttime)
+                var iter = texture_dict.Values.GetEnumerator();
+                while(iter.MoveNext())
                 {
-                    tinfo = ti;
-                    break;
+                    ti = iter.Current;
+                    if(ti.refcount == 0 && now > ti.pasttime)
+                    {
+                        tinfo = ti;
+                        break;
+                    }
                 }
             }
             if(tinfo != null)
@@ -676,7 +754,10 @@ internal static class SpriteManager
                 Debug.Log("Unload Texture " + tinfo.imagename);
 
                 tinfo.Dispose();
-                texture_dict.Remove(tinfo.imagename);
+                lock(texture_dict_lock)
+                {
+                    texture_dict.Remove(tinfo.imagename);
+                }
                 tinfo = null;
 
                 GC.Collect();
@@ -728,12 +809,19 @@ internal static class SpriteManager
     }
     internal static void ForceClear()
     {
-        var iter = texture_dict.Values.GetEnumerator();
-        while(iter.MoveNext())
+        lock(texture_dict_lock)
         {
-            iter.Current.Dispose();
+            var iter = texture_dict.Values.GetEnumerator();
+            while(iter.MoveNext())
+            {
+                iter.Current.Dispose();
+            }
+            texture_dict.Clear();
         }
-        texture_dict.Clear();
+        lock(loading_set_lock)
+        {
+            loading_set.Clear();
+        }
         GC.Collect();
     }
     internal static void SetResourceCSVLine(string filename, string[] lines)

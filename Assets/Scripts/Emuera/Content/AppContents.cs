@@ -46,6 +46,16 @@ namespace MinorShift.Emuera.Content
 			if (name == null)
 				return null;
             
+            // Trim whitespace to handle cases where image names have leading/trailing spaces
+            name = name.Trim();
+            
+            // Guard against empty strings after trimming
+            if (string.IsNullOrEmpty(name))
+            {
+                UnityEngine.Debug.LogWarning("AppContents.GetSprite: Empty or whitespace-only image name provided");
+                return null;
+            }
+            
             name = name.ToUpper();
 			ASprite result = null;
 			imageDictionary.TryGetValue(name, out result);
@@ -53,7 +63,9 @@ namespace MinorShift.Emuera.Content
 			// Debug logging to help diagnose image loading issues
 			if (result == null)
 			{
-				UnityEngine.Debug.LogWarning($"AppContents.GetSprite: Image '{name}' not found in imageDictionary. " +
+                // Enhanced diagnostics: show length and first few chars for Unicode issues
+                string displayName = name.Length > 20 ? name.Substring(0, 20) + "..." : name;
+                UnityEngine.Debug.LogWarning($"AppContents.GetSprite: Image '{displayName}' (len={name.Length}) not found in imageDictionary. " +
 					$"Available images count: {imageDictionary.Count}. " +
 					$"Make sure the image is registered in a CSV file in the Resources folder.");
 			}
@@ -65,7 +77,11 @@ namespace MinorShift.Emuera.Content
 		{
 			if (name == null)
 				return;
-			name = name.ToUpper();
+            name = name.Trim().ToUpper();
+            
+            // Guard against empty strings after trimming
+            if (string.IsNullOrEmpty(name))
+                return;
 
             ASprite sprite = null;
             if(imageDictionary.TryGetValue(name, out sprite))
@@ -79,7 +95,9 @@ namespace MinorShift.Emuera.Content
 		{
 			if (string.IsNullOrEmpty(imgName))
 				throw new ArgumentOutOfRangeException();
-			imgName = imgName.ToUpper();
+			imgName = imgName.Trim().ToUpper();
+            if (string.IsNullOrEmpty(imgName))
+                throw new ArgumentOutOfRangeException("Image name is empty after trimming");
 			SpriteG newCImg = new SpriteG(imgName, parent, rect);
 			imageDictionary[imgName] = newCImg;
 		}
@@ -88,7 +106,9 @@ namespace MinorShift.Emuera.Content
 		{
 			if (string.IsNullOrEmpty(imgName))
 				throw new ArgumentOutOfRangeException();
-			imgName = imgName.ToUpper();
+			imgName = imgName.Trim().ToUpper();
+            if (string.IsNullOrEmpty(imgName))
+                throw new ArgumentOutOfRangeException("Image name is empty after trimming");
 			SpriteAnime newCImg = new SpriteAnime(imgName, new Size(w, h));
 			imageDictionary[imgName] = newCImg;
 		}
