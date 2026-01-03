@@ -198,6 +198,7 @@ namespace MinorShift.Emuera.Sub
 			//1756 正規表現を使ってみたがほぼ変わらなかったので没
 			//Match m = reg.Match(st.RowString, st.CurrentPosition);
 			//st.Jump(m.Length);
+			//return m.Value;
 			char c = st.Current;
 			if ((c == '-') || (c == '+'))
 			{
@@ -1036,10 +1037,23 @@ namespace MinorShift.Emuera.Sub
 				return expandMacro(ret);
 			return ret;
 
-		}
+	}
 
-		private static WordCollection expandMacro(WordCollection wc)
-		{
+	/// <summary>
+	/// Public method to expand macros in an existing WordCollection.
+	/// Used for re-expanding macros in DIM lines that were created before UseMacro was enabled.
+	/// </summary>
+	/// <param name="wc">WordCollection to expand macros in</param>
+	/// <returns>WordCollection with macros expanded</returns>
+	public static WordCollection ExpandMacroPublic(WordCollection wc)
+	{
+		if (!UseMacro)
+			return wc;
+		return expandMacro(wc);
+	}
+
+	private static WordCollection expandMacro(WordCollection wc)
+	{
 			//マクロ展開
 			wc.Pointer = 0;
 			int count = 0;

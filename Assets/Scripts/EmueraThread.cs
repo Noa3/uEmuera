@@ -16,7 +16,7 @@ public class EmueraThread
 
     // Thread synchronization
     private readonly object sync_lock_ = new object();
-    private readonly ManualResetEventSlim input_event_ = new ManualResetEventSlim(false);
+    private CancellationTokenSource cancel_token_source_ = new CancellationTokenSource();
     
     // Thread state
     private Thread game_thread_;
@@ -44,7 +44,7 @@ public class EmueraThread
     {
         debugmode_ = debug;
         running_ = true;
-        input_event_.Reset();
+        cancel_token_source_ = new CancellationTokenSource();
         
         // Always use background thread for framerate-independent execution
         game_thread_ = new Thread(Work)
@@ -62,7 +62,16 @@ public class EmueraThread
     public void End()
     {
         running_ = false;
-        input_event_.Set(); // Wake up any waiting thread
+        
+        // Signal cancellation
+        try
+        {
+            cancel_token_source_?.Cancel();
+        }
+        catch (ObjectDisposedException)
+        {
+            // Already disposed, ignore
+        }
         
         // Wait for thread to finish (with timeout)
         if (game_thread_ != null && game_thread_.IsAlive)
@@ -75,6 +84,16 @@ public class EmueraThread
             }
         }
         game_thread_ = null;
+        
+        // Dispose cancellation token source
+        try
+        {
+            cancel_token_source_?.Dispose();
+        }
+        catch (ObjectDisposedException)
+        {
+            // Already disposed, ignore
+        }
     }
 
     /// <summary>
@@ -122,7 +141,6 @@ public class EmueraThread
         {
             input_ = c;
             skipflag_ = skip;
-            input_event_.Set(); // Signal that input is available
         }
     }
     
@@ -139,6 +157,8 @@ public class EmueraThread
     {
         try
         {
+            var cancel_token = cancel_token_source_.Token;
+            
             // Initialize game
             MinorShift.Emuera.Program.debugMode = debugmode_;
             MinorShift.Emuera.Program.Main(Array.Empty<string>());
@@ -148,27 +168,45 @@ public class EmueraThread
 
             input_ = null;
             
-            while (running_)
+            while (running_ && !cancel_token.IsCancellationRequested)
             {
                 skipflag_ = false;
 
                 // Wait for input with periodic timer updates
-                while (input_ == null)
+                while (input_ == null && !cancel_token.IsCancellationRequested)
                 {
-                    // Wait for input signal with timeout for timer updates
-                    if (input_event_.Wait(TIMER_UPDATE_INTERVAL_MS))
+                    // Wait for input signal or cancellation with timeout for timer updates
+                    try
                     {
-                        // Input received, exit wait loop
-                        input_event_.Reset();
-                        break;
+                        // Use WaitHandle.WaitAny with cancellation token for proper timeout handling
+                        int wait_result = WaitHandle.WaitTimeout;
+                        
+                        // Sleep in short intervals to check for input and cancellation
+                        for (int i = 0; i < TIMER_UPDATE_INTERVAL_MS; i += 5)
+                        {
+                            cancel_token.ThrowIfCancellationRequested();
+                            
+                            // Check if input arrived
+                            if (input_ != null)
+                                break;
+                            
+                            Thread.Sleep(Math.Min(5, TIMER_UPDATE_INTERVAL_MS - i));
+                        }
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        // Cancellation requested, exit cleanly
+                        return;
                     }
                     
-                    if (!running_)
+                    if (!running_ || cancel_token.IsCancellationRequested)
                         return;
                         
                     // Update timers even while waiting for input
                     uEmuera.Forms.Timer.Update();
                 }
+
+                cancel_token.ThrowIfCancellationRequested();
 
                 // Get fresh console reference each iteration (may be disposed during game exit)
                 var console = MinorShift.Emuera.GlobalStatic.Console;
@@ -224,9 +262,9 @@ public class EmueraThread
                 }
             }
         }
-        catch (Exception ex) when (ex is ThreadInterruptedException || ex is OperationCanceledException)
+        catch (OperationCanceledException)
         {
-            // Thread was interrupted or cancelled - expected during shutdown
+            // Thread was cancelled - expected during shutdown
         }
         catch (Exception ex)
         {

@@ -52,6 +52,7 @@ namespace MinorShift.Emuera.GameProc
             List<string> isOnlyEvent = new List<string>();
             noError = true;
 			uint starttime = WinmmTimer.TickCount;
+			int totalFiles = erbFiles.Count;
 			try
 			{
 				labelDic.RemoveAll();
@@ -59,6 +60,10 @@ namespace MinorShift.Emuera.GameProc
 				{
 					string filename = erbFiles[i].Key;
 					string file = erbFiles[i].Value;
+					
+					// Update loading status with progress
+					GenericUtils.SetLoadingStatus($"Loading ERB ({i + 1}/{totalFiles}): {filename}");
+					
 #if UEMUERA_DEBUG
 					if (displayReport)
 						output.PrintSystemLine(string.Format(GameMessages.ElapsedTime, (WinmmTimer.TickCount - starttime).ToString("D4")) + ":" + string.Format(GameMessages.LoadingFile, filename));
@@ -73,6 +78,7 @@ namespace MinorShift.Emuera.GameProc
 #if UEMUERA_DEBUG
 				output.PrintSystemLine(string.Format(GameMessages.ElapsedTime, (WinmmTimer.TickCount - starttime).ToString("D4")) + ":");
 #endif
+				GenericUtils.SetLoadingStatus("Building function list...");
 				if (displayReport)
 					output.PrintSystemLine(GameMessages.BuildingUserFunctionList);
 				setLabelsArg();
@@ -81,6 +87,7 @@ namespace MinorShift.Emuera.GameProc
 #if UEMUERA_DEBUG
 				output.PrintSystemLine(string.Format(GameMessages.ElapsedTime, (WinmmTimer.TickCount - starttime).ToString("D4")) + ":");
 #endif
+				GenericUtils.SetLoadingStatus("Checking syntax...");
 				if (displayReport)
 					output.PrintSystemLine(GameMessages.CheckingSyntax);
 				checkScript();
@@ -89,6 +96,7 @@ namespace MinorShift.Emuera.GameProc
 #if UEMUERA_DEBUG
 				output.PrintSystemLine(string.Format(GameMessages.ElapsedTime, (WinmmTimer.TickCount - starttime).ToString("D4")) + ":");
 #endif
+				GenericUtils.SetLoadingStatus("Load complete!");
 				if (displayReport)
 					output.PrintSystemLine(GameMessages.LoadComplete);
 			}

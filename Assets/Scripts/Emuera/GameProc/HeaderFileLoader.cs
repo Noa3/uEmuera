@@ -73,20 +73,33 @@ namespace MinorShift.Emuera.GameProc
 		{
 			StringStream st;
 			ScriptPosition position = null;
-			//EraStreamReader eReader = new EraStreamReader(false);
-			//1815修正 _rename.csvの適用
-			//eramakerEXの仕様的には.ERHに適用するのはおかしいけど、もうEmueraの仕様になっちゃってるのでしかたないか
 			EraStreamReader eReader = new EraStreamReader(true);
 
+			UnityEngine.Debug.Log($"[HeaderFileLoader] Attempting to open: {filename} at path: {filepath}");
+			
 			if (!eReader.Open(filepath, filename))
 			{
-				throw new CodeEE(eReader.Filename + "のオープンに失敗しました");
-				//return false;
+				// Check if file actually exists
+				if (System.IO.File.Exists(filepath))
+				{
+					UnityEngine.Debug.LogError($"[HeaderFileLoader] File exists but failed to open: {filename} - possible encoding or permission issue");
+					throw new CodeEE(filename + "のオープンに失敗しました(ファイルは存在します - エンコーディング/パーミッション問題の可能性)");
+				}
+				else
+				{
+					UnityEngine.Debug.LogError($"[HeaderFileLoader] File not found: {filepath}");
+					throw new CodeEE(filename + "のオープンに失敗しました(ファイルが見つかりません)");
+				}
 			}
+			
+			UnityEngine.Debug.Log($"[HeaderFileLoader] Successfully opened: {filename}");
+			
 			try
 			{
+				int lineCount = 0;
 				while ((st = eReader.ReadEnabledLine()) != null)
 				{
+					lineCount++;
 					if (!noError)
 						return false;
 					position = new ScriptPosition(filename, eReader.LineNo);
@@ -103,6 +116,12 @@ namespace MinorShift.Emuera.GameProc
 					if (Config.ICFunction)
 						sharpID = sharpID.ToUpper();
 					LexicalAnalyzer.SkipWhiteSpace(st);
+					
+					if (sharpID == "DEFINE")
+					{
+						UnityEngine.Debug.Log($"[HeaderFileLoader] Processing #DEFINE at {filename}:{eReader.LineNo}");
+					}
+					
 					switch (sharpID)
 					{
 						case "DEFINE":
@@ -114,22 +133,23 @@ namespace MinorShift.Emuera.GameProc
 							break;
 						case "DIM":
 						case "DIMS":
-							//1822 #DIMは保留しておいて後でまとめてやる
+							UnityEngine.Debug.Log($"[HeaderFileLoader] Queuing #DIM at {filename}:{eReader.LineNo}");
 							{
 								WordCollection wc = LexicalAnalyzer.Analyse(st, LexEndWith.EoL, LexAnalyzeFlag.AllowAssignment);
 								dimlines.Enqueue(new DimLineWC(wc, sharpID == "DIMS", false, position));
 							}
-							//analyzeSharpDim(st, position, sharpID == "DIMS");
 							break;
 						default:
 							throw new CodeEE("#" + sharpID + "は解釈できないプリプロセッサです", position);
 					}
 				}
+				UnityEngine.Debug.Log($"[HeaderFileLoader] Finished reading {filename}, processed {lineCount} lines");
 			}
 			catch (CodeEE e)
 			{
 				if (e.Position != null)
 					position = e.Position;
+				UnityEngine.Debug.LogError($"[HeaderFileLoader] Error in {filename}: {e.Message}");
 				ParserMediator.Warn(e.Message, position, 2);
 				return false;
 			}
@@ -268,49 +288,238 @@ namespace MinorShift.Emuera.GameProc
 		private bool analyzeSharpDimLines()
 		{
 			bool noError = true;
-			bool tryAgain = true;
-			while (dimlines.Count > 0)
+			
+			// Enable macro expansion for DIM processing since macros should be defined by now
+			bool previousUseMacro = LexicalAnalyzer.UseMacro;
+			LexicalAnalyzer.UseMacro = idDic.UseMacro();
+			
+			UnityEngine.Debug.Log($"[HeaderFileLoader] Starting DIM line analysis with UseMacro={LexicalAnalyzer.UseMacro}, {dimlines.Count} DIM lines queued");
+			
+			try
 			{
-				int count = dimlines.Count;
-				for (int i = 0; i < count; i++)
+				// TWO-PASS APPROACH:
+				// Pass 1: Process all CONST declarations first and register them as macros
+				//         (with retries for CONSTs that depend on other CONSTs)
+				// Pass 2: Process all other DIM declarations (which can now use the constants)
+				
+				Queue<DimLineWC> constLines = new Queue<DimLineWC>();
+				Queue<DimLineWC> nonConstLines = new Queue<DimLineWC>();
+				int totalLines = dimlines.Count;
+				
+				// Separate CONST and non-CONST lines
+				while (dimlines.Count > 0)
 				{
 					DimLineWC dimline = dimlines.Dequeue();
-					try
+					dimline.WC.Pointer = 0;
+					
+					bool isConst = IsConstDeclaration(dimline.WC);
+					dimline.WC.Pointer = 0;
+					
+					if (isConst)
+						constLines.Enqueue(dimline);
+					else
+						nonConstLines.Enqueue(dimline);
+				}
+				
+				UnityEngine.Debug.Log($"[HeaderFileLoader] Separated {constLines.Count} CONST lines and {nonConstLines.Count} non-CONST lines");
+				
+				// === PASS 1: Process CONST declarations with retry support ===
+				UnityEngine.Debug.Log($"[HeaderFileLoader] Pass 1: Processing CONST declarations...");
+				
+				int constCount = 0;
+				bool constTryAgain = true;
+				int constAttemptCount = 0;
+				
+				while (constLines.Count > 0)
+				{
+					int count = constLines.Count;
+					constAttemptCount++;
+					
+					for (int i = 0; i < count; i++)
 					{
-						UserDefinedVariableData data = UserDefinedVariableData.Create(dimline);
-						if (data.Reference)
-							throw new NotImplCodeEE();
-						VariableToken var = null;
-						if (data.CharaData)
-							var = parentProcess.VEvaluator.VariableData.CreateUserDefCharaVariable(data);
-						else
-							var = parentProcess.VEvaluator.VariableData.CreateUserDefVariable(data);
-						idDic.AddUseDefinedVariable(var);
-					}
-					catch (IdentifierNotFoundCodeEE e)
-					{
-						//繰り返すことで解決する見込みがあるならキューの最後に追加
-						if (tryAgain)
+						DimLineWC dimline = constLines.Dequeue();
+						try
 						{
 							dimline.WC.Pointer = 0;
-							dimlines.Enqueue(dimline);
+							UserDefinedVariableData data = UserDefinedVariableData.Create(dimline);
+							if (data.Reference)
+								throw new NotImplCodeEE();
+							
+							// Register CONST as a macro so other DIM lines can use it
+							if (data.Const && data.DefaultInt != null && data.DefaultInt.Length == 1)
+							{
+								idDic.AddIntegerMacro(data.Name, data.DefaultInt[0]);
+								// Update UseMacro since we added a new macro
+								LexicalAnalyzer.UseMacro = idDic.UseMacro();
+							}
+							
+							VariableToken var = null;
+							if (data.CharaData)
+								var = parentProcess.VEvaluator.VariableData.CreateUserDefCharaVariable(data);
+							else
+								var = parentProcess.VEvaluator.VariableData.CreateUserDefVariable(data);
+							idDic.AddUseDefinedVariable(var);
+							constCount++;
 						}
-						else
+						catch (IdentifierNotFoundCodeEE e)
 						{
-							ParserMediator.Warn(e.Message, dimline.SC, 2);
-							noError = true;
+							// This CONST depends on another CONST that hasn't been processed yet
+							if (constTryAgain)
+							{
+								dimline.WC.Pointer = 0;
+								constLines.Enqueue(dimline);
+							}
+							else
+							{
+								UnityEngine.Debug.LogError($"[HeaderFileLoader] CONST identifier not found at {dimline.SC.Filename}:{dimline.SC.LineNo}: {e.Message}");
+								ParserMediator.Warn(e.Message, dimline.SC, 2);
+								noError = false;
+							}
+						}
+						catch (CodeEE e)
+						{
+							// Check if this is an "unrecognized identifier" error that might be resolved by retry
+							if (constTryAgain && e.Message.Contains("unrecognized identifier"))
+							{
+								dimline.WC.Pointer = 0;
+								constLines.Enqueue(dimline);
+							}
+							else
+							{
+								UnityEngine.Debug.LogError($"[HeaderFileLoader] CONST error at {dimline.SC.Filename}:{dimline.SC.LineNo}: {e.Message}");
+								ParserMediator.Warn(e.Message, dimline.SC, 2);
+								noError = false;
+							}
 						}
 					}
-					catch (CodeEE e)
+					
+					if (constLines.Count == count)
 					{
-						ParserMediator.Warn(e.Message, dimline.SC, 2);
-						noError = false;
+						// No progress made, stop retrying
+						constTryAgain = false;
 					}
 				}
-				if (dimlines.Count == count)
-					tryAgain = false;
+				
+				UnityEngine.Debug.Log($"[HeaderFileLoader] Pass 1 complete: {constCount} CONST declarations processed in {constAttemptCount} attempts");
+				
+				// === PASS 2: Process non-CONST declarations ===
+				UnityEngine.Debug.Log($"[HeaderFileLoader] Pass 2: Processing non-CONST declarations with UseMacro={LexicalAnalyzer.UseMacro}...");
+				
+				bool tryAgain = true;
+				int processedCount = 0;
+				int attemptCount = 0;
+				
+				while (nonConstLines.Count > 0)
+				{
+					int count = nonConstLines.Count;
+					attemptCount++;
+					
+					for (int i = 0; i < count; i++)
+					{
+						DimLineWC dimline = nonConstLines.Dequeue();
+						try
+						{
+							dimline.WC.Pointer = 0;
+							
+							UserDefinedVariableData data = UserDefinedVariableData.Create(dimline);
+							if (data.Reference)
+								throw new NotImplCodeEE();
+							VariableToken var = null;
+							if (data.CharaData)
+								var = parentProcess.VEvaluator.VariableData.CreateUserDefCharaVariable(data);
+							else
+								var = parentProcess.VEvaluator.VariableData.CreateUserDefVariable(data);
+							idDic.AddUseDefinedVariable(var);
+							processedCount++;
+						}
+						catch (IdentifierNotFoundCodeEE e)
+						{
+							//繰り返すことで解決する見込みがあるならキューの最後に追加
+							if (tryAgain)
+							{
+								dimline.WC.Pointer = 0;
+								nonConstLines.Enqueue(dimline);
+							}
+							else
+							{
+								UnityEngine.Debug.LogError($"[HeaderFileLoader] Identifier not found at {dimline.SC.Filename}:{dimline.SC.LineNo}: {e.Message}");
+								ParserMediator.Warn(e.Message, dimline.SC, 2);
+								noError = false;
+							}
+						}
+						catch (CodeEE e)
+						{
+							UnityEngine.Debug.LogError($"[HeaderFileLoader] Code error at {dimline.SC.Filename}:{dimline.SC.LineNo}: {e.Message}");
+							ParserMediator.Warn(e.Message, dimline.SC, 2);
+							noError = false;
+						}
+					}
+					if (nonConstLines.Count == count)
+					{
+						tryAgain = false;
+					}
+				}
+				
+				UnityEngine.Debug.Log($"[HeaderFileLoader] Pass 2 complete: {processedCount} non-CONST variables processed in {attemptCount} attempts");
+				UnityEngine.Debug.Log($"[HeaderFileLoader] DIM line analysis complete. Total: {constCount + processedCount} of {totalLines} variables processed");
 			}
+			finally
+			{
+				// Restore previous UseMacro state
+				LexicalAnalyzer.UseMacro = previousUseMacro;
+			}
+			
 			return noError;
+		}
+		
+		/// <summary>
+		/// Check if a DIM line is a CONST declaration by scanning for CONST keyword.
+		/// Does not modify the WordCollection pointer permanently.
+		/// </summary>
+		private static bool IsConstDeclaration(WordCollection wc)
+		{
+			int originalPointer = wc.Pointer;
+			try
+			{
+				while (!wc.EOL)
+				{
+					var word = wc.Current as IdentifierWord;
+					if (word == null)
+					{
+						// Hit a non-identifier (comma, equals, etc.) - no more keywords
+						break;
+					}
+					
+					string code = word.Code;
+					if (Config.ICVariable)
+						code = code.ToUpper();
+					
+					if (code == "CONST")
+						return true;
+					
+					// Check if this is a known keyword or the variable name
+					switch (code)
+					{
+						case "REF":
+						case "DYNAMIC":
+						case "STATIC":
+						case "GLOBAL":
+						case "SAVEDATA":
+						case "CHARADATA":
+							// Known keyword, continue scanning
+							wc.ShiftNext();
+							continue;
+						default:
+							// This is the variable name, stop scanning
+							return false;
+					}
+				}
+				return false;
+			}
+			finally
+			{
+				wc.Pointer = originalPointer;
+			}
 		}
 
 		private void analyzeSharpFunction(StringStream st, ScriptPosition position, bool funcs)

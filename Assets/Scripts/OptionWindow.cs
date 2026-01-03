@@ -376,6 +376,22 @@ public class OptionWindow : MonoBehaviour
     public void ShowInProgress(bool value)
     {
         inprogress.SetActive(value);
+        if (!value && loadingStatusText != null)
+        {
+            loadingStatusText.text = "";
+        }
+    }
+    
+    /// <summary>
+    /// Updates the loading status text displayed during initialization.
+    /// </summary>
+    /// <param name="status">The status message to display.</param>
+    public void SetLoadingStatus(string status)
+    {
+        if (loadingStatusText != null)
+        {
+            loadingStatusText.text = status;
+        }
     }
 
     void SwitchButton(int index)
@@ -977,6 +993,14 @@ public class OptionWindow : MonoBehaviour
     [Header("Progress")]
     [Tooltip("Loading/progress indicator")]
     public GameObject inprogress;
+    
+    /// <summary>
+    /// Text component to display current loading status message.
+    /// Should be a child of the inprogress GameObject.
+    /// </summary>
+    [Tooltip("Text component to display current loading status message")]
+    public Text loadingStatusText;
+    
     List<Shadow> button_shadows;
 
     /// <summary>

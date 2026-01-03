@@ -427,6 +427,20 @@ namespace MinorShift.Emuera
 
 		internal void AddUseDefinedVariable(VariableToken var)
 		{
+			// Check if variable already exists to avoid duplicate key exception
+			if (varTokenDic.ContainsKey(var.Name))
+			{
+				UnityEngine.Debug.LogWarning($"[IdentifierDictionary] Variable '{var.Name}' already defined, skipping duplicate");
+				return;
+			}
+			
+			// Also check nameDic to avoid conflicts
+			if (nameDic.ContainsKey(var.Name))
+			{
+				UnityEngine.Debug.LogWarning($"[IdentifierDictionary] Name '{var.Name}' already registered in nameDic, skipping");
+				return;
+			}
+			
 			varTokenDic.Add(var.Name, var);
 			if (var.IsCharacterData)
 			{
@@ -436,9 +450,73 @@ namespace MinorShift.Emuera
 		}
 		internal void AddMacro(DefineMacro mac)
 		{
+			// Check for duplicates to avoid ArgumentException
+			if (nameDic.ContainsKey(mac.Keyword))
+			{
+				UnityEngine.Debug.LogWarning($"[IdentifierDictionary] Macro '{mac.Keyword}' already defined in nameDic, skipping");
+				return;
+			}
+			if (macroDic.ContainsKey(mac.Keyword))
+			{
+				UnityEngine.Debug.LogWarning($"[IdentifierDictionary] Macro '{mac.Keyword}' already defined in macroDic, skipping");
+				return;
+			}
+			
 			nameDic.Add(mac.Keyword, DefinedNameType.UserMacro);
 			macroDic.Add(mac.Keyword, mac);
 		}
+
+		/// <summary>
+		/// Adds a simple integer constant macro (equivalent to #DEFINE NAME value)
+		/// </summary>
+		/// <param name="name">The macro name</param>
+		/// <param name="value">The integer value</param>
+		internal void AddIntegerMacro(string name, long value)
+		{
+			string originalName = name;
+			if (Config.ICVariable)
+				name = name.ToUpper();
+			
+			// Skip if already defined
+			if (nameDic.ContainsKey(name))
+			{
+				UnityEngine.Debug.LogWarning($"[IdentifierDictionary] Macro '{originalName}' already defined, skipping");
+				return;
+			}
+				
+			WordCollection wc = new WordCollection();
+			wc.Add(new LiteralIntegerWord(value));
+			DefineMacro mac = new DefineMacro(name, wc, 0);
+			nameDic.Add(mac.Keyword, DefinedNameType.UserMacro);
+			macroDic.Add(mac.Keyword, mac);
+			
+			UnityEngine.Debug.Log($"[IdentifierDictionary] Added macro: {name} = {value}");
+		}
+
+		/// <summary>
+		/// Initializes predefined constants commonly used in ERA game variants.
+		/// These constants are typically expected by games like eraTohoTW that use
+		/// Emuera extensions (EE variants).
+		/// </summary>
+		internal void InitializePredefinedConstants()
+		{
+			// Note: Most constants should NOT be predefined here because they are defined
+			// in the game's ERH files using #DIM CONST. If we add them as macros here,
+			// macro expansion will replace the variable name in the CONST definition,
+			// causing parsing errors like "#DIM CONST 3000 = 3000" instead of
+			// "#DIM CONST MAX_CHARA_NUM = 3000".
+			//
+			// Only add constants here that are:
+			// 1. Not defined anywhere in ERH files, AND
+			// 2. Used in array size specifications before any ERH defines them
+			//
+			// The proper solution is to process ERH files in dependency order or
+			// use a two-pass approach (first pass collects CONST definitions,
+			// second pass processes DIM lines that use those constants).
+			
+			UnityEngine.Debug.Log("[IdentifierDictionary] Predefined constants initialization skipped - constants are defined in ERH files");
+		}
+
 		internal void AddRefMethod(UserDefinedRefMethod refm)
 		{
 			refmethodDic.Add(refm.Name, refm);

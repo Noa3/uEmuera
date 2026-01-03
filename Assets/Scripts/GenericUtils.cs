@@ -864,6 +864,19 @@ public static class GenericUtils
         text_content.ShowIsInProcess(value);
     }
     
+    /// <summary>
+    /// Updates the loading status text displayed during initialization.
+    /// Call this from loading code to show current progress to the user.
+    /// </summary>
+    /// <param name="status">The status message to display.</param>
+    public static void SetLoadingStatus(string status)
+    {
+        if (text_content != null && text_content.option_window != null)
+        {
+            text_content.option_window.SetLoadingStatus(status);
+        }
+    }
+    
     static EmueraContent text_content
     {
         get

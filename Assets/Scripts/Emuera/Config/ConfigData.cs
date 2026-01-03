@@ -469,13 +469,14 @@ static ConfigData() { }
 				//bool defineIgnoreWarningFiles = false;
 				while ((line = eReader.ReadLine()) != null)
 				{
-					var md5 = md5s[md5i++];
 					if ((line.Length == 0) || (line[0] == ';'))
 						continue;
 					pos = new ScriptPosition(eReader.Filename, eReader.LineNo);
 					string[] tokens = line.Split(new char[] { ':' });
 					if (tokens.Length < 2)
 						continue;
+					// Get MD5 only for lines with colon (matching CalcMd5ListForConfig behavior)
+					var md5 = md5i < md5s.Count ? md5s[md5i++] : null;
                     var token_0 = tokens[0].Trim();
                     AConfigItem item = GetConfigItem(token_0);
                     if(item == null)
