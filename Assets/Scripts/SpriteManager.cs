@@ -26,49 +26,36 @@ internal static class SpriteManager
     static Dictionary<string, string> file_index_ = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
     static bool file_index_initialized_ = false;
     
-    // Directory tree cache for subdirectory searching and Unicode normalization
-    static readonly Dictionary<string, DirectoryNode> directory_cache_ = new Dictionary<string, DirectoryNode>(StringComparer.OrdinalIgnoreCase);
-    
     // Negative cache for files confirmed not to exist (avoids repeated expensive searches)
     static readonly HashSet<string> missing_files_cache_ = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
     static readonly object missing_files_lock = new object();
     
     /// <summary>
     /// Creates a placeholder transparent texture for missing images.
-    /// Uses transparent pixels instead of grey to avoid showing visible placeholder boxes.
     /// </summary>
-    /// <param name="width">Width of the placeholder texture</param>
-    /// <param name="height">Height of the placeholder texture</param>
-    /// <returns>A transparent placeholder texture</returns>
     static Texture2D CreatePlaceholderTexture(int width = 64, int height = 64)
     {
         var tex = new Texture2D(width, height, TextureFormat.RGBA32, false);
-        // Use transparent color so missing images don't show ugly grey boxes
         var transparentColor = new UnityEngine.Color(0f, 0f, 0f, 0f);
         var pixels = new UnityEngine.Color[width * height];
         for (int i = 0; i < pixels.Length; i++)
-        {
             pixels[i] = transparentColor;
-        }
         tex.SetPixels(pixels);
         tex.Apply();
         return tex;
     }
 
     /// <summary>
-    /// Helper method to create and store a placeholder TextureInfo for a missing or failed image.
-    /// Also updates the bitmap size if provided.
+    /// Creates and stores a placeholder TextureInfo.
     /// </summary>
-    /// <param name="name">The texture name/key for storage</param>
-    /// <param name="baseimage">Optional Bitmap to update with placeholder dimensions</param>
-    /// <returns>The created TextureInfo with placeholder texture</returns>
     static TextureInfo CreateAndStorePlaceholder(string name, Bitmap baseimage = null)
     {
         var placeholderTex = CreatePlaceholderTexture();
         var ti = new TextureInfo(name, placeholderTex);
         lock(texture_dict_lock)
         {
-            texture_dict.Add(name, ti);
+            if (!texture_dict.ContainsKey(name))
+                texture_dict.Add(name, ti);
         }
         if (baseimage != null)
         {
@@ -79,11 +66,8 @@ internal static class SpriteManager
     }
 
     /// <summary>
-    /// Creates a placeholder SpriteInfo directly without storing in texture dictionary.
-    /// Used for cases where we need a sprite but don't have valid texture data.
+    /// Creates a placeholder SpriteInfo.
     /// </summary>
-    /// <param name="name">The sprite name for logging purposes</param>
-    /// <returns>A SpriteInfo with a grey placeholder sprite</returns>
     static SpriteInfo CreatePlaceholderSpriteInfo(string name)
     {
         var placeholderTex = CreatePlaceholderTexture();
@@ -93,10 +77,7 @@ internal static class SpriteManager
     
     /// <summary>
     /// Creates a placeholder SpriteInfo for an existing TextureInfo.
-    /// Used when sprite creation fails for a valid texture.
     /// </summary>
-    /// <param name="parentTexture">The parent TextureInfo to associate with</param>
-    /// <returns>A SpriteInfo with a grey placeholder sprite</returns>
     static SpriteInfo CreatePlaceholderSpriteInfoForTexture(TextureInfo parentTexture)
     {
         var placeholderTex = CreatePlaceholderTexture();
@@ -104,12 +85,8 @@ internal static class SpriteManager
     }
     
     /// <summary>
-    /// Helper method to create a SpriteInfo from a texture.
-    /// Centralizes the sprite creation logic used by placeholder methods.
+    /// Creates a SpriteInfo from a texture.
     /// </summary>
-    /// <param name="textureInfo">The TextureInfo to associate with</param>
-    /// <param name="texture">The texture to create sprite from</param>
-    /// <returns>A SpriteInfo with the created sprite</returns>
     static SpriteInfo CreateSpriteInfoFromTexture(TextureInfo textureInfo, Texture2D texture)
     {
         var rect = new Rect(0, 0, texture.width, texture.height);
@@ -124,7 +101,7 @@ internal static class SpriteManager
     
     /// <summary>
     /// Initializes the file index by scanning the resources directory.
-    /// Builds both flat index and directory tree for optimal performance.
+    /// Single-pass scan for optimal performance.
     /// Call this when loading a game to enable fast case-insensitive file lookups.
     /// </summary>
     /// <param name="resourcesDirectory">The resources directory to scan</param>
@@ -142,11 +119,10 @@ internal static class SpriteManager
         {
             missing_files_cache_.Clear();
         }
-        directory_cache_.Clear();
         
         if (!Directory.Exists(resourcesDirectory))
         {
-            Debug.LogWarning($"SpriteManager: Resources directory not found for indexing: {resourcesDirectory}");
+            Debug.LogWarning($"SpriteManager: Resources directory not found: {resourcesDirectory}");
             return;
         }
         
@@ -155,256 +131,128 @@ internal static class SpriteManager
         
         try
         {
-            // Build directory tree with all files and subdirectories
-            var rootNode = BuildDirectoryTree(resourcesDirectory);
-            if (rootNode != null)
-            {
-                lock (file_index_lock)
-                {
-                    directory_cache_[resourcesDirectory] = rootNode;
-                }
-            }
-            
-            // Also maintain flat index for quick single-file lookups
+            // Single-pass: scan all image files at once
+            var allFiles = new List<string>();
             foreach (var ext in ImageExtensions)
             {
                 try
                 {
-                    var files = Directory.GetFiles(resourcesDirectory, "*" + ext, SearchOption.AllDirectories);
-                    foreach (var file in files)
+                    allFiles.AddRange(Directory.GetFiles(resourcesDirectory, "*" + ext, SearchOption.AllDirectories));
+                }
+                catch { }
+            }
+            
+            // Index all files in one pass
+            foreach (var file in allFiles)
+            {
+                var fileName = Path.GetFileName(file);
+                
+                // Index by filename
+                if (!file_index_.ContainsKey(fileName))
+                {
+                    file_index_[fileName] = file;
+                    fileCount++;
+                }
+                
+                // Also index by relative path (normalized with forward slashes)
+                if (file.StartsWith(resourcesDirectory, StringComparison.OrdinalIgnoreCase))
+                {
+                    var relativePath = file.Substring(resourcesDirectory.Length)
+                        .TrimStart(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)
+                        .Replace('\\', '/');
+                    if (!file_index_.ContainsKey(relativePath))
                     {
-                        // Use filename (without path) as key for quick lookup
-                        var fileName = Path.GetFileName(file);
-                        lock (file_index_lock)
-                        {
-                            // If duplicate filename exists, keep the first one found
-                            if (!file_index_.ContainsKey(fileName))
-                            {
-                                file_index_[fileName] = file;
-                                fileCount++;
-                            }
-                        }
+                        file_index_[relativePath] = file;
                     }
+                }
+            }
+            
+            file_index_initialized_ = true;
+                    stopwatch.Stop();
+                    Debug.Log($"SpriteManager: Indexed {fileCount} files in {stopwatch.ElapsedMilliseconds}ms");
                 }
                 catch (Exception ex)
                 {
-                    Debug.LogWarning($"SpriteManager: Error scanning for {ext} files: {ex.Message}");
+                    Debug.LogError($"SpriteManager: Failed to initialize file index: {ex.Message}");
                 }
             }
-            
-            // Also index by relative path from resources directory for more specific lookups
-            foreach (var ext in ImageExtensions)
-            {
-                try
-                {
-                    var files = Directory.GetFiles(resourcesDirectory, "*" + ext, SearchOption.AllDirectories);
-                    foreach (var file in files)
-                    {
-                        // Create relative path key
-                        var relativePath = file;
-                        if (file.StartsWith(resourcesDirectory, StringComparison.OrdinalIgnoreCase))
-                        {
-                            relativePath = file.Substring(resourcesDirectory.Length).TrimStart(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
-                        }
-                        lock (file_index_lock)
-                        {
-                            if (!file_index_.ContainsKey(relativePath))
-                            {
-                                file_index_[relativePath] = file;
-                            }
-                        }
-                    }
-                }
-                catch { }
-            }
-            
-            lock (file_index_lock)
-            {
-                file_index_initialized_ = true;
-            }
-            
-            stopwatch.Stop();
-            Debug.Log($"SpriteManager: Indexed {fileCount} image files in directory tree in {stopwatch.ElapsedMilliseconds}ms");
-        }
-        catch (Exception ex)
-        {
-            Debug.LogError($"SpriteManager: Failed to initialize file index: {ex.Message}");
-        }
-    }
-    
-    /// <summary>
-    /// Builds a directory tree for fast hierarchical file searching.
-    /// </summary>
-    static DirectoryNode BuildDirectoryTree(string path)
-    {
-        try
-        {
-            var node = new DirectoryNode { FullPath = path };
-            
-            // Add all image files in this directory
-            foreach (var ext in ImageExtensions)
-            {
-                try
-                {
-                    var files = Directory.GetFiles(path, "*" + ext, SearchOption.TopDirectoryOnly);
-                    foreach (var file in files)
-                    {
-                        var fileName = Path.GetFileName(file);
-                        if (!node.Files.ContainsKey(fileName))
-                        {
-                            node.Files[fileName] = file;
-                        }
-                    }
-                }
-                catch { }
-            }
-            
-            // Recursively add subdirectories
-            try
-            {
-                var subdirs = Directory.GetDirectories(path);
-                foreach (var subdir in subdirs)
-                {
-                    var subdirName = Path.GetFileName(subdir);
-                    var subdirNode = BuildDirectoryTree(subdir);
-                    if (subdirNode != null)
-                    {
-                        node.Subdirectories[subdirName] = subdirNode;
-                    }
-                }
-            }
-            catch { }
-            
-            return node;
-        }
-        catch
-        {
-            return null;
-        }
-    }
 
-    /// <summary>
-    /// Tries to resolve a file path using the pre-built index.
-    /// Much faster than walking directories for case-insensitive resolution.
-    /// </summary>
-    /// <param name="originalPath">The path to resolve</param>
-    /// <returns>The resolved path if found, null otherwise</returns>
-    static string TryResolveFromIndex(string originalPath)
-    {
-        if (string.IsNullOrEmpty(originalPath))
-            return null;
+            /// <summary>
+            /// Tries to resolve a file path using the pre-built index.
+            /// </summary>
+            static string TryResolveFromIndex(string originalPath)
+            {
+                if (string.IsNullOrEmpty(originalPath) || !file_index_initialized_)
+                    return null;
             
-        lock (file_index_lock)
-        {
-            if (!file_index_initialized_)
+                // Try exact path first
+                if (file_index_.TryGetValue(originalPath, out var resolved))
+                    return resolved;
+            
+                // Try with normalized path separators
+                var normalized = originalPath.Replace('\\', '/');
+                if (file_index_.TryGetValue(normalized, out resolved))
+                    return resolved;
+            
+                // Try filename only
+                var fileName = Path.GetFileName(originalPath);
+                if (file_index_.TryGetValue(fileName, out resolved))
+                    return resolved;
+        
                 return null;
-                
-            // Try exact path first
-            if (file_index_.TryGetValue(originalPath, out var resolved))
-                return resolved;
-                
-            // Try filename only
-            var fileName = Path.GetFileName(originalPath);
-            if (file_index_.TryGetValue(fileName, out resolved))
-                return resolved;
-            
-            // Try directory-aware lookup with fuzzy matching
-            var dirPath = Path.GetDirectoryName(originalPath);
-            if (!string.IsNullOrEmpty(dirPath))
-            {
-                foreach (var cacheNode in directory_cache_.Values)
-                {
-                    var found = cacheNode.FindFile(fileName, true);
-                    if (!string.IsNullOrEmpty(found))
-                    {
-                        Debug.LogWarning($"SpriteManager: Found via directory tree search: '{originalPath}' -> '{found}'");
-                        return found;
-                    }
-                }
             }
-        }
-        
-        return null;
-    }
     
-    /// <summary>
-    /// Performs deep directory-aware search with fuzzy matching.
-    /// Used when standard lookups fail to find a file.
-    /// Searches all cached directories and uses Levenshtein distance for fuzzy matching.
+            /// <summary>
+            /// Performs Unicode normalization search for Japanese filenames.
+    /// Only called as last resort when standard lookups fail.
     /// </summary>
-    static string TryAdvancedDirectorySearch(string originalPath)
+    static string TryUnicodeNormalizedSearch(string originalPath)
     {
-        if (string.IsNullOrEmpty(originalPath))
+        if (string.IsNullOrEmpty(originalPath) || !file_index_initialized_)
             return null;
             
-        lock (file_index_lock)
+        var fileName = Path.GetFileName(originalPath);
+        
+        // Try Unicode normalized versions
+        var normalizedFormC = fileName.Normalize(NormalizationForm.FormC);
+        var normalizedFormD = fileName.Normalize(NormalizationForm.FormD);
+        
+        if (file_index_.TryGetValue(normalizedFormC, out var resolved))
+            return resolved;
+        if (file_index_.TryGetValue(normalizedFormD, out resolved))
+                return resolved;
+        
+            return null;
+        }
+    
+        /// <summary>
+        /// Checks if a file is in the missing files cache.
+        /// </summary>
+        static bool IsKnownMissing(string path)
         {
-            var fileName = Path.GetFileName(originalPath);
+            if (string.IsNullOrEmpty(path))
+                return false;
             
-            // Try Unicode normalized versions for Japanese filename compatibility
-            // FormC (Composed form) and FormD (Decomposed form) may differ due to filesystem encoding
-            var normalizedFormC = fileName.Normalize(NormalizationForm.FormC);
-            var normalizedFormD = fileName.Normalize(NormalizationForm.FormD);
-            
-            // Search all cached directory nodes
-            foreach (var rootNode in directory_cache_.Values)
+            lock (missing_files_lock)
             {
-                // Try exact match with normalized forms
-                var found = rootNode.FindFile(normalizedFormC, includeSubdirs: true);
-                if (!string.IsNullOrEmpty(found))
-                {
-                    Debug.LogWarning($"SpriteManager: Advanced search found (FormC): '{originalPath}' -> '{found}'");
-                    return found;
-                }
-                
-                found = rootNode.FindFile(normalizedFormD, includeSubdirs: true);
-                if (!string.IsNullOrEmpty(found))
-                {
-                    Debug.LogWarning($"SpriteManager: Advanced search found (FormD): '{originalPath}' -> '{found}'");
-                    return found;
-                }
-                
-                // Try original filename (fuzzy matching)
-                found = rootNode.FindFile(fileName, includeSubdirs: true);
-                if (!string.IsNullOrEmpty(found))
-                {
-                    Debug.LogWarning($"SpriteManager: Advanced search found (fuzzy): '{originalPath}' -> '{found}'");
-                    return found;
-                }
+                return missing_files_cache_.Contains(path) || 
+                       missing_files_cache_.Contains(Path.GetFileName(path));
             }
         }
-        
-        return null;
-    }
     
-    /// <summary>
-    /// Checks if a file is in the missing files cache.
-    /// </summary>
-    static bool IsKnownMissing(string path)
-    {
-        if (string.IsNullOrEmpty(path))
-            return false;
-            
-        lock (missing_files_lock)
+        /// <summary>
+        /// Adds a file path to the missing files cache.
+        /// </summary>
+        static void MarkAsMissing(string path)
         {
-            return missing_files_cache_.Contains(path) || 
-                   missing_files_cache_.Contains(Path.GetFileName(path));
-        }
-    }
-    
-    /// <summary>
-    /// Adds a file path to the missing files cache.
-    /// </summary>
-    static void MarkAsMissing(string path)
-    {
-        if (string.IsNullOrEmpty(path))
-            return;
+            if (string.IsNullOrEmpty(path))
+                return;
             
-        lock (missing_files_lock)
-        {
-            missing_files_cache_.Add(path);
-            missing_files_cache_.Add(Path.GetFileName(path));
-        }
+            lock (missing_files_lock)
+            {
+                missing_files_cache_.Add(path);
+                missing_files_cache_.Add(Path.GetFileName(path));
+            }
     }
 
     // Attempts to resolve a full path in a case-insensitive manner by walking each segment.
@@ -726,65 +574,41 @@ internal static class SpriteManager
         }
         if(string.IsNullOrEmpty(filename))
         {
-            Debug.LogError($"SpriteManager: Empty filename for texture '{name}'");
-            return null;
+            return CreateAndStorePlaceholder(name);
         }
 
-        string pathToLoad = filename.Replace('/', Path.DirectorySeparatorChar).Replace('\\', Path.DirectorySeparatorChar);
-        FileInfo fi = new FileInfo(pathToLoad);
-        if(!fi.Exists)
+        // Use file index for fast lookup
+        string pathToLoad = TryResolveFromIndex(filename);
+        if (string.IsNullOrEmpty(pathToLoad))
         {
-            // Try original, lower, upper, and mixed-case filename variants within the same directory first
-            var dir = Path.GetDirectoryName(pathToLoad);
-            var file = Path.GetFileName(pathToLoad);
-            if (!string.IsNullOrEmpty(dir) && !string.IsNullOrEmpty(file) && Directory.Exists(dir))
-            {
-                foreach (var variant in GenerateFilenameCaseVariants(dir, file))
-                {
-                    if (File.Exists(variant))
-                    {
-                        Debug.LogWarning($"SpriteManager: Using case-variant for '{pathToLoad}' -> '{variant}'");
-                        pathToLoad = variant;
-                        fi = new FileInfo(pathToLoad);
-                        break;
-                    }
-                }
+            // Try Unicode normalized search
+            pathToLoad = TryUnicodeNormalizedSearch(filename);
+        }
+        if (string.IsNullOrEmpty(pathToLoad))
+        {
+            // Fall back to original path
+            pathToLoad = filename.Replace('/', Path.DirectorySeparatorChar).Replace('\\', Path.DirectorySeparatorChar);
             }
-            // Attempt case-insensitive full path resolution
-            if(!fi.Exists)
+        
+            if(!File.Exists(pathToLoad))
             {
-                var resolved = ResolvePathCaseInsensitive(pathToLoad);
-                if (!string.IsNullOrEmpty(resolved))
+                return CreateAndStorePlaceholder(name);
+            }
+
+            try
+            {
+                var content = File.ReadAllBytes(pathToLoad);
+                if (content == null || content.Length == 0)
                 {
-                    Debug.LogWarning($"SpriteManager: Fixed path casing for '{filename}' -> '{resolved}'");
-                    pathToLoad = resolved;
-                    fi = new FileInfo(pathToLoad);
-                }
-                else
-                {
-                    Debug.LogWarning($"SpriteManager: File not found for texture '{name}': {filename}. Creating transparent placeholder.");
                     return CreateAndStorePlaceholder(name);
                 }
-            }
-        }
 
-        try
-        {
-            var content = File.ReadAllBytes(pathToLoad);
-            if (content == null || content.Length == 0)
-            {
-                Debug.LogError($"SpriteManager: Empty content while reading '{pathToLoad}'");
-                return null;
-            }
+                TextureFormat format = TextureFormat.RGBA32;
+                var extname = uEmuera.Utils.GetSuffix(pathToLoad).ToLower();
 
-            // Use a safe default format for runtime-loaded images
-            TextureFormat format = TextureFormat.RGBA32;
-
-            var extname = uEmuera.Utils.GetSuffix(pathToLoad).ToLower();
-
-            if (extname == "webp")
-            {
-                var tex = Texture2DExt.CreateTexture2DFromWebP(content, false, false,
+                if (extname == "webp")
+                {
+                    var tex = Texture2DExt.CreateTexture2DFromWebP(content, false, false,
                     out Error err);
                 if (err != Error.Success)
                 {
@@ -894,159 +718,87 @@ internal static class SpriteManager
         // Fast path: Check if already known to be missing
         if (IsKnownMissing(pathToLoad))
         {
-            // Create placeholder immediately without expensive searches
-            var placeholderTex = CreatePlaceholderTexture();
-            ti = new TextureInfo(baseimage.filename, placeholderTex);
-            lock(texture_dict_lock)
-            {
-                if (!texture_dict.ContainsKey(baseimage.filename))
-                    texture_dict.Add(baseimage.filename, ti);
-            }
-            baseimage.size.Width = placeholderTex.width;
-            baseimage.size.Height = placeholderTex.height;
-            
-            // Process callbacks
+            ti = CreateAndStorePlaceholder(baseimage.filename, baseimage);
             ProcessLoadingCallbacks(baseimage.filename, ti);
             yield break;
         }
         
-        FileInfo fi = new FileInfo(pathToLoad);
-        if(!fi.Exists)
+        // Try index-based lookup first (fast O(1) lookup)
+        var indexResolved = TryResolveFromIndex(pathToLoad);
+        if (!string.IsNullOrEmpty(indexResolved))
         {
-            // Try index-based lookup first (fast O(1) lookup)
-            var indexResolved = TryResolveFromIndex(pathToLoad);
-            if (!string.IsNullOrEmpty(indexResolved) && File.Exists(indexResolved))
-            {
-                pathToLoad = indexResolved;
-                fi = new FileInfo(pathToLoad);
-            }
-            else
-            {
-                // Fall back to case variant search only if index lookup failed
-                var dir = Path.GetDirectoryName(pathToLoad);
-                var file = Path.GetFileName(pathToLoad);
-                if (!string.IsNullOrEmpty(dir) && !string.IsNullOrEmpty(file) && Directory.Exists(dir))
-                {
-                    foreach (var variant in GenerateFilenameCaseVariants(dir, file))
-                    {
-                        if (File.Exists(variant))
-                        {
-                            pathToLoad = variant;
-                            fi = new FileInfo(pathToLoad);
-                            break;
-                        }
-                    }
-                }
-                
-                // Try advanced directory search with fuzzy matching (handles Unicode/Japanese encoding issues)
-                if(!fi.Exists)
-                {
-                    var advancedFound = TryAdvancedDirectorySearch(pathToLoad);
-                    if (!string.IsNullOrEmpty(advancedFound) && File.Exists(advancedFound))
-                    {
-                        pathToLoad = advancedFound;
-                        fi = new FileInfo(pathToLoad);
-                    }
-                }
-                
-                // Only do expensive directory walking if still not found
-                if(!fi.Exists)
-                {
-                    var resolved = ResolvePathCaseInsensitive(pathToLoad);
-                    if (!string.IsNullOrEmpty(resolved))
-                    {
-                        pathToLoad = resolved;
-                        fi = new FileInfo(pathToLoad);
-                    }
-                }
-            }
-        }
-        if(fi.Exists)
-        {
-            byte[] content = null;
-            try
-            {
-                content = File.ReadAllBytes(pathToLoad);
-            }
-            catch (Exception ex)
-            {
-                Debug.LogError($"SpriteManager: Exception while reading image '{pathToLoad}'. Error={ex.GetType().Name}: {ex.Message}");
-            }
-
-            if (content == null || content.Length == 0)
-            {
-                Debug.LogError($"SpriteManager: Empty content after reading '{pathToLoad}'");
-            }
-            else
-            {
-                // Use a safe default format for runtime-loaded images
-                TextureFormat format = TextureFormat.RGBA32;
-
-                var extname = uEmuera.Utils.GetSuffix(pathToLoad).ToLower();
-
-                if (extname == "webp")
-                {
-                    var tex = Texture2DExt.CreateTexture2DFromWebP(content, false, false,
-                    out Error err);
-                    if (err != Error.Success)
-                    {
-                        Debug.LogError($"SpriteManager: Failed to decode WEBP '{pathToLoad}'. Error={err}");
-                    }
-                    else
-                    {
-                        ti = new TextureInfo(baseimage.filename, tex);
-                        lock(texture_dict_lock)
-                        {
-                            texture_dict.Add(baseimage.filename, ti);
-
-                            baseimage.size.Width = tex.width;
-                            baseimage.size.Height = tex.height;
-                        }
-                    }
-                }
-                else
-                {
-                    var tex = new Texture2D(2, 2, format, false);
-                    if (tex.LoadImage(content))
-                    {
-                        ti = new TextureInfo(baseimage.filename, tex);
-                        lock(texture_dict_lock)
-                        {
-                            texture_dict.Add(baseimage.filename, ti);
-
-                            baseimage.size.Width = tex.width;
-                            baseimage.size.Height = tex.height;
-                        }
-                    }
-                    else
-                    {
-                        Debug.LogError($"SpriteManager: Failed to load image '{pathToLoad}' (ext={extname})");
-                    }
-                }
-            }
+            pathToLoad = indexResolved;
         }
         else
         {
-            // Mark as missing to skip expensive searches next time
-            MarkAsMissing(baseimage.path);
-            MarkAsMissing(baseimage.filename);
-            
-            Debug.LogWarning($"SpriteManager: File not found '{pathToLoad}' for bitmap '{baseimage.filename}'. Creating transparent placeholder.");
-            var placeholderTex = CreatePlaceholderTexture();
-            ti = new TextureInfo(baseimage.filename, placeholderTex);
-            lock(texture_dict_lock)
-            {
-                if (!texture_dict.ContainsKey(baseimage.filename))
-                    texture_dict.Add(baseimage.filename, ti);
-            }
-            baseimage.size.Width = placeholderTex.width;
-            baseimage.size.Height = placeholderTex.height;
-        }
+            // Try Unicode normalized search for Japanese filenames
+            var unicodeResolved = TryUnicodeNormalizedSearch(pathToLoad);
+            if (!string.IsNullOrEmpty(unicodeResolved))
+                    {
+                        pathToLoad = unicodeResolved;
+                    }
+                }
         
-        // Process callbacks
-        ProcessLoadingCallbacks(baseimage.filename, ti);
-        yield break;
-    }
+                if(File.Exists(pathToLoad))
+                {
+                    byte[] content = null;
+                    try
+                    {
+                        content = File.ReadAllBytes(pathToLoad);
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.LogError($"SpriteManager: Failed to read '{pathToLoad}': {ex.Message}");
+                    }
+
+                    if (content != null && content.Length > 0)
+                    {
+                        TextureFormat format = TextureFormat.RGBA32;
+                        var extname = uEmuera.Utils.GetSuffix(pathToLoad).ToLower();
+
+                        if (extname == "webp")
+                        {
+                            var tex = Texture2DExt.CreateTexture2DFromWebP(content, false, false, out Error err);
+                            if (err == Error.Success)
+                            {
+                                ti = new TextureInfo(baseimage.filename, tex);
+                                lock(texture_dict_lock)
+                                {
+                                    if (!texture_dict.ContainsKey(baseimage.filename))
+                                        texture_dict.Add(baseimage.filename, ti);
+                                    baseimage.size.Width = tex.width;
+                                    baseimage.size.Height = tex.height;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            var tex = new Texture2D(2, 2, format, false);
+                            if (tex.LoadImage(content))
+                            {
+                                ti = new TextureInfo(baseimage.filename, tex);
+                                lock(texture_dict_lock)
+                                {
+                                    if (!texture_dict.ContainsKey(baseimage.filename))
+                                        texture_dict.Add(baseimage.filename, ti);
+                                    baseimage.size.Width = tex.width;
+                                    baseimage.size.Height = tex.height;
+                                }
+                            }
+                        }
+                    }
+                }
+        
+                // If loading failed, create placeholder and mark as missing
+                if (ti == null)
+                {
+                    MarkAsMissing(baseimage.path);
+                    ti = CreateAndStorePlaceholder(baseimage.filename, baseimage);
+                }
+        
+                ProcessLoadingCallbacks(baseimage.filename, ti);
+                yield break;
+            }
     
     /// <summary>
     /// Processes callbacks for loaded textures.
@@ -1280,111 +1032,7 @@ internal static class SpriteManager
         else
         {
             yield return Path.Combine(directory, capFirst);
-            yield return Path.Combine(directory, capWords);
-        }
-    }
-    
-    /// <summary>
-    /// Represents a cached directory structure with all files and subdirectories.
-    /// Enables fast searching without repeated disk I/O.
-    /// </summary>
-    class DirectoryNode
-    {
-        public string FullPath { get; set; }
-        public Dictionary<string, string> Files { get; set; } = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-        public Dictionary<string, DirectoryNode> Subdirectories { get; set; } = new Dictionary<string, DirectoryNode>(StringComparer.OrdinalIgnoreCase);
-        
-        /// <summary>
-        /// Searches for a file in this directory and subdirectories.
-        /// Uses fuzzy matching if exact match fails.
-        /// </summary>
-        public string FindFile(string filename, bool includeSubdirs = true)
-        {
-            // Try exact match first
-            if (Files.TryGetValue(filename, out var exactMatch))
-                return exactMatch;
-            
-            // Try case-insensitive exact match
-            foreach (var kvp in Files)
-            {
-                if (string.Equals(kvp.Key, filename, StringComparison.OrdinalIgnoreCase))
-                    return kvp.Value;
-            }
-            
-            // If not found and subdirs are allowed, search subdirectories
-            if (includeSubdirs)
-            {
-                foreach (var subdir in Subdirectories.Values)
-                {
-                    var found = subdir.FindFile(filename, true);
-                    if (!string.IsNullOrEmpty(found))
-                        return found;
+                        yield return Path.Combine(directory, capWords);
+                    }
                 }
             }
-            
-            // Fuzzy matching as last resort - find similar filename
-            var bestMatch = FindSimilarFile(filename);
-            if (!string.IsNullOrEmpty(bestMatch))
-                return bestMatch;
-            
-            return null;
-        }
-        
-        /// <summary>
-        /// Finds the most similar filename using edit distance.
-        /// Useful for finding files with encoding issues (e.g., Japanese filename corruption).
-        /// </summary>
-        string FindSimilarFile(string target)
-        {
-            string bestMatch = null;
-            int bestDistance = int.MaxValue;
-            
-            // Only search if similarity threshold can be met
-            int threshold = Math.Max(2, target.Length / 2);
-            
-            foreach (var kvp in Files)
-            {
-                int distance = LevenshteinDistance(target, kvp.Key);
-                if (distance < bestDistance && distance <= threshold)
-                {
-                    bestDistance = distance;
-                    bestMatch = kvp.Value;
-                }
-            }
-            
-            return bestMatch;
-        }
-        
-        /// <summary>
-        /// Calculates Levenshtein distance (edit distance) between two strings.
-        /// Used for fuzzy file matching.
-        /// </summary>
-        static int LevenshteinDistance(string a, string b)
-        {
-            if (a.Length == 0) return b.Length;
-            if (b.Length == 0) return a.Length;
-            
-            var d = new int[a.Length + 1, b.Length + 1];
-            
-            for (int i = 0; i <= a.Length; i++)
-                d[i, 0] = i;
-            for (int j = 0; j <= b.Length; j++)
-                d[0, j] = j;
-                
-            for (int i = 1; i <= a.Length; i++)
-            {
-                for (int j = 1; j <= b.Length; j++)
-                {
-                    int cost = (a[i - 1] == b[j - 1]) ? 0 : 1;
-                    d[i, j] = Math.Min(
-                        Math.Min(d[i - 1, j] + 1, d[i, j - 1] + 1),
-                        d[i - 1, j - 1] + cost);
-                }
-            }
-            
-            return d[a.Length, b.Length];
-        }
-    }
-
-
-}
