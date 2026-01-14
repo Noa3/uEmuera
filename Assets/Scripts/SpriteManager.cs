@@ -255,64 +255,11 @@ internal static class SpriteManager
             }
     }
 
-    // Attempts to resolve a full path in a case-insensitive manner by walking each segment.
-    // Useful on case-sensitive file systems or when asset references use inconsistent casing.
+    // File resolution is handled by uEmuera.Utils.ResolvePathInsensitive
+    // This method is kept for backward compatibility but delegates to Utils
     static string ResolvePathCaseInsensitive(string originalPath)
     {
-        if (string.IsNullOrEmpty(originalPath))
-            return null;
-        try
-        {
-            var seps = new[] { Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar };
-            var root = Path.GetPathRoot(originalPath);
-            var relative = string.IsNullOrEmpty(root) ? originalPath : originalPath.Substring(root.Length);
-            var parts = relative.Split(seps, StringSplitOptions.RemoveEmptyEntries);
-
-            string current = string.IsNullOrEmpty(root) ? Directory.GetCurrentDirectory() : root.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
-
-            for (int i = 0; i < parts.Length; i++)
-            {
-                var part = parts[i];
-                bool last = i == parts.Length - 1;
-                if (!Directory.Exists(current))
-                    return null;
-
-                if (!last)
-                {
-                    string matchedDir = null;
-                    var dirs = Directory.GetDirectories(current);
-                    for (int d = 0; d < dirs.Length; d++)
-                    {
-                        var dirName = Path.GetFileName(dirs[d]);
-                        if (string.Equals(dirName, part, StringComparison.OrdinalIgnoreCase))
-                        {
-                            matchedDir = dirs[d];
-                            break;
-                        }
-                    }
-                    if (matchedDir == null)
-                        return null;
-                    current = matchedDir;
-                }
-                else
-                {
-                    // Last segment assumed to be a file
-                    var files = Directory.GetFiles(current);
-                    for (int f = 0; f < files.Length; f++)
-                    {
-                        var fileName = Path.GetFileName(files[f]);
-                        if (string.Equals(fileName, part, StringComparison.OrdinalIgnoreCase))
-                            return files[f];
-                    }
-                    return null;
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            Debug.LogWarning($"SpriteManager: ResolvePathCaseInsensitive failed for '{originalPath}': {ex.GetType().Name}: {ex.Message}");
-        }
-        return null;
+        return uEmuera.Utils.ResolvePathInsensitive(originalPath, expectDirectory: false);
     }
 
     internal class SpriteInfo : IDisposable
@@ -528,6 +475,15 @@ internal static class SpriteManager
         }
         if(ti == null)
         {
+            // IMMEDIATE NON-BLOCKING: Return placeholder immediately so screen can switch
+            // The actual texture will load in background and update later
+            if(callback != null)
+            {
+                var placeholderSprite = CreatePlaceholderSpriteInfo(src.Name);
+                callback(obj, placeholderSprite);
+            }
+            
+            // Queue background loading
             var item = new CallbackInfo(src, obj, callback);
             lock(loading_set_lock)
             {
@@ -708,6 +664,171 @@ internal static class SpriteManager
             kGetColor,
         }
         //Todo: ??????
+    }
+
+    // Preloading support for critical images
+    static readonly List<string> preload_queue_ = new List<string>();
+    static readonly object preload_queue_lock_ = new object();
+    static bool preload_in_progress_ = false;
+
+    /// <summary>
+    /// Adds an image to the preload queue. Images in the preload queue will be loaded
+    /// in the background with higher priority than on-demand loads.
+    /// </summary>
+    /// <param name="imageName">The image name to preload</param>
+    public static void PreloadImage(string imageName)
+    {
+        if (string.IsNullOrEmpty(imageName))
+            return;
+
+        lock (preload_queue_lock_)
+        {
+            if (!preload_queue_.Contains(imageName))
+            {
+                preload_queue_.Add(imageName);
+                
+                // Start preloading coroutine if not already running
+                if (!preload_in_progress_)
+                {
+                    preload_in_progress_ = true;
+                    GenericUtils.StartCoroutine(PreloadCoroutine());
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// Adds multiple images to the preload queue.
+    /// </summary>
+    /// <param name="imageNames">Array of image names to preload</param>
+    public static void PreloadImages(params string[] imageNames)
+    {
+        if (imageNames == null || imageNames.Length == 0)
+            return;
+
+        lock (preload_queue_lock_)
+        {
+            foreach (var name in imageNames)
+            {
+                if (!string.IsNullOrEmpty(name) && !preload_queue_.Contains(name))
+                {
+                    preload_queue_.Add(name);
+                }
+            }
+
+            // Start preloading coroutine if not already running
+            if (!preload_in_progress_ && preload_queue_.Count > 0)
+            {
+                preload_in_progress_ = true;
+                GenericUtils.StartCoroutine(PreloadCoroutine());
+            }
+        }
+    }
+
+    /// <summary>
+    /// Coroutine that processes the preload queue.
+    /// </summary>
+    static IEnumerator PreloadCoroutine()
+    {
+        while (true)
+        {
+            string imageToLoad = null;
+            
+            lock (preload_queue_lock_)
+            {
+                if (preload_queue_.Count > 0)
+                {
+                    imageToLoad = preload_queue_[0];
+                    preload_queue_.RemoveAt(0);
+                }
+                else
+                {
+                    preload_in_progress_ = false;
+                    yield break;
+                }
+            }
+
+            if (!string.IsNullOrEmpty(imageToLoad))
+            {
+                // Try to get the sprite from AppContents
+                var sprite = MinorShift.Emuera.Content.AppContents.GetSprite(imageToLoad);
+                if (sprite != null && sprite.Bitmap != null)
+                {
+                    // Check if already loaded
+                    bool alreadyLoaded = false;
+                    lock (texture_dict_lock)
+                    {
+                        alreadyLoaded = texture_dict.ContainsKey(sprite.Bitmap.filename);
+                    }
+
+                    if (!alreadyLoaded)
+                    {
+                        // Load it synchronously in the preload coroutine
+                        // This ensures preloaded images are ready before needed
+                        yield return Loading(sprite.Bitmap);
+                    }
+                }
+            }
+
+            // Yield to prevent blocking
+            yield return null;
+        }
+    }
+
+    /// <summary>
+    /// Gets cache statistics for debugging and monitoring.
+    /// </summary>
+    public static CacheStats GetCacheStats()
+    {
+        var stats = new CacheStats();
+        
+        lock (texture_dict_lock)
+        {
+            stats.LoadedTexturesCount = texture_dict.Count;
+        }
+        
+        lock (file_index_lock)
+        {
+            stats.IndexedFilesCount = file_index_.Count;
+            stats.FileIndexInitialized = file_index_initialized_;
+        }
+        
+        lock (missing_files_lock)
+        {
+            stats.MissingFilesCachedCount = missing_files_cache_.Count;
+        }
+        
+        lock (loading_set_lock)
+        {
+            stats.LoadingInProgressCount = loading_set.Count;
+        }
+        
+        lock (preload_queue_lock_)
+        {
+            stats.PreloadQueueCount = preload_queue_.Count;
+        }
+        
+        return stats;
+    }
+
+    /// <summary>
+    /// Cache statistics structure.
+    /// </summary>
+    public struct CacheStats
+    {
+        public int LoadedTexturesCount;
+        public int IndexedFilesCount;
+        public bool FileIndexInitialized;
+        public int MissingFilesCachedCount;
+        public int LoadingInProgressCount;
+        public int PreloadQueueCount;
+
+        public override string ToString()
+        {
+            return $"SpriteManager Stats: Loaded={LoadedTexturesCount}, " +
+                   $"Indexed={IndexedFilesCount}, Missing={MissingFilesCachedCount}, " +
+                   $"Loading={LoadingInProgressCount}, Preload={PreloadQueueCount}";
+        }
     }
 
     static IEnumerator Loading(Bitmap baseimage)
@@ -950,6 +1071,11 @@ internal static class SpriteManager
         {
             missing_files_cache_.Clear();
         }
+        lock(preload_queue_lock_)
+        {
+            preload_queue_.Clear();
+            preload_in_progress_ = false;
+        }
         GC.Collect();
     }
     internal static void SetResourceCSVLine(string filename, string[] lines)
@@ -985,54 +1111,4 @@ internal static class SpriteManager
         new Dictionary<string, List<CallbackInfo>>(StringComparer.OrdinalIgnoreCase);
     static Dictionary<string, TextureInfo> texture_dict =
         new Dictionary<string, TextureInfo>(StringComparer.OrdinalIgnoreCase);
-    // Generate mixed-case variants for a filename to improve chances on case-sensitive filesystems.
-    static IEnumerable<string> GenerateFilenameCaseVariants(string directory, string file)
-    {
-        if (string.IsNullOrEmpty(directory) || string.IsNullOrEmpty(file))
-            yield break;
-        var name = Path.GetFileNameWithoutExtension(file);
-        var ext = Path.GetExtension(file);
-        var extNoDot = ext?.TrimStart('.') ?? string.Empty;
-
-        // Base variants
-        yield return Path.Combine(directory, file); // original
-        yield return Path.Combine(directory, file.ToLowerInvariant());
-        yield return Path.Combine(directory, file.ToUpperInvariant());
-
-        // Name variants
-        var capFirst = (name.Length > 0) ? char.ToUpperInvariant(name[0]) + name.Substring(1).ToLowerInvariant() : name;
-        var capWords = name;
-        try
-        {
-            var parts = name.Split(new[] { '_', '-', ' ' }, StringSplitOptions.RemoveEmptyEntries);
-            for (int i = 0; i < parts.Length; i++)
-            {
-                var p = parts[i];
-                if (p.Length > 0)
-                    parts[i] = char.ToUpperInvariant(p[0]) + p.Substring(1).ToLowerInvariant();
-            }
-            capWords = string.Join("_", parts);
-        }
-        catch { }
-
-        // Extension variants
-        var extLower = string.IsNullOrEmpty(ext) ? ext : ext.ToLowerInvariant();
-        var extUpper = string.IsNullOrEmpty(ext) ? ext : ext.ToUpperInvariant();
-
-        // Combine name + extension variants
-        if (!string.IsNullOrEmpty(ext))
-        {
-            yield return Path.Combine(directory, name + extLower);
-            yield return Path.Combine(directory, name + extUpper);
-            yield return Path.Combine(directory, capFirst + extLower);
-            yield return Path.Combine(directory, capFirst + extUpper);
-            yield return Path.Combine(directory, capWords + extLower);
-            yield return Path.Combine(directory, capWords + extUpper);
-        }
-        else
-        {
-            yield return Path.Combine(directory, capFirst);
-                        yield return Path.Combine(directory, capWords);
-                    }
-                }
-            }
+    }

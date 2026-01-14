@@ -36,6 +36,13 @@ public class EmueraImage : EmueraBehaviour
                 SpriteManager.GivebackSpriteInfo(spriteinfo);
                 return;
             }
+            
+            // Give back the old sprite before storing the new one
+            if(this.spriteinfo != null && this.spriteinfo != spriteinfo)
+            {
+                SpriteManager.GivebackSpriteInfo(this.spriteinfo);
+            }
+            
             if(spriteinfo == null)
             {
                 image.sprite = null;
