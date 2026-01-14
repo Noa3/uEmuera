@@ -492,7 +492,12 @@ internal static class SpriteManager
         if(ti == null)
         {
             // IMMEDIATE NON-BLOCKING: Return placeholder immediately so screen can switch
-            // The actual texture will load in background and update later
+            // The actual texture will load in background and update later.
+            // NOTE: The callback will be called TWICE:
+            //   1. Immediately with a placeholder (transparent sprite)
+            //   2. Later when the actual texture loads
+            // This is intentional - SetSprite() handles sprite replacement properly
+            // by releasing the old sprite before storing the new one.
             if(callback != null)
             {
                 var placeholderSprite = CreatePlaceholderSpriteInfo(src.Name);
@@ -734,10 +739,12 @@ internal static class SpriteManager
                 }
             }
 
+#if UNITY_EDITOR || DEBUG
             if (addedCount > 0)
             {
                 Debug.Log($"SpriteManager: Added {addedCount} images to preload queue (total: {preload_queue_.Count})");
             }
+#endif
 
             // Start preloading coroutine if not already running
             if (!preload_in_progress_ && preload_queue_.Count > 0)
@@ -797,15 +804,16 @@ internal static class SpriteManager
 
                     if (!alreadyLoaded)
                     {
-                        // Load it synchronously in the preload coroutine
-                        // This ensures preloaded images are ready before needed
+                        // Start loading in background via coroutine
+                        // The Loading coroutine already handles yielding appropriately
                         yield return Loading(sprite.Bitmap);
                     }
                 }
             }
 
-            // Yield to prevent blocking
-            yield return null;
+            // Yield between items to maintain UI responsiveness
+            // Small delay prevents tight loop when processing many items
+            yield return new WaitForEndOfFrame();
         }
     }
 
