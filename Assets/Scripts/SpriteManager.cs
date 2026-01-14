@@ -255,6 +255,22 @@ internal static class SpriteManager
             }
     }
 
+    /// <summary>
+    /// Normalizes path separators for the current platform.
+    /// Replaces both forward and backward slashes with the platform-specific separator.
+    /// </summary>
+    static string NormalizePathSeparators(string path)
+    {
+        if (string.IsNullOrEmpty(path))
+            return path;
+        
+        // Replace both slash types with platform separator
+        if (Path.DirectorySeparatorChar == '/')
+            return path.Replace('\\', '/');
+        else
+            return path.Replace('/', '\\');
+    }
+
     // File resolution is handled by uEmuera.Utils.ResolvePathInsensitive
     // This method is kept for backward compatibility but delegates to Utils
     static string ResolvePathCaseInsensitive(string originalPath)
@@ -542,8 +558,8 @@ internal static class SpriteManager
         }
         if (string.IsNullOrEmpty(pathToLoad))
         {
-            // Fall back to original path
-            pathToLoad = filename.Replace('/', Path.DirectorySeparatorChar).Replace('\\', Path.DirectorySeparatorChar);
+            // Fall back to original path with normalized separators
+            pathToLoad = NormalizePathSeparators(filename);
             }
         
             if(!File.Exists(pathToLoad))
@@ -708,12 +724,19 @@ internal static class SpriteManager
 
         lock (preload_queue_lock_)
         {
+            int addedCount = 0;
             foreach (var name in imageNames)
             {
                 if (!string.IsNullOrEmpty(name) && !preload_queue_.Contains(name))
                 {
                     preload_queue_.Add(name);
+                    addedCount++;
                 }
+            }
+
+            if (addedCount > 0)
+            {
+                Debug.Log($"SpriteManager: Added {addedCount} images to preload queue (total: {preload_queue_.Count})");
             }
 
             // Start preloading coroutine if not already running
@@ -722,6 +745,17 @@ internal static class SpriteManager
                 preload_in_progress_ = true;
                 GenericUtils.StartCoroutine(PreloadCoroutine());
             }
+        }
+    }
+
+    /// <summary>
+    /// Checks if preloading is currently in progress.
+    /// </summary>
+    public static bool IsPreloadingInProgress()
+    {
+        lock (preload_queue_lock_)
+        {
+            return preload_in_progress_;
         }
     }
 
@@ -834,7 +868,7 @@ internal static class SpriteManager
     static IEnumerator Loading(Bitmap baseimage)
     {
         TextureInfo ti = null;
-        string pathToLoad = baseimage.path.Replace('/', Path.DirectorySeparatorChar).Replace('\\', Path.DirectorySeparatorChar);
+        string pathToLoad = NormalizePathSeparators(baseimage.path);
         
         // Fast path: Check if already known to be missing
         if (IsKnownMissing(pathToLoad))
