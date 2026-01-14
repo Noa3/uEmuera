@@ -93,7 +93,7 @@ LightmapSettings:
     m_ExportTrainingData: 0
     m_TrainingDataDestination: TrainingData
     m_LightProbeSampleCountMultiplier: 4
-  m_LightingDataAsset: {fileID: 112000000, guid: 7d58d290ead951c4897aa09cd5ef7242,
+  m_LightingDataAsset: {fileID: 112000000, guid: ef6a13839eec29f49940020aac64411f,
     type: 2}
   m_LightingSettings: {fileID: 1291147032}
 --- !u!196 &4
@@ -4112,7 +4112,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "\u5973"
+  m_Text: O
 --- !u!114 &114174167155980201
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4237,7 +4237,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "\u4E2D"
+  m_Text: I
 --- !u!114 &114199676580919473
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4588,7 +4588,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "\u7948"
+  m_Text: A
 --- !u!114 &114275538029559441
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4828,6 +4828,7 @@ MonoBehaviour:
   lock_sprite: {fileID: 21300000, guid: a7484effcbd1b5f43a87a4bdeb3e8858, type: 3}
   unlock_sprite: {fileID: 21300000, guid: 0cef0b3c2f1c85c4a81fc3fab71a3454, type: 3}
   inprogress: {fileID: 1264017809562257}
+  loadingStatusText: {fileID: 0}
   quick_buttons: {fileID: 114317806774486241}
   input_pad: {fileID: 114483407246195617}
   scale_pad: {fileID: 114640590970076283}
@@ -5055,7 +5056,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "\u3002"
+  m_Text: N
 --- !u!114 &114349112902554305
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5250,7 +5251,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "\u7977"
+  m_Text: D
 --- !u!114 &114380983400210455
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5808,7 +5809,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "\u5C11"
+  m_Text: L
 --- !u!114 &114497384090715234
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6100,7 +6101,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "\u3002"
+  m_Text: .
 --- !u!114 &114558400022398527
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8616,7 +8617,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "\u3002"
+  m_Text: G
 --- !u!114 &114994368644162869
 MonoBehaviour:
   m_ObjectHideFlags: 0
