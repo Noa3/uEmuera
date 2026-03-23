@@ -144,8 +144,7 @@ This fork applies aggressive build optimizations for all platforms:
 
 If you find uEmuera useful, consider supporting development:
 
-<!-- TODO: Replace YOUR_PAYPAL_USERNAME with your actual PayPal username -->
-[![PayPal](https://img.shields.io/badge/PayPal-Donate-blue?style=for-the-badge&logo=paypal)](https://paypal.me/YOUR_PAYPAL_USERNAME)
+[![PayPal](https://img.shields.io/badge/PayPal-Donate-blue?style=for-the-badge&logo=paypal)](https://www.paypal.com/donate/?hosted_button_id=FL9RQYJGPFLAU)
 
 You can also support via GitHub Sponsors using the **Sponsor** button at the top of this repository.
 
