@@ -1,4 +1,4 @@
-﻿using MinorShift.Emuera.Sub;
+using MinorShift.Emuera.Sub;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -20,6 +20,9 @@ namespace MinorShift.Emuera.Content
 		static readonly Dictionary<string, AContentFile> resourceDic = new Dictionary<string, AContentFile>();
 		static readonly Dictionary<string, ASprite> imageDictionary = new Dictionary<string, ASprite>();
 		static readonly Dictionary<int, GraphicsImage> gList;
+		
+		// Cache for missing image names to avoid repeated log spam and improve performance
+		static readonly HashSet<string> missingImagesLogged_ = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
 		//static public T GetContent<T>(string name)where T :AContentItem
 		//{
@@ -46,17 +49,45 @@ namespace MinorShift.Emuera.Content
 			if (name == null)
 				return null;
             
+            // Trim whitespace to handle cases where image names have leading/trailing spaces
+            name = name.Trim();
+            
+            // Guard against empty strings after trimming
+            if (string.IsNullOrEmpty(name))
+            {
+                // Only log once per session
+                if (!missingImagesLogged_.Contains("__EMPTY__"))
+                {
+                    missingImagesLogged_.Add("__EMPTY__");
+                    UnityEngine.Debug.LogWarning("AppContents.GetSprite: Empty or whitespace-only image name provided");
+                }
+                return null;
+            }
+            
             name = name.ToUpper();
-            ASprite result = null;
-            imageDictionary.TryGetValue(name, out result);
-            return result;
+			ASprite result = null;
+			imageDictionary.TryGetValue(name, out result);
+			
+            // Debug logging only once per missing image (deduplication for performance)
+			if (result == null && !missingImagesLogged_.Contains(name))
+			{
+                         missingImagesLogged_.Add(name);
+                         string displayName = name.Length > 20 ? name.Substring(0, 20) + "..." : name;
+                         UnityEngine.Debug.LogWarning("AppContents.GetSprite: Image '" + displayName + "' not found. Count: " + imageDictionary.Count);
+			}
+			
+			return result;
 		}
 
 		static public void SpriteDispose(string name)
 		{
 			if (name == null)
 				return;
-			name = name.ToUpper();
+            name = name.Trim().ToUpper();
+            
+            // Guard against empty strings after trimming
+            if (string.IsNullOrEmpty(name))
+                return;
 
             ASprite sprite = null;
             if(imageDictionary.TryGetValue(name, out sprite))
@@ -70,7 +101,9 @@ namespace MinorShift.Emuera.Content
 		{
 			if (string.IsNullOrEmpty(imgName))
 				throw new ArgumentOutOfRangeException();
-			imgName = imgName.ToUpper();
+			imgName = imgName.Trim().ToUpper();
+            if (string.IsNullOrEmpty(imgName))
+                throw new ArgumentOutOfRangeException("Image name is empty after trimming");
 			SpriteG newCImg = new SpriteG(imgName, parent, rect);
 			imageDictionary[imgName] = newCImg;
 		}
@@ -79,7 +112,9 @@ namespace MinorShift.Emuera.Content
 		{
 			if (string.IsNullOrEmpty(imgName))
 				throw new ArgumentOutOfRangeException();
-			imgName = imgName.ToUpper();
+			imgName = imgName.Trim().ToUpper();
+            if (string.IsNullOrEmpty(imgName))
+                throw new ArgumentOutOfRangeException("Image name is empty after trimming");
 			SpriteAnime newCImg = new SpriteAnime(imgName, new Size(w, h));
 			imageDictionary[imgName] = newCImg;
 		}
@@ -89,12 +124,18 @@ namespace MinorShift.Emuera.Content
 				return true;
 			try
 			{
+				// Pre-index all image files for fast case-insensitive lookups
+				SpriteManager.InitializeFileIndex(Program.ContentDir);
+				
 				//Search all csv files in the resources folder
 				List<string> csvFiles = new List<string>(Directory.GetFiles(Program.ContentDir, "*.csv", SearchOption.TopDirectoryOnly));
 #if(UNITY_ANDROID || UNITY_IOS) && !UNITY_EDITOR
                 csvFiles.AddRange(Directory.GetFiles(Program.ContentDir, "*.CSV", SearchOption.TopDirectoryOnly));
 #endif
+                UnityEngine.Debug.Log($"AppContents.LoadContents: Found {csvFiles.Count} CSV files in Resources folder");
+                
                 var count = csvFiles.Count;
+                int totalImagesLoaded = 0;
                 for(var i=0; i<count; ++i)
 				{
                     var filepath = csvFiles[i];
@@ -122,7 +163,10 @@ namespace MinorShift.Emuera.Content
 						{
 							currentAnime = item as SpriteAnime;
 							if (!imageDictionary.ContainsKey(item.Name))
+							{
 								imageDictionary.Add(item.Name, item);
+								totalImagesLoaded++;
+							}
 							else
 							{
 								ParserMediator.Warn("A resource with the same name has already been created:" + item.Name, sp, 0);
@@ -131,9 +175,28 @@ namespace MinorShift.Emuera.Content
 						}
 					}
 				}
+				
+				UnityEngine.Debug.Log($"AppContents.LoadContents: Successfully loaded {totalImagesLoaded} images from CSV files");
+				
+                // Auto-discover images from subdirectories (for games like eraMakaiRanch)
+				int autoDiscoveredCount = AutoDiscoverImagesFromSubdirectories(Program.ContentDir);
+				UnityEngine.Debug.Log("AppContents: Total: " + imageDictionary.Count + " (CSV: " + totalImagesLoaded + ", Auto: " + autoDiscoveredCount + ")");
+				
+				// Log first few image names for debugging
+				if (imageDictionary.Count > 0)
+				{
+					UnityEngine.Debug.Log("Sample of loaded images (first 10):");
+					int sampleCount = 0;
+					foreach (var key in imageDictionary.Keys)
+					{
+						UnityEngine.Debug.Log($"  - {key}");
+						if (++sampleCount >= 10) break;
+					}
+				}
 			}
-			catch(Exception )
+			catch(Exception ex)
 			{
+				UnityEngine.Debug.LogError($"AppContents.LoadContents: Exception during loading - {ex.GetType().Name}: {ex.Message}");
 				return false;
 				//throw new CodeEE("An error occurred while loading the resource file");
 			}
@@ -145,8 +208,9 @@ namespace MinorShift.Emuera.Content
             var iter = resourceDic.Values.GetEnumerator();
             while(iter.MoveNext())
 				iter.Current.Dispose();
-			resourceDic.Clear();
+            resourceDic.Clear();
 			imageDictionary.Clear();
+			missingImagesLogged_.Clear();
 			foreach (var graph in gList.Values)
 				graph.GDispose();
 			gList.Clear();
@@ -206,9 +270,12 @@ namespace MinorShift.Emuera.Content
 				ParserMediator.Warn("Second argument has no file extension:" + arg2Original, sp, 1);
 				return null;
 			}
-			// Use original casing for file path, but uppercase for dictionary key
-			string parentNameKey = dir + arg2;
-			string parentNamePath = dir + arg2Original;
+            // Use original casing for file path, but uppercase for dictionary key
+			// Normalize path separators for cross-platform compatibility
+			string normalizedArg2 = arg2.Replace('\\', '/');
+			string normalizedArg2Original = arg2Original.Replace('\\', '/');
+			string parentNameKey = dir + normalizedArg2;
+			string parentNamePath = dir + normalizedArg2Original;
 
 			//Load parent image ConstImage
 			if (!resourceDic.ContainsKey(parentNameKey))
@@ -318,11 +385,109 @@ namespace MinorShift.Emuera.Content
 			}
 
 			//New sprite definition
-			ASprite image = new SpriteF(name, parentImage, rect, pos);
+            ASprite image = new SpriteF(name, parentImage, rect, pos);
 			return image;
+			}
+
+			/// <summary>
+			/// Supported image extensions for auto-discovery.
+			/// </summary>
+			static readonly string[] AutoDiscoveryExtensions = { ".png", ".jpg", ".jpeg", ".bmp", ".gif", ".webp" };
+
+			/// <summary>
+			/// Auto-discovers and registers images from subdirectories that are not explicitly listed in CSV files.
+			/// This enables eraMakaiRanch-style games where images are organized by folder naming convention.
+			/// Images are registered using their filename (without extension) as the key, uppercased.
+			/// </summary>
+			/// <param name="contentDir">The root resources directory to scan</param>
+			/// <returns>Number of newly registered images</returns>
+			internal static int AutoDiscoverImagesFromSubdirectories(string contentDir)
+			{
+			if (!Directory.Exists(contentDir))
+				return 0;
+
+			int newImagesCount = 0;
+
+			try
+			{
+				// Get all subdirectories
+				var subdirs = Directory.GetDirectories(contentDir, "*", SearchOption.AllDirectories);
+				
+				foreach (var subdir in subdirs)
+				{
+				foreach (var ext in AutoDiscoveryExtensions)
+				{
+				try
+				{
+				var files = Directory.GetFiles(subdir, "*" + ext, SearchOption.TopDirectoryOnly);
+				foreach (var filePath in files)
+				{
+					// Get filename without extension as the image name (uppercase)
+					var fileName = Path.GetFileNameWithoutExtension(filePath);
+					if (string.IsNullOrEmpty(fileName))
+					continue;
+
+					var imageName = fileName.Trim().ToUpper();
+					if (string.IsNullOrEmpty(imageName))
+					continue;
+
+					// Skip if already registered (CSV takes priority)
+					if (imageDictionary.ContainsKey(imageName))
+					continue;
+
+					// Create ConstImage and sprite for this file
+					try
+					{
+					var bmp = new uEmuera.Drawing.Bitmap(filePath);
+					bmp.name = imageName;
+
+					// Use full path as key for resource dictionary
+					string resourceKey = filePath.ToUpper();
+									
+					ConstImage img = new ConstImage(resourceKey);
+					img.CreateFrom(bmp, Config.TextDrawingMode == TextDrawingMode.WINAPI);
+									
+					if (!img.IsCreated)
+					{
+					continue;
+					}
+
+					// Don't add to resourceDic if already exists
+					if (!resourceDic.ContainsKey(resourceKey))
+					{
+					resourceDic.Add(resourceKey, img);
+					}
+
+                    // Create sprite covering entire image
+					// Use 0,0 size as marker - SpriteManager will use full texture dimensions
+					var rect = new uEmuera.Drawing.Rectangle(0, 0, 0, 0);
+					var pos = new uEmuera.Drawing.Point(0, 0);
+									
+					ASprite sprite = new SpriteF(imageName, img, rect, pos);
+					imageDictionary.Add(imageName, sprite);
+					newImagesCount++;
+					}
+					catch (Exception ex)
+					{
+					UnityEngine.Debug.LogWarning("AppContents: Failed to auto-register image '" + fileName + "': " + ex.Message);
+					}
+				}
+				}
+				catch { }
+				}
+				}
+
+				if (newImagesCount > 0)
+				{
+				UnityEngine.Debug.Log("AppContents: Auto-discovered " + newImagesCount + " images from subdirectories");
+				}
+			}
+			catch (Exception ex)
+			{
+				UnityEngine.Debug.LogError("AppContents: Error during auto-discovery: " + ex.Message);
+			}
+
+		return newImagesCount;
 		}
-
-
-
 	}
 }

@@ -97,6 +97,9 @@ public class FirstWindow : MonoBehaviour
 
         GenericUtils.FindChildByName<Text>(gameObject, "version")
             .text = Application.version + " ";
+        
+        // Apply dark theme styling
+        ApplyDarkTheme();
 
         GetList(Application.persistentDataPath);
         setting_.SetActive(true);
@@ -106,16 +109,33 @@ public class FirstWindow : MonoBehaviour
         if(!string.IsNullOrEmpty(main_entry.era_path))
             GetList(main_entry.era_path);
         // In editor, also allow standalone directory logic for testing
-        InitStandaloneDirectory();
+        // Only show dialog if no valid custom directory is set
+        string customDir = PlayerPrefs.GetString(CUSTOM_DIR_KEY, "");
+        if(string.IsNullOrEmpty(customDir) || !uEmuera.Utils.DirectoryExistsInsensitive(customDir))
+        {
+            InitStandaloneDirectory();
+        }
 #endif
 #if UNITY_ANDROID && !UNITY_EDITOR
         // Android: Check and request storage permissions before accessing external storage
         GenericUtils.StartCoroutine(InitAndroidStorage());
 #endif
 #if UNITY_STANDALONE && !UNITY_EDITOR
-        // Standalone (Windows, Linux, macOS): Allow custom directory selection
-        GetList(Path.GetFullPath(Application.dataPath + "/.."));
-        InitStandaloneDirectory();
+        // Standalone (Windows, Linux, macOS): Prioritize custom directory from PlayerPrefs if set
+        string customDir = PlayerPrefs.GetString(CUSTOM_DIR_KEY, "");
+        
+        if(!string.IsNullOrEmpty(customDir) && uEmuera.Utils.DirectoryExistsInsensitive(customDir))
+        {
+            // Custom directory exists - use only this directory
+            var normalized = uEmuera.Utils.NormalizeExistingDirectoryPath(customDir);
+            GetList(normalized);
+        }
+        else
+        {
+            // No valid custom directory - use default path and show dialog
+            GetList(Path.GetFullPath(Application.dataPath + "/.."));
+            InitStandaloneDirectory();
+        }
 #endif
     }
     
@@ -242,25 +262,13 @@ public class FirstWindow : MonoBehaviour
     
     /// <summary>
     /// Initializes the directory system for standalone platforms.
-    /// Loads custom directory if valid, otherwise shows the directory selection dialog.
+    /// Shows the directory selection dialog for manual selection.
+    /// (Auto-initialization now handled in Start method)
     /// </summary>
     void InitStandaloneDirectory()
     {
-        string customDir = PlayerPrefs.GetString(CUSTOM_DIR_KEY, "");
-        
-        // Check if we have a valid custom directory (case-insensitive on Unix/mac)
-        if(!string.IsNullOrEmpty(customDir) && uEmuera.Utils.DirectoryExistsInsensitive(customDir))
-        {
-            // Normalize to actual casing if possible
-            customDir = uEmuera.Utils.NormalizeExistingDirectoryPath(customDir);
-            GetList(customDir);
-        }
-        else
-        {
-            // No valid directory set, show the directory selection dialog automatically
-            // Use a small delay to ensure UI is ready
-            GenericUtils.StartCoroutine(ShowDirectoryDialogDelayed());
-        }
+        // Show the directory selection dialog
+        GenericUtils.StartCoroutine(ShowDirectoryDialogDelayed());
     }
     
     /// <summary>
@@ -345,6 +353,43 @@ public class FirstWindow : MonoBehaviour
     {
         var ow = EmueraContent.instance.option_window;
         ow.ShowMenu();
+    }
+    
+    /// <summary>
+    /// Applies dark theme styling to the FirstWindow UI.
+    /// </summary>
+    void ApplyDarkTheme()
+    {
+        // Apply dark theme to the entire window
+        UIStyleManager.ApplyDarkTheme(gameObject);
+        
+        // Specifically style the title bar
+        if (titlebar != null)
+        {
+            titlebar.color = UIStyleManager.DarkTheme.TextPrimary;
+            UIStyleManager.AddTextShadow(titlebar);
+        }
+        
+        // Style the version text
+        var versionText = GenericUtils.FindChildByName<Text>(gameObject, "version");
+        if (versionText != null)
+        {
+            versionText.color = UIStyleManager.DarkTheme.TextSecondary;
+        }
+        
+        // Style the scroll view background
+        var scrollBg = GenericUtils.FindChildByName<UnityEngine.UI.Image>(gameObject, "ScrollRect");
+        if (scrollBg != null)
+        {
+            scrollBg.color = UIStyleManager.DarkTheme.BackgroundDark;
+        }
+        
+        // Style the main background
+        var mainBg = GetComponent<UnityEngine.UI.Image>();
+        if (mainBg != null)
+        {
+            mainBg.color = UIStyleManager.DarkTheme.BackgroundMedium;
+        }
     }
 
     /// <summary>

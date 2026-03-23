@@ -1,9 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using MinorShift.Emuera;
 
-public class EmueraLine : EmueraBehaviour
+public class EmueraLine : EmueraBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
     void Awake()
     {
@@ -50,25 +51,48 @@ public class EmueraLine : EmueraBehaviour
     UnityEngine.UI.ContentSizeFitter size_fitter_ = null;
     GenericUtils.PointerClickListener click_handler_ = null;
 
-#if UNITY_STANDALONE
-    public UnityEngine.UI.Button button
+    // Store the original color for reverting when pointer exits
+    Color original_color_;
+    bool is_hovering_ = false;
+
+    /// <summary>
+    /// Called when pointer enters the button text area - implements hover highlighting
+    /// </summary>
+    public void OnPointerEnter(PointerEventData eventData)
     {
-        get
+        if (unit_desc == null || !unit_desc.isbutton)
+            return;
+        if (unit_desc.generation < EmueraContent.instance.button_generation)
+            return;
+
+        is_hovering_ = true;
+        original_color_ = text.color;
+        text.color = Config.FocusColor.ToUnityColor();
+        
+        // Notify on-demand render manager to render the highlight
+        if (OnDemandRenderManager.instance != null)
         {
-            if (button_ == null)
-            {
-                button_ = GetComponent<UnityEngine.UI.Button>();
-                if (button_ == null)
-                    button_ = gameObject.AddComponent<UnityEngine.UI.Button>();
-                var colors = button_.colors;
-                colors.highlightedColor = Config.FocusColor.ToUnityColor();
-                button_.colors = colors;
-            }
-            return button_;
+            OnDemandRenderManager.instance.SetContentDirty();
         }
     }
-    UnityEngine.UI.Button button_ = null;
-#endif
+
+    /// <summary>
+    /// Called when pointer exits the button text area - removes hover highlighting
+    /// </summary>
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        if (!is_hovering_)
+            return;
+
+        is_hovering_ = false;
+        text.color = original_color_;
+        
+        // Notify on-demand render manager to render the change
+        if (OnDemandRenderManager.instance != null)
+        {
+            OnDemandRenderManager.instance.SetContentDirty();
+        }
+    }
 
     /// <summary>
     /// 更新内容
@@ -82,15 +106,13 @@ public class EmueraLine : EmueraBehaviour
         //if((int)text.alignment > 0)
         //    ud.posx = 0;
         text.color = ud.color;
+        original_color_ = ud.color; // Store original color
         text.supportRichText = ud.richedit;
 
         if(ud.isbutton && ud.generation >= EmueraContent.instance.button_generation)
         {
             click_handler_.enabled = true;
             text.raycastTarget = true;
-#if UNITY_STANDALONE
-            button.enabled = true;
-#endif
 #if UNITY_EDITOR
             code = ud.code;
             generation = ud.generation;
@@ -100,9 +122,12 @@ public class EmueraLine : EmueraBehaviour
         {
             click_handler_.enabled = false;
             text.raycastTarget = false;
-#if UNITY_STANDALONE
-            button.enabled = false;
-#endif
+            // Clear hover state when button is disabled
+            if (is_hovering_)
+            {
+                is_hovering_ = false;
+                text.color = ud.color;
+            }
         }
 
         var font = FontUtils.default_font;
@@ -189,6 +214,7 @@ public class EmueraLine : EmueraBehaviour
         line_desc = null;
         UnitIdx = -1;
         text.text = "";
+        is_hovering_ = false;
         if(underline_ != null)
             underline_.gameObject.SetActive(false);
         if(strickout_ != null)

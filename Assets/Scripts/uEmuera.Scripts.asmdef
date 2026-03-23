@@ -4,7 +4,13 @@
     "references": [
         "WebP",
         "Unity.Localization",
-        "Unity.ResourceManager"
+        "Unity.ResourceManager",
+        "Unity.Mathematics",
+        "Unity.Collections",
+        "Unity.Burst",
+        "Unity.Jobs",
+        "Unity.Postprocessing.Runtime",
+        "Unity.2D.PixelPerfect"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

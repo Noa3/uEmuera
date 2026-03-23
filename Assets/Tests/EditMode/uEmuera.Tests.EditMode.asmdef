@@ -4,7 +4,9 @@
     "references": [
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner",
-        "uEmuera.Scripts"
+        "uEmuera.Scripts",
+        "Unity.Mathematics",
+        "Unity.Burst"
     ],
     "includePlatforms": [
         "Editor"

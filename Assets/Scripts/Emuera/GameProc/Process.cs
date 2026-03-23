@@ -59,6 +59,7 @@ namespace MinorShift.Emuera.GameProc
             initialiing = true;
             try
             {
+				GenericUtils.SetLoadingStatus("Initializing...");
 				ParserMediator.Initialize(console);
 				//Error handling for config files (config files are loaded before entering this function)
 				if (ParserMediator.HasWarning)
@@ -72,6 +73,7 @@ namespace MinorShift.Emuera.GameProc
 					}
 				}
 				//Load resources folder
+				GenericUtils.SetLoadingStatus("Loading resources...");
 				if (!Content.AppContents.LoadContents())
 				{
 					ParserMediator.FlushWarningList();
@@ -87,6 +89,7 @@ namespace MinorShift.Emuera.GameProc
                     {
                         if (Config.DisplayReport)
 							console.PrintSystemLine(GameMessages.LoadingMacroTxt);
+						GenericUtils.SetLoadingStatus("Loading macro.txt...");
                         KeyMacro.LoadMacroFile(macroPath);
                     }
 				}
@@ -98,6 +101,7 @@ namespace MinorShift.Emuera.GameProc
 					{
 						if (Config.DisplayReport)
 							console.PrintSystemLine(GameMessages.LoadingReplaceCsv);
+						GenericUtils.SetLoadingStatus("Loading _Replace.csv...");
 						ConfigData.Instance.LoadReplaceFile(replacePath);
 						if (ParserMediator.HasWarning)
 						{
@@ -123,6 +127,7 @@ namespace MinorShift.Emuera.GameProc
                     {
                         if (Config.DisplayReport || Program.AnalysisMode)
 							console.PrintSystemLine(GameMessages.LoadingRenameCsv);
+						GenericUtils.SetLoadingStatus("Loading _Rename.csv...");
 						ParserMediator.LoadEraExRenameFile(renamePath);
                     }
                     else
@@ -134,6 +139,7 @@ namespace MinorShift.Emuera.GameProc
                     console.RefreshStrings(true);
 				}
 				//Load gamebase.csv
+				GenericUtils.SetLoadingStatus("Loading GAMEBASE.CSV...");
 				gamebase = new GameBase();
                 if (!gamebase.LoadGameBaseCsv(Program.CsvDir + "GAMEBASE.CSV"))
                 {
@@ -145,6 +151,7 @@ namespace MinorShift.Emuera.GameProc
 				GlobalStatic.GameBaseData = gamebase;
 
 				//Load all csv files except the above
+				GenericUtils.SetLoadingStatus("Loading CSV files...");
 				ConstantData constant = new ConstantData();
 				constant.LoadData(Program.CsvDir, console, Config.DisplayReport);
 				GlobalStatic.ConstantData = constant;
@@ -156,6 +163,10 @@ namespace MinorShift.Emuera.GameProc
 				idDic = new IdentifierDictionary(vEvaluator.VariableData);
 				GlobalStatic.IdentifierDictionary = idDic;
 
+				// Initialize predefined constants before loading ERH files
+				// These constants are commonly expected by ERA game variants
+				idDic.InitializePredefinedConstants();
+
 				StrForm.Initialize();
 				VariableParser.Initialize();
 
@@ -166,9 +177,12 @@ namespace MinorShift.Emuera.GameProc
 				GlobalStatic.LabelDictionary = labelDic;
 				HeaderFileLoader hLoader = new HeaderFileLoader(console, idDic, this);
 
+				// Keep UseMacro disabled during ERH loading to avoid conflicts
+				// Macros will be expanded during DIM line processing in analyzeSharpDimLines
 				LexicalAnalyzer.UseMacro = false;
 
 				//Load ERH
+				GenericUtils.SetLoadingStatus("Loading ERH files...");
 				if (!hLoader.LoadHeaderFiles(Program.ErbDir, Config.DisplayReport))
 				{
 					ParserMediator.FlushWarningList();
@@ -181,11 +195,13 @@ namespace MinorShift.Emuera.GameProc
 				LoadUserDefinedVariablesFromCsv(Program.CsvDir, console, Config.DisplayReport);
 
 				//Load ERB
+				GenericUtils.SetLoadingStatus("Loading ERB files...");
 				ErbLoader loader = new ErbLoader(console, exm, this);
                 if (Program.AnalysisMode)
                     noError = loader.loadErbs(Program.AnalysisFiles, labelDic);
                 else
                     noError = loader.LoadErbFiles(Program.ErbDir, Config.DisplayReport, labelDic);
+				GenericUtils.SetLoadingStatus("Initializing game...");
                 initSystemProcess();
                 initialiing = false;
             }
@@ -525,25 +541,47 @@ namespace MinorShift.Emuera.GameProc
 		}
 
 		public string getRawTextFormFilewithLine(ScriptPosition position)
-        {
-			string extents = position.Filename.Substring(position.Filename.Length - 4).ToLower();
-			if (extents == ".erb")
+    {
+		string extents = position.Filename.Substring(position.Filename.Length - 4).ToLower();
+		if (extents == ".erb")
+		{
+			string path = uEmuera.Utils.ResolveExistingFilePath(Program.ErbDir + position.Filename);
+			if (string.IsNullOrEmpty(path))
 			{
-				string path = uEmuera.Utils.ResolveExistingFilePath(Program.ErbDir + position.Filename);
-				if (string.IsNullOrEmpty(path))
-					return "";
-				return position.LineNo > 0 ? File.ReadLines(path, Config.Encode).Skip(position.LineNo - 1).First() : "";
-			}
-			else if (extents == ".csv")
-			{
-				string path = uEmuera.Utils.ResolveExistingFilePath(Program.CsvDir + position.Filename);
-				if (string.IsNullOrEmpty(path))
-					return "";
-				return position.LineNo > 0 ? File.ReadLines(path, Config.Encode).Skip(position.LineNo - 1).First() : "";
-			}
-			else
+				UnityEngine.Debug.LogWarning($"File not found: {Program.ErbDir + position.Filename}");
 				return "";
+			}
+			try
+			{
+				return position.LineNo > 0 ? File.ReadLines(path, Config.Encode).Skip(position.LineNo - 1).First() : "";
+			}
+			catch (System.Exception ex)
+			{
+				UnityEngine.Debug.LogWarning($"Error reading file {path}: {ex.Message}");
+				return "";
+			}
 		}
+		else if (extents == ".csv")
+		{
+			string path = uEmuera.Utils.ResolveExistingFilePath(Program.CsvDir + position.Filename);
+			if (string.IsNullOrEmpty(path))
+			{
+				UnityEngine.Debug.LogWarning($"File not found: {Program.CsvDir + position.Filename}");
+				return "";
+			}
+			try
+			{
+				return position.LineNo > 0 ? File.ReadLines(path, Config.Encode).Skip(position.LineNo - 1).First() : "";
+			}
+			catch (System.Exception ex)
+			{
+				UnityEngine.Debug.LogWarning($"Error reading file {path}: {ex.Message}");
+				return "";
+			}
+		}
+		else
+			return "";
+	}
 
 		/// <summary>
 		/// Loads CSV data for user-defined variables.

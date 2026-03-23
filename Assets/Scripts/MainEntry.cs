@@ -19,6 +19,12 @@ public class MainEntry : MonoBehaviour
         
         // Initialize on-demand rendering manager
         InitializeOnDemandRendering();
+        
+        // Initialize pixel perfect camera for crisp rendering
+        InitializePixelPerfect();
+        
+        // Initialize post-processing manager
+        InitializePostProcessing();
     }
     
     /// <summary>
@@ -54,6 +60,36 @@ public class MainEntry : MonoBehaviour
             var renderManagerObj = new GameObject("OnDemandRenderManager");
             renderManagerObj.AddComponent<OnDemandRenderManager>();
             DontDestroyOnLoad(renderManagerObj);
+        }
+    }
+    
+    /// <summary>
+    /// Initializes the pixel perfect camera system.
+    /// Creates the PixelPerfectManager if it doesn't exist.
+    /// </summary>
+    void InitializePixelPerfect()
+    {
+        if (PixelPerfectManager.instance == null)
+        {
+            var ppManagerObj = new GameObject("PixelPerfectManager");
+            var ppManager = ppManagerObj.AddComponent<PixelPerfectManager>();
+            ppManager.targetCamera = Camera.main;
+            DontDestroyOnLoad(ppManagerObj);
+        }
+    }
+    
+    /// <summary>
+    /// Initializes the post-processing system.
+    /// Creates the PostProcessingManager if it doesn't exist.
+    /// </summary>
+    void InitializePostProcessing()
+    {
+        if (PostProcessingManager.instance == null)
+        {
+            var ppManagerObj = new GameObject("PostProcessingManager");
+            var ppManager = ppManagerObj.AddComponent<PostProcessingManager>();
+            ppManager.targetCamera = Camera.main;
+            DontDestroyOnLoad(ppManagerObj);
         }
     }
 

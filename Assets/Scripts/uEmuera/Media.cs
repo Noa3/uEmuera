@@ -4,14 +4,14 @@
     {
         public static void Play()
         {
-            uEmuera.Logger.Info("uEmuera.Media.SystemSounds.Hand.Play");
+            // System sound - no audio playback in Unity
         }
     }
     public static class Asterisk
     {
         public static void Play()
         {
-            uEmuera.Logger.Info("uEmuera.Media.SystemSounds.Asterisk.Play");
+            // System sound - no audio playback in Unity
         }
     }
 }

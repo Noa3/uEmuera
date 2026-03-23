@@ -37,6 +37,11 @@ namespace MinorShift.Emuera.GameProc
 
 		public static UserDefinedVariableData Create(WordCollection wc, bool dims, bool isPrivate, ScriptPosition sc)
 		{
+			// NOTE: We must NOT expand macros on the variable name itself!
+			// For example, "#DIM CONST MAX_CHARA_NUM = 3000" must keep MAX_CHARA_NUM as the variable name.
+			// However, macros SHOULD be expanded for size specifications like "#DIM MY_ARRAY, MAX_CHARA_NUM".
+			// We handle this by deferring macro expansion until after we extract the variable name.
+			
 			string dimtype = dims ? "#DIM" : "#DIMS";
 			UserDefinedVariableData ret = new UserDefinedVariableData();
 			ret.TypeIsStr = dims;
@@ -45,14 +50,14 @@ namespace MinorShift.Emuera.GameProc
 			bool staticDefined = false;
 			ret.Const = false;
 			string keyword = dimtype;
-			//List<string> keywords;
+			
+			// First pass: extract keywords and variable name WITHOUT macro expansion
 			while (!wc.EOL && (idw = wc.Current as IdentifierWord) != null)
 			{
 				wc.ShiftNext();
 				keyword = idw.Code;
 				if (Config.ICVariable)
 					keyword = keyword.ToUpper();
-				//TODO ifの数があたまわるい なんとかしたい
 				switch (keyword)
 				{
 					case "CONST":
@@ -71,9 +76,6 @@ namespace MinorShift.Emuera.GameProc
 						ret.Const = true;
 						break;
 					case "REF":
-						//throw new CodeEE("未実装の機能です", sc);
-						//if (!isPrivate)
-						//	throw new CodeEE("広域変数の宣言に" + keyword + "キーワードは指定できません", sc);
 						if (staticDefined && ret.Static)
 							throw new CodeEE(keyword + "とSTATICキーワードは同時に指定できません", sc);
 						if (ret.CharaData)
@@ -176,7 +178,44 @@ namespace MinorShift.Emuera.GameProc
 			}
 		whilebreak:
 			if (ret.Name == null)
+			{
+				string contextMsg = (sc != null) ? $" at {sc.Filename}:{sc.LineNo}" : "";
+				UnityEngine.Debug.LogError($"[UserDefinedVariable] CONST parsing error: No valid variable name after '{keyword}'{contextMsg}");
 				throw new CodeEE(keyword + "の後に有効な変数名が指定されていません", sc);
+			}
+			
+			// Now that we have the variable name, expand macros for the remaining tokens (size specifications)
+			// This ensures the variable name is NOT replaced by a macro, but size specs can use macros
+			if (LexicalAnalyzer.UseMacro && !wc.EOL)
+			{
+				// Create a new WordCollection with just the remaining tokens and expand macros
+				int currentPos = wc.Pointer;
+				WordCollection remaining = new WordCollection();
+				while (!wc.EOL)
+				{
+					remaining.Add(wc.Current);
+					wc.ShiftNext();
+				}
+				remaining.Pointer = 0;
+				remaining = LexicalAnalyzer.ExpandMacroPublic(remaining);
+				remaining.Pointer = 0;
+				
+				// Replace the remaining tokens in wc with expanded ones
+				wc.Pointer = currentPos;
+				// Clear remaining items and add expanded ones
+				while (wc.Collection.Count > currentPos)
+				{
+					wc.Collection.RemoveAt(wc.Collection.Count - 1);
+				}
+				remaining.Pointer = 0;
+				while (!remaining.EOL)
+				{
+					wc.Collection.Add(remaining.Current);
+					remaining.ShiftNext();
+				}
+				wc.Pointer = currentPos;
+			}
+			
 			string errMes = "";
 			int errLevel = -1;
 			if (isPrivate)

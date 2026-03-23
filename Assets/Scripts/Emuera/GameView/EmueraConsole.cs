@@ -418,9 +418,9 @@ namespace MinorShift.Emuera.GameView
 					return selectingButton.Inputs;
 				if (state != ConsoleState.WaitInput)
 					return null;
-				if (inputReq.InputType == InputType.IntValue && (selectingButton.IsInteger))
+				if ((inputReq.InputType == InputType.IntValue || inputReq.InputType == InputType.BIntValue) && (selectingButton.IsInteger))
 					return selectingButton.Input.ToString();
-				if (inputReq.InputType == InputType.StrValue)
+				if (inputReq.InputType == InputType.StrValue || inputReq.InputType == InputType.BStrValue)
 					return selectingButton.Inputs;
 				return null;
 			}
@@ -498,7 +498,7 @@ namespace MinorShift.Emuera.GameView
                 updatedGeneration = false;
             lastInputLine = emuera.getCurrentLine;
 			//????????????????INPUT????????INPUTS????????????
-			if (inputReq.InputType == InputType.IntValue)
+			if (inputReq.InputType == InputType.IntValue || inputReq.InputType == InputType.BIntValue)
 			{
 				if (lastButtonGeneration == newButtonGeneration)
 					unchecked { newButtonGeneration++; }
@@ -506,7 +506,7 @@ namespace MinorShift.Emuera.GameView
 					lastButtonGeneration = newButtonGeneration;
 				lastButtonIsInput = true;
 			}
-			if (inputReq.InputType == InputType.StrValue)
+			if (inputReq.InputType == InputType.StrValue || inputReq.InputType == InputType.BStrValue)
 			{
 				if (lastButtonGeneration == newButtonGeneration)
 					unchecked { newButtonGeneration++; }
@@ -813,19 +813,24 @@ namespace MinorShift.Emuera.GameView
 				switch (inputReq.InputType)
 				{
 					case InputType.IntValue:
+					case InputType.BIntValue:  // Button-only integer input - same handling as IntValue
 						if (string.IsNullOrEmpty(str) && inputReq.HasDefValue && !IsRunningTimer)
 						{
 							inputValue = inputReq.DefIntValue;
 							str = inputValue.ToString();
 						}
 						else if (!Int64.TryParse(str, out inputValue))
+						{
+							UnityEngine.Debug.LogWarning($"[EmueraConsole.doInputToEmueraProgram] Failed to parse integer input: '{str}', InputType={inputReq.InputType}");
 							return false;
+						}
 						if (inputReq.IsSystemInput)
 							emuera.InputSystemInteger(inputValue);
 						else
 							emuera.InputInteger(inputValue);
 						break;
 					case InputType.StrValue:
+					case InputType.BStrValue:  // Button-only string input - same handling as StrValue
 						if (string.IsNullOrEmpty(str) && inputReq.HasDefValue && !IsRunningTimer)
 							str = inputReq.DefStrValue;
 						//????????
@@ -922,14 +927,19 @@ namespace MinorShift.Emuera.GameView
 		{
 			MesSkip = keySkip;
 			if ((state == ConsoleState.Running) || (state == ConsoleState.Initializing))
+			{
+				UnityEngine.Debug.LogWarning($"[EmueraConsole.PressEnterKey] Ignored - state is {state} (Running or Initializing), input='{str}'");
 				return;
+			}
 			else if ((state == ConsoleState.Quit))
 			{
+				UnityEngine.Debug.Log($"[EmueraConsole.PressEnterKey] state=Quit, closing window");
 				window.Close();
 				return;
 			}
 			else if (state == ConsoleState.Error)
 			{
+				UnityEngine.Debug.Log($"[EmueraConsole.PressEnterKey] state=Error, input='{str}'");
 				if (str == ErrorButtonsText && selectingButton != null && selectingButton.ErrPos != null)
 				{
 					openErrorFile(selectingButton.ErrPos);
@@ -944,8 +954,12 @@ namespace MinorShift.Emuera.GameView
 #else
 			// Guard against null inputReq in production builds
 			if (state != ConsoleState.WaitInput || inputReq == null)
+			{
+				UnityEngine.Debug.LogWarning($"[EmueraConsole.PressEnterKey] Ignored - state={state}, inputReq={inputReq != null}, input='{str}'");
 				return;
+			}
 #endif
+			UnityEngine.Debug.Log($"[EmueraConsole.PressEnterKey] Processing input='{str}', state={state}, InputType={inputReq?.InputType}, OneInput={inputReq?.OneInput}, NeedValue={inputReq?.NeedValue}");
 			KillMacro = false;
 			try
 			{
@@ -956,18 +970,25 @@ namespace MinorShift.Emuera.GameView
 				{
 					// Additional null check guard - inputReq might become null between checks
 					if (inputReq == null)
+					{
+						UnityEngine.Debug.LogWarning($"[EmueraConsole.PressEnterKey] inputReq became null during processing, aborting. input='{str}'");
 						return;
+					}
 					
 					var req = inputReq;
 					if (req == null) return;
 					
 					if (str.StartsWith("@") && !req.OneInput)
 					{
+						UnityEngine.Debug.Log($"[EmueraConsole.PressEnterKey] System command detected: '{str}'");
 						doSystemCommand(str);
 						return;
 					}
 					if (inputReq.InputType == InputType.Void)
+					{
+						UnityEngine.Debug.LogWarning($"[EmueraConsole.PressEnterKey] InputType is Void, ignoring input='{str}'");
 						return;
+					}
 					if (timer.Enabled &&
 						(inputReq.InputType == InputType.AnyKey || inputReq.InputType == InputType.EnterKey))
 						stopTimer();
@@ -993,9 +1014,11 @@ namespace MinorShift.Emuera.GameView
 					//????????????????????????????????????????
 					if (inputReq.InputType == InputType.Void)
 					{
+						UnityEngine.Debug.Log($"[EmueraConsole.PressEnterKey] InputType became Void during loop, using empty input");
 						i--;
 						inputs = "";
 					}
+					UnityEngine.Debug.Log($"[EmueraConsole.PressEnterKey] Calling callEmueraProgram with inputs='{inputs}' (iteration {i+1}/{text.Length})");
 					callEmueraProgram(inputs);
 					RefreshStrings(false);
 					while (MesSkip && state == ConsoleState.WaitInput)
@@ -1015,7 +1038,10 @@ namespace MinorShift.Emuera.GameView
 					}
 					MesSkip = false;
 					if (state != ConsoleState.WaitInput)
+					{
+						UnityEngine.Debug.Log($"[EmueraConsole.PressEnterKey] State changed to {state}, exiting loop");
 						break;
+					}
 					//?????????????????????????????????
 					//Application.DoEvents();
 #if UEMUERA_DEBUG
@@ -1170,7 +1196,7 @@ namespace MinorShift.Emuera.GameView
 		bool runningERBfromMemory = false;
 		/// <summary>
 		/// ??????????Debug??????????????????????????
-		/// *.ERB???????????????????
+		/// *.ERB????????????????????
 		/// 1750 IsDebug????
 		/// </summary>
 		public bool RunERBFromMemory { get { return runningERBfromMemory; } set { runningERBfromMemory = value; } }
@@ -1242,7 +1268,7 @@ namespace MinorShift.Emuera.GameView
 		}
 		#endregion
 
-		#region ???
+		#region ????
 		uint lastUpdate = 0;
 		uint msPerFrame = 1000 / 60;//60FPS
 		ConsoleRedraw redraw = ConsoleRedraw.Normal;
