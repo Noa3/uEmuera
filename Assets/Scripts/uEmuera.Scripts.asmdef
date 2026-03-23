@@ -9,8 +9,8 @@
         "Unity.Collections",
         "Unity.Burst",
         "Unity.Jobs",
-        "Unity.Postprocessing",
-        "Unity.2D.Pixel-Perfect"
+        "Unity.Postprocessing.Runtime",
+        "Unity.2D.PixelPerfect"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

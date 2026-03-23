@@ -87,14 +87,15 @@ namespace uEmuera.Tests.PlayMode
             // Should either be preloading or finished (both are valid)
             bool afterPreload = SpriteManager.IsPreloadingInProgress();
             
-            // Wait a bit for processing
+            // Wait for processing to complete
             yield return new WaitForSeconds(0.5f);
             
-            // Eventually should finish
+            // After the wait, preloading should have finished (images don't exist so they resolve quickly)
             bool finalState = SpriteManager.IsPreloadingInProgress();
+            Assert.IsFalse(finalState, "Preloading should have completed within 0.5s for non-existent test images");
             
-            // Just verify the method works without crashing
-            Assert.IsTrue(true, "Preloading state check completed without errors");
+            // The initial state before queueing should have been false
+            Assert.IsFalse(initialState, "Preloading should not be in progress before any preload requests");
         }
 
         [UnityTest]

@@ -128,13 +128,6 @@ public class EmueraThread
             return;
         }
         
-        // Block non-button input when waiting for button-only input (BINPUT/BINPUTS)
-        if (!from_button && console.IsWaitingButtonOnlyInput)
-        {
-            UnityEngine.Debug.Log($"[EmueraThread.Input] Ignoring non-button input while waiting for button-only input. input='{c}', InputType={console.InputType}");
-            return;
-        }
-        
         UnityEngine.Debug.Log($"[EmueraThread.Input] Processing input: '{c}', from_button={from_button}, skip={skip}, IsWaitingInput={console.IsWaitingInput}, InputType={console.InputType}");
             
         lock (sync_lock_)
