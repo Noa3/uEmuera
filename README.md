@@ -25,7 +25,7 @@ It can run almost all era script games!
 This fork includes significant improvements and modernizations:
 
 #### Engine & Platform Updates
-- **Unity 6 (6000.2.14f1)** - Upgraded from Unity 2018/2019 for better performance and modern features
+- **Unity 6 (6000.3.3f1)** - Upgraded from Unity 2018/2019 for better performance and modern features
 - **Updated deprecated Unity APIs** - Migrated to modern Unity 6 compatible APIs
 - **Lightweight rendering** - Configured for optimized rendering
 - **Performance Optimizations** - Refactored with Unity.Mathematics and Burst compiler:
@@ -146,7 +146,7 @@ Emuera是Emulator of Eramaker的缩写，是Windows平台下文字游戏平台�
 本分支包含重大改进和现代化更新：
 
 #### 引擎与平台更新
-- **Unity 6 (6000.2.14f1)** - 从Unity 2018/2019升级，获得更好的性能和现代特性
+- **Unity 6 (6000.3.3f1)** - 从Unity 2018/2019升级，获得更好的性能和现代特性
 - **更新已弃用的Unity API** - 迁移到现代Unity 6兼容的API
 - **轻量级渲染** - 配置优化渲染
 
@@ -257,7 +257,7 @@ Es kann fast alle Era-Skriptspiele ausführen!
 Dieser Fork enthält bedeutende Verbesserungen und Modernisierungen:
 
 #### Engine- & Plattform-Updates
-- **Unity 6 (6000.2.14f1)** - Upgrade von Unity 2018/2019 für bessere Leistung und moderne Funktionen
+- **Unity 6 (6000.3.3f1)** - Upgrade von Unity 2018/2019 für bessere Leistung und moderne Funktionen
 - **Aktualisierte veraltete Unity-APIs** - Migration auf moderne Unity 6-kompatible APIs
 - **Leichtgewichtiges Rendering** - Optimierte Rendering-Konfiguration
 

@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -11,6 +12,8 @@ namespace MinorShift.Emuera.Content
     /// Manages audio playback for Emuera games.
     /// Supports PLAYSOUND, STOPSOUND, PLAYBGM, STOPBGM, and EXISTSOUND commands from Emuera EM/EE.
     /// Supports WAV (synchronous), OGG and MP3 (asynchronous via UnityWebRequest).
+    /// Thread-safe: methods may be called from the background game thread; Unity API calls
+    /// are dispatched to the main thread via an internal action queue processed in Update().
     /// </summary>
     public class AudioManager : MonoBehaviour
     {
@@ -55,6 +58,12 @@ namespace MinorShift.Emuera.Content
         private int _soundVolume = 100;
         private int _bgmVolume = 100;
 
+        // Main thread dispatch: actions enqueued from the background game thread
+        // are drained in Update() on the Unity main thread.
+        private readonly Queue<Action> _mainThreadQueue = new Queue<Action>();
+        private readonly object _queueLock = new object();
+        private int _mainThreadId;
+
         void Awake()
         {
             if (_instance != null && _instance != this)
@@ -63,6 +72,7 @@ namespace MinorShift.Emuera.Content
                 return;
             }
             _instance = this;
+            _mainThreadId = Thread.CurrentThread.ManagedThreadId;
 
             // Create audio sources
             _soundSource = gameObject.AddComponent<AudioSource>();
@@ -83,6 +93,41 @@ namespace MinorShift.Emuera.Content
                 _instance = null;
             }
             ClearCache();
+        }
+
+        void Update()
+        {
+            // Drain the main-thread action queue (filled by background game thread calls).
+            Action action;
+            while (true)
+            {
+                lock (_queueLock)
+                {
+                    if (_mainThreadQueue.Count == 0)
+                        break;
+                    action = _mainThreadQueue.Dequeue();
+                }
+                action?.Invoke();
+            }
+        }
+
+        /// <summary>
+        /// Enqueues an action to run on the Unity main thread.
+        /// If already on the main thread the action is executed immediately.
+        /// </summary>
+        private void RunOnMainThread(Action action)
+        {
+            if (Thread.CurrentThread.ManagedThreadId == _mainThreadId)
+            {
+                action();
+            }
+            else
+            {
+                lock (_queueLock)
+                {
+                    _mainThreadQueue.Enqueue(action);
+                }
+            }
         }
 
         /// <summary>
@@ -125,14 +170,57 @@ namespace MinorShift.Emuera.Content
         /// Plays a sound effect.
         /// For WAV files: plays immediately (synchronous).
         /// For OGG/MP3: starts async load and will play when ready.
+        /// May be called from the background game thread; Unity API calls are dispatched
+        /// to the main thread via the internal action queue.
         /// </summary>
         /// <param name="filename">The filename of the sound file.</param>
-        /// <returns>1 if successful or loading started, 0 otherwise.</returns>
+        /// <returns>
+        /// 1 if the request was accepted (played immediately, loading started, or queued).
+        /// 0 if the filename is invalid or the file cannot be found.
+        /// Audio errors during playback are non-fatal and logged via Debug.LogWarning.
+        /// </returns>
         public int PlaySound(string filename)
         {
             if (string.IsNullOrEmpty(filename))
                 return 0;
 
+            // Validate the file can be found before queuing (avoids reporting success for missing files).
+            if (!uEmuera.Utils.FileExistsInsensitive(GetFullSoundPath(filename)))
+            {
+                string extension = Path.GetExtension(filename);
+                bool hasKnownExtension = !string.IsNullOrEmpty(extension);
+                if (!hasKnownExtension)
+                {
+                    // Try common extensions
+                    string[] extensions = { ".wav", ".ogg", ".mp3" };
+                    bool found = false;
+                    foreach (var ext in extensions)
+                    {
+                        if (uEmuera.Utils.FileExistsInsensitive(GetFullSoundPath(filename + ext)))
+                        {
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found)
+                        return 0;
+                }
+            }
+
+            // If called from the background game thread, dispatch to main thread.
+            // Return 1 ("request accepted") — consistent with the existing async OGG/MP3
+            // semantics where loading starts on main thread and plays when ready.
+            if (Thread.CurrentThread.ManagedThreadId != _mainThreadId)
+            {
+                RunOnMainThread(() => PlaySoundOnMainThread(filename));
+                return 1;
+            }
+
+            return PlaySoundOnMainThread(filename);
+        }
+
+        private int PlaySoundOnMainThread(string filename)
+        {
             string key = filename.ToUpperInvariant();
             
             // Check cache first
@@ -150,7 +238,19 @@ namespace MinorShift.Emuera.Content
             // Try to load the audio clip
             AudioClip clip = LoadAudioClip(filename, true);
             if (clip == null)
+            {
+                // For async formats (OGG/MP3), LoadAudioClip starts loading via coroutine
+                // and intentionally returns null while loading is in progress.
+                // Report success ("loading started") to the script.
+                string extension = Path.GetExtension(filename);
+                if (!string.IsNullOrEmpty(extension))
+                {
+                    extension = extension.ToLowerInvariant();
+                    if (extension == ".ogg" || extension == ".mp3")
+                        return 1;
+                }
                 return 0;
+            }
 
             _soundSource.clip = clip;
             _soundSource.volume = _soundVolume / 100.0f;
@@ -160,27 +260,71 @@ namespace MinorShift.Emuera.Content
 
         /// <summary>
         /// Stops the currently playing sound effect.
+        /// May be called from the background game thread; dispatched to main thread if needed.
         /// </summary>
         public void StopSound()
         {
-            if (_soundSource != null && _soundSource.isPlaying)
+            RunOnMainThread(() =>
             {
-                _soundSource.Stop();
-            }
+                if (_soundSource != null && _soundSource.isPlaying)
+                    _soundSource.Stop();
+            });
         }
 
         /// <summary>
         /// Plays background music with loop.
         /// For WAV files: plays immediately (synchronous).
         /// For OGG/MP3: starts async load and will play when ready.
+        /// May be called from the background game thread; Unity API calls are dispatched
+        /// to the main thread via the internal action queue.
         /// </summary>
         /// <param name="filename">The filename of the BGM file.</param>
-        /// <returns>1 if successful or loading started, 0 otherwise.</returns>
+        /// <returns>
+        /// 1 if the request was accepted (played immediately, loading started, or queued).
+        /// 0 if the filename is invalid or the file cannot be found.
+        /// Audio errors during playback are non-fatal and logged via Debug.LogWarning.
+        /// </returns>
         public int PlayBGM(string filename)
         {
             if (string.IsNullOrEmpty(filename))
                 return 0;
 
+            // Validate the file can be found before queuing (avoids reporting success for missing files).
+            if (!uEmuera.Utils.FileExistsInsensitive(GetFullSoundPath(filename)))
+            {
+                string extension = Path.GetExtension(filename);
+                bool hasKnownExtension = !string.IsNullOrEmpty(extension);
+                if (!hasKnownExtension)
+                {
+                    string[] extensions = { ".wav", ".ogg", ".mp3" };
+                    bool found = false;
+                    foreach (var ext in extensions)
+                    {
+                        if (uEmuera.Utils.FileExistsInsensitive(GetFullSoundPath(filename + ext)))
+                        {
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found)
+                        return 0;
+                }
+            }
+
+            // If called from the background game thread, dispatch to main thread.
+            // Return 1 ("request accepted") — consistent with the existing async OGG/MP3
+            // semantics where loading starts on main thread and plays when ready.
+            if (Thread.CurrentThread.ManagedThreadId != _mainThreadId)
+            {
+                RunOnMainThread(() => PlayBGMOnMainThread(filename));
+                return 1;
+            }
+
+            return PlayBGMOnMainThread(filename);
+        }
+
+        private int PlayBGMOnMainThread(string filename)
+        {
             string key = filename.ToUpperInvariant();
             
             // Check cache first
@@ -199,7 +343,19 @@ namespace MinorShift.Emuera.Content
             // Try to load the audio clip
             AudioClip clip = LoadAudioClip(filename, false);
             if (clip == null)
+            {
+                // For async formats (OGG/MP3), LoadAudioClip starts loading via coroutine
+                // and intentionally returns null while loading is in progress.
+                // Report success ("loading started") to the script.
+                string extension = Path.GetExtension(filename);
+                if (!string.IsNullOrEmpty(extension))
+                {
+                    extension = extension.ToLowerInvariant();
+                    if (extension == ".ogg" || extension == ".mp3")
+                        return 1;
+                }
                 return 0;
+            }
 
             _bgmSource.clip = clip;
             _bgmSource.volume = _bgmVolume / 100.0f;
@@ -210,13 +366,15 @@ namespace MinorShift.Emuera.Content
 
         /// <summary>
         /// Stops the currently playing background music.
+        /// May be called from the background game thread; dispatched to main thread if needed.
         /// </summary>
         public void StopBGM()
         {
-            if (_bgmSource != null && _bgmSource.isPlaying)
+            RunOnMainThread(() =>
             {
-                _bgmSource.Stop();
-            }
+                if (_bgmSource != null && _bgmSource.isPlaying)
+                    _bgmSource.Stop();
+            });
         }
 
         /// <summary>

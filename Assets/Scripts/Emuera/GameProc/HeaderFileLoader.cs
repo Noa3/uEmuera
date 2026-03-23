@@ -75,7 +75,9 @@ namespace MinorShift.Emuera.GameProc
 			ScriptPosition position = null;
 			EraStreamReader eReader = new EraStreamReader(true);
 
+#if UEMUERA_DEBUG
 			UnityEngine.Debug.Log($"[HeaderFileLoader] Attempting to open: {filename} at path: {filepath}");
+#endif
 			
 			if (!eReader.Open(filepath, filename))
 			{
@@ -92,8 +94,9 @@ namespace MinorShift.Emuera.GameProc
 				}
 			}
 			
+#if UEMUERA_DEBUG
 			UnityEngine.Debug.Log($"[HeaderFileLoader] Successfully opened: {filename}");
-			
+#endif
 			try
 			{
 				int lineCount = 0;
@@ -119,7 +122,9 @@ namespace MinorShift.Emuera.GameProc
 					
 					if (sharpID == "DEFINE")
 					{
+#if UEMUERA_DEBUG
 						UnityEngine.Debug.Log($"[HeaderFileLoader] Processing #DEFINE at {filename}:{eReader.LineNo}");
+#endif
 					}
 					
 					switch (sharpID)
@@ -133,7 +138,9 @@ namespace MinorShift.Emuera.GameProc
 							break;
 						case "DIM":
 						case "DIMS":
+#if UEMUERA_DEBUG
 							UnityEngine.Debug.Log($"[HeaderFileLoader] Queuing #DIM at {filename}:{eReader.LineNo}");
+#endif
 							{
 								WordCollection wc = LexicalAnalyzer.Analyse(st, LexEndWith.EoL, LexAnalyzeFlag.AllowAssignment);
 								dimlines.Enqueue(new DimLineWC(wc, sharpID == "DIMS", false, position));
@@ -143,7 +150,9 @@ namespace MinorShift.Emuera.GameProc
 							throw new CodeEE("#" + sharpID + "は解釈できないプリプロセッサです", position);
 					}
 				}
+#if UEMUERA_DEBUG
 				UnityEngine.Debug.Log($"[HeaderFileLoader] Finished reading {filename}, processed {lineCount} lines");
+#endif
 			}
 			catch (CodeEE e)
 			{
@@ -293,7 +302,9 @@ namespace MinorShift.Emuera.GameProc
 			bool previousUseMacro = LexicalAnalyzer.UseMacro;
 			LexicalAnalyzer.UseMacro = idDic.UseMacro();
 			
+#if UEMUERA_DEBUG
 			UnityEngine.Debug.Log($"[HeaderFileLoader] Starting DIM line analysis with UseMacro={LexicalAnalyzer.UseMacro}, {dimlines.Count} DIM lines queued");
+#endif
 			
 			try
 			{
@@ -321,10 +332,14 @@ namespace MinorShift.Emuera.GameProc
 						nonConstLines.Enqueue(dimline);
 				}
 				
+#if UEMUERA_DEBUG
 				UnityEngine.Debug.Log($"[HeaderFileLoader] Separated {constLines.Count} CONST lines and {nonConstLines.Count} non-CONST lines");
+#endif
 				
 				// === PASS 1: Process CONST declarations with retry support ===
+#if UEMUERA_DEBUG
 				UnityEngine.Debug.Log($"[HeaderFileLoader] Pass 1: Processing CONST declarations...");
+#endif
 				
 				int constCount = 0;
 				bool constTryAgain = true;
@@ -400,10 +415,14 @@ namespace MinorShift.Emuera.GameProc
 					}
 				}
 				
+#if UEMUERA_DEBUG
 				UnityEngine.Debug.Log($"[HeaderFileLoader] Pass 1 complete: {constCount} CONST declarations processed in {constAttemptCount} attempts");
+#endif
 				
 				// === PASS 2: Process non-CONST declarations ===
+#if UEMUERA_DEBUG
 				UnityEngine.Debug.Log($"[HeaderFileLoader] Pass 2: Processing non-CONST declarations with UseMacro={LexicalAnalyzer.UseMacro}...");
+#endif
 				
 				bool tryAgain = true;
 				int processedCount = 0;
@@ -460,8 +479,10 @@ namespace MinorShift.Emuera.GameProc
 					}
 				}
 				
+#if UEMUERA_DEBUG
 				UnityEngine.Debug.Log($"[HeaderFileLoader] Pass 2 complete: {processedCount} non-CONST variables processed in {attemptCount} attempts");
 				UnityEngine.Debug.Log($"[HeaderFileLoader] DIM line analysis complete. Total: {constCount + processedCount} of {totalLines} variables processed");
+#endif
 			}
 			finally
 			{
