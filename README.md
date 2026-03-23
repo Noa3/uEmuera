@@ -1,349 +1,233 @@
-uEmuera - Noa Version
-=======
+<div align="center">
 
-<img src="Assets/splash/icon.png" width="256"/>
+# uEmuera — Noa Version
 
-[English](#english) | [中文](#中文) | [Deutsch](#deutsch)
+<img src="Assets/splash/icon.png" width="180"/>
+
+**A cross-platform Emuera emulator powered by Unity 6**
+
+Run era script games on **Windows**, **Linux**, and **Android**!
+
+[![GitHub Release](https://img.shields.io/github/v/release/Noa3/uEmuera?style=flat-square)](https://github.com/Noa3/uEmuera/releases)
+[![License](https://img.shields.io/github/license/Noa3/uEmuera?style=flat-square)](LICENSE)
+[![Unity](https://img.shields.io/badge/Unity-6000.3.3f1-blue?style=flat-square&logo=unity)](https://unity.com)
+
+[**Download**](https://github.com/Noa3/uEmuera/releases) · [**Wiki**](https://github.com/Noa3/uEmuera/wiki/) · [**Issues**](https://github.com/Noa3/uEmuera/issues)
+
+</div>
 
 ---
 
-## English
+[English](#about) | [中文](#中文) | [Deutsch](#deutsch)
 
-**Special Note for Android 10:**
-**If the app cannot find files placed in sdcard/uEmuera, try placing them in sdcard/Android/data/xerysherry.uEmuera/files/ instead.**
+## About
 
-Emuera stands for "Emulator of Eramaker", a text-based game platform for Windows.
+Emuera ("Emulator of Eramaker") is a text-based game platform originally built for Windows. **uEmuera** is a Unity 6 port that runs era script games on Windows, Linux, and Android.
 
-This project is a Unity3D port of Emuera. It leverages Unity3D's cross-platform capabilities to make it easier to port to non-Windows platforms.
+This fork is based on [xerysherry/uEmuera](https://github.com/xerysherry/uEmuera) (emuera1824v15) with extensive improvements, modernizations, and EM/EE (Emuera MultipleEx/Emuera EnhanceEx) extension support.
 
-The current project is based on the emuera1824v15 source code with additional EM/EE (Emuera MultipleEx/Emuera EnhanceEx) extensions implemented.
+> **Android 10+ Note:** If the app cannot find files in `sdcard/uEmuera`, place them in `sdcard/Android/data/noa3.uEmuera/files/` instead.
 
-It can run almost all era script games!
+## ✨ Features
 
-### What's New in This Fork (vs [xerysherry/uEmuera](https://github.com/xerysherry/uEmuera))
+<table>
+<tr><td>
 
-This fork includes significant improvements and modernizations:
+### Engine & Performance
+- **Unity 6** (6000.3.3f1) — upgraded from Unity 2018/2019
+- **IL2CPP** scripting backend for all platforms
+- **Burst compiler** & SIMD-optimized math (5-6x faster)
+- **Incremental GC** — reduced frame hitches
+- **Graphics Jobs** enabled on all platforms
+- **75% reduction** in GC allocations during scrolling
+- Modern C# 9.0 features
 
-#### Engine & Platform Updates
-- **Unity 6 (6000.3.3f1)** - Upgraded from Unity 2018/2019 for better performance and modern features
-- **Updated deprecated Unity APIs** - Migrated to modern Unity 6 compatible APIs
-- **Lightweight rendering** - Configured for optimized rendering
-- **Performance Optimizations** - Refactored with Unity.Mathematics and Burst compiler:
-  - SIMD-optimized math operations for 5-6x faster calculations
-  - Burst-compiled jobs for parallel processing
-  - Modern C# 9.0 features (records, init-only properties)
-  - 75% reduction in GC allocations during scrolling
-  - See [Performance Optimizations](Docs/PERFORMANCE_OPTIMIZATIONS.md) for details
+</td><td>
 
-#### Extended Game Compatibility
-- **Emuera EM/EE Extensions** - Added support for extended Emuera commands:
-  - `BINPUT` / `BINPUTS` - Binary input commands
-  - `TRYCALLF` / `TRYCALLFORMF` - Try-call function variants
-- **Sound Commands** - Full audio implementation with `AudioManager`:
-  - `PLAYSOUND` / `STOPSOUND` - Sound effect playback
-  - `PLAYBGM` / `STOPBGM` - Background music playback
-  - `EXISTSOUND` - Sound file existence check
-  - Supports WAV format with volume control
-- **GXX Graphics Instructions** - Implementation support for GXX drawing commands
-- **Case-Insensitive Folder Names** - Automatically detects `resources/`, `Resources/`, `RESOURCES/`, etc.
+### Game Compatibility
+- **EM/EE Extensions**: `BINPUT`, `BINPUTS`, `TRYCALLF`, `TRYCALLFORMF`
+- **Audio**: `PLAYSOUND`/`STOPSOUND`, `PLAYBGM`/`STOPBGM`, `EXISTSOUND` (WAV)
+- **GXX Graphics** instruction support
+- **Case-insensitive** folder name detection
+- Runs **almost all** era script games
 
-#### Internationalization & Documentation
-- **Multi-language README** - English, Chinese, and German documentation
-- **Unity Localization Support** - Built-in localization for English, Chinese (Simplified), and Japanese
-- **Comment Translation** - Japanese and Chinese code comments translated to English
-- **XML Documentation** - Added comprehensive XML documentation to public APIs
+</td></tr>
+<tr><td>
 
-#### Development & Quality
-- **Unit Test Framework** - Integrated Unity Test Framework with EditMode and PlayMode tests
-- **Copilot Instructions** - Project-specific AI development guidelines
-- **Gothic Fonts Support** - Additional font options
+### UI/UX
+- **Dark theme** — reduced eye strain with ERA game aesthetics
+- **Pixel Perfect** rendering — crisp text and images
+- **CRT post-processing** — optional retro CRT effect
+- **Resizable window** — flexible windowed mode on desktop
+- **Gothic font** support
 
-#### UI/UX Improvements
-- **Modern Dark Theme UI** - Professional dark color scheme for reduced eye strain
-  - Carefully crafted color palette with ERA game aesthetics
-  - Applied to main menu, settings, and all dialogs
-  - Better contrast and readability
-- **Pixel Perfect Rendering** - Crisp, sharp text and images
-  - Unity 2D Pixel Perfect Camera integration
-  - Eliminates blur and maintains visual clarity
-  - Configurable through Settings menu
-  - Works seamlessly with post-processing
-- **CRT Post-Processing Effect** - Optional retro CRT monitor visual effect
-  - Vignette, chromatic aberration, and film grain
-  - Configurable through Settings menu
-  - Optimized for mobile devices
-  - Can be combined with Pixel Perfect for best results
+</td><td>
 
-#### Bug Fixes
-- Fixed image loading issues
-- Fixed WebP format errors
-- Fixed EmueraContent generation logic
+### Development
+- **Unit tests** — EditMode & PlayMode test suites
+- **Multi-language** UI — English, Chinese, Japanese
+- **XML documentation** on all public APIs
+- **Translated comments** — JP/CN → English
+- [Performance Docs](Docs/PERFORMANCE_OPTIMIZATIONS.md)
 
-### Download
-----
+</td></tr>
+</table>
 
-[https://github.com/noa3/uEmuera/releases](https://github.com/noa3/uEmuera/releases)
+## 📥 Download
 
-### How to Use
---------
+**[→ Latest Release](https://github.com/Noa3/uEmuera/releases)**
 
-1. Ensure that all era-related files are encoded in UTF-8, including \*.csv, \*.ERB, and \*.ERH files.
+| Platform | Build | Notes |
+|----------|-------|-------|
+| **Windows** | `.zip` | Extract and run. Resizable window, starts windowed. |
+| **Linux** | `.zip` | Extract, `chmod +x`, run. Resizable window. |
+| **Android** | `.apk` | Sideload. Grant file access on first launch. |
 
-2. When running the app for the first time, grant "File Access" permission.
+## 🚀 Quick Start
 
-3. Place the processed era script folder in the emuera folder on your sdcard. Full paths: storage/emulated/0/emuera, storage/emulated/1/emuera, storage/emulated/2/emuera
+1. **Ensure UTF-8 encoding** for all era files (`*.csv`, `*.ERB`, `*.ERH`)
+2. **Grant file access** permission on first launch
+3. **Place era game folders** in the appropriate location:
 
-### Known Issues / Areas for Improvement
--------------------
+| Platform | Game Folder Path |
+|----------|-----------------|
+| **Windows / Linux** | Same directory as the executable, or select via file browser |
+| **Android** | `storage/emulated/0/emuera` or `Android/data/noa3.uEmuera/files/` |
 
-1. Cannot modify era game configuration within the app
+## 🖼️ Screenshots
 
-2. No debugging functionality
+<details>
+<summary>Click to expand screenshots</summary>
 
-3. Some game instructions have low efficiency, causing lag
+**Game: EraMakakaiRanch**
 
-4. May consume more battery (a common issue with Unity3D applications)
+<img width="1381" height="691" alt="EraMakakaiRanch" src="https://github.com/user-attachments/assets/25ab5fa1-3a88-4ef9-a0b9-bf2d8584782a" />
 
-5. OGG and MP3 audio formats require async loading - WAV recommended for synchronous playback to avoid timing issues
+**Game: EraAkumaMaid**
 
-6. ...
+<img width="1377" height="773" alt="EraAkumaMaid" src="https://github.com/user-attachments/assets/042375f2-8ff3-478c-8548-3e116ce2736e" />
 
-### Screenshots
-----
-- Game: EraMakakaiRanch
-<img width="1381" height="691" alt="grafik" src="https://github.com/user-attachments/assets/25ab5fa1-3a88-4ef9-a0b9-bf2d8584782a" />
-- Game: EraAkumaMaid
-<img width="1377" height="773" alt="grafik" src="https://github.com/user-attachments/assets/042375f2-8ff3-478c-8548-3e116ce2736e" />
+| Start Screen | Game Running | Quick Buttons |
+|:---:|:---:|:---:|
+| ![Start](Screenshot/screenshot1.png) | ![Running](Screenshot/screenshot2.png) | ![Buttons](Screenshot/screenshot3.png) |
 
-Start Screen
-![Screenshot1](Screenshot/screenshot1.png)
-Game Running Screen
-![Screenshot2](Screenshot/screenshot2.png)
-Quick Buttons
-![Screenshot3](Screenshot/screenshot3.png)
-Command Input
-![Screenshot4](Screenshot/screenshot4.png)
-Zoom Control
-![Screenshot5](Screenshot/screenshot5.png)
+| Command Input | Zoom Control |
+|:---:|:---:|
+| ![Input](Screenshot/screenshot4.png) | ![Zoom](Screenshot/screenshot5.png) |
+
+</details>
+
+## ⚙️ Build Optimizations
+
+This fork applies aggressive build optimizations for all platforms:
+
+| Setting | Android | Windows / Linux |
+|---------|---------|-----------------|
+| Scripting Backend | IL2CPP | IL2CPP |
+| Managed Stripping | High | High |
+| Engine Code Stripping | ✅ | ✅ |
+| Incremental GC | ✅ | ✅ |
+| Graphics Jobs | ✅ | ✅ |
+| Burst Compiler | ✅ | ✅ |
+| Mip Stripping | ✅ | ✅ |
+| Multithreaded Rendering | ✅ | ✅ |
+
+## 🐛 Known Issues
+
+- Cannot modify era game configuration within the app
+- No debugging functionality
+- Some game instructions have low efficiency, causing lag
+- Higher battery consumption (common with Unity3D apps)
+- OGG/MP3 audio requires async loading — **WAV recommended** for synchronous playback
+
+## 💖 Support This Project
+
+If you find uEmuera useful, consider supporting development:
+
+[![PayPal](https://img.shields.io/badge/PayPal-Donate-blue?style=for-the-badge&logo=paypal)](https://www.paypal.com/donate/?hosted_button_id=FL9RQYJGPFLAU)
+
+You can also support via GitHub Sponsors using the **Sponsor** button at the top of this repository.
+
+## 📄 License
+
+Licensed under the [Apache License 2.0](LICENSE).
+
+Based on [xerysherry/uEmuera](https://github.com/xerysherry/uEmuera) and emuera1824v15.
 
 ---
 
 ## 中文
 
-**Android10 特别说明：**
-**如果放入sdcard/uEmuera下无法找到的话，可以放入sdcard/Android/data/xerysherry.uEmuera/files/下**
+**uEmuera** 是 Emuera（Emulator of Eramaker）的 Unity 6 移植版，可在 **Windows**、**Linux** 和 **Android** 上运行 era 脚本游戏。
 
-Emuera是Emulator of Eramaker的缩写，是Windows平台下文字游戏平台。
+基于 [xerysherry/uEmuera](https://github.com/xerysherry/uEmuera)（emuera1824v15），包含大量改进和 EM/EE 扩展支持。
 
-该项目为Emuera的Unity3D移植版本。意在利用Unity3D多平台特性，方便移植到非Windows平台。
+> **Android 10+ 说明：** 如果 `sdcard/uEmuera` 无法找到文件，请放入 `sdcard/Android/data/noa3.uEmuera/files/`
 
-当前项目以基于emuera1824v15版本源代码，并添加了EM/EE（Emuera MultipleEx/Emuera EnhanceEx）扩展支持。
+### 主要特性
 
-几乎可以执行所有era脚本游戏！
+- **Unity 6** 引擎，IL2CPP 编译，Burst 优化
+- **EM/EE 扩展命令**：`BINPUT`、`TRYCALLF` 等
+- **完整音频系统**：`PLAYSOUND`、`PLAYBGM` 等（支持 WAV）
+- **GXX 图形指令**支持
+- **深色主题 UI**、**像素完美渲染**、**CRT 后处理效果**
+- **可调整窗口大小** — 桌面端灵活窗口模式
+- 多语言支持（英文、中文、日文）
 
-### 本分支的新功能 (相比 [xerysherry/uEmuera](https://github.com/xerysherry/uEmuera))
+### 快速开始
 
-本分支包含重大改进和现代化更新：
+1. 确保所有 era 文件编码为 **UTF-8**（`*.csv`、`*.ERB`、`*.ERH`）
+2. 首次运行时授予 **文件访问** 权限
+3. 将 era 游戏文件夹放在：
+   - **Android**: `storage/emulated/0/emuera` 或 `Android/data/noa3.uEmuera/files/`
+   - **Windows/Linux**: 程序目录内，或通过文件浏览器选择
 
-#### 引擎与平台更新
-- **Unity 6 (6000.3.3f1)** - 从Unity 2018/2019升级，获得更好的性能和现代特性
-- **更新已弃用的Unity API** - 迁移到现代Unity 6兼容的API
-- **轻量级渲染** - 配置优化渲染
+### 已知问题
 
-#### 扩展游戏兼容性
-- **Emuera EM/EE扩展** - 添加扩展Emuera命令支持：
-  - `BINPUT` / `BINPUTS` - 二进制输入命令
-  - `TRYCALLF` / `TRYCALLFORMF` - Try-call函数变体
-- **音频命令** - 完整的音频实现（AudioManager）：
-  - `PLAYSOUND` / `STOPSOUND` - 音效播放
-  - `PLAYBGM` / `STOPBGM` - 背景音乐播放
-  - `EXISTSOUND` - 音频文件存在检查
-  - 支持WAV格式和音量控制
-- **GXX图形指令** - 实现GXX绘图命令支持
-- **文件夹名大小写不敏感** - 自动检测 `resources/`、`Resources/`、`RESOURCES/` 等
-
-#### 国际化与文档
-- **多语言README** - 英文、中文和德文文档
-- **Unity本地化支持** - 内置英文、中文（简体）和日文本地化
-- **注释翻译** - 日文和中文代码注释翻译为英文
-- **XML文档** - 为公共API添加全面的XML文档
-
-#### 开发与质量
-- **单元测试框架** - 集成Unity测试框架，包含EditMode和PlayMode测试
-- **Copilot指南** - 项目特定的AI开发指南
-- **哥特字体支持** - 额外的字体选项
-
-#### UI/UX改进
-- **现代深色主题UI** - 专业的深色配色方案减少眼睛疲劳
-  - 精心设计的ERA游戏美学配色
-  - 应用于主菜单、设置和所有对话框
-  - 更好的对比度和可读性
-- **像素完美渲染** - 清晰锐利的文字和图像
-  - Unity 2D Pixel Perfect Camera集成
-  - 消除模糊并保持视觉清晰度
-  - 可通过设置菜单配置
-  - 与后处理效果完美协同工作
-- **CRT后处理效果** - 可选的复古CRT显示器视觉效果
-  - 晕影、色差和胶片颗粒效果
-  - 可通过设置菜单配置
-  - 针对移动设备优化
-  - 可与像素完美结合获得最佳效果
-
-#### 错误修复
-- 修复图片加载问题
-- 修复WebP格式错误
-- 修复EmueraContent生成逻辑
+- 无法在 app 内修改游戏配置
+- 无调试功能
+- 部分指令效率较低可能导致卡顿
+- OGG/MP3 需异步加载，建议使用 **WAV** 格式
 
 ### 下载
-----
 
-[https://github.com/noa3/uEmuera/releases](https://github.com/noa3/uEmuera/releases)
-
-### 如何使用：
---------
-
-1. 请确保era相关文件编码为UTF8，包括\*.csv, \*.ERB, \*.ERH。
-
-2. 请在初次运行app时，选择允许"文件访问"的权限。
-
-3. 请把处理完毕的era脚本文件夹放置在sdcard下的emuera文件夹内。完整路径为storage/emulated/0/emuera, storage/emulated/1/emuera, storage/emulated/2/emuera
-
-### 已知问题/需要改进项：
--------------------
-
-1. 无法在app内修改era游戏配置
-
-2. 无调试功能
-
-3. 部分游戏的某些指令效率较低，导致卡顿
-
-4. 可能会比较耗电（Unity3D程序通病）
-
-5. OGG和MP3音频格式需要异步加载 - 建议使用WAV格式进行同步播放以避免时序问题
-
-6. ...
-
-### 截图
-----
-
-开始界面
-![Screenshot1](Screenshot/screenshot1.png)
-游戏运行界面
-![Screenshot2](Screenshot/screenshot2.png)
-快捷按钮
-![Screenshot3](Screenshot/screenshot3.png)
-指令输入
-![Screenshot4](Screenshot/screenshot4.png)
-缩放控制
-![Screenshot5](Screenshot/screenshot5.png)
+**[→ 最新版本](https://github.com/Noa3/uEmuera/releases)**
 
 ---
 
 ## Deutsch
 
-**Hinweis für Android 10:**
-**Wenn die App Dateien in sdcard/uEmuera nicht finden kann, versuche sie in sdcard/Android/data/xerysherry.uEmuera/files/ zu platzieren.**
+**uEmuera** ist eine Unity 6-Portierung von Emuera (Emulator of Eramaker) für **Windows**, **Linux** und **Android**.
 
-Emuera steht für "Emulator of Eramaker", eine textbasierte Spielplattform für Windows.
+Basierend auf [xerysherry/uEmuera](https://github.com/xerysherry/uEmuera) (emuera1824v15) mit umfangreichen Verbesserungen und EM/EE-Erweiterungen.
 
-Dieses Projekt ist eine Unity3D-Portierung von Emuera. Es nutzt die plattformübergreifenden Fähigkeiten von Unity3D, um die Portierung auf Nicht-Windows-Plattformen zu erleichtern.
+> **Android 10+ Hinweis:** Wenn `sdcard/uEmuera` nicht funktioniert, Dateien in `sdcard/Android/data/noa3.uEmuera/files/` ablegen.
 
-Das aktuelle Projekt basiert auf dem emuera1824v15-Quellcode mit zusätzlich implementierten EM/EE (Emuera MultipleEx/Emuera EnhanceEx)-Erweiterungen.
+### Hauptmerkmale
 
-Es kann fast alle Era-Skriptspiele ausführen!
+- **Unity 6** Engine, IL2CPP-Kompilierung, Burst-Optimierung
+- **EM/EE-Erweiterungen**: `BINPUT`, `TRYCALLF` usw.
+- **Vollständiges Audiosystem**: `PLAYSOUND`, `PLAYBGM` usw. (WAV-Format)
+- **GXX-Grafikbefehle**
+- **Dunkles Theme**, **Pixel Perfect Rendering**, **CRT-Effekt**
+- **Anpassbare Fenstergröße** — flexibler Fenstermodus auf dem Desktop
+- Mehrsprachig (Englisch, Chinesisch, Japanisch)
 
-### Neuerungen in diesem Fork (vs [xerysherry/uEmuera](https://github.com/xerysherry/uEmuera))
+### Schnellstart
 
-Dieser Fork enthält bedeutende Verbesserungen und Modernisierungen:
+1. Alle Era-Dateien müssen **UTF-8**-kodiert sein (`*.csv`, `*.ERB`, `*.ERH`)
+2. Beim ersten Start **Dateizugriff** erlauben
+3. Era-Spielordner ablegen in:
+   - **Android**: `storage/emulated/0/emuera` oder `Android/data/noa3.uEmuera/files/`
+   - **Windows/Linux**: Im Programmverzeichnis oder über den Dateibrowser auswählen
 
-#### Engine- & Plattform-Updates
-- **Unity 6 (6000.3.3f1)** - Upgrade von Unity 2018/2019 für bessere Leistung und moderne Funktionen
-- **Aktualisierte veraltete Unity-APIs** - Migration auf moderne Unity 6-kompatible APIs
-- **Leichtgewichtiges Rendering** - Optimierte Rendering-Konfiguration
+### Bekannte Probleme
 
-#### Erweiterte Spielkompatibilität
-- **Emuera EM/EE-Erweiterungen** - Unterstützung für erweiterte Emuera-Befehle:
-  - `BINPUT` / `BINPUTS` - Binäre Eingabebefehle
-  - `TRYCALLF` / `TRYCALLFORMF` - Try-Call-Funktionsvarianten
-- **Sound-Befehle** - Vollständige Audio-Implementierung mit `AudioManager`:
-  - `PLAYSOUND` / `STOPSOUND` - Soundeffekt-Wiedergabe
-  - `PLAYBGM` / `STOPBGM` - Hintergrundmusik-Wiedergabe
-  - `EXISTSOUND` - Prüfung auf Sounddatei-Existenz
-  - Unterstützt WAV-Format mit Lautstärkeregelung
-- **GXX-Grafikbefehle** - Implementierungsunterstützung für GXX-Zeichenbefehle
-- **Groß-/Kleinschreibung bei Ordnernamen ignorieren** - Erkennt automatisch `resources/`, `Resources/`, `RESOURCES/`, etc.
-
-#### Internationalisierung & Dokumentation
-- **Mehrsprachiges README** - Englische, chinesische und deutsche Dokumentation
-- **Unity-Lokalisierungsunterstützung** - Integrierte Lokalisierung für Englisch, Chinesisch (vereinfacht) und Japanisch
-- **Kommentar-Übersetzungen** - Japanische und chinesische Code-Kommentare ins Englische übersetzt
-- **XML-Dokumentation** - Umfassende XML-Dokumentation für öffentliche APIs
-
-#### Entwicklung & Qualität
-- **Unit-Test-Framework** - Integriertes Unity Test Framework mit EditMode- und PlayMode-Tests
-- **Copilot-Anweisungen** - Projektspezifische KI-Entwicklungsrichtlinien
-- **Gothic-Schriftarten-Unterstützung** - Zusätzliche Schriftoptionen
-
-#### UI/UX-Verbesserungen
-- **Modernes dunkles Theme** - Professionelles dunkles Farbschema zur Reduzierung der Augenbelastung
-  - Sorgfältig gestaltete Farbpalette mit ERA-Spielästhetik
-  - Angewendet auf Hauptmenü, Einstellungen und alle Dialoge
-  - Besserer Kontrast und Lesbarkeit
-- **Pixel Perfect Rendering** - Gestochen scharfer Text und Bilder
-  - Unity 2D Pixel Perfect Camera Integration
-  - Eliminiert Unschärfe und erhält visuelle Klarheit
-  - Konfigurierbar über das Einstellungsmenü
-  - Funktioniert nahtlos mit Nachbearbeitung
-- **CRT-Nachbearbeitungseffekt** - Optionaler Retro-CRT-Monitor-Effekt
-  - Vignette, chromatische Aberration und Filmkorn
-  - Konfigurierbar über das Einstellungsmenü
-  - Optimiert für mobile Geräte
-  - Kann mit Pixel Perfect für beste Ergebnisse kombiniert werden
-
-#### Fehlerbehebungen
-- Bildladeproblem behoben
-- WebP-Formatfehler behoben
-- EmueraContent-Generierungslogik behoben
+- Spielkonfiguration kann nicht in der App geändert werden
+- Keine Debugging-Funktionalität
+- Einige Befehle können Verzögerungen verursachen
+- OGG/MP3 erfordern asynchrones Laden — **WAV empfohlen**
 
 ### Download
-----
 
-[https://github.com/noa3/uEmuera/releases](https://github.com/noa3/uEmuera/releases)
-
-### Verwendung:
---------
-
-1. Stelle sicher, dass alle Era-bezogenen Dateien UTF-8-kodiert sind, einschließlich \*.csv, \*.ERB und \*.ERH.
-
-2. Erteile beim ersten Start der App die Berechtigung "Dateizugriff".
-
-3. Platziere den verarbeiteten Era-Skriptordner im emuera-Ordner auf deiner SD-Karte. Vollständige Pfade: storage/emulated/0/emuera, storage/emulated/1/emuera, storage/emulated/2/emuera
-
-### Bekannte Probleme / Verbesserungsbereiche
--------------------
-
-1. Kann Era-Spielkonfiguration nicht innerhalb der App ändern
-
-2. Keine Debugging-Funktionalität
-
-3. Einige Spielanweisungen haben geringe Effizienz und verursachen Verzögerungen
-
-4. Kann mehr Batterie verbrauchen (ein häufiges Problem bei Unity3D-Anwendungen)
-
-5. OGG- und MP3-Audioformate erfordern asynchrones Laden - WAV wird für synchrone Wiedergabe empfohlen, um Timing-Probleme zu vermeiden
-
-6. ...
-
-### Screenshots
-----
-
-Startbildschirm
-![Screenshot1](Screenshot/screenshot1.png)
-Spielbildschirm
-![Screenshot2](Screenshot/screenshot2.png)
-Schnelltasten
-![Screenshot3](Screenshot/screenshot3.png)
-Befehlseingabe
-![Screenshot4](Screenshot/screenshot4.png)
-Zoom-Steuerung
-![Screenshot5](Screenshot/screenshot5.png)
+**[→ Neueste Version](https://github.com/Noa3/uEmuera/releases)**
