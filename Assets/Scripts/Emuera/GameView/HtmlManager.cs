@@ -1166,7 +1166,7 @@ namespace MinorShift.Emuera.GameView
 		/// <summary>
 		/// Estimates the pixel width of an img or shape tag (stub: 2 × FontSize).
 		/// </summary>
-		private static int HtmlLength(string htmlTag)
+		internal static int HtmlLength(string htmlTag)
 		{
 			return Config.FontSize * 2;
 		}

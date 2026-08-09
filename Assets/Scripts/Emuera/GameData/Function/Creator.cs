@@ -276,7 +276,24 @@ namespace MinorShift.Emuera.GameData.Function
                 ["DT_SORT"] = new DtRowOpMethod(DtRowOpMethod.Op.Sort),
                 ["DT_TOCSV"] = new DtRowOpMethod(DtRowOpMethod.Op.ToCsv),
                 ["DT_TOXML"] = new DtRowOpMethod(DtRowOpMethod.Op.ToXml),
-            };
+
+                // New built-in commands
+                ["CLEARMEMORY"] = new ClearMemoryMethod(),
+                ["EXISTFILE"] = new ExistFileMethod(),
+                ["EXISTVAR"] = new ExistVarMethod(),
+                ["ENUMFILES"] = new EnumFilesMethod(),
+                ["DT_ROW_LENGTH"] = new DtRowLengthMethod(),
+                ["DT_CELL_GET"] = new DtCellGetMethod(DtCellGetMethod.Op.GetInt),
+                ["DT_CELL_GETS"] = new DtCellGetMethod(DtCellGetMethod.Op.GetStr),
+                ["DT_CELL_ISNULL"] = new DtCellGetMethod(DtCellGetMethod.Op.IsNull),
+                 ["DT_SELECT"] = new DtSelectMethod(),
+
+                 // ERA standard built-ins
+                 ["GETDOINGFUNCTION"] = new GetDoingFunctionMethod(),
+                 ["HTML_STRINGLEN"] = new HtmlStringLenMethod(),
+                 ["GETVAR"] = new GetVarMethod(),
+                 ["GETVARS"] = new GetVarsMethod(),
+             };
 
 
             //1823 自分の関数名を知っていた方が何かと便利なので覚えさせることにした

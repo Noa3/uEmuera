@@ -5307,5 +5307,270 @@ namespace MinorShift.Emuera.GameData.Function
 	}
 
 	#endregion
+
+	#region CLEARMEMORY / EXISTFILE / EXISTVAR / ENUMFILES / DT extensions
+
+	private sealed class ClearMemoryMethod : FunctionMethod
+	{
+		public ClearMemoryMethod() { ReturnType = typeof(Int64); argumentTypeArray = new Type[0]; CanRestructure = false; }
+		public override Int64 GetIntValue(ExpressionMediator exm, IOperandTerm[] arguments)
+		{
+			long before = GC.GetTotalMemory(false);
+			GC.Collect();
+			long after = GC.GetTotalMemory(true);
+			return Math.Max(0L, before - after);
+		}
+	}
+
+	private sealed class ExistFileMethod : FunctionMethod
+	{
+		public ExistFileMethod() { ReturnType = typeof(Int64); argumentTypeArray = new Type[] { typeof(string) }; CanRestructure = false; }
+		public override Int64 GetIntValue(ExpressionMediator exm, IOperandTerm[] arguments)
+		{
+			string rel = arguments[0].GetStrValue(exm);
+			if (string.IsNullOrEmpty(rel)) return 0;
+			try
+			{
+				string full = System.IO.Path.IsPathRooted(rel) ? rel : System.IO.Path.Combine(Program.ExeDir, rel);
+				string canonical = System.IO.Path.GetFullPath(full);
+				string baseDir = System.IO.Path.GetFullPath(Program.ExeDir);
+				if (!canonical.StartsWith(baseDir, StringComparison.OrdinalIgnoreCase)) return 0;
+				return System.IO.File.Exists(canonical) ? 1L : 0L;
+			}
+			catch { return 0; }
+		}
+	}
+
+	private sealed class ExistVarMethod : FunctionMethod
+	{
+		public ExistVarMethod() { ReturnType = typeof(Int64); argumentTypeArray = new Type[] { typeof(string) }; CanRestructure = false; }
+		public override Int64 GetIntValue(ExpressionMediator exm, IOperandTerm[] arguments)
+		{
+			string varname = arguments[0].GetStrValue(exm);
+			var token = GlobalStatic.IdentifierDictionary?.GetVariableToken(varname, null, true);
+			if (token == null) return 0;
+			long res = 0;
+			if (token.IsInteger) res |= 1;
+			if (token.IsString)  res |= 2;
+			if (token.IsConst)   res |= 4;
+			if (token.IsArray2D) res |= 8;
+			if (token.IsArray3D) res |= 16;
+			return res;
+		}
+	}
+
+	private sealed class EnumFilesMethod : FunctionMethod
+	{
+		public EnumFilesMethod()
+		{
+			ReturnType = typeof(Int64);
+			argumentTypeArray = new Type[] { typeof(string), typeof(string), typeof(Int64) };
+			CanRestructure = false;
+		}
+		public override string CheckArgumentType(string name, IOperandTerm[] arguments)
+		{
+			if (arguments.Length < 1)
+				return string.Format(Properties.Resources.SyntaxErrMesMethodDefaultArgumentNum1, name, 1);
+			if (arguments.Length > 3)
+				return string.Format(Properties.Resources.SyntaxErrMesMethodDefaultArgumentNum2, name);
+			Type[] types = new Type[] { typeof(string), typeof(string), typeof(Int64) };
+			for (int i = 0; i < arguments.Length; i++)
+			{
+				if (arguments[i] == null)
+					return string.Format(Properties.Resources.SyntaxErrMesMethodDefaultArgumentNotNullable0, name, i + 1);
+				if (types[i] != arguments[i].GetOperandType())
+					return string.Format(Properties.Resources.SyntaxErrMesMethodDefaultArgumentType0, name, i + 1);
+			}
+			return null;
+		}
+		public override Int64 GetIntValue(ExpressionMediator exm, IOperandTerm[] arguments)
+		{
+			string dir = arguments[0].GetStrValue(exm);
+			if (string.IsNullOrEmpty(dir)) return -1;
+			if (!System.IO.Path.IsPathRooted(dir))
+				dir = System.IO.Path.Combine(Program.ExeDir, dir);
+			try { dir = System.IO.Path.GetFullPath(dir); } catch { return -1; }
+			if (!System.IO.Directory.Exists(dir)) return -1;
+			string pat = arguments.Length > 1 ? arguments[1].GetStrValue(exm) : "*";
+			bool recursive = arguments.Length > 2 && arguments[2].GetIntValue(exm) != 0;
+			var opt = recursive ? System.IO.SearchOption.AllDirectories : System.IO.SearchOption.TopDirectoryOnly;
+			string[] files;
+			try { files = System.IO.Directory.GetFiles(dir, pat, opt); } catch { return -1; }
+			string exeDir = System.IO.Path.GetFullPath(Program.ExeDir);
+			for (int i = 0; i < files.Length; i++)
+				try { files[i] = System.IO.Path.GetRelativePath(exeDir, files[i]); } catch { }
+			string[] results = exm.VEvaluator.VariableData.DataStringArray[(int)(VariableCode.RESULTS & VariableCode.__LOWERCASE__)];
+			int cnt = Math.Min(files.Length, results.Length);
+			Array.Copy(files, results, cnt);
+			return files.Length;
+		}
+	}
+
+	private sealed class DtRowLengthMethod : FunctionMethod
+	{
+		public DtRowLengthMethod() { ReturnType = typeof(Int64); argumentTypeArray = new Type[] { typeof(string) }; CanRestructure = false; }
+		public override Int64 GetIntValue(ExpressionMediator exm, IOperandTerm[] arguments)
+		{
+			string name = arguments[0].GetStrValue(exm).ToUpperInvariant();
+			if (!exm.VEvaluator.VariableData.DataDataTables.TryGetValue(name, out EraDataTable dt)) return -1;
+			return dt.RowCount;
+		}
+	}
+
+	private sealed class DtCellGetMethod : FunctionMethod
+	{
+		public enum Op { GetInt, GetStr, IsNull }
+		readonly Op op;
+		public DtCellGetMethod(Op op)
+		{
+			this.op = op;
+			ReturnType = op == Op.GetStr ? typeof(string) : typeof(Int64);
+			argumentTypeArray = new Type[] { typeof(string), typeof(Int64), typeof(string) };
+			CanRestructure = false;
+		}
+		public override Int64 GetIntValue(ExpressionMediator exm, IOperandTerm[] arguments)
+		{
+			string name = arguments[0].GetStrValue(exm).ToUpperInvariant();
+			if (!exm.VEvaluator.VariableData.DataDataTables.TryGetValue(name, out EraDataTable dt))
+				return op == Op.IsNull ? -2L : 0L;
+			int idx = (int)arguments[1].GetIntValue(exm);
+			string col = arguments[2].GetStrValue(exm);
+			if (idx < 0 || idx >= dt.RowCount) return op == Op.IsNull ? -1L : 0L;
+			if (dt.ColExist(col) == 0) return op == Op.IsNull ? -1L : 0L;
+			if (op == Op.IsNull) return string.IsNullOrEmpty(dt.GetStr(idx, col)) ? 1L : 0L;
+			return dt.GetInt(idx, col);
+		}
+		public override string GetStrValue(ExpressionMediator exm, IOperandTerm[] arguments)
+		{
+			string name = arguments[0].GetStrValue(exm).ToUpperInvariant();
+			if (!exm.VEvaluator.VariableData.DataDataTables.TryGetValue(name, out EraDataTable dt)) return "";
+			int idx = (int)arguments[1].GetIntValue(exm);
+			string col = arguments[2].GetStrValue(exm);
+			if (idx < 0 || idx >= dt.RowCount || dt.ColExist(col) == 0) return "";
+			return dt.GetStr(idx, col);
+		}
+	}
+
+	private sealed class DtSelectMethod : FunctionMethod
+	{
+		public DtSelectMethod() { ReturnType = typeof(Int64); argumentTypeArray = new Type[] { typeof(string), typeof(string), typeof(string) }; CanRestructure = false; }
+		public override Int64 GetIntValue(ExpressionMediator exm, IOperandTerm[] arguments)
+		{
+			string name = arguments[0].GetStrValue(exm).ToUpperInvariant();
+			if (!exm.VEvaluator.VariableData.DataDataTables.TryGetValue(name, out EraDataTable dt)) return 0;
+			string col = arguments[1].GetStrValue(exm);
+			string val = arguments[2].GetStrValue(exm);
+			var matches = new List<int>();
+			for (int i = 0; i < dt.RowCount; i++)
+				if (string.Equals(dt.GetStr(i, col), val, StringComparison.OrdinalIgnoreCase))
+					matches.Add(i);
+			Int64[] result = exm.VEvaluator.VariableData.DataIntegerArray[(int)(VariableCode.RESULT & VariableCode.__LOWERCASE__)];
+			int cnt = Math.Min(matches.Count, result.Length);
+			for (int i = 0; i < cnt; i++) result[i] = matches[i];
+			return matches.Count;
+		}
+	}
+
+	private sealed class GetDoingFunctionMethod : FunctionMethod
+	{
+		public GetDoingFunctionMethod()
+		{
+			ReturnType = typeof(string);
+			argumentTypeArray = new Type[0];
+			CanRestructure = false;
+		}
+		public override string GetStrValue(ExpressionMediator exm, IOperandTerm[] arguments)
+		{
+			var line = exm.Process.getCurrentLine;
+			if (line?.ParentLabelLine == null) return "";
+			return line.ParentLabelLine.LabelName;
+		}
+		public override Int64 GetIntValue(ExpressionMediator exm, IOperandTerm[] arguments) => 0;
+	}
+
+	private sealed class HtmlStringLenMethod : FunctionMethod
+	{
+		public HtmlStringLenMethod()
+		{
+			ReturnType = typeof(Int64);
+			argumentTypeArray = new Type[] { typeof(string), typeof(Int64) };
+			CanRestructure = false;
+		}
+		public override string CheckArgumentType(string name, IOperandTerm[] arguments)
+		{
+			if (arguments.Length < 1 || arguments.Length > 2)
+				return name + "関数のargumentの数が違います";
+			if (arguments[0] == null || arguments[0].GetOperandType() != typeof(string))
+				return name + "関数の1番目のargumentは文字列型が必要です";
+			if (arguments.Length == 2 && arguments[1] != null && arguments[1].GetOperandType() != typeof(Int64))
+				return name + "関数の2番目のargumentは整数型が必要です";
+			return null;
+		}
+		public override Int64 GetIntValue(ExpressionMediator exm, IOperandTerm[] arguments)
+		{
+			string html = arguments[0].GetStrValue(exm);
+			int len = HtmlManager.HtmlLength(html);
+			bool rawPx = arguments.Length >= 2 && arguments[1] != null && arguments[1].GetIntValue(exm) != 0;
+			if (rawPx) return len;
+			int fs = Config.FontSize;
+			if (fs <= 0) return 0;
+			int half = fs / 2;
+			if (half <= 0) return len;
+			long result = len / half;
+			if (len % half != 0) result += (len >= 0 ? 1 : -1);
+			return result;
+		}
+	}
+
+	private sealed class GetVarMethod : FunctionMethod
+	{
+		public GetVarMethod()
+		{
+			ReturnType = typeof(Int64);
+			argumentTypeArray = new Type[] { typeof(string) };
+			CanRestructure = false;
+		}
+		public override Int64 GetIntValue(ExpressionMediator exm, IOperandTerm[] arguments)
+		{
+			string expr = arguments[0].GetStrValue(exm);
+			if (string.IsNullOrEmpty(expr)) return 0;
+			try
+			{
+				var st = new StringStream(expr);
+				var wc = LexicalAnalyzer.Analyse(st, LexEndWith.EoL, LexAnalyzeFlag.None);
+				var term = ExpressionParser.ReduceExpressionTerm(wc, TermEndWith.EoL);
+				if (term == null || term.GetOperandType() != typeof(Int64)) return 0;
+				return term.GetIntValue(exm);
+			}
+			catch { return 0; }
+		}
+	}
+
+	private sealed class GetVarsMethod : FunctionMethod
+	{
+		public GetVarsMethod()
+		{
+			ReturnType = typeof(string);
+			argumentTypeArray = new Type[] { typeof(string) };
+			CanRestructure = false;
+		}
+		public override string GetStrValue(ExpressionMediator exm, IOperandTerm[] arguments)
+		{
+			string expr = arguments[0].GetStrValue(exm);
+			if (string.IsNullOrEmpty(expr)) return "";
+			try
+			{
+				var st = new StringStream(expr);
+				var wc = LexicalAnalyzer.Analyse(st, LexEndWith.EoL, LexAnalyzeFlag.None);
+				var term = ExpressionParser.ReduceExpressionTerm(wc, TermEndWith.EoL);
+				if (term == null || term.GetOperandType() != typeof(string)) return "";
+				return term.GetStrValue(exm);
+			}
+			catch { return ""; }
+		}
+		public override Int64 GetIntValue(ExpressionMediator exm, IOperandTerm[] arguments) => 0;
+	}
+
+	#endregion
 }
 }
