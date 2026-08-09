@@ -4,6 +4,7 @@ using MinorShift.Emuera.GameView;      // ConsoleImagePart, HtmlManager, EmueraC
 using MinorShift.Emuera;               // Config
 using MinorShift.Emuera.Compatibility; // CompatibilityScanner
 using MinorShift.Emuera.GameProc.Function; // FunctionArgType
+using MinorShift.Emuera.GameData;      // EraDataTable
 
 namespace uEmuera.Tests.EditMode
 {
@@ -219,6 +220,152 @@ namespace uEmuera.Tests.EditMode
             Assert.IsNotNull(enc, "CP932 / Shift-JIS encoding should be available after registration");
             Assert.AreNotEqual("utf-8", enc.WebName.ToLowerInvariant(),
                 "Should be CP932, not UTF-8 fallback");
+        }
+
+        #endregion
+
+        #region MAP commands — registered and accessible
+
+        [Test]
+        public void MapCommands_AllRegistered()
+        {
+            string[] mapCmds = { "MAP_CREATE", "MAP_EXIST", "MAP_RELEASE", "MAP_GET", "MAP_HAS",
+                                  "MAP_SET", "MAP_REMOVE", "MAP_CLEAR", "MAP_SIZE", "MAP_GETKEYS",
+                                  "MAP_TOXML", "MAP_FROMXML" };
+            foreach (string cmd in mapCmds)
+                Assert.IsTrue(
+                    CompatibilityScanner.IsMethod(cmd) || CompatibilityScanner.IsInstruction(cmd),
+                    cmd + " should be registered as method or instruction");
+        }
+
+        #endregion
+
+        #region XML commands — registered
+
+        [Test]
+        public void XmlCommands_AllRegistered()
+        {
+            string[] xmlCmds = { "XML_DOCUMENT", "XML_RELEASE", "XML_EXIST", "XML_GET", "XML_SET",
+                                  "XML_TOSTR", "XML_ADDNODE", "XML_REMOVENODE", "XML_ADDATTRIBUTE",
+                                  "XML_REMOVEATTRIBUTE", "XML_REPLACE" };
+            foreach (string cmd in xmlCmds)
+                Assert.IsTrue(
+                    CompatibilityScanner.IsMethod(cmd) || CompatibilityScanner.IsInstruction(cmd),
+                    cmd + " should be registered as method or instruction");
+        }
+
+        #endregion
+
+        #region DT_* commands — registered and EraDataTable functional
+
+        [Test]
+        public void DtCommands_AllRegistered()
+        {
+            string[] dtCmds = { "DT_CREATE", "DT_EXIST", "DT_RELEASE", "DT_CLEAR", "DT_COLUMN_ADD",
+                                 "DT_COLUMN_NAMES", "DT_COLUMN_EXIST", "DT_COLUMN_REMOVE",
+                                 "DT_ROW_COUNT", "DT_ROW_ADD", "DT_ROW_REMOVE", "DT_GET", "DT_SET",
+                                 "DT_FIND", "DT_SORT", "DT_TOCSV", "DT_TOXML" };
+            foreach (string cmd in dtCmds)
+                Assert.IsTrue(
+                    CompatibilityScanner.IsMethod(cmd) || CompatibilityScanner.IsInstruction(cmd),
+                    cmd + " should be registered as method or instruction");
+        }
+
+        [Test]
+        public void EraDataTable_CRUD()
+        {
+            var dt = new EraDataTable();
+            Assert.AreEqual(0, dt.RowCount);
+            Assert.IsTrue(dt.AddCol("Name", EraDataTable.ColType.Str));
+            Assert.IsTrue(dt.AddCol("Value", EraDataTable.ColType.Int));
+            int row = dt.AddRow();
+            Assert.AreEqual(0, row);
+            dt.SetStr(0, "Name", "Alice");
+            dt.SetInt(0, "Value", 42);
+            Assert.AreEqual("Alice", dt.GetStr(0, "Name"));
+            Assert.AreEqual(42L, dt.GetInt(0, "Value"));
+            Assert.AreEqual(1, dt.RowCount);
+        }
+
+        [Test]
+        public void EraDataTable_DuplicateColumnRejected()
+        {
+            var dt = new EraDataTable();
+            Assert.IsTrue(dt.AddCol("Key", EraDataTable.ColType.Str));
+            Assert.IsFalse(dt.AddCol("Key", EraDataTable.ColType.Int), "Duplicate column should be rejected");
+        }
+
+        [Test]
+        public void EraDataTable_Find()
+        {
+            var dt = new EraDataTable();
+            dt.AddCol("Key", EraDataTable.ColType.Str);
+            dt.AddRow(); dt.SetStr(0, "Key", "foo");
+            dt.AddRow(); dt.SetStr(1, "Key", "bar");
+            Assert.AreEqual(1, dt.Find("Key", "bar"));
+            Assert.AreEqual(-1, dt.Find("Key", "baz"));
+        }
+
+        [Test]
+        public void EraDataTable_ToCsv_HasHeader()
+        {
+            var dt = new EraDataTable();
+            dt.AddCol("A", EraDataTable.ColType.Str);
+            dt.AddRow(); dt.SetStr(0, "A", "hello");
+            string csv = dt.ToCsv();
+            Assert.IsTrue(csv.Contains("A"), "CSV should contain column header");
+            Assert.IsTrue(csv.Contains("hello"), "CSV should contain cell value");
+        }
+
+        [Test]
+        public void EraDataTable_Clear_RemovesRows()
+        {
+            var dt = new EraDataTable();
+            dt.AddCol("X", EraDataTable.ColType.Int);
+            dt.AddRow();
+            dt.AddRow();
+            Assert.AreEqual(2, dt.RowCount);
+            dt.Clear();
+            Assert.AreEqual(0, dt.RowCount);
+            Assert.AreEqual(1, dt.ColumnCount, "Clear should keep column definitions");
+        }
+
+        [Test]
+        public void EraDataTable_RemoveRow_ShiftsIndices()
+        {
+            var dt = new EraDataTable();
+            dt.AddCol("V", EraDataTable.ColType.Str);
+            dt.AddRow(); dt.SetStr(0, "V", "first");
+            dt.AddRow(); dt.SetStr(1, "V", "second");
+            dt.RemoveRow(0);
+            Assert.AreEqual(1, dt.RowCount);
+            Assert.AreEqual("second", dt.GetStr(0, "V"));
+        }
+
+        #endregion
+
+        #region ERDNAME — method registered
+
+        [Test]
+        public void ErdName_MethodRegistered()
+        {
+            Assert.IsTrue(CompatibilityScanner.IsMethod("ERDNAME"),
+                "ERDNAME should be registered as a built-in method");
+        }
+
+        #endregion
+
+        #region Simple G*/Sprite/Input commands — registered
+
+        [Test]
+        public void SimpleCommands_AllRegistered()
+        {
+            string[] cmds = { "GDRAWLINE", "SPRITEDISPOSEALL", "SPRITEEXIST",
+                               "FLOWINPUT", "FLOWINPUTS", "HTML_PRINT_ISLAND", "HTML_PRINT_ISLAND_CLEAR" };
+            foreach (string cmd in cmds)
+                Assert.IsTrue(
+                    CompatibilityScanner.IsMethod(cmd) || CompatibilityScanner.IsInstruction(cmd),
+                    cmd + " should be registered as method or instruction");
         }
 
         #endregion

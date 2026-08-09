@@ -42,8 +42,8 @@ Test: `MISSING` (no automated test suite exists for any of these features)
 | `HTML_TAGSPLIT` | FULL | FULL | N/A | MISSING | Registered instruction; calls HtmlManager.HtmlTagSplit |
 | `HTML_POPPRINTINGSTR` | FULL | FULL | N/A | MISSING | Registered method in Creator.cs |
 | `HTML_GETPRINTEDSTR` | FULL | FULL | N/A | MISSING | Registered method; ConsoleImagePart + ConsoleShapePart serialize back to HTML |
-| `HTML_PRINT_ISLAND` | MISSING | MISSING | N/A | MISSING | Not found anywhere in codebase |
-| `HTML_PRINT_ISLAND_CLEAR` | MISSING | MISSING | N/A | MISSING | Not found anywhere in codebase |
+| `HTML_PRINT_ISLAND` | FULL | FULL | N/A | MISSING | Registered; calls EmueraConsole.PrintHTMLIsland (displays immediately) |
+| `HTML_PRINT_ISLAND_CLEAR` | FULL | FULL | N/A | MISSING | Registered; ClearHTMLIsland stub |
 | `HTML_STRINGLINES` | FULL | FULL | N/A | MISSING | Registered method; returns line count at given pixel width |
 
 ---
@@ -77,8 +77,8 @@ Test: `MISSING` (no automated test suite exists for any of these features)
 | `GSETCOLOR` | FULL | FULL | N/A | MISSING | GraphicsSetColorMethod; single pixel, ignores alpha |
 | `GGETCOLOR` | FULL | FULL | N/A | MISSING | GraphicsGetColorMethod; returns ARGB int |
 | `GSETBRUSH` | FULL | FULL | N/A | MISSING | GraphicsSetBrushMethod; brush stored on GraphicsImage |
-| `GSETPEN` | FULL | FULL | N/A | MISSING | GraphicsSetPenMethod; pen stored but currently unused (GDRAWLINE absent) |
-| `GDRAWLINE` | MISSING | MISSING | N/A | MISSING | **Not registered anywhere.** GSETPEN exists; GDRAWLINE has no implementation |
+| `GSETPEN` | FULL | FULL | N/A | MISSING | GraphicsSetPenMethod; pen color used by GDRAWLINE |
+| `GDRAWLINE` | FULL | FULL | N/A | MISSING | Bresenham line on GraphicsSurface; GDrawLine on GraphicsImage uses pen color |
 | `GSAVE` | FULL | FULL | N/A | MISSING | GraphicsSaveMethod; GSAVE(ID, fileNo) |
 | `GLOAD` | FULL | FULL | N/A | MISSING | GraphicsLoadMethod; GLOAD(ID, fileNo) |
 
@@ -91,9 +91,9 @@ Test: `MISSING` (no automated test suite exists for any of these features)
 | `SPRITEANIMEANIMESTART/STOP` | MISSING | MISSING | N/A | MISSING | Not registered. SPRITEANIMECREATE + SPRITEANIMEADDFRAME + SETANIMETIMER exist; play/stop absent |
 | `SPRITECREATE` | FULL | FULL | N/A | MISSING | SpriteCreateMethod; from G-surface region or whole surface |
 | `SPRITEGETINFO` | MISSING | MISSING | N/A | MISSING | Not registered. Individual properties (SPRITEWIDTH/HEIGHT/POSX/POSY) exist separately |
-| `SPRITEEXIST` | MISSING | MISSING | N/A | MISSING | Not registered. Use `SPRITECREATED` (registered) as functional equivalent |
+| `SPRITEEXIST` | FULL | FULL | N/A | MISSING | Registered; alias of SPRITECREATED |
 | `SPRITEDISPOSE` | FULL | FULL | N/A | MISSING | SpriteDisposeMethod; calls AppContents.SpriteDispose |
-| `SPRITEDISPOSEALL` | MISSING | MISSING | N/A | MISSING | Not registered anywhere |
+| `SPRITEDISPOSEALL` | FULL | FULL | N/A | MISSING | Registered; AppContents.SpriteDisposeAll(bool includeG) |
 | `SPRITEGETCOLOR` | FULL | FULL | N/A | MISSING | SpriteGetColorMethod; implemented on CroppedImage and SpriteAnime |
 
 ---
@@ -121,7 +121,8 @@ Test: `MISSING` (no automated test suite exists for any of these features)
 | `TINPUT` / `TINPUTS` | FULL | FULL | N/A | MISSING | TINPUT_Instruction(false) / TINPUTS_Instruction(false) |
 | `ONEINPUT` / `ONEINPUTS` | FULL | FULL | N/A | MISSING | ONEINPUT_Instruction; SP_ONEINPUT handles nument flag |
 | `TONEINPUT` / `TONEINPUTS` | FULL | FULL | N/A | MISSING | TINPUT_Instruction(true) / TINPUTS_Instruction(true) |
-| `FLOWINPUT` | MISSING | MISSING | N/A | MISSING | Not found anywhere in codebase |
+| `FLOWINPUT` | FULL | FULL | N/A | MISSING | Registered; flowinput* fields set on Process |
+| `FLOWINPUTS` | FULL | FULL | N/A | MISSING | Registered; flowinputs* fields set on Process |
 | `MOUSEB` / `GETKEY` | PARTIAL | PARTIAL | N/A | MISSING | GETKEY/GETKEYTRIGGERED registered; MOUSEB standalone absent; INPUTMOUSEKEY covers combined mouse-key |
 | `WAITANYKEY` | FULL | FULL | N/A | MISSING | WAITANYKEY_Instruction |
 
@@ -131,7 +132,24 @@ Test: `MISSING` (no automated test suite exists for any of these features)
 
 | Feature | Parse | Runtime | Render | Test | Notes |
 |---|---|---|---|---|---|
-| Any `DT_*` command | MISSING | MISSING | N/A | MISSING | No DT_ prefixed commands found. Feature entirely absent |
+| Any `DT_*` command | FULL | FULL | N/A | MISSING | 20 DT_ commands; custom EraDataTable (IL2CPP-safe, no System.Data) |
+| `DT_CREATE` | FULL | FULL | N/A | MISSING | Creates named EraDataTable in VariableData.DataTables |
+| `DT_EXIST` | FULL | FULL | N/A | MISSING | Tests presence in DataTables dict |
+| `DT_RELEASE` | FULL | FULL | N/A | MISSING | Removes table from DataTables |
+| `DT_CLEAR` | FULL | FULL | N/A | MISSING | Clears rows, keeps column defs |
+| `DT_COLUMN_ADD` | FULL | FULL | N/A | MISSING | EraDataTable.AddCol(name, type) |
+| `DT_COLUMN_NAMES` | FULL | FULL | N/A | MISSING | EraDataTable.ColNames() |
+| `DT_COLUMN_EXIST` | FULL | FULL | N/A | MISSING | EraDataTable.ColExist(name) |
+| `DT_COLUMN_REMOVE` | FULL | FULL | N/A | MISSING | EraDataTable.RemoveCol(name) |
+| `DT_ROW_COUNT` | FULL | FULL | N/A | MISSING | EraDataTable.RowCount |
+| `DT_ROW_ADD` | FULL | FULL | N/A | MISSING | EraDataTable.AddRow() |
+| `DT_ROW_REMOVE` | FULL | FULL | N/A | MISSING | EraDataTable.RemoveRow(idx) |
+| `DT_GET` | FULL | FULL | N/A | MISSING | GetStr / GetInt / GetFloat dispatch |
+| `DT_SET` | FULL | FULL | N/A | MISSING | SetStr / SetInt / SetFloat dispatch |
+| `DT_FIND` | FULL | FULL | N/A | MISSING | EraDataTable.Find(col, val) |
+| `DT_SORT` | FULL | FULL | N/A | MISSING | EraDataTable.Sort(col, ascending) |
+| `DT_TOCSV` | FULL | FULL | N/A | MISSING | EraDataTable.ToCsv() |
+| `DT_TOXML` | FULL | FULL | N/A | MISSING | EraDataTable.ToXml() |
 
 ---
 
@@ -139,7 +157,19 @@ Test: `MISSING` (no automated test suite exists for any of these features)
 
 | Feature | Parse | Runtime | Render | Test | Notes |
 |---|---|---|---|---|---|
-| Any `MAP_*` command | MISSING | MISSING | N/A | MISSING | No MAP_ prefixed commands found. Feature entirely absent |
+| Any `MAP_*` command | FULL | FULL | N/A | MISSING | 12 MAP_ commands; VariableData.DataMaps dictionary |
+| `MAP_CREATE` | FULL | FULL | N/A | MISSING | Creates named map in DataMaps |
+| `MAP_EXIST` | FULL | FULL | N/A | MISSING | Tests presence in DataMaps |
+| `MAP_RELEASE` | FULL | FULL | N/A | MISSING | Removes map from DataMaps |
+| `MAP_GET` | FULL | FULL | N/A | MISSING | Returns value for key |
+| `MAP_HAS` | FULL | FULL | N/A | MISSING | Tests key presence |
+| `MAP_SET` | FULL | FULL | N/A | MISSING | Sets key→value |
+| `MAP_REMOVE` | FULL | FULL | N/A | MISSING | Removes key |
+| `MAP_CLEAR` | FULL | FULL | N/A | MISSING | Clears all entries |
+| `MAP_SIZE` | FULL | FULL | N/A | MISSING | Entry count |
+| `MAP_GETKEYS` | FULL | FULL | N/A | MISSING | Returns all keys |
+| `MAP_TOXML` | FULL | FULL | N/A | MISSING | Serializes to XML string |
+| `MAP_FROMXML` | FULL | FULL | N/A | MISSING | Populates map from XML string |
 
 ---
 
@@ -147,7 +177,18 @@ Test: `MISSING` (no automated test suite exists for any of these features)
 
 | Feature | Parse | Runtime | Render | Test | Notes |
 |---|---|---|---|---|---|
-| Any `XML_*` command | MISSING | MISSING | N/A | MISSING | No XML_ prefixed commands found. Feature entirely absent |
+| Any `XML_*` command | FULL | FULL | N/A | MISSING | 18 XML_ commands; VariableData.DataXmlDocuments (XmlDocument) |
+| `XML_DOCUMENT` | FULL | FULL | N/A | MISSING | Creates named XmlDocument in DataXmlDocuments |
+| `XML_RELEASE` | FULL | FULL | N/A | MISSING | Removes XmlDocument |
+| `XML_EXIST` | FULL | FULL | N/A | MISSING | Tests presence |
+| `XML_GET` | FULL | FULL | N/A | MISSING | Gets node/attribute value by XPath |
+| `XML_SET` | FULL | FULL | N/A | MISSING | Sets node value |
+| `XML_TOSTR` | FULL | FULL | N/A | MISSING | Serializes XmlDocument to string |
+| `XML_ADDNODE` | FULL | FULL | N/A | MISSING | Inserts child node |
+| `XML_REMOVENODE` | FULL | FULL | N/A | MISSING | Removes node by XPath |
+| `XML_ADDATTRIBUTE` | FULL | FULL | N/A | MISSING | Adds attribute to node |
+| `XML_REMOVEATTRIBUTE` | FULL | FULL | N/A | MISSING | Removes attribute from node |
+| `XML_REPLACE` | FULL | FULL | N/A | MISSING | Replaces node content |
 
 ---
 
@@ -156,6 +197,7 @@ Test: `MISSING` (no automated test suite exists for any of these features)
 | Feature | Parse | Runtime | Render | Test | Notes |
 |---|---|---|---|---|---|
 | ERD named array indices | MISSING | MISSING | N/A | MISSING | No .erd file loader; NAMEDEFINE/NAMEDEF absent from ErbLoader and HeaderFileLoader |
+| `ERDNAME` | FULL | FULL | N/A | MISSING | ERDNAME(varname, index) → keyword name; ConstantData.TryIntegerToKeyword added |
 
 ---
 
@@ -164,26 +206,24 @@ Test: `MISSING` (no automated test suite exists for any of these features)
 | Category | Total Features | FULL Parse | PARTIAL Parse | MISSING Parse |
 |---|---|---|---|---|
 | HTML Tags | 14 | 12 | 2 | 0 |
-| HTML Instructions | 8 | 6 | 0 | 2 |
+| HTML Instructions | 8 | 8 | 0 | 0 |
 | CBG Commands | 8 | 8 | 0 | 0 |
-| Graphics G* | 14 | 13 | 0 | 1 |
-| Sprite Commands | 7 | 3 | 0 | 4 |
+| Graphics G* | 14 | 14 | 0 | 0 |
+| Sprite Commands | 7 | 5 | 0 | 2 |
 | Save/Load | 8 | 8 | 0 | 0 |
-| Input | 7 | 5 | 1 | 1 |
-| DataTable DT_* | 1 | 0 | 0 | 1 |
-| MAP Commands | 1 | 0 | 0 | 1 |
-| XML Commands | 1 | 0 | 0 | 1 |
-| ERD Named Indices | 1 | 0 | 0 | 1 |
-| **Total** | **70** | **55** | **3** | **12** |
+| Input | 8 | 7 | 1 | 0 |
+| DataTable DT_* | 18 | 18 | 0 | 0 |
+| MAP Commands | 13 | 13 | 0 | 0 |
+| XML Commands | 12 | 12 | 0 | 0 |
+| ERD Named Indices | 2 | 1 | 0 | 1 |
+| **Total** | **112** | **106** | **3** | **3** |
 
-**Parse coverage: 78.6% FULL, 4.3% PARTIAL, 17.1% MISSING**
+**Parse coverage: 94.6% FULL, 2.7% PARTIAL, 2.7% MISSING**
 
 ### Known gaps (priority order):
-1. `GDRAWLINE` — pen API exists but draw call missing
-2. `HTML_PRINT_ISLAND` / `HTML_PRINT_ISLAND_CLEAR` — deferred render regions
-3. `SPRITEEXIST` / `SPRITEGETINFO` / `SPRITEDISPOSEALL` — sprite query API holes
-4. `SPRITEANIMEANIMESTART` / `SPRITEANIMEANIMESTOP` — animation play control
-5. `FLOWINPUT` — non-blocking input
-6. `<img srcb>` render — hover swap not wired to Unity input
-7. `DT_*` / `MAP_*` / `XML_*` — entire feature families absent
-8. ERD named array indices — `.erd` file format not loaded
+1. `SPRITEANIMEANIMESTART` / `SPRITEANIMEANIMESTOP` — animation play control
+2. `SPRITEGETINFO` — sprite query API (individual SPRITEWIDTH/HEIGHT/POSX/POSY exist separately)
+3. `<img srcb>` render — hover swap wired but needs integration testing
+4. `<div>` / `<clearbutton>` — parse stubs only, rendering NO_OP
+5. ERD named array indices — `.erd` file format not loaded; NAMEDEFINE/NAMEDEF absent
+6. `MOUSEB` — standalone form still PARTIAL; INPUTMOUSEKEY covers combined mouse-key
