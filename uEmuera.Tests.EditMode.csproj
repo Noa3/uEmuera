@@ -62,6 +62,7 @@
     <Compile Include="Assets\Tests\EditMode\PixelPerfectManagerTests.cs" />
     <Compile Include="Assets\Tests\EditMode\PostProcessingManagerTests.cs" />
     <Compile Include="Assets\Tests\EditMode\MathUtilitiesTests.cs" />
+    <Compile Include="Assets\Tests\EditMode\Phase3ConformanceTests.cs" />
     <Compile Include="Assets\Tests\EditMode\ColorTests.cs" />
     <Compile Include="Assets\Tests\EditMode\UtilsTests.cs" />
     <Compile Include="Assets\Tests\EditMode\UIStyleManagerTests.cs" />
