@@ -45,6 +45,7 @@ Test: `MISSING` (no automated test suite exists for any of these features)
 | `HTML_PRINT_ISLAND` | FULL | FULL | N/A | MISSING | Registered; calls EmueraConsole.PrintHTMLIsland (displays immediately) |
 | `HTML_PRINT_ISLAND_CLEAR` | FULL | FULL | N/A | MISSING | Registered; ClearHTMLIsland stub |
 | `HTML_STRINGLINES` | FULL | FULL | N/A | MISSING | Registered method; returns line count at given pixel width |
+| `HTML_STRINGLEN` | FULL | FULL | N/A | MISSING | Returns rendered display length in half-width chars |
 
 ---
 
@@ -150,6 +151,11 @@ Test: `MISSING` (no automated test suite exists for any of these features)
 | `DT_SORT` | FULL | FULL | N/A | MISSING | EraDataTable.Sort(col, ascending) |
 | `DT_TOCSV` | FULL | FULL | N/A | MISSING | EraDataTable.ToCsv() |
 | `DT_TOXML` | FULL | FULL | N/A | MISSING | EraDataTable.ToXml() |
+| `DT_ROW_LENGTH(name)` | FULL | FULL | N/A | MISSING | Row count; -1 if table missing |
+| `DT_CELL_GET(name,row,col)` | FULL | FULL | N/A | MISSING | Int cell value |
+| `DT_CELL_GETS(name,row,col)` | FULL | FULL | N/A | MISSING | String cell value |
+| `DT_CELL_ISNULL(name,row,col)` | FULL | FULL | N/A | MISSING | 0=has value, 1=empty, -1=no row, -2=no table |
+| `DT_SELECT(name,col,val)` | FULL | FULL | N/A | MISSING | Fills RESULT[] with matching row indices |
 
 ---
 
@@ -201,6 +207,20 @@ Test: `MISSING` (no automated test suite exists for any of these features)
 
 ---
 
+## File System / Process
+
+| Feature | Parse | Runtime | Render | Test | Notes |
+|---|---|---|---|---|---|
+| `EXISTFILE(path)` | FULL | FULL | N/A | MISSING | Sandboxed to ExeDir; path traversal blocked |
+| `EXISTVAR(varname)` | FULL | FULL | N/A | MISSING | Returns bitmask of variable type flags |
+| `ENUMFILES(dir,...)` | FULL | FULL | N/A | MISSING | Fills RESULTS[] with relative file paths |
+| `CLEARMEMORY()` | FULL | FULL | N/A | MISSING | GC.Collect(); returns bytes freed |
+| `GETDOINGFUNCTION()` | FULL | FULL | N/A | MISSING | Returns current executing function label name |
+| `GETVAR(expr)` | FULL | FULL | N/A | MISSING | Parses string as ERA int expression and evals |
+| `GETVARS(expr)` | FULL | FULL | N/A | MISSING | Parses string as ERA string expression and evals |
+
+---
+
 ## Summary Counts
 
 | Category | Total Features | FULL Parse | PARTIAL Parse | MISSING Parse |
@@ -212,13 +232,14 @@ Test: `MISSING` (no automated test suite exists for any of these features)
 | Sprite Commands | 7 | 5 | 0 | 2 |
 | Save/Load | 8 | 8 | 0 | 0 |
 | Input | 8 | 7 | 1 | 0 |
-| DataTable DT_* | 18 | 18 | 0 | 0 |
+| DataTable DT_* | 23 | 23 | 0 | 0 |
 | MAP Commands | 13 | 13 | 0 | 0 |
 | XML Commands | 12 | 12 | 0 | 0 |
 | ERD Named Indices | 2 | 1 | 0 | 1 |
-| **Total** | **112** | **106** | **3** | **3** |
+| File System / Process | 7 | 7 | 0 | 0 |
+| **Total** | **124** | **118** | **3** | **3** |
 
-**Parse coverage: 94.6% FULL, 2.7% PARTIAL, 2.7% MISSING**
+**Parse coverage: 95.2% FULL, 2.4% PARTIAL, 2.4% MISSING**
 
 ### Known gaps (priority order):
 1. `SPRITEANIMEANIMESTART` / `SPRITEANIMEANIMESTOP` — animation play control
