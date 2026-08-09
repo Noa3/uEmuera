@@ -341,7 +341,7 @@ namespace MinorShift.Emuera.GameView
 		
 		public void PrintImg(string str)
 		{
-			printBuffer.Append(new ConsoleImagePart(str, null, 0, 0, 0));
+			printBuffer.Append(new ConsoleImagePart(str, null, null, 0, 0, 0));
 		}
 
 		public void PrintShape(string type, int[] param)
@@ -350,7 +350,7 @@ namespace MinorShift.Emuera.GameView
 			printBuffer.Append(part);
 		}
 
-		public void PrintHtml(string str)
+		public void PrintHtml(string str, bool toPrintBuffer = false)
 		{
 			if (string.IsNullOrEmpty(str))
 				return;

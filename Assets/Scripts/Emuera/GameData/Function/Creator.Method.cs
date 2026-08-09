@@ -2914,6 +2914,37 @@ namespace MinorShift.Emuera.GameData.Function
 				return HtmlManager.Escape(arguments[0].GetStrValue(exm));
 			}
 		}
+
+		/// <summary>
+		/// HTML_STRINGLINES(str, width) - Returns number of display lines the HTML string occupies at the given half-width character width.
+		/// </summary>
+		private sealed class HtmlStringLinesMethod : FunctionMethod
+		{
+			public HtmlStringLinesMethod()
+			{
+				ReturnType = typeof(Int64);
+				argumentTypeArray = new Type[] { typeof(string), typeof(Int64) };
+				CanRestructure = false;
+			}
+			public override Int64 GetIntValue(ExpressionMediator exm, IOperandTerm[] arguments)
+			{
+				string str = arguments[0].GetStrValue(exm);
+				if (string.IsNullOrEmpty(str)) return 0;
+				int width = (int)arguments[1].GetIntValue(exm);
+				if (width <= 0) return 0;
+				int lineCount = 0;
+				string remaining = str;
+				do
+				{
+					string[] parts = HtmlManager.HtmlSubString(remaining, width);
+					if (parts == null || parts.Length < 2 || (string.IsNullOrEmpty(parts[0]) && string.IsNullOrEmpty(parts[1])))
+						break;
+					remaining = parts[1];
+					lineCount++;
+				} while (!string.IsNullOrEmpty(remaining));
+				return Math.Max(1, lineCount);
+			}
+		}
 		#endregion
 
 		#region 画像処理系

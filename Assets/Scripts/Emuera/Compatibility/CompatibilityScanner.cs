@@ -392,8 +392,12 @@ namespace MinorShift.Emuera.Compatibility
         #endregion
 
         /// <summary>
-        /// Detect era-script text encoding: UTF-8 (with/without BOM) preferred, else
-        /// legacy per-file heuristics. Kept lossless so the scanner never mutates tokens.
+        /// Detect era-script text encoding.
+        /// Priority: UTF-8 BOM → UTF-16 LE/BE BOM → UTF-8 validity check → CP932 fallback → UTF-8.
+        /// CP932 (Shift-JIS) detection covers legacy era games that predate UTF-8 adoption.
+        /// Requires CodePagesEncodingProvider to be registered on .NET Core runtimes;
+        /// Unity's Mono runtime exposes CP932 via I18N.CJK.dll without registration.
+        /// Kept lossless so the scanner never mutates tokens.
         /// </summary>
         public static Encoding DetectEncoding(string path)
         {
@@ -405,9 +409,41 @@ namespace MinorShift.Emuera.Compatibility
                     got = fs.Read(head, 0, 4);
             }
             catch { return Encoding.UTF8; }
+
+            // UTF-8 BOM (EF BB BF)
             if (got >= 3 && head[0] == 0xEF && head[1] == 0xBB && head[2] == 0xBF)
                 return new UTF8Encoding(true);
-            return Encoding.UTF8;
+            // UTF-16 LE BOM (FF FE)
+            if (got >= 2 && head[0] == 0xFF && head[1] == 0xFE)
+                return Encoding.Unicode;
+            // UTF-16 BE BOM (FE FF)
+            if (got >= 2 && head[0] == 0xFE && head[1] == 0xFF)
+                return Encoding.BigEndianUnicode;
+
+            // No BOM — probe up to 1 KB to decide UTF-8 vs CP932
+            try
+            {
+                using (var fs = new FileStream(path, FileMode.Open, FileAccess.Read))
+                {
+                    byte[] sample = new byte[1024];
+                    int sampleLen = fs.Read(sample, 0, sample.Length);
+                    if (sampleLen > 0)
+                    {
+                        // throwOnInvalidBytes=true so GetChars throws on bad UTF-8 sequences
+                        var decoder = new UTF8Encoding(false, true).GetDecoder();
+                        char[] chars = new char[sampleLen];
+                        decoder.GetChars(sample, 0, sampleLen, chars, 0);
+                    }
+                }
+                return new UTF8Encoding(false); // valid UTF-8, no BOM
+            }
+            catch (DecoderFallbackException)
+            {
+                // Not valid UTF-8 — assume CP932 / Shift-JIS (legacy era game)
+                try { return Encoding.GetEncoding(932); }
+                catch { return Encoding.UTF8; }
+            }
+            catch { return Encoding.UTF8; }
         }
     }
 

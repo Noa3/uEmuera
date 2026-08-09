@@ -24,6 +24,24 @@ namespace MinorShift.Emuera
         public static Encoding Encode = Encoding.UTF8;
         public static Encoding SaveEncode = Encoding.UTF8;
 
+        /// <summary>
+        /// Returns CP932 / Shift-JIS encoding if available, otherwise falls back to UTF-8.
+        /// CP932 is used by many legacy era games. On .NET Core this requires
+        /// CodePagesEncodingProvider to be registered at startup; on Unity's Mono runtime,
+        /// I18N.CJK.dll provides the encoding natively.
+        /// </summary>
+        public static Encoding GetShiftJis()
+        {
+            try
+            {
+                return Encoding.GetEncoding(932);
+            }
+            catch (NotSupportedException)
+            {
+                return Encoding.UTF8;
+            }
+        }
+
         private static Dictionary<ConfigCode, string> nameDic = null;
 		public static string GetConfigName(ConfigCode code)
 		{

@@ -42,6 +42,22 @@ namespace MinorShift.Emuera
 		//[STAThread]
 		public static void Main(string[] args)
 		{
+			// Register CodePagesEncodingProvider so Encoding.GetEncoding(932) / CP932 / Shift-JIS
+			// works on .NET Core and .NET 5+ runtimes (not included by default).
+			// On Unity's Mono runtime, I18N.CJK.dll provides CP932 support natively, so this
+			// is a no-op there. Uses reflection to avoid a compile-time package dependency.
+			try
+			{
+				// Try fully-qualified assembly name first (NuGet package on .NET Core)
+				var t = Type.GetType("System.Text.CodePagesEncodingProvider, System.Text.Encoding.CodePages")
+				         ?? Type.GetType("System.Text.CodePagesEncodingProvider");
+				var prop = t?.GetProperty("Instance",
+					System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
+				var provider = prop?.GetValue(null) as System.Text.EncodingProvider;
+				if (provider != null)
+					System.Text.Encoding.RegisterProvider(provider);
+			}
+			catch { }
 
 			ExeDir = Sys.ExeDir;
 #if UEMUERA_DEBUG

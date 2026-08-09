@@ -23,12 +23,13 @@ namespace MinorShift.Emuera.GameView
 		/// Images are loaded via AppContents.GetSprite() from the resources folder.
 		/// If image loading fails, displays alt text with the img tag parameters.
 		/// </summary>
-		/// <param name="resName">Image resource name (src attribute) - required</param>
-		/// <param name="resNameb">Button state image resource name (srcb attribute) - optional</param>
-		/// <param name="raw_height">Image height - 0=font size, positive number=percentage of font size, number with px=absolute pixels</param>
-		/// <param name="raw_width">Image width - 0=maintain aspect ratio, positive number=percentage of font size, number with px=absolute pixels</param>
-		/// <param name="raw_ypos">Vertical position offset - number=percentage of font size, number with px=absolute pixels</param>
-		public ConsoleImagePart(string resName, string resNameb, MixedNum raw_height, MixedNum raw_width, MixedNum raw_ypos)
+	/// <param name="resName">Image resource name (src attribute) - required</param>
+	/// <param name="resNameb">Button state image resource name (srcb attribute) - optional</param>
+	/// <param name="resNamem">Mask image resource name (srcm attribute) - optional</param>
+	/// <param name="raw_height">Image height - 0=font size, positive number=percentage of font size, number with px=absolute pixels</param>
+	/// <param name="raw_width">Image width - 0=maintain aspect ratio, positive number=percentage of font size, number with px=absolute pixels</param>
+	/// <param name="raw_ypos">Vertical position offset - number=percentage of font size, number with px=absolute pixels</param>
+	public ConsoleImagePart(string resName, string resNameb, string resNamem, MixedNum raw_height, MixedNum raw_width, MixedNum raw_ypos)
 		{
 			ResourceName = resName ?? "";
 			ButtonResourceName = resNameb;
@@ -103,17 +104,20 @@ namespace MinorShift.Emuera.GameView
 			//	top = 0;
 			//if(bottom < Config.FontSize)
 			//	bottom = Config.FontSize;
-			if (ButtonResourceName != null)
+		if (ButtonResourceName != null)
+		{
+			if(ButtonResourceName == ResourceName)
+				cImageB = cImage;
+			else
 			{
-				if(ButtonResourceName == ResourceName)
-					cImageB = cImage;
-				else
-				{
-					cImageB = AppContents.GetSprite(ButtonResourceName);
-					if(cImageB == null)
-						cImageB = null;
-				}
+				cImageB = AppContents.GetSprite(ButtonResourceName);
+				if(cImageB == null)
+					cImageB = null;
 			}
+		}
+		MappingResourceName = resNamem;
+		if (resNamem != null)
+			cImageM = AppContents.GetSprite(resNamem);
             // Successful images also need a serializable representation so that
             // DisplayLine2Html/HTML_GETPRINTEDSTR can round-trip the img tag.
             AltText = BuildAltText();
@@ -133,6 +137,11 @@ namespace MinorShift.Emuera.GameView
             {
                 sb.Append("' srcb='");
                 sb.Append(ButtonResourceName);
+            }
+            if (MappingResourceName != null)
+            {
+                sb.Append("' srcm='");
+                sb.Append(MappingResourceName);
             }
             if(rawHeight.num != 0)
             {
@@ -169,6 +178,9 @@ namespace MinorShift.Emuera.GameView
         public bool FlipX { get; private set; }
         /// <summary>Raw negative height flips the image vertically.</summary>
         public bool FlipY { get; private set; }
+        /// <summary>Mask image resource name (srcm attribute). Null if not specified.</summary>
+        public readonly string MappingResourceName;
+        private readonly ASprite cImageM;
 
         public ASprite Image { get { return cImage; } }
         public ASprite ImageBackground { get { return cImageB; } }
@@ -254,6 +266,25 @@ namespace MinorShift.Emuera.GameView
 			//}
 			//else
 			//	GDI.TabbedTextOutFull(Config.Font, Config.ForeColor, AltText, PointX, pointY);
+		}
+
+		/// <summary>
+		/// Returns the color value from the srcm mask image at logical coordinates
+		/// (x, y) relative to the image's display rect. Used for CBG button hit testing.
+		/// Returns 0 if no mask or pixel is transparent.
+		/// </summary>
+		public long GetMappingColor(int x, int y)
+		{
+			if (cImageM == null || !cImageM.IsCreated)
+				return 0;
+			// Scale point from display coords to mask image coords
+			var size = cImageM.DestBaseSize;
+			if (destRect.Width <= 0 || destRect.Height <= 0)
+				return 0;
+			int mx = x * size.Width / destRect.Width;
+			int my = y * size.Height / destRect.Height;
+			var c = cImageM.SpriteGetColor(mx, my);
+			return ((long)(c.A & 0xFF) << 24) | ((long)(c.R & 0xFF) << 16) | ((long)(c.G & 0xFF) << 8) | (long)(c.B & 0xFF);
 		}
 	}
 }

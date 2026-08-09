@@ -543,17 +543,17 @@ namespace uEmuera
                 return content_files;
 
             List<string> bmpfilelist = new List<string>();
-            bmpfilelist.AddRange(Directory.GetFiles(contentdir, "*.png", SearchOption.TopDirectoryOnly));
-            bmpfilelist.AddRange(Directory.GetFiles(contentdir, "*.bmp", SearchOption.TopDirectoryOnly));
-            bmpfilelist.AddRange(Directory.GetFiles(contentdir, "*.jpg", SearchOption.TopDirectoryOnly));
-            bmpfilelist.AddRange(Directory.GetFiles(contentdir, "*.gif", SearchOption.TopDirectoryOnly));
-            bmpfilelist.AddRange(Directory.GetFiles(contentdir, "*.webp", SearchOption.TopDirectoryOnly));
+            bmpfilelist.AddRange(Directory.GetFiles(contentdir, "*.png", SearchOption.AllDirectories));
+            bmpfilelist.AddRange(Directory.GetFiles(contentdir, "*.bmp", SearchOption.AllDirectories));
+            bmpfilelist.AddRange(Directory.GetFiles(contentdir, "*.jpg", SearchOption.AllDirectories));
+            bmpfilelist.AddRange(Directory.GetFiles(contentdir, "*.gif", SearchOption.AllDirectories));
+            bmpfilelist.AddRange(Directory.GetFiles(contentdir, "*.webp", SearchOption.AllDirectories));
 #if(UNITY_ANDROID || UNITY_IOS) && !UNITY_EDITOR
-            bmpfilelist.AddRange(Directory.GetFiles(contentdir, "*.PNG", SearchOption.TopDirectoryOnly));
-            bmpfilelist.AddRange(Directory.GetFiles(contentdir, "*.BMP", SearchOption.TopDirectoryOnly));
-            bmpfilelist.AddRange(Directory.GetFiles(contentdir, "*.JPG", SearchOption.TopDirectoryOnly));
-            bmpfilelist.AddRange(Directory.GetFiles(contentdir, "*.GIF", SearchOption.TopDirectoryOnly));
-            bmpfilelist.AddRange(Directory.GetFiles(contentdir, "*.WEBP", SearchOption.TopDirectoryOnly));
+            bmpfilelist.AddRange(Directory.GetFiles(contentdir, "*.PNG", SearchOption.AllDirectories));
+            bmpfilelist.AddRange(Directory.GetFiles(contentdir, "*.BMP", SearchOption.AllDirectories));
+            bmpfilelist.AddRange(Directory.GetFiles(contentdir, "*.JPG", SearchOption.AllDirectories));
+            bmpfilelist.AddRange(Directory.GetFiles(contentdir, "*.GIF", SearchOption.AllDirectories));
+            bmpfilelist.AddRange(Directory.GetFiles(contentdir, "*.WEBP", SearchOption.AllDirectories));
 
 #endif
             var filecount = bmpfilelist.Count;
@@ -583,10 +583,10 @@ namespace uEmuera
 
             var contentdir = MinorShift._Library.Sys.ExeDir + "resources/";
             List<string> csvFiles = new List<string>(Directory.GetFiles(
-                contentdir, "*.csv", SearchOption.TopDirectoryOnly));
+                contentdir, "*.csv", SearchOption.AllDirectories));
 #if(UNITY_ANDROID || UNITY_IOS) && !UNITY_EDITOR
             csvFiles.AddRange(Directory.GetFiles(
-                contentdir, "*.CSV", SearchOption.TopDirectoryOnly));
+                contentdir, "*.CSV", SearchOption.AllDirectories));
 #endif
             resource_csv_lines_ = new Dictionary<string, string[]>();
 
@@ -667,10 +667,10 @@ namespace uEmuera
 
             var contentdir = MinorShift._Library.Sys.ExeDir + "resources/";
             List<string> csvFiles = new List<string>(Directory.GetFiles(
-                contentdir, "*.csv", SearchOption.TopDirectoryOnly));
+                contentdir, "*.csv", SearchOption.AllDirectories));
 #if(UNITY_ANDROID || UNITY_IOS) && !UNITY_EDITOR
             csvFiles.AddRange(Directory.GetFiles(
-                contentdir, "*.CSV", SearchOption.TopDirectoryOnly));
+                contentdir, "*.CSV", SearchOption.AllDirectories));
 #endif
             resource_csv_lines_ = new Dictionary<string, string[]>();
 

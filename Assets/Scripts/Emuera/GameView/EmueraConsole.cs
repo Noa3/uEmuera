@@ -302,6 +302,43 @@ namespace MinorShift.Emuera.GameView
 		}
 		public int ClientWidth { get { return UnityEngine.Screen.width; } }
 		public int ClientHeight { get { return UnityEngine.Screen.height; } }
+
+		/// <summary>Snapshot of a single CBG layer entry for the Unity renderer.</summary>
+		internal struct CbgEntry
+		{
+			public ASprite Image;
+			public ASprite ImageB; // hover/button alternate
+			public int X;
+			public int Y;
+			public int ZDepth;
+			public bool IsButton;
+			public int ButtonValue;
+			public string Tooltip;
+		}
+
+		/// <summary>
+		/// Returns CBG entries (excluding zdepth==0 reserved background) for the Unity renderer.
+		/// </summary>
+		public List<CbgEntry> GetCbgSnapshot()
+		{
+			var result = new List<CbgEntry>(cbgList.Count);
+			foreach (var c in cbgList)
+			{
+				if (c.zdepth == 0) continue;
+				result.Add(new CbgEntry
+				{
+					Image = c.Img,
+					ImageB = c.ImgB,
+					X = c.x,
+					Y = c.y,
+					ZDepth = c.zdepth,
+					IsButton = c.isButton,
+					ButtonValue = c.buttonValue,
+					Tooltip = c.tooltipString
+				});
+			}
+			return result;
+		}
 #endregion
 
 		const string ErrorButtonsText = "__openFileWithDebug__";

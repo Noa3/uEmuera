@@ -53,16 +53,16 @@
     <Analyzer Include="C:\Program Files\Unity\Hub\Editor\6000.5.4f1\Editor\Data\BCLExtensions\TargetingPacks\netstandard2.1\analyzers\dotnet\roslyn4.0\cs\System.Text.Json.SourceGeneration.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Tests\EditMode\StringStreamTests.cs" />
     <Compile Include="Assets\Tests\EditMode\FontTests.cs" />
-    <Compile Include="Assets\Tests\EditMode\PixelPerfectManagerTests.cs" />
     <Compile Include="Assets\Tests\EditMode\CompatibilityScannerTests.cs" />
     <Compile Include="Assets\Tests\EditMode\AndroidPermissionManagerTests.cs" />
+    <Compile Include="Assets\Tests\EditMode\GraphicsSurfaceTests.cs" />
+    <Compile Include="Assets\Tests\EditMode\DrawingPrimitivesTests.cs" />
+    <Compile Include="Assets\Tests\EditMode\StringStreamTests.cs" />
+    <Compile Include="Assets\Tests\EditMode\PixelPerfectManagerTests.cs" />
     <Compile Include="Assets\Tests\EditMode\PostProcessingManagerTests.cs" />
     <Compile Include="Assets\Tests\EditMode\MathUtilitiesTests.cs" />
-    <Compile Include="Assets\Tests\EditMode\GraphicsSurfaceTests.cs" />
     <Compile Include="Assets\Tests\EditMode\ColorTests.cs" />
-    <Compile Include="Assets\Tests\EditMode\DrawingPrimitivesTests.cs" />
     <Compile Include="Assets\Tests\EditMode\UtilsTests.cs" />
     <Compile Include="Assets\Tests\EditMode\UIStyleManagerTests.cs" />
   </ItemGroup>

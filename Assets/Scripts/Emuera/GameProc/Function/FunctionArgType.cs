@@ -72,5 +72,6 @@
 		SP_REF,
 		SP_REFBYNAME,
 		SP_HTMLSPLIT,
+		SP_HTML_PRINT,//<string expression>[, <int expression>] - HTML_PRINT with optional toPrintBuffer flag
 	}
 }

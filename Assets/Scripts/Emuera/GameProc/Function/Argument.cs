@@ -367,6 +367,20 @@ namespace MinorShift.Emuera.GameProc.Function
         readonly public VariableTerm Num;
 	}
 
+	/// <summary>
+	/// Argument for HTML_PRINT: the HTML string plus optional int flag (non-zero = inject into print buffer).
+	/// </summary>
+	internal sealed class SpHtmlPrintArgument : Argument
+	{
+		public SpHtmlPrintArgument(IOperandTerm str, IOperandTerm opt)
+		{
+			HtmlStr = str;
+			OptTerm = opt;
+		}
+		public readonly IOperandTerm HtmlStr;
+		public readonly IOperandTerm OptTerm; // null if not specified
+	}
+
 	internal sealed class SpGetIntArgument : Argument
 	{
 		public SpGetIntArgument(VariableTerm var)

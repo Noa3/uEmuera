@@ -1,10 +1,11 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using MinorShift.Emuera.GameView;
 using MinorShift.Emuera.Content;
 
-public class EmueraImage : EmueraBehaviour
+public class EmueraImage : EmueraBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
     class ImageInfo : MonoBehaviour
     {
@@ -27,6 +28,23 @@ public class EmueraImage : EmueraBehaviour
         public void Load(ASprite src)
         {
             SpriteManager.GetSprite(src, this, ImageInfo.OnLoadImageCallback);
+        }
+
+        ASprite srcSprite_;
+        ASprite srcbSprite_;
+
+        public void LoadBoth(ASprite src, ASprite srcb)
+        {
+            srcSprite_ = src;
+            srcbSprite_ = srcb;
+            Load(src);
+        }
+
+        public void SetHover(bool hovered)
+        {
+            ASprite target = (hovered && srcbSprite_ != null) ? srcbSprite_ : srcSprite_;
+            if (target != null)
+                Load(target);
         }
         void SetSprite(SpriteManager.SpriteInfo spriteinfo)
         {
@@ -137,7 +155,7 @@ public class EmueraImage : EmueraBehaviour
 #if UNITY_EDITOR
             image.name = image_part.Image.Name;
 #endif
-            imageinfo.Load(image_part.Image);
+            imageinfo.LoadBoth(image_part.Image, image_part.ImageBackground);
             image_infos_.Add(imageinfo);
 
             var image_rect = image_part.dest_rect;
@@ -172,7 +190,9 @@ public class EmueraImage : EmueraBehaviour
                 image_part.PointX - ud.posx + sprite_x_offset, 
                 maxy - image_part.Top - image_rect.Height - sprite_y_offset);
             rt.sizeDelta = new Vector2(image_rect.Width, image_rect.Height);
-            rt.localScale = Vector3.one;
+            float scaleX = image_part.FlipX ? -1f : 1f;
+            float scaleY = image_part.FlipY ? -1f : 1f;
+            rt.localScale = new Vector3(scaleX, scaleY, 1f);
 
             width = Mathf.Max(image_part.PointX - ud.posx + sprite_x_offset + image_rect.Width, width);
         }
@@ -191,6 +211,18 @@ public class EmueraImage : EmueraBehaviour
             image.Clear();
         }
         image_infos_.Clear();
+    }
+
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+        foreach (var info in image_infos_)
+            info.SetHover(true);
+    }
+
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        foreach (var info in image_infos_)
+            info.SetHover(false);
     }
 
     UnityEngine.UI.Image image

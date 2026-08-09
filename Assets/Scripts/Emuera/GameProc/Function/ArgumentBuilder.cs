@@ -227,6 +227,7 @@ namespace MinorShift.Emuera.GameProc.Function
 			argb[FunctionArgType.SP_REF] = new SP_REF_ArgumentBuilder(false);
 			argb[FunctionArgType.SP_REFBYNAME] = new SP_REF_ArgumentBuilder(true);
 			argb[FunctionArgType.SP_HTMLSPLIT] = new SP_HTMLSPLIT_ArgumentBuilder();
+			argb[FunctionArgType.SP_HTML_PRINT] = new SP_HTML_PRINT_ArgumentBuilder();
 			
         }
 		
@@ -1940,6 +1941,24 @@ namespace MinorShift.Emuera.GameProc.Function
 				if (!checkArgumentType(line, exm, terms))
 					return null;
 				return new ExpressionsArgument(argumentTypeArray, terms);
+			}
+		}
+
+		private sealed class SP_HTML_PRINT_ArgumentBuilder : ArgumentBuilder
+		{
+			public SP_HTML_PRINT_ArgumentBuilder()
+			{
+				argumentTypeArray = new Type[] { typeof(string), typeof(Int64) };
+				minArg = 1;
+			}
+			public override Argument CreateArgument(InstructionLine line, ExpressionMediator exm)
+			{
+				IOperandTerm[] terms = popTerms(line);
+				if (!checkArgumentType(line, exm, terms))
+					return null;
+				IOperandTerm strTerm = terms[0];
+				IOperandTerm optTerm = terms.Length >= 2 ? terms[1] : null;
+				return new SpHtmlPrintArgument(strTerm, optTerm);
 			}
 		}
 	}

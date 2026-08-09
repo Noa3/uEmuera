@@ -69,6 +69,13 @@ public class EmueraContent : MonoBehaviour
     [Tooltip("Reference to the option window")]
     public OptionWindow option_window;
 
+    /// <summary>
+    /// Optional CBG (Client Background Graphics) renderer.
+    /// Assign in the Inspector. When set, Refresh() is called on every display update.
+    /// </summary>
+    [Tooltip("CBG renderer component (optional). Assign to enable CBGSETG/CBGSETSPRITE rendering.")]
+    public EmuleraCbgRenderer cbgRenderer;
+
     Camera main_camere;
     Image background;
     uEmuera.Drawing.Color background_color;
@@ -202,6 +209,10 @@ public class EmueraContent : MonoBehaviour
         if(!dirty_ && math.all(drag_delta == float2.zero))
             return;
         dirty_ = false;
+
+        // Rebuild CBG graphics every display refresh
+        if (cbgRenderer != null)
+            cbgRenderer.Refresh();
 
         float display_width = DISPLAY_WIDTH;
         float display_height = DISPLAY_HEIGHT;

@@ -146,6 +146,7 @@ namespace MinorShift.Emuera.GameData.Function
                 ["HTML_POPPRINTINGSTR"] = new HtmlPopPrintingStrMethod(),
                 ["HTML_TOPLAINTEXT"] = new HtmlToPlainTextMethod(),
                 ["HTML_ESCAPE"] = new HtmlEscapeMethod(),
+                ["HTML_STRINGLINES"] = new HtmlStringLinesMethod(),
 
 
                 //画像処理系

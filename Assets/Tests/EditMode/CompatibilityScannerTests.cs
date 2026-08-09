@@ -136,5 +136,12 @@ namespace uEmuera.Tests.EditMode
             File.WriteAllText(registryPath, reg.ToString());
             TestContext.WriteLine("registry: " + registryPath);
         }
+
+        // TODO: Add fixture with CP932-encoded .ERB file to test encoding detection.
+        // A Shift-JIS / CP932 file (no BOM, bytes invalid in UTF-8) should cause
+        // DetectEncoding() to return Encoding.GetEncoding(932) rather than UTF-8.
+        // Prerequisite: CodePagesEncodingProvider registered at startup (Program.Main) or
+        // I18N.CJK.dll present (Unity Mono). Generate test bytes with:
+        //   File.WriteAllBytes(path, Encoding.GetEncoding(932).GetBytes("PRINT こんにちは\n"));
     }
 }

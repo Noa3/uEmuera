@@ -18,7 +18,7 @@ namespace MinorShift.Emuera.GameView
 	 * ✅ <font face="" color="" bcolor=""></font> Font specification, color specification, button selection color specification
 	 * ✅ <!-- --> Comment
 	 * ✅ <nonbutton title='～～'> Non-button text with title attribute
-	 * ✅ <img src='～～' srcb='～～' height='' width='' ypos=''> Image with button variant
+	 * ✅ <img src='～～' srcb='～～' srcm='～～' height='' width='' ypos=''> Image with button variant
 	 * ✅ <shape type='rect' param='0,0,0,0' color='' bcolor=''> Shape drawing (rect, space, polygon)
 	 * ✅ Escape sequences: &amp; &gt; &lt; &quot; &apos;
 	 * ✅ &#nn; &#xnn; Unicode character references
@@ -724,8 +724,9 @@ namespace MinorShift.Emuera.GameView
 						if (wc == null)
 							throw new CodeEE($"<{tag}> tag has no attributes specified");
 						string attrValue = null;
-						string src = null;
-						string srcb = null;
+					string src = null;
+					string srcb = null;
+					string srcm = null;
 						MixedNum height = new MixedNum(); ;
 						MixedNum width = new MixedNum(); ;
 						MixedNum ypos = new MixedNum(); ;
@@ -746,13 +747,19 @@ namespace MinorShift.Emuera.GameView
 									throw new CodeEE($"<{tag}> tag: '{word.Code}' attribute specified more than once");
 								src = attrValue;
 							}
-							else if (word.Code.Equals("srcb", StringComparison.OrdinalIgnoreCase))
-							{
-								if (srcb != null)
-									throw new CodeEE($"<{tag}> tag: '{word.Code}' attribute specified more than once");
-								srcb = attrValue;
-							}
-							else if (word.Code.Equals("height", StringComparison.OrdinalIgnoreCase))
+						else if (word.Code.Equals("srcb", StringComparison.OrdinalIgnoreCase))
+						{
+							if (srcb != null)
+								throw new CodeEE($"<{tag}> tag: '{word.Code}' attribute specified more than once");
+							srcb = attrValue;
+						}
+						else if (word.Code.Equals("srcm", StringComparison.OrdinalIgnoreCase))
+						{
+							if (srcm != null)
+								throw new CodeEE($"<{tag}> tag: '{word.Code}' attribute specified more than once");
+							srcm = attrValue;
+						}
+						else if (word.Code.Equals("height", StringComparison.OrdinalIgnoreCase))
 							{
 								if (height.num != 0)
 									throw new CodeEE($"<{tag}> tag: '{word.Code}' attribute specified more than once");
@@ -793,8 +800,8 @@ namespace MinorShift.Emuera.GameView
 						}
 						if (src == null)
 							throw new CodeEE($"<{tag}> tag requires 'src' attribute to specify image resource name");
-						// Create ConsoleImagePart which will load the image from resources folder via AppContents.GetSprite()
-						return new ConsoleImagePart(src, srcb, height, width, ypos);
+					// Create ConsoleImagePart which will load the image from resources folder via AppContents.GetSprite()
+					return new ConsoleImagePart(src, srcb, srcm, height, width, ypos);
 					}
 
 				case "shape":
@@ -1041,6 +1048,111 @@ namespace MinorShift.Emuera.GameView
 				i = color.R * 0x10000 + color.G * 0x100 + color.B;
 			}
 			return i;
+		}
+
+		/// <summary>
+		/// Splits an HTML string at a given half-width-character-equivalent width boundary.
+		/// Returns [before, after] where before fits within length and after is the remainder.
+		/// </summary>
+		public static string[] HtmlSubString(string str, int length)
+		{
+			Stack<string[]> beginStack = new Stack<string[]>();
+			Stack<string[]> endStack = new Stack<string[]>();
+
+			length = length * Config.FontSize / 2;
+			str = Unescape(str);
+			int found = -1, last = 0, delbr = 0;
+			bool content = false;
+			while (true)
+			{
+				string tstr;
+				int tmp;
+				found = str.IndexOf('<', last);
+				if (found != last)
+				{
+					string pref = "", suff = "";
+					foreach (string[] s in beginStack)
+						if (s[1] == "style") pref += s[0];
+					Stack<string[]> arr = new Stack<string[]>(endStack);
+					while (arr.Count > 0)
+						if (arr.Peek()[1] == "style") suff += arr.Pop()[0];
+						else arr.Pop();
+					if (found < 0)
+						tstr = str.Substring(last, str.Length - last);
+					else
+						tstr = str.Substring(last, found - last);
+					tmp = GetSubStr(pref, suff, tstr, ref length);
+					last += tmp + 1;
+					content = true;
+					if (found < 0 || tmp < tstr.Length) break;
+				}
+				else last++;
+				found = str.IndexOf('>', last);
+				if (found <= 0) break;
+				if (str[last] == '/')
+				{
+					if (beginStack.Count > 0) beginStack.Pop();
+					if (endStack.Count > 0) endStack.Pop();
+				}
+				else
+				{
+					int fspace = str.IndexOf(' ', last, found - last);
+					if (fspace < 0) fspace = found;
+					string tag = str.Substring(last, fspace - last);
+					if (tag == "br") { delbr = 1; break; }
+					if (tag == "img" || tag == "shape")
+					{
+						var pos = last - 1;
+						tstr = str.Substring(pos, found - pos + 1);
+						tmp = HtmlLength(tstr);
+						length -= tmp;
+						if (length < 0 && content) break;
+					}
+					else
+					{
+						bool ist = tag == "b" || tag == "i" || tag == "s";
+						beginStack.Push(new string[] { string.Concat("<", str.Substring(last, found - last), ">"), ist ? "style" : "" });
+						endStack.Push(new string[] { "</" + tag + ">", ist ? "style" : "" });
+					}
+				}
+				last = found + 1;
+			}
+			string[] ret = new string[2];
+			ret[0] = "";
+			ret[1] = "";
+			if (last == 0) return new string[] { "", str };
+			ret[0] = str.Substring(0, last - 1);
+			while (endStack.Count > 0) ret[0] += endStack.Pop()[0];
+			while (beginStack.Count > 0) ret[1] = beginStack.Pop()[0] + ret[1];
+			ret[1] += str.Substring(last - 1 + delbr * 4, str.Length - last + 1 - delbr * 4);
+			return ret;
+		}
+
+		/// <summary>
+		/// Measures how many characters fit within the remaining pixel budget.
+		/// Full-width chars (> U+007F) cost 2 units; half-width cost 1.
+		/// Returns the number of characters consumed.
+		/// </summary>
+		private static int GetSubStr(string pref, string suff, string text, ref int length)
+		{
+			int used = 0;
+			for (int i = 0; i < text.Length; i++)
+			{
+				int cw = text[i] > 0x7F ? 2 : 1;
+				if (length < cw && used > 0) break;
+				length -= cw;
+				used++;
+				if (length <= 0) break;
+			}
+			return used;
+		}
+
+		/// <summary>
+		/// Estimates the pixel width of an img or shape tag (stub: 2 × FontSize).
+		/// </summary>
+		private static int HtmlLength(string htmlTag)
+		{
+			return Config.FontSize * 2;
 		}
 
 	}
