@@ -1,0 +1,735 @@
+{
+  "generated": "2026-08-09",
+  "project": "uEmuera",
+  "reference": "EM+EE (Emuera-Anchor / EmueraEE)",
+  "note": "Status determined by codebase search (Assets/Scripts/Emuera/). parse_status reflects parser registration; runtime_status reflects instruction/method execution; render_status is N/A for non-visual commands. test_status is MISSING throughout — no automated test suite exists for these features.",
+  "status_legend": {
+    "parse": { "FULL": "parsed correctly and completely", "PARTIAL": "parsed but edge cases or only one form", "PARSE_ONLY": "parsed but runtime does nothing", "MISSING": "not parsed; crashes or errors if used" },
+    "runtime": { "FULL": "behaves correctly", "PARTIAL": "some cases work", "NO_OP": "parsed but does nothing at runtime", "MISSING": "not implemented" },
+    "render": { "FULL": "correct visual output", "PARTIAL": "some cases render", "NO_OP": "accepted but no visual change", "MISSING": "not implemented", "N/A": "not a visual feature" }
+  },
+  "categories": {
+    "HTML_Tags": [
+      {
+        "name": "img_src",
+        "description": "Basic image display via <img src='...'>",
+        "introduced_in": "base",
+        "parse_status": "FULL",
+        "runtime_status": "FULL",
+        "render_status": "FULL",
+        "test_status": "MISSING",
+        "notes": "Parsed in HtmlManager.cs case 'img'; ConsoleImagePart created; src name resolved through AppContents."
+      },
+      {
+        "name": "img_srcb",
+        "description": "Button-hover variant image via srcb attribute on <img>",
+        "introduced_in": "EE",
+        "parse_status": "FULL",
+        "runtime_status": "FULL",
+        "render_status": "PARTIAL",
+        "test_status": "MISSING",
+        "notes": "srcb attribute parsed and stored in ConsoleImagePart (HtmlManager.cs:754). Unity renderer receives the value but hover/PointerEnter swap is not yet wired to UnityEngine input events."
+      },
+      {
+        "name": "img_srcm",
+        "description": "Mask image via srcm attribute on <img>",
+        "introduced_in": "EE",
+        "parse_status": "FULL",
+        "runtime_status": "FULL",
+        "render_status": "FULL",
+        "test_status": "MISSING",
+        "notes": "srcm parsed and stored (HtmlManager.cs:760). SpriteGetColor used for per-pixel mask in ConsoleImagePart.cs:286. GraphicsSurface.GDrawGWithMask implements compositing."
+      },
+      {
+        "name": "img_flip",
+        "description": "Horizontal/vertical image flip via negative width or height on <img>",
+        "introduced_in": "EE",
+        "parse_status": "FULL",
+        "runtime_status": "FULL",
+        "render_status": "FULL",
+        "test_status": "MISSING",
+        "notes": "Negative width/height stored as FlipH/FlipV flags in ConsoleImagePart (ConsoleImagePart.cs:72-73). GraphicsSurface handles GDI-style flip in blit path (GraphicsSurface.cs:180)."
+      },
+      {
+        "name": "div",
+        "description": "<div> block element with optional positioning",
+        "introduced_in": "EE",
+        "parse_status": "PARTIAL",
+        "runtime_status": "NO_OP",
+        "render_status": "NO_OP",
+        "test_status": "MISSING",
+        "notes": "Opening tag silently consumed (HtmlManager.cs:811-815 NYI stub). Closing tag silently ignored (HtmlManager.cs:635-637). Content renders inline with no block semantics."
+      },
+      {
+        "name": "clearbutton",
+        "description": "<clearbutton> clears all registered button items",
+        "introduced_in": "EE",
+        "parse_status": "PARTIAL",
+        "runtime_status": "NO_OP",
+        "render_status": "NO_OP",
+        "test_status": "MISSING",
+        "notes": "Tag parsed and silently consumed (HtmlManager.cs:812-815). Clearbutton behavior NYI per comment. No runtime effect."
+      },
+      {
+        "name": "button",
+        "description": "<button value='...'> creates a clickable button",
+        "introduced_in": "base",
+        "parse_status": "FULL",
+        "runtime_status": "FULL",
+        "render_status": "FULL",
+        "test_status": "MISSING",
+        "notes": "Fully implemented. ConsoleButtonString created with integer or string value. Stacks with font/style tags."
+      },
+      {
+        "name": "font",
+        "description": "<font face='' color='' bcolor=''> font and color specification",
+        "introduced_in": "base",
+        "parse_status": "FULL",
+        "runtime_status": "FULL",
+        "render_status": "FULL",
+        "test_status": "MISSING",
+        "notes": "face, color, and bcolor attributes parsed (HtmlManager.cs:973-988). Nested font stacks supported (FonttagList). Closing </font> pops stack."
+      },
+      {
+        "name": "p_align",
+        "description": "<p align=''> sets line alignment (left/center/right)",
+        "introduced_in": "base",
+        "parse_status": "FULL",
+        "runtime_status": "FULL",
+        "render_status": "FULL",
+        "test_status": "MISSING",
+        "notes": "Maps to ALIGNMENT command semantics. Line-start to line-end only; end tag optional. left/center/right values supported (HtmlManager.cs:711-718)."
+      },
+      {
+        "name": "nobr",
+        "description": "<nobr> prevents line breaks (PRINTSINGLE equivalent)",
+        "introduced_in": "base",
+        "parse_status": "FULL",
+        "runtime_status": "FULL",
+        "render_status": "FULL",
+        "test_status": "MISSING",
+        "notes": "Line-start only. Error thrown if used mid-line or twice. Equivalent to PRINTSINGLE semantics."
+      },
+      {
+        "name": "bius_styles",
+        "description": "<b><i><u><s> inline font style tags",
+        "introduced_in": "base",
+        "parse_status": "FULL",
+        "runtime_status": "FULL",
+        "render_status": "FULL",
+        "test_status": "MISSING",
+        "notes": "Bold/Italic/Underline/Strikethrough via FontStyle flags. Correctly stacked and closed. Serialized to HTML round-trip in getStringStyleStartingTag."
+      },
+      {
+        "name": "shape",
+        "description": "<shape type='rect|space|polygon' param='...' color='' bcolor=''> shape drawing",
+        "introduced_in": "EE",
+        "parse_status": "FULL",
+        "runtime_status": "FULL",
+        "render_status": "FULL",
+        "test_status": "MISSING",
+        "notes": "ConsoleShapePart created. type, param, color, bcolor attributes handled (HtmlManager.cs:823-890). HTML_GETPRINTEDSTR round-trip via ConsoleShapePart serialization."
+      },
+      {
+        "name": "nonbutton",
+        "description": "<nonbutton title='...'> non-clickable text with tooltip",
+        "introduced_in": "EE",
+        "parse_status": "FULL",
+        "runtime_status": "FULL",
+        "render_status": "FULL",
+        "test_status": "MISSING",
+        "notes": "title attribute and optional locked X position (PointXisLocked/PointX) parsed. Distinct from <button>; IsButtonTag=false."
+      },
+      {
+        "name": "br",
+        "description": "<br> forced line break",
+        "introduced_in": "base",
+        "parse_status": "FULL",
+        "runtime_status": "FULL",
+        "render_status": "FULL",
+        "test_status": "MISSING",
+        "notes": "Sets FlagBr in HtmlAnalzeState; flushes current buffer to a new display line."
+      }
+    ],
+    "HTML_Instructions": [
+      {
+        "name": "HTML_PRINT",
+        "description": "Renders an HTML string to the console",
+        "introduced_in": "base",
+        "parse_status": "FULL",
+        "runtime_status": "FULL",
+        "render_status": "N/A",
+        "test_status": "MISSING",
+        "notes": "Registered as HTML_PRINT_Instruction in FunctionIdentifier. Argument type SP_HTML_PRINT handles parsing. Calls Console.PrintHtml(str, toPrintBuffer)."
+      },
+      {
+        "name": "HTML_PRINT_second_arg",
+        "description": "HTML_PRINT optional second integer argument (non-zero = inject into print buffer)",
+        "introduced_in": "EE",
+        "parse_status": "FULL",
+        "runtime_status": "FULL",
+        "render_status": "N/A",
+        "test_status": "MISSING",
+        "notes": "SP_HTML_PRINT ArgumentBuilder parses optional int expression as OptTerm. Instraction.Child.cs reads arg.OptTerm and passes toPrintBuffer flag to PrintHtml."
+      },
+      {
+        "name": "HTML_TAGSPLIT",
+        "description": "Splits an HTML string at tag boundaries into a string array",
+        "introduced_in": "EE",
+        "parse_status": "FULL",
+        "runtime_status": "FULL",
+        "render_status": "N/A",
+        "test_status": "MISSING",
+        "notes": "Registered as HTML_TAGSPLIT_Instruction in FunctionIdentifier. Calls HtmlManager.HtmlTagSplit(str) which returns string[]."
+      },
+      {
+        "name": "HTML_POPPRINTINGSTR",
+        "description": "Pops the current accumulated HTML printing string",
+        "introduced_in": "EE",
+        "parse_status": "FULL",
+        "runtime_status": "FULL",
+        "render_status": "N/A",
+        "test_status": "MISSING",
+        "notes": "Registered as HtmlPopPrintingStrMethod in Creator.cs. Returns the accumulated print string and clears it."
+      },
+      {
+        "name": "HTML_GETPRINTEDSTR",
+        "description": "Returns the HTML representation of the last printed display line",
+        "introduced_in": "EE",
+        "parse_status": "FULL",
+        "runtime_status": "FULL",
+        "render_status": "N/A",
+        "test_status": "MISSING",
+        "notes": "Registered as HtmlGetPrintedStrMethod in Creator.cs. ConsoleImagePart and ConsoleShapePart both implement HTML serialization for round-trip correctness (ConsoleImagePart.cs:122-129)."
+      },
+      {
+        "name": "HTML_PRINT_ISLAND",
+        "description": "Starts an HTML island (deferred render region)",
+        "introduced_in": "EE",
+        "parse_status": "MISSING",
+        "runtime_status": "MISSING",
+        "render_status": "N/A",
+        "test_status": "MISSING",
+        "notes": "Not found anywhere in codebase. Not in BuiltInFunctionCode, FunctionIdentifier, or Creator.cs."
+      },
+      {
+        "name": "HTML_PRINT_ISLAND_CLEAR",
+        "description": "Clears a previously opened HTML island",
+        "introduced_in": "EE",
+        "parse_status": "MISSING",
+        "runtime_status": "MISSING",
+        "render_status": "N/A",
+        "test_status": "MISSING",
+        "notes": "Not found anywhere in codebase. Not implemented."
+      },
+      {
+        "name": "HTML_STRINGLINES",
+        "description": "Returns the number of display lines an HTML string occupies at a given width",
+        "introduced_in": "EE",
+        "parse_status": "FULL",
+        "runtime_status": "FULL",
+        "render_status": "N/A",
+        "test_status": "MISSING",
+        "notes": "Registered as HtmlStringLinesMethod in Creator.cs. Signature: HTML_STRINGLINES(str, width). Returns line count."
+      }
+    ],
+    "CBG_Commands": [
+      {
+        "name": "CBGSETG",
+        "description": "Sets a G-surface image onto the CBG background layer at (x,y,zdepth)",
+        "introduced_in": "EE",
+        "parse_status": "FULL",
+        "runtime_status": "FULL",
+        "render_status": "N/A",
+        "test_status": "MISSING",
+        "notes": "Registered as CBGSetGraphicsMethod in Creator.cs. Signature: CBGSETG(int ID, int x, int y, int zdepth)."
+      },
+      {
+        "name": "CBGSETSPRITE",
+        "description": "Sets a sprite image onto the CBG background layer",
+        "introduced_in": "EE",
+        "parse_status": "FULL",
+        "runtime_status": "FULL",
+        "render_status": "N/A",
+        "test_status": "MISSING",
+        "notes": "Registered as CBGSetCIMGMethod in Creator.cs. Signature: CBGSETCIMG(str imgName, int x, int y, int zdepth)."
+      },
+      {
+        "name": "CBGCLEAR",
+        "description": "Clears all CBG background layer items",
+        "introduced_in": "EE",
+        "parse_status": "FULL",
+        "runtime_status": "FULL",
+        "render_status": "N/A",
+        "test_status": "MISSING",
+        "notes": "Registered as CBGClearMethod in Creator.cs."
+      },
+      {
+        "name": "CBGREMOVERANGE",
+        "description": "Removes CBG items within a z-depth range",
+        "introduced_in": "EE",
+        "parse_status": "FULL",
+        "runtime_status": "FULL",
+        "render_status": "N/A",
+        "test_status": "MISSING",
+        "notes": "Registered as CBGRemoveRangeMethod. Signature: CBGREMOVERANGE(int zmin, int zmax)."
+      },
+      {
+        "name": "CBGSETBMAPG",
+        "description": "Sets a BMap G-surface onto the CBG background",
+        "introduced_in": "EE",
+        "parse_status": "FULL",
+        "runtime_status": "FULL",
+        "render_status": "N/A",
+        "test_status": "MISSING",
+        "notes": "Registered as CBGSetBMapGMethod in Creator.cs. Signature: CBGSETBMAPG(int ID, int x, int y, int zdepth)."
+      },
+      {
+        "name": "CBGSETBUTTONSPRITE",
+        "description": "Associates a sprite with a CBG button slot",
+        "introduced_in": "EE",
+        "parse_status": "FULL",
+        "runtime_status": "FULL",
+        "render_status": "N/A",
+        "test_status": "MISSING",
+        "notes": "Registered as CBGSETButtonSpriteMethod. Signature: CBGSETBUTTONSPRITE(int button, str imgName, str imgNameB, int x, int y, int zdepth, str tooltipmes)."
+      },
+      {
+        "name": "CBGREMOVEBMAP",
+        "description": "Removes the CBG BMap layer",
+        "introduced_in": "EE",
+        "parse_status": "FULL",
+        "runtime_status": "FULL",
+        "render_status": "N/A",
+        "test_status": "MISSING",
+        "notes": "Registered as CBGRemoveBMapMethod in Creator.cs."
+      },
+      {
+        "name": "CBGCLEARBUTTON",
+        "description": "Clears all CBG button associations",
+        "introduced_in": "EE",
+        "parse_status": "FULL",
+        "runtime_status": "FULL",
+        "render_status": "N/A",
+        "test_status": "MISSING",
+        "notes": "Registered as CBGClearButtonMethod in Creator.cs."
+      }
+    ],
+    "Graphics_G": [
+      {
+        "name": "GCREATE",
+        "description": "Creates an off-screen graphics buffer",
+        "introduced_in": "EE",
+        "parse_status": "FULL",
+        "runtime_status": "FULL",
+        "render_status": "N/A",
+        "test_status": "MISSING",
+        "notes": "Registered as GraphicsCreateMethod in Creator.cs."
+      },
+      {
+        "name": "GCREATEFROMFILE",
+        "description": "Creates a graphics buffer from an image file",
+        "introduced_in": "EE",
+        "parse_status": "FULL",
+        "runtime_status": "FULL",
+        "render_status": "N/A",
+        "test_status": "MISSING",
+        "notes": "Registered as GraphicsCreateFromFileMethod. Copies pixel content from file into a new surface (GraphicsImage.cs:35)."
+      },
+      {
+        "name": "GDISPOSE",
+        "description": "Disposes a graphics buffer by ID",
+        "introduced_in": "EE",
+        "parse_status": "FULL",
+        "runtime_status": "FULL",
+        "render_status": "N/A",
+        "test_status": "MISSING",
+        "notes": "Registered as GraphicsDisposeMethod in Creator.cs."
+      },
+      {
+        "name": "GCLEAR",
+        "description": "Overwrites every pixel of a G-surface with a color",
+        "introduced_in": "EE",
+        "parse_status": "FULL",
+        "runtime_status": "FULL",
+        "render_status": "N/A",
+        "test_status": "MISSING",
+        "notes": "Registered as GraphicsClearMethod. GraphicsSurface.GClear overwrites all pixels (GraphicsSurface.cs:91)."
+      },
+      {
+        "name": "GFILLRECTANGLE",
+        "description": "Fills a rectangle on a G-surface with a color",
+        "introduced_in": "EE",
+        "parse_status": "FULL",
+        "runtime_status": "FULL",
+        "render_status": "N/A",
+        "test_status": "MISSING",
+        "notes": "Registered as GraphicsFillRectangleMethod. Clips to surface bounds. Signature: GFILLRECTANGLE(ID, cARGB, x, y, w, h)."
+      },
+      {
+        "name": "GDRAWG",
+        "description": "Blits one G-surface onto another with optional color matrix",
+        "introduced_in": "EE",
+        "parse_status": "FULL",
+        "runtime_status": "FULL",
+        "render_status": "N/A",
+        "test_status": "MISSING",
+        "notes": "Registered as GraphicsDrawGMethod. Supports optional CM (color matrix) argument. Alpha compositing handled (GraphicsSurface.cs:16)."
+      },
+      {
+        "name": "GDRAWGWITHMASK",
+        "description": "Draws G-surface onto another using a mask surface",
+        "introduced_in": "EE",
+        "parse_status": "FULL",
+        "runtime_status": "FULL",
+        "render_status": "N/A",
+        "test_status": "MISSING",
+        "notes": "Registered as GraphicsDrawGWithMaskMethod. Mask alpha scales source opacity per pixel (GraphicsSurface.cs:280)."
+      },
+      {
+        "name": "GSETCOLOR",
+        "description": "Sets a single pixel color on a G-surface",
+        "introduced_in": "EE",
+        "parse_status": "FULL",
+        "runtime_status": "FULL",
+        "render_status": "N/A",
+        "test_status": "MISSING",
+        "notes": "Registered as GraphicsSetColorMethod. Overwrites single pixel ignoring alpha compositing (GraphicsSurface.cs:83)."
+      },
+      {
+        "name": "GGETCOLOR",
+        "description": "Gets the color of a single pixel from a G-surface",
+        "introduced_in": "EE",
+        "parse_status": "FULL",
+        "runtime_status": "FULL",
+        "render_status": "N/A",
+        "test_status": "MISSING",
+        "notes": "Registered as GraphicsGetColorMethod in Creator.cs (Creator.cs:175). Returns ARGB packed integer."
+      },
+      {
+        "name": "GSETBRUSH",
+        "description": "Sets the brush used for fill operations on a G-surface",
+        "introduced_in": "EE",
+        "parse_status": "FULL",
+        "runtime_status": "FULL",
+        "render_status": "N/A",
+        "test_status": "MISSING",
+        "notes": "Registered as GraphicsSetBrushMethod. Stores Brush on GraphicsImage (GraphicsImage.cs:170)."
+      },
+      {
+        "name": "GSETPEN",
+        "description": "Sets the pen used for line drawing on a G-surface",
+        "introduced_in": "EE",
+        "parse_status": "FULL",
+        "runtime_status": "FULL",
+        "render_status": "N/A",
+        "test_status": "MISSING",
+        "notes": "Registered as GraphicsSetPenMethod. Stores Pen on GraphicsImage (GraphicsImage.cs:175). Pen set but GDRAWLINE not implemented, so pen is currently unused."
+      },
+      {
+        "name": "GDRAWLINE",
+        "description": "Draws a line on a G-surface using the current pen",
+        "introduced_in": "EE",
+        "parse_status": "MISSING",
+        "runtime_status": "MISSING",
+        "render_status": "N/A",
+        "test_status": "MISSING",
+        "notes": "NOT registered in Creator.cs or FunctionIdentifier. GSETPEN exists but GDRAWLINE has no implementation. CompatibilityScanner mentions GDRAW prefix commands but GDRAWLINE is absent from all registries."
+      },
+      {
+        "name": "GSAVE",
+        "description": "Saves a G-surface to a file slot",
+        "introduced_in": "EE",
+        "parse_status": "FULL",
+        "runtime_status": "FULL",
+        "render_status": "N/A",
+        "test_status": "MISSING",
+        "notes": "Registered as GraphicsSaveMethod in Creator.cs. Signature: GSAVE(int ID, int fileNo)."
+      },
+      {
+        "name": "GLOAD",
+        "description": "Loads a G-surface from a file slot",
+        "introduced_in": "EE",
+        "parse_status": "FULL",
+        "runtime_status": "FULL",
+        "render_status": "N/A",
+        "test_status": "MISSING",
+        "notes": "Registered as GraphicsLoadMethod in Creator.cs. Signature: GLOAD(int ID, int fileNo)."
+      }
+    ],
+    "Sprite_Commands": [
+      {
+        "name": "SPRITEANIMEANIMESTART_STOP",
+        "description": "Starts or stops a sprite animation playback",
+        "introduced_in": "EE",
+        "parse_status": "MISSING",
+        "runtime_status": "MISSING",
+        "render_status": "N/A",
+        "test_status": "MISSING",
+        "notes": "SPRITEANIMEANIMESTART and SPRITEANIMEANIMESTOP are not registered anywhere. SPRITEANIMECREATE, SPRITEANIMEADDFRAME, and SETANIMETIMER exist but play/stop control is absent."
+      },
+      {
+        "name": "SPRITECREATE",
+        "description": "Creates a sprite from a region of a G-surface",
+        "introduced_in": "EE",
+        "parse_status": "FULL",
+        "runtime_status": "FULL",
+        "render_status": "N/A",
+        "test_status": "MISSING",
+        "notes": "Registered as SpriteCreateMethod. Signature: SPRITECREATE(str imgName, int gID[, int x, int y, int w, int h])."
+      },
+      {
+        "name": "SPRITEGETINFO",
+        "description": "Returns information about a sprite (width, height, etc.)",
+        "introduced_in": "EE",
+        "parse_status": "MISSING",
+        "runtime_status": "MISSING",
+        "render_status": "N/A",
+        "test_status": "MISSING",
+        "notes": "Not registered anywhere. Individual properties (SPRITEWIDTH, SPRITEHEIGHT, SPRITEPOSX, SPRITEPOSY, SPRITECREATED) exist as SpriteStateMethod entries."
+      },
+      {
+        "name": "SPRITEEXIST",
+        "description": "Returns whether a named sprite exists",
+        "introduced_in": "EE",
+        "parse_status": "MISSING",
+        "runtime_status": "MISSING",
+        "render_status": "N/A",
+        "test_status": "MISSING",
+        "notes": "Not registered. Functional equivalent SPRITECREATED (SpriteStateMethod) is registered and returns 1/0 for sprite existence. Games using SPRITEEXIST will fail."
+      },
+      {
+        "name": "SPRITEDISPOSE",
+        "description": "Disposes a named sprite",
+        "introduced_in": "EE",
+        "parse_status": "FULL",
+        "runtime_status": "FULL",
+        "render_status": "N/A",
+        "test_status": "MISSING",
+        "notes": "Registered as SpriteDisposeMethod. Calls AppContents.SpriteDispose(name)."
+      },
+      {
+        "name": "SPRITEDISPOSEALL",
+        "description": "Disposes all sprites",
+        "introduced_in": "EE",
+        "parse_status": "MISSING",
+        "runtime_status": "MISSING",
+        "render_status": "N/A",
+        "test_status": "MISSING",
+        "notes": "Not registered anywhere in codebase."
+      },
+      {
+        "name": "SPRITEGETCOLOR",
+        "description": "Gets the pixel color from a sprite at (x, y)",
+        "introduced_in": "EE",
+        "parse_status": "FULL",
+        "runtime_status": "FULL",
+        "render_status": "N/A",
+        "test_status": "MISSING",
+        "notes": "Registered as SpriteGetColorMethod. Uses ASprite.SpriteGetColor(x, y) - implemented on both CroppedImage and SpriteAnime."
+      }
+    ],
+    "Save_Load": [
+      {
+        "name": "SAVEGAME_LOADGAME",
+        "description": "Opens the save/load screen (shop context only)",
+        "introduced_in": "base",
+        "parse_status": "FULL",
+        "runtime_status": "FULL",
+        "render_status": "N/A",
+        "test_status": "MISSING",
+        "notes": "Registered as SAVELOADGAME_Instruction (shared for both). Throws CodeEE if called inside @SHOW_SHOP. Only valid in shop context."
+      },
+      {
+        "name": "SAVEDATA_LOADDATA",
+        "description": "Saves/loads game data to a numbered slot",
+        "introduced_in": "base",
+        "parse_status": "FULL",
+        "runtime_status": "FULL",
+        "render_status": "N/A",
+        "test_status": "MISSING",
+        "notes": "SAVEDATA uses SP_SAVEDATA ArgumentBuilder (slot + description string). LOADDATA takes INT_EXPRESSION. Process.ScriptProc.cs handles execution."
+      },
+      {
+        "name": "SAVEGLOBAL_LOADGLOBAL",
+        "description": "Saves/loads global variable state",
+        "introduced_in": "base",
+        "parse_status": "FULL",
+        "runtime_status": "FULL",
+        "render_status": "N/A",
+        "test_status": "MISSING",
+        "notes": "Registered as SAVEGLOBAL_Instruction/LOADGLOBAL_Instruction. Uses VariableEvaluator.SaveGlobalToStream1808 / LoadGlobalFromStream1808."
+      },
+      {
+        "name": "SAVEVAR_LOADVAR",
+        "description": "Saves/loads specific variables by name",
+        "introduced_in": "EE",
+        "parse_status": "FULL",
+        "runtime_status": "FULL",
+        "render_status": "N/A",
+        "test_status": "MISSING",
+        "notes": "Registered as SAVEVAR_Instruction/LOADVAR_Instruction. SP_SAVEVAR ArgumentBuilder handles variable list. Character variables rejected with explicit error (use SAVECHARA)."
+      },
+      {
+        "name": "SAVECHARA_LOADCHARA",
+        "description": "Saves/loads character data by index",
+        "introduced_in": "EE",
+        "parse_status": "FULL",
+        "runtime_status": "FULL",
+        "render_status": "N/A",
+        "test_status": "MISSING",
+        "notes": "Registered as SAVECHARA_Instruction/LOADCHARA_Instruction. SP_SAVECHARA handles variable-length chara index list."
+      },
+      {
+        "name": "DELDATA_CHKDATA",
+        "description": "Deletes a save slot / checks if a save slot contains valid data",
+        "introduced_in": "base",
+        "parse_status": "FULL",
+        "runtime_status": "FULL",
+        "render_status": "N/A",
+        "test_status": "MISSING",
+        "notes": "DELDATA registered as DELDATA_Instruction. CHKDATA registered as CheckdataMethod in Creator.cs (Creator.cs:41). Both support numeric and filename-based addressing."
+      },
+      {
+        "name": "binary_save_1808",
+        "description": "Binary save format version 1808",
+        "introduced_in": "1808",
+        "parse_status": "FULL",
+        "runtime_status": "FULL",
+        "render_status": "N/A",
+        "test_status": "MISSING",
+        "notes": "EraBinaryDataReader1808 and EraBinaryDataWriter implement full binary serialization (EraBinaryDataReader.cs:146, EraBinaryDataWriter.cs:27). Magic constant Version1808=1808."
+      },
+      {
+        "name": "text_save_format",
+        "description": "Text-based save format (legacy and default)",
+        "introduced_in": "base",
+        "parse_status": "FULL",
+        "runtime_status": "FULL",
+        "render_status": "N/A",
+        "test_status": "MISSING",
+        "notes": "EraDataReader/EraDataWriter handle text-based save files. EMU_1808_START marker separates header sections. Both formats supported simultaneously."
+      }
+    ],
+    "Input": [
+      {
+        "name": "INPUT_INPUTS",
+        "description": "Integer / string input with wait",
+        "introduced_in": "base",
+        "parse_status": "FULL",
+        "runtime_status": "FULL",
+        "render_status": "N/A",
+        "test_status": "MISSING",
+        "notes": "Registered as INPUT_Instruction and INPUTS_Instruction in FunctionIdentifier (FunctionIdentifier.cs:190-191)."
+      },
+      {
+        "name": "TINPUT_TINPUTS",
+        "description": "Timed integer / string input",
+        "introduced_in": "base",
+        "parse_status": "FULL",
+        "runtime_status": "FULL",
+        "render_status": "N/A",
+        "test_status": "MISSING",
+        "notes": "Registered as TINPUT_Instruction(false) and TINPUTS_Instruction(false). TONEINPUT/TONEINPUTS use same classes with one-input flag=true."
+      },
+      {
+        "name": "ONEINPUT_ONEINPUTS",
+        "description": "Single-character integer / string input",
+        "introduced_in": "base",
+        "parse_status": "FULL",
+        "runtime_status": "FULL",
+        "render_status": "N/A",
+        "test_status": "MISSING",
+        "notes": "Registered as ONEINPUT_Instruction/ONEINPUTS_Instruction. SP_ONEINPUT handles nument (multi-digit behavior flag)."
+      },
+      {
+        "name": "TONEINPUT_TONEINPUTS",
+        "description": "Timed single-character integer / string input",
+        "introduced_in": "base",
+        "parse_status": "FULL",
+        "runtime_status": "FULL",
+        "render_status": "N/A",
+        "test_status": "MISSING",
+        "notes": "Registered as TINPUT_Instruction(true)/TINPUTS_Instruction(true). Shares implementation with TINPUT, differs in one-input semantics."
+      },
+      {
+        "name": "FLOWINPUT",
+        "description": "Non-blocking flow input (async-style input processing)",
+        "introduced_in": "EE",
+        "parse_status": "MISSING",
+        "runtime_status": "MISSING",
+        "render_status": "N/A",
+        "test_status": "MISSING",
+        "notes": "Not found anywhere in codebase — not in BuiltInFunctionCode, FunctionIdentifier, or Creator.cs."
+      },
+      {
+        "name": "MOUSEB_GETKEY",
+        "description": "Mouse button state / keyboard key state queries",
+        "introduced_in": "EE",
+        "parse_status": "PARTIAL",
+        "runtime_status": "PARTIAL",
+        "render_status": "N/A",
+        "test_status": "MISSING",
+        "notes": "GETKEY and GETKEYTRIGGERED registered as GetKeyStateMethod (Creator.cs:164-165). MOUSEB as a standalone function is not registered; INPUTMOUSEKEY (FunctionIdentifier.cs:380) covers mouse-key combined input. MOUSEX/MOUSEY listed in CompatibilityScanner input group."
+      },
+      {
+        "name": "WAITANYKEY",
+        "description": "Waits for any key press",
+        "introduced_in": "base",
+        "parse_status": "FULL",
+        "runtime_status": "FULL",
+        "render_status": "N/A",
+        "test_status": "MISSING",
+        "notes": "Registered as WAITANYKEY_Instruction in FunctionIdentifier (FunctionIdentifier.cs:197)."
+      }
+    ],
+    "DataTable_DT": [
+      {
+        "name": "DT_any",
+        "description": "Any DT_* DataTable command",
+        "introduced_in": "EE",
+        "parse_status": "MISSING",
+        "runtime_status": "MISSING",
+        "render_status": "N/A",
+        "test_status": "MISSING",
+        "notes": "No DT_ prefixed commands found anywhere in the codebase. DataTable feature is entirely absent."
+      }
+    ],
+    "MAP_Commands": [
+      {
+        "name": "MAP_any",
+        "description": "Any MAP_* map command",
+        "introduced_in": "EE",
+        "parse_status": "MISSING",
+        "runtime_status": "MISSING",
+        "render_status": "N/A",
+        "test_status": "MISSING",
+        "notes": "No MAP_ prefixed commands found anywhere in the codebase. MAP feature is entirely absent."
+      }
+    ],
+    "XML_Commands": [
+      {
+        "name": "XML_any",
+        "description": "Any XML_* XML processing command",
+        "introduced_in": "EE",
+        "parse_status": "MISSING",
+        "runtime_status": "MISSING",
+        "render_status": "N/A",
+        "test_status": "MISSING",
+        "notes": "No XML_ prefixed commands found anywhere in the codebase. XML feature is entirely absent."
+      }
+    ],
+    "ERD_Named_Indices": [
+      {
+        "name": "ERD_named_array_indices",
+        "description": "Named array index definitions via .erd files (NAMEDEFINE / NameDef)",
+        "introduced_in": "EE",
+        "parse_status": "MISSING",
+        "runtime_status": "MISSING",
+        "render_status": "N/A",
+        "test_status": "MISSING",
+        "notes": "No .erd file extension recognized; NAMEDEFINE/NAMEDEF not found in any loader (ErbLoader, HeaderFileLoader). ERD support is entirely absent. STRNAME/TSTRNAME/SAVESTRNAME CSV loading exists but is unrelated."
+      }
+    ]
+  }
+}

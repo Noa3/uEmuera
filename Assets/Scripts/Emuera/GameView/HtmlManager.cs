@@ -632,8 +632,12 @@ namespace MinorShift.Emuera.GameView
 						state.CurrentButtonTag = null;
 						state.FlagButton = true;
 						return null;
-					default:
-						throw new CodeEE("終了タグ</"+tag+">は解釈できません");
+				case "div":
+				case "clearbutton":
+					// Stub: closing tags for NYI elements - silently ignored.
+					return null;
+				default:
+					throw new CodeEE("終了タグ</"+tag+">は解釈できません");
 				}
 				//goto error;
 			}
@@ -804,7 +808,19 @@ namespace MinorShift.Emuera.GameView
 					return new ConsoleImagePart(src, srcb, srcm, height, width, ypos);
 					}
 
-				case "shape":
+				case "div":
+				case "clearbutton":
+				{
+					// Stub: consume all attribute tokens silently.
+					// Div positioning and clearbutton behavior are NYI; content renders inline.
+					if (wc != null)
+					{
+						while (!wc.EOL)
+							wc.ShiftNext();
+					}
+					return null;
+				}
+			case "shape":
 					{
 						if (wc == null)
 							throw new CodeEE("<" + tag + ">タグに属性が設定されていません");
