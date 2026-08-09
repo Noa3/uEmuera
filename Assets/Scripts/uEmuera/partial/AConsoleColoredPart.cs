@@ -3,7 +3,7 @@
 namespace MinorShift.Emuera.GameView
 {
     /// <summary>
-	/// 色つき
+	/// Colored
 	/// </summary>
 	abstract partial class AConsoleColoredPart : AConsoleDisplayPart
     {

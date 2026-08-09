@@ -69,26 +69,26 @@ namespace MinorShift.Emuera.GameView
 
 		private sealed class HtmlAnalzeState
 		{
-			public bool LineHead = true;//行頭フラグ。一度もテキストが出てきてない状態
+			public bool LineHead = true;//line-head flag. the state where no text has appeared yet
 			public FontStyle FontStyle = FontStyle.Regular;
 			public List<HtmlAnalzeStateFontTag> FonttagList = new List<HtmlAnalzeStateFontTag>();
-			public bool FlagNobr = false;//falseの時に</nobr>するとError
-			public bool FlagP = false;//falseの時に</p>するとError
-			public bool FlagNobrClosed = false;//trueの時に</nobr>するとError
-			public bool FlagPClosed = false;//trueの時に</p>するとError
+			public bool FlagNobr = false;//Errors when </nobr> is used while false
+			public bool FlagP = false;//Errors when </p> is used while false
+			public bool FlagNobrClosed = false;//Errors when </nobr> is used while true
+			public bool FlagPClosed = false;//Errors when </p> is used while true
 			public DisplayLineAlignment Alignment = DisplayLineAlignment.LEFT;
 
 			/// <summary>
-			/// 今まで追加された文字列についてのボタンタグ情報
+			/// Button tag information about the string(s) added so far
 			/// </summary>
 			public HtmlAnalzeStateButtonTag LastButtonTag = null;
 			/// <summary>
-			/// 最新のボタンタグ情報
+			/// The latest button tag information
 			/// </summary>
 			public HtmlAnalzeStateButtonTag CurrentButtonTag = null;
 
-			public bool FlagBr = false;//<br>による強制改行の予約
-			public bool FlagButton = false;//<button></button>によるボタン化の予約
+			public bool FlagBr = false;//reservation of a forced line break by <br>
+			public bool FlagButton = false;//reservation of buttonification by <button></button>
 
 			public StringStyle GetSS()
 			{
@@ -115,7 +115,7 @@ namespace MinorShift.Emuera.GameView
 		}
 
 		/// <summary>
-		/// 表示行からhtmlへの変換
+		/// Conversion from display lines to html
 		/// </summary>
 		/// <param name="lines"></param>
 		/// <returns></returns>
@@ -257,11 +257,11 @@ namespace MinorShift.Emuera.GameView
 		}
 		
 		/// <summary>
-		/// htmlから表示行の作成
+		/// Creation of display lines from html
 		/// </summary>
-		/// <param name="str">htmlテキスト</param>
+		/// <param name="str">html text</param>
 		/// <param name="sm"></param>
-		/// <param name="console">実際の表示に使わないならnullにする</param>
+		/// <param name="console">set to null when not used for actual display</param>
 		/// <returns></returns>
 		public static ConsoleDisplayLine[] Html2DisplayLine(string str, StringMeasure sm, EmueraConsole console)
 		{
@@ -298,7 +298,7 @@ namespace MinorShift.Emuera.GameView
 					state.LineHead = false;
 					st.CurrentPosition += found;
 				}
-				//コメントタグのみ特別扱い
+				//only comment tags are given special treatment
 				if (hasComment && st.CurrentEqualTo("<!--"))
 				{
 					st.CurrentPosition += 4;
@@ -308,12 +308,12 @@ namespace MinorShift.Emuera.GameView
 					st.CurrentPosition += found + 3;
 					continue;
 				}
-				if (hasReturn && st.Current == '\n')//テキスト中の\nは<br>として扱う
+				if (hasReturn && st.Current == '\n')//treats \n in text as <br>
 				{
 					state.FlagBr = true;
 					st.ShiftNext();
 				}
-				else//タグ解析
+				else//tag analysis
 				{
 					st.ShiftNext();
 					AConsoleDisplayPart part = tagAnalyze(state, st);
@@ -339,7 +339,7 @@ namespace MinorShift.Emuera.GameView
 				state.FlagButton = false;
 				state.LastButtonTag = state.CurrentButtonTag;
 			}
-			//</nobr></p>は省略許可
+			//omitting </nobr></p> is permitted
 			if (state.CurrentButtonTag != null || state.FontStyle != FontStyle.Regular || state.FonttagList.Count > 0)
 				throw new CodeEE("閉じられていないタグがあります");
 			if (cssList.Count > 0)
@@ -373,7 +373,7 @@ namespace MinorShift.Emuera.GameView
 
 		public static string Escape(string str)
 		{
-			//Net4.5では便利なクラスがあるらしい
+			//it seems there is a convenient class in Net4.5
 			//return System.Web.HttpUtility.HtmlEncode(str);
 
 			int index = 0;
@@ -382,12 +382,12 @@ namespace MinorShift.Emuera.GameView
 			while (index < str.Length)
 			{
 				found = str.IndexOfAny(rep, index);
-				if (found < 0)//見つからなければ以降を追加して終了
+				if (found < 0)//if nothing is found, append the rest and end
 				{
 					b.Append(str.Substring(index));
 					break;
 				}
-				if (found > index)//間に非エスケープ文字があるなら追加しておく
+				if (found > index)//if there are unescaped characters in between, add them first
 					b.Append(str.Substring(index, found - index));
 				string repnew = repDic[str[found]];
 				b.Append(repnew);
@@ -403,16 +403,16 @@ namespace MinorShift.Emuera.GameView
 			if (found < 0)
 				return str;
 			StringBuilder b = new StringBuilder();
-			// &～; をひたすら置換するだけ
+			//just keeps replacing &～;
 			while (index < str.Length)
 			{
 				found = str.IndexOf('&', index);
-				if (found < 0)//見つからなければ以降を追加して終了
+				if (found < 0)//if nothing is found, append the rest and end
 				{
 					b.Append(str.Substring(index));
 					break;
 				}
-				if (found > index)//間に非エスケープ文字があるなら追加しておく
+				if (found > index)//if there are unescaped characters in between, add them first
 					b.Append(str.Substring(index, found - index));
 				index = found;
 				found = str.IndexOf(';', index);
@@ -467,7 +467,7 @@ namespace MinorShift.Emuera.GameView
 		}
 
 		/// <summary>
-		/// ここまでのcssをボタン化。発生原因はbrタグ、行末、ボタンタグ
+		/// Convert the css collected so far into a button. Caused by br tags, end-of-line, and button tags
 		/// </summary>
 		/// <param name="cssList"></param>
 		/// <param name="isbutton"></param>
@@ -590,7 +590,7 @@ namespace MinorShift.Emuera.GameView
 				if (found < 0)
 				{
 					st.CurrentPosition = st.RowString.Length;
-					return null;//戻り先でErrorを出す
+					return null;//the Error is raised at the return point
 				}
 				tag = st.Substring(st.CurrentPosition, found).Trim();
 				st.CurrentPosition += found;
@@ -637,13 +637,13 @@ namespace MinorShift.Emuera.GameView
 				}
 				//goto error;
 			}
-			//以降は開始タグ
+			//from here on are opening tags
 
 			bool tempUseMacro = LexicalAnalyzer.UseMacro;
 			WordCollection wc = null;
 			try
 			{
-				LexicalAnalyzer.UseMacro = false;//一時的にマクロ展開をやめる
+				LexicalAnalyzer.UseMacro = false;//temporarily stop macro expansion
 				tag = LexicalAnalyzer.ReadSingleIdentifier(st);
 				LexicalAnalyzer.SkipWhiteSpace(st);
 				if (st.Current != '>')
@@ -978,7 +978,7 @@ namespace MinorShift.Emuera.GameView
 								throw new CodeEE("<" + tag + ">タグの属性名" + word.Code + "は解釈できません");
 							}
 						}
-						//他のfontタグの内側であるなら未設定項目については外側のfontタグの設定を受け継ぐ(posは除く)
+						//if inside another font tag, inherit the unset items from the font tag outside (pos excluded)
 						if (state.FonttagList.Count > 0)
 						{
 							HtmlAnalzeStateFontTag oldFont = state.FonttagList[state.FonttagList.Count - 1];
@@ -1023,7 +1023,7 @@ namespace MinorShift.Emuera.GameView
 			else
 			{
 				Color color = Color.FromName(str);
-				if (color.A == 0)//色名として解釈失敗 Error確定
+				if (color.A == 0)//failed to interpret as a color name. Error confirmed
 				{
 					if(str.Equals("transparent", StringComparison.OrdinalIgnoreCase))
 						throw new CodeEE("無色透明(Transparent)は色として指定できません");
@@ -1031,11 +1031,11 @@ namespace MinorShift.Emuera.GameView
 					{
 						i = Convert.ToInt32(str, 16);
 					}
-					catch//16進数でもない
+					catch//not even hexadecimal
 					{
 						throw new CodeEE("指定された色名\"" + str + "\"は無効な色名です");
 					}
-					//#RRGGBBを意図したのかもしれない
+					//maybe they intended #RRGGBB
 					throw new CodeEE("指定された色名\"" + str + "\"は無効な色名です(16進数で色を指定する場合には数値の前に#が必要です)");
 				}
 				i = color.R * 0x10000 + color.G * 0x100 + color.B;

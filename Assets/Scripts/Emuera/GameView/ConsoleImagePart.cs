@@ -32,12 +32,19 @@ namespace MinorShift.Emuera.GameView
 		{
 			ResourceName = resName ?? "";
 			ButtonResourceName = resNameb;
+            // Keep the raw attribute values so the exact img tag (src, srcb, height,
+            // width, ypos with px suffixes) can be reconstructed for HTML_GETPRINTEDSTR
+            // in release builds as well as the editor.
+            rawHeight = raw_height;
+            rawWidth = raw_width;
+            rawYpos = raw_ypos;
 
             cImage = AppContents.GetSprite(ResourceName);
 		
 			// If image loading failed, create alt text and return early
 			if(cImage == null)
 			{
+				decline = true;
 				// Initialize fields for failed image load
 				top = 0;
 				bottom = Config.FontSize;
@@ -46,37 +53,7 @@ namespace MinorShift.Emuera.GameView
 				destRect = new Rectangle(0, 0, 0, 0);
 				
 				// Create alt text showing the img tag
-				StringBuilder sb = new StringBuilder();
-				sb.Append("<img src='");
-				sb.Append(ResourceName);
-				if(ButtonResourceName != null)
-				{
-					sb.Append("' srcb='");
-					sb.Append(ButtonResourceName);
-				}
-				if(raw_height.num != 0)
-				{
-					sb.Append("' height='");
-					sb.Append(raw_height.num.ToString());
-					if (raw_height.isPx)
-						sb.Append("px");
-				}
-				if(raw_width.num != 0)
-				{
-					sb.Append("' width='");
-					sb.Append(raw_width.num.ToString());
-					if (raw_width.isPx)
-						sb.Append("px");
-				}
-				if(raw_ypos.num != 0)
-				{
-					sb.Append("' ypos='");
-					sb.Append(raw_ypos.num.ToString());
-					if (raw_ypos.isPx)
-						sb.Append("px");
-				}
-				sb.Append("'>");
-				AltText = sb.ToString();
+				AltText = BuildAltText();
 				Str = AltText;
 				return;
 			}
@@ -91,6 +68,10 @@ namespace MinorShift.Emuera.GameView
 				height = raw_height.isPx ? raw_height.num : (Config.FontSize * raw_height.num / 100);
 			// If width not specified or 0 is specified, set width (in px units) to maintain original image aspect ratio. Fractional parts less than 1 are recorded in XsubPixel.
 			// Negative values are possible, but final Width is adjusted to be positive later.
+			// A negative width/height must ALSO flip the image (Emuera semantics) and the
+			// flip flag is preserved here for the Unity renderer instead of being lost.
+			FlipX = raw_width.num < 0;
+			FlipY = raw_height.num < 0;
 			if (raw_width.num == 0)
 			{
 				Width = cImage.DestBaseSize.Width * height / cImage.DestBaseSize.Height;
@@ -133,7 +114,61 @@ namespace MinorShift.Emuera.GameView
 						cImageB = null;
 				}
 			}
+            // Successful images also need a serializable representation so that
+            // DisplayLine2Html/HTML_GETPRINTEDSTR can round-trip the img tag.
+            AltText = BuildAltText();
 		}
+
+        /// <summary>
+        /// Reconstructs the original img tag with all attributes. Used both as the
+        /// failure alt-text (drawn as text) and for markup round-tripping via
+        /// HTML_GETPRINTEDSTR (which must work in release builds, not only UNITY_EDITOR).
+        /// </summary>
+        string BuildAltText()
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.Append("<img src='");
+            sb.Append(ResourceName);
+            if(ButtonResourceName != null)
+            {
+                sb.Append("' srcb='");
+                sb.Append(ButtonResourceName);
+            }
+            if(rawHeight.num != 0)
+            {
+                sb.Append("' height='");
+                sb.Append(rawHeight.num.ToString());
+                if (rawHeight.isPx)
+                    sb.Append("px");
+            }
+            if(rawWidth.num != 0)
+            {
+                sb.Append("' width='");
+                sb.Append(rawWidth.num.ToString());
+                if (rawWidth.isPx)
+                    sb.Append("px");
+            }
+            if(rawYpos.num != 0)
+            {
+                sb.Append("' ypos='");
+                sb.Append(rawYpos.num.ToString());
+                if (rawYpos.isPx)
+                    sb.Append("px");
+            }
+            sb.Append("'>");
+            return sb.ToString();
+        }
+
+        /// <summary>True when the sprite failed to load (a valid <see cref="AltText"/> is then rendered as text).</summary>
+        public bool IsLoadFailed { get { return decline; } }
+        readonly bool decline = false;
+        readonly MixedNum rawHeight;
+        readonly MixedNum rawWidth;
+        readonly MixedNum rawYpos;
+        /// <summary>Raw negative width flips the image horizontally.</summary>
+        public bool FlipX { get; private set; }
+        /// <summary>Raw negative height flips the image vertically.</summary>
+        public bool FlipY { get; private set; }
 
         public ASprite Image { get { return cImage; } }
         public ASprite ImageBackground { get { return cImageB; } }
@@ -145,9 +180,9 @@ namespace MinorShift.Emuera.GameView
 		private readonly int top;
 		private readonly int bottom;
 		private readonly Rectangle destRect;
-//#pragma warning disable CS0649 // フィールド 'ConsoleImagePart.ia' は割り当てられません。常に既定値 null を使用します。
+//#pragma warning disable CS0649 // Field 'ConsoleImagePart.ia' is never assigned. It always uses the default value null.
 //		private readonly ImageAttributes ia;
-//#pragma warning restore CS0649 // フィールド 'ConsoleImagePart.ia' は割り当てられません。常に既定値 null を使用します。
+//#pragma warning restore CS0649 // Field 'ConsoleImagePart.ia' is never assigned. It always uses the default value null.
 		public readonly string ResourceName;
 		public readonly string ButtonResourceName;
 		public override int Top { get { return top; } }
@@ -185,7 +220,7 @@ namespace MinorShift.Emuera.GameView
 			//if (img != null && img.IsCreated)
 			//{
 			//	Rectangle rect = destRect;
-			//	//PointX微調整
+			//	//PointX fine adjustment
 			//	rect.X = destRect.X + PointX + Config.DrawingParam_ShapePositionShift;
 			//	rect.Y = destRect.Y + pointY;
 			//	img.GraphicsDraw(graph, rect);
@@ -203,7 +238,7 @@ namespace MinorShift.Emuera.GameView
 		{
 			//if (this.Error)
 			//	return;
-			//SpriteF img = cImage as SpriteF;//Graphicsから作成したImageはGDI対象外
+			//SpriteF img = cImage as SpriteF;//images created from a Graphics are not GDI targets
 			//if (isSelecting && cImageB != null)
 			//	img = cImageB as SpriteF;
 			//if (img != null && img.IsCreated)

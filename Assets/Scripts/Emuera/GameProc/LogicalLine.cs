@@ -10,7 +10,7 @@ using MinorShift.Emuera.GameProc.Function;
 namespace MinorShift.Emuera.GameProc
 {
 	/// <summary>
-	/// 命令文1行に相当する抽象クラス
+	/// Abstract class representing one instruction line
 	/// </summary>
 	internal abstract class LogicalLine
 	{
@@ -52,7 +52,7 @@ namespace MinorShift.Emuera.GameProc
 	}
 
 	///// <summary>
-	///// コメント行。
+	///// Comment line.
 	///// </summary>
 	//internal sealed class CommentLine : LogicalLine
 	//{
@@ -69,7 +69,7 @@ namespace MinorShift.Emuera.GameProc
 	//}
 
 	/// <summary>
-	/// 無効な行。
+	/// Invalid line.
 	/// </summary>
 	internal sealed class InvalidLine : LogicalLine
 	{
@@ -85,7 +85,7 @@ namespace MinorShift.Emuera.GameProc
 	}
 
 	/// <summary>
-	/// 命令文
+	/// Instruction statement
 	/// </summary>
 	internal sealed class InstructionLine : LogicalLine
 	{
@@ -133,7 +133,7 @@ namespace MinorShift.Emuera.GameProc
 		}
 
 		/// <summary>
-		/// 繰り返しの終了を記憶する
+		/// Remembers the end of the loop
 		/// </summary>
 		public Int64 LoopEnd
 		{
@@ -143,7 +143,7 @@ namespace MinorShift.Emuera.GameProc
 
 		VariableTerm cnt;
 		/// <summary>
-		/// 繰り返しにつかう変数を記憶する
+		/// Remembers the variable used for the loop
 		/// </summary>
 		public VariableTerm LoopCounter
 		{
@@ -153,7 +153,7 @@ namespace MinorShift.Emuera.GameProc
 
 		Int64 step;
 		/// <summary>
-		/// 繰り返しのたびに増加する値を記憶する
+		/// Remembers the value incremented on each loop
 		/// </summary>
 		public Int64 LoopStep
 		{
@@ -163,11 +163,11 @@ namespace MinorShift.Emuera.GameProc
 
 		private LogicalLine jumpto = null;
         private LogicalLine jumptoendcatch = null;
-		//IF文とSELECT文のみが使う。
+		//only used by IF and SELECT statements.
 		public List<InstructionLine> IfCaseList = null;
-        //PRINTDATA文のみが使う。
+        //only used by PRINTDATA statements.
         public List<List<InstructionLine>> dataList = null;
-        //TRYCALLLIST系が使う
+        //used by TRYCALLLIST family
         public List<InstructionLine> callList = null;
 
 		public LogicalLine JumpTo
@@ -185,12 +185,12 @@ namespace MinorShift.Emuera.GameProc
 	}
 
 	/// <summary>
-	/// ファイルの始端と終端
+	/// Start and end of a file
 	/// </summary>
 	internal sealed class NullLine : LogicalLine { }
 	
 	/// <summary>
-	/// ラベルがErrorになっている関数行専用のクラス
+	/// Class exclusively for function lines whose label is in Error state
 	/// </summary>
 	internal sealed class InvalidLabelLine : FunctionLabelLine
 	{
@@ -212,7 +212,7 @@ namespace MinorShift.Emuera.GameProc
 	}
 
 	/// <summary>
-	/// @で始まるラベル行
+	/// Label line starting with @
 	/// </summary>
 	internal class FunctionLabelLine : LogicalLine, IComparable<FunctionLabelLine>
 	{
@@ -267,21 +267,21 @@ namespace MinorShift.Emuera.GameProc
         //public SingleTerm[] SubNames { get; set; }
 		public int Depth { get; set; }
 
-		#region IComparable<FunctionLabelLine> メンバ
-		//ソート用情報
+		#region IComparable<FunctionLabelLine> Members
+		//data for sorting
 		public int Index { get; set; }
 		public int FileIndex { get; set; }
 		public int CompareTo(FunctionLabelLine other)
 		{
 			if (FileIndex != other.FileIndex)
 				return FileIndex.CompareTo(other.FileIndex);
-			//position == nullであるLine(デバッグコマンドなど)をSortすることはないはず
+			//Lines where position == null (like debug commands) should never be sorted
 			if (position.LineNo != other.position.LineNo)
 				return position.LineNo.CompareTo(other.position.LineNo);
 			return Index.CompareTo(other.Index);
 		}
         #endregion
-        #region private変数
+        #region private variables
         readonly Dictionary<string, UserDefinedVariableToken> privateVar = new Dictionary<string, UserDefinedVariableToken>();
 		internal bool AddPrivateVariable(UserDefinedVariableData data)
 		{
@@ -289,7 +289,7 @@ namespace MinorShift.Emuera.GameProc
 				return false;
 			UserDefinedVariableToken var = GlobalStatic.VariableData.CreatePrivateVariable(data);
 			privateVar.Add(data.Name, var);
-			//静的な変数のみの場合は関数呼び出し時に何もする必要がない
+			//if only static variables, nothing needs to be done at function call time
 			if (!data.Static)
 				hasPrivDynamicVar = true;
 			return true;
@@ -301,7 +301,7 @@ namespace MinorShift.Emuera.GameProc
 		}
 
 		/// <summary>
-		/// argumentの値の確定後、argumentの代入より前に呼ぶこと
+		/// Call after the argument values are finalized, before the arguments are assigned
 		/// </summary>
 		internal void In()
 		{
@@ -326,7 +326,7 @@ namespace MinorShift.Emuera.GameProc
 	}
 
 	/// <summary>
-	/// $で始まるラベル行
+	/// Label line starting with $
 	/// </summary>
 	internal sealed class GotoLabelLine : LogicalLine, IEqualityComparer<GotoLabelLine>
 	{
@@ -341,7 +341,7 @@ namespace MinorShift.Emuera.GameProc
 			get { return labelname; }
 		}
 
-		#region IEqualityComparer<GotoLabelLine> メンバ
+		#region IEqualityComparer<GotoLabelLine> Members
 
 		public bool Equals(GotoLabelLine x, GotoLabelLine y)
 		{

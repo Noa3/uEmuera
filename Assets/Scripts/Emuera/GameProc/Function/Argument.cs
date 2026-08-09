@@ -15,7 +15,7 @@ namespace MinorShift.Emuera.GameProc.Function
 	}
 
 	/// <summary>
-	/// 一般的なargument。複数の文字列式及び数式
+	/// Generic argument. Multiple string expressions and numeric expressions
 	/// </summary>
 	internal sealed class ExpressionsArgument : Argument
 	{
@@ -25,7 +25,7 @@ namespace MinorShift.Emuera.GameProc.Function
 			ArgumentArray = terms;
 		}
 		/// <summary>
-		/// argumentの型(ArgumentArrayよりもLengthが大きい可能性があるので見るのはArgumentArrayにすること)
+		/// argument type (may be larger than ArgumentArray.Length so inspect ArgumentArray instead)
 		/// </summary>
 		readonly public Type[] ArgumentTypeArray;
 		readonly public IOperandTerm[] ArgumentArray;
@@ -504,7 +504,7 @@ namespace MinorShift.Emuera.GameProc.Function
         readonly public IOperandTerm Flag;
     }
     
-	#region set系
+	#region set group
 	internal sealed class SpSetArgument : Argument
 	{
 		public SpSetArgument(VariableTerm var, IOperandTerm termSrc)

@@ -1403,12 +1403,11 @@ namespace MinorShift.Emuera.GameProc.Function
 
 			public override void DoInstruction(ExpressionMediator exm, InstructionLine func, ProcessState state)
 			{
-				throw new NotImplCodeEE();
-				//SpSaveVarArgument arg = (SpSaveVarArgument)func.Argument;
-				//VariableToken[] vars = arg.VarTokens;
-				//string datFilename = arg.Term.GetStrValue(exm);
-				//string savMes = arg.SavMes.GetStrValue(exm);
-				//exm.VEvaluator.SaveVariable(datFilename, savMes, vars);
+				SpSaveVarArgument arg = (SpSaveVarArgument)func.Argument;
+				VariableToken[] vars = arg.VarTokens;
+				string datFilename = arg.Term.GetStrValue(exm);
+				string savMes = arg.SavMes.GetStrValue(exm);
+				exm.VEvaluator.SaveVariable(datFilename, savMes, vars);
 			}
 		}
 		private sealed class LOADVAR_Instruction : AbstractInstruction
@@ -1421,15 +1420,13 @@ namespace MinorShift.Emuera.GameProc.Function
 
 			public override void DoInstruction(ExpressionMediator exm, InstructionLine func, ProcessState state)
 			{
-				throw new NotImplCodeEE();
-				//ExpressionArgument arg = (ExpressionArgument)func.Argument;
-				//string datFilename = null;
-				//if (arg.IsConst)
-				//    datFilename = arg.ConstStr;
-				//else
-				//    datFilename = arg.Term.GetStrValue(exm);
-				//exm.VEvaluator.LoadVariable(datFilename);
-
+				ExpressionArgument arg = (ExpressionArgument)func.Argument;
+				string datFilename;
+				if (arg.IsConst)
+					datFilename = arg.ConstStr;
+				else
+					datFilename = arg.Term.GetStrValue(exm);
+				exm.VEvaluator.LoadVariable(datFilename);
 			}
 		}
 

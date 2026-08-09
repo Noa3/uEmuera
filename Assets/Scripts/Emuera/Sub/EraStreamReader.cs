@@ -32,11 +32,11 @@ namespace MinorShift.Emuera.Sub
 
 		public bool Open(string path, string name)
 		{
-			//そんなお行儀の悪いことはしていない
+			//we are not being that naughty
 			//if (disposed)
-			//    throw new ExeEE("破棄したオブジェクトを再利用しようとした");
+			//    throw new ExeEE("tried to reuse a disposed object");
 			//if ((reader != null) || (stream != null) || (filepath != null))
-			//    throw new ExeEE("使用中のオブジェクトを別用途に再利用しようとした");
+			//    throw new ExeEE("tried to reuse an in-use object for another purpose");
 			filepath = path;
 			filename = name;
 			nextNo = 0;
@@ -62,7 +62,7 @@ namespace MinorShift.Emuera.Sub
 		}
 
 		/// <summary>
-		/// 次の有効な行を読む。LexicalAnalyzer経由でConfigを参照するのでConfig完成までつかわないこと。
+		/// Reads the next enabled line. It references Config via LexicalAnalyzer, so do not use it until Config is complete.
 		/// </summary>
 		public StringStream ReadEnabledLine(bool disabled = false)
 		{
@@ -88,7 +88,7 @@ namespace MinorShift.Emuera.Sub
 				LexicalAnalyzer.SkipWhiteSpace(st);
 				if (st.EOS)
 					continue;
-				//[SKIPSTART]～[SKIPEND]中にここが誤爆するので無効化
+				//disabled because this would misfire inside [SKIPSTART]-[SKIPEND]
 				if (!disabled)
 				{
 					if (st.Current == '}')
@@ -102,7 +102,7 @@ namespace MinorShift.Emuera.Sub
 				}
 				return st;
 			}
-			//curNoはこの後加算しない(始端記号の行を行番号とする)
+			//curNo is not incremented from here on (the starting-marker line becomes the line number)
 			StringBuilder b = new StringBuilder();
 			while (true)
 			{
@@ -127,10 +127,10 @@ namespace MinorShift.Emuera.Sub
 							throw new CodeEE("行連結終端記号'}'の行に'}'以外の文字を含めることはできません", new ScriptPosition(filename, nextNo));
 						break;
 					}
-                    //行連結文字なら1字でないとおかしい、というか、こうしないとFORMの数値変数処理が誤爆する。
+                    //A line-joining character must be a single character, otherwise FOR's numeric-variable processing misfires.
                     //{
                     //A}
-                    //みたいなどうしようもないコードは知ったこっちゃない
+                    //we do not care about hopeless code like the following
 					if (test[0] == '{' && test.Length == 1)
 						throw new CodeEE("予期しない行連結始端記号'{'が見つかりました", new ScriptPosition(filename, nextNo));
 				}
@@ -143,7 +143,7 @@ namespace MinorShift.Emuera.Sub
 		}
 
 		/// <summary>
-		/// 直前に読んだ行の行番号
+		/// Line number of the line read most recently
 		/// </summary>
 		public int LineNo
 		{ get { return curNo; } }
@@ -164,7 +164,7 @@ namespace MinorShift.Emuera.Sub
 
 		public void Close() { this.Dispose(); }
 		bool disposed = false;
-		#region IDisposable メンバ
+		#region IDisposable Members
 
 		public void Dispose()
 		{

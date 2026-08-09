@@ -95,7 +95,7 @@ public class EmueraLine : EmueraBehaviour, IPointerEnterHandler, IPointerExitHan
     }
 
     /// <summary>
-    /// 更新内容
+    /// Update contents
     /// </summary>
     public override void UpdateContent()
     {

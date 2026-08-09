@@ -16,29 +16,28 @@ namespace MinorShift.Emuera
 	public static class Program
 	{
 		/*
-		コードの開始地点。
-		ここでMainWindowを作り、
-		MainWindowがProcessを作り、
-		ProcessがGameBase・ConstantData・Variableを作る。
+		The starting point of the code.
+		MainWindow is created here,
+		MainWindow creates Process,
+		and Process creates GameBase, ConstantData and Variable.
 		
 		
-		*.ERBの読み込み、実行、その他の処理をProcessが、
-		入出力をMainWindowが、
-		定数の保存をConstantDataが、
-		変数の管理をVariableが行う。
+		Process handles loading and executing *.ERB and other processing,
+		MainWindow handles input/output,
+		ConstantData handles the storage of constants,
+		and Variable handles the management of variables.
 		 
-		と言う予定だったが改変するうちに境界が曖昧になってしまった。
+		That was the plan, but the boundaries became blurred during remodeling.
 		 
-		後にEmueraConsoleを追加し、それに入出力を担当させることに。
+		EmueraConsole was added later, and it took charge of the input/output.
         
-        1750 DebugConsole追加
-         Debugを全て切り離すことはできないので一部EmueraConsoleにも担当させる
+        1750 DebugConsole added
+         Debug cannot be fully separated, so a part of it is also handled by EmueraConsole
 		
-		TODO: 1819 MainWindow & Consoleの入力・表示組とProcess&Dataのデータ処理組だけでも分離したい
-
+		TODO: 1819 Want to at least separate the MainWindow & Console input/display group from the Process & Data processing group
 		*/
 		/// <summary>
-		/// アプリケーションのメイン エントリ ポイントです。
+		/// The application's main entry point.
 		/// </summary>
 		//[STAThread]
 		public static void Main(string[] args)
@@ -48,9 +47,9 @@ namespace MinorShift.Emuera
 #if UEMUERA_DEBUG
 			//debugMode = true;
 
-			//ExeDirにバリアントのパスを代入することでテスト実行するためのコード。
-			//ローカルパスの末尾には\必須。
-			//ローカルパスを記載した場合は頒布前に削除すること。
+			//Code for testing by assigning a local path to ExeDir.
+			//A trailing \ is required at the end of a local path.
+			//If a local path is written, remove it before distribution.
 			ExeDir = @"";
 			
 #endif
@@ -89,14 +88,14 @@ namespace MinorShift.Emuera
 					ContentDir = ExeDir + "Resources/";
 				}
 			}
-			//Error出力用
-			//1815 .exeが東方板のNGワードに引っかかるそうなので除去
+			//For error output
+			//1815 Removed because .exe apparently trips an NG word on the Touhou board
 			//ExeName = Path.GetFileNameWithoutExtension(Sys.ExeName);
 
 			Application.EnableVisualStyles();
 			Application.SetCompatibleTextRenderingDefault(false);
 			ConfigData.Instance.LoadConfig();
-            //二重起動の禁止かつ二重起動
+            //Forbid and forbid double startup
 			//if ((!Config.AllowMultipleInstances) && (Sys.PrevInstance()))
 			//{
 			//	MessageBox.Show("多重起動を許可する場合、emuera.configを書き換えて下さい", "既に起動しています");
@@ -115,7 +114,7 @@ namespace MinorShift.Emuera
             int argsStart = 0;
             if ((args.Length > 0)&&(args[0].Equals("-DEBUG", StringComparison.CurrentCultureIgnoreCase)))
             {
-                argsStart = 1;//デバッグモードかつ解析モード時に最初の1っこ(-DEBUG)を飛ばす
+                argsStart = 1;//skip the first one (-DEBUG) when in debug mode and parsing mode
 				debugMode = true;
             }
 			if(debugMode)
@@ -193,7 +192,7 @@ namespace MinorShift.Emuera
 				//		RebootLocation = new Point();
 				//	}
 				//}
-				////条件次第ではParserMediatorが空でない状態で再起動になる場合がある
+				////Depending on the conditions, it may restart with a non-empty ParserMediator
 				//ParserMediator.ClearWarningList();
 				//ParserMediator.Initialize(null);
 				//GlobalStatic.Reset();
@@ -204,7 +203,7 @@ namespace MinorShift.Emuera
 		}
 
 		/// <summary>
-		/// 実行ファイルのディレクトリ。最後に\を付けたstring
+		/// Directory of the executable file. A string ending with \
 		/// </summary>
 		public static string ExeDir { get; private set; }
 		public static string CsvDir { get; private set; }

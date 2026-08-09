@@ -5,10 +5,10 @@ using MinorShift.Emuera.Sub;
 
 namespace MinorShift.Emuera.GameData.Variable
 {
-	//1756 全ての機能をVariableTokenとManagerに委譲、消滅
-	//……しようと思ったがConstantDataから参照されているので捨て切れなかった。
+	//1756 Delegated all functionality to VariableToken and Manager, then removed
+	//...intended to do so, but could not be fully discarded because ConstantData still references it.
 	/// <summary>
-	/// VariableCodeのラッパー
+	/// Wrapper for VariableCode
 	/// </summary>
 	internal sealed class VariableIdentifier
 	{
@@ -187,9 +187,9 @@ namespace MinorShift.Emuera.GameData.Variable
 						throw new ExeEE("STRINGかつARRAY2DのSAVE_EXTENDEDは未実装");
 #endif
 				nameDic.Add(key, code);
-				////セーブが必要な変数リストの作成
+				////Creation of the list of variables that need saving
 
-				////__SAVE_EXTENDED__フラグ持ち
+				////Those carrying the __SAVE_EXTENDED__ flag
 				//if ((code & VariableCode.__SAVE_EXTENDED__) == VariableCode.__SAVE_EXTENDED__)
 				//{
 				//    if ((code & VariableCode.__CHARACTER_DATA__) == VariableCode.__CHARACTER_DATA__)
@@ -202,7 +202,7 @@ namespace MinorShift.Emuera.GameData.Variable
 				//    && ((code & VariableCode.__UNCHANGEABLE__) != VariableCode.__UNCHANGEABLE__)
 				//    && ((code & VariableCode.__LOCAL__) != VariableCode.__LOCAL__)
 				//    && (!key.StartsWith("NOTUSE_")) )
-				//{//eramaker由来の変数でセーブするもの
+				//{//Variables derived from eramaker that are saved
 
 				//    VariableCode flag = code & (VariableCode.__ARRAY_1D__ | VariableCode.__ARRAY_2D__ | VariableCode.__ARRAY_3D__ | VariableCode.__STRING__ | VariableCode.__INTEGER__ | VariableCode.__CHARACTER_DATA__);
 				//    int codeInt = (int)VariableCode.__LOWERCASE__ & (int)code;

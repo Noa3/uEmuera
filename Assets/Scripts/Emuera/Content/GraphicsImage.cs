@@ -1,483 +1,64 @@
-﻿using MinorShift._Library;
-using System;
+﻿using System;
 using System.Collections.Generic;
-//using System.Drawing;
-//using System.Drawing.Imaging;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using UnityEngine;
 using uEmuera.Drawing;
-//using System.Threading.Tasks;
 
 namespace MinorShift.Emuera.Content
 {
-	internal sealed class GraphicsImage : AbstractImage
-	{
-		//public Bitmap Bitmap;
-		//public IntPtr GDIhDC { get; protected set; }
-		//protected Graphics g;
-		//protected IntPtr hBitmap;
-		//protected IntPtr hDefaultImg;
-
-		public GraphicsImage(int id)
-		{
-			ID = id;
-			//g = null;
-			//Bitmap = null;
-			//created = false;
-			//locked = false;
-		}
-		public readonly int ID;
-        //Size size;
-        //Brush brush = null;
-        //Pen pen = null;
-        //Font font = null;
-        //Bitmap b;
-        //Graphics g;
-
-
-        ////bool created;
-        ////bool locked;
-        //public void LockGraphics()
-        //{
-        //	//if (locked)
-        //	//	return;
-        //	//g = Graphics.FromImage(b);
-        //	//locked = true;
-        //}
-        //public void UnlockGraphics()
-        //{
-        //	//if (!locked)
-        //	//	return;
-        //	//g.Dispose();
-        //	//g = null;
-        //	//locked = false;
-        //}
-
-        #region Bitmap writing and creation
-
-        /// <summary>
-        /// GCREATE(int ID, int width, int height)
-        /// Creates the Bitmap underlying Graphics. Error checking is done by caller only.
-        /// </summary>
-        public void GCreate(int x, int y, bool useGDI)
+    /// <summary>
+    /// Graphics (G) object backing store for the E* G-commands. Pixels live in a
+    /// CPU <see cref="GraphicsSurface"/>; drawing operations that can be applied on
+    /// the ERB thread (clears, fills, pixel writes, surface-to-surface blits) are
+    /// applied immediately. Blits that need to read a Unity texture (file-backed
+    /// images) are queued and executed on the main thread when the host calls
+    /// <see cref="ExecutePendingMainThreadOps"/>.
+    /// </summary>
+    internal sealed class GraphicsImage : AbstractImage
+    {
+        public GraphicsImage(int id)
         {
-            this.GDispose();
+            ID = id;
+        }
+        public readonly int ID;
+
+        #region lifecycle
+
+        public void GCreate(int width, int height, bool useGDI)
+        {
+            GDispose();
             is_created = true;
-            width = x;
-            height = y;
+            this.width = width;
+            this.height = height;
+            surface = new GraphicsSurface(width, height);
         }
 
-        internal void GCreateFromF(Bitmap bmp, bool useGDI)
+        /// <summary>
+        /// GCREATEFROMFILE - copies the pixel content of <paramref name="bmp"/> into
+        /// a new surface. <see cref="Bitmap.GetPixel"/> reads a Unity texture, so the
+        /// actual copy is deferred to the main thread when the bitmap is texture-backed.
+        /// </summary>
+        public void GCreateFromF(Bitmap bmp, bool useGDI)
         {
-            //if(useGDI)
-            //    throw new NotImplementedException();
-            //this.GDispose();
-            //Bitmap = new Bitmap(bmp.Width, bmp.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-            //size = new Size(bmp.Width, bmp.Height);
-            //g = Graphics.FromImage(Bitmap);
-            //g.DrawImage(bmp, 0, 0, bmp.Width, bmp.Height);
-
-            this.GDispose();
+            GDispose();
+            if (bmp == null || bmp.Width <= 0 || bmp.Height <= 0)
+                return;
             is_created = true;
             width = bmp.Width;
             height = bmp.Height;
-
+            surface = new GraphicsSurface(width, height);
+            enqueueOp(new BlitBitmapOp(bmp, new Rectangle(0, 0, bmp.Width, bmp.Height),
+                new Rectangle(0, 0, bmp.Width, bmp.Height), null));
         }
 
-        /// <summary>
-        /// GCLEAR(int ID, int cARGB)
-        /// Error checking is done by caller only.
-        /// </summary>
-        public void GClear(uEmuera.Drawing.Color c)
-        {
-        //	if (g == null)
-        //		throw new NullReferenceException();
-        //	g.Clear(c);
-        }
-
-        /// <summary>
-        /// GDRAWTEXTGDRAWTEXT int ID, str text, int x, int y
-        /// Error checking is done by caller only.
-        /// </summary>
-        //public void GDrawString(string text, int x, int y)
-        //{
-        //	if (g == null)
-        //		throw new NullReferenceException();
-        //	Font usingFont = font;
-        //	if (usingFont == null)
-        //		usingFont = Config.Font;
-        //	if (brush != null)
-        //	{
-        //		g.DrawString(text, usingFont, brush, x, y);
-        //	}
-        //	else
-        //	{
-        //		using (SolidBrush b = new SolidBrush(Config.ForeColor))
-        //			g.DrawString(text, usingFont, b, x, y);
-        //	}
-        //}
-        /// <summary>
-        /// GDRAWTEXTGDRAWTEXT int ID, str text, int x, int y, int width, int height
-        /// Error checking is done by caller only.
-        /// </summary>
-        //public void GDrawString(string text, int x, int y, int width, int height)
-        //{
-        //	if (g == null)
-        //		throw new NullReferenceException();
-        //	Font usingFont = font;
-        //	if (usingFont == null)
-        //		usingFont = Config.Font;
-        //	if (brush != null)
-        //	{
-        //		g.DrawString(text, usingFont, brush, new RectangleF(x,y,width,height));
-        //	}
-        //	else
-        //	{
-        //		using (SolidBrush b = new SolidBrush(Config.ForeColor))
-        //			g.DrawString(text, usingFont, b, new RectangleF(x, y, width, height));
-        //	}
-        //}
-
-        /// <summary>
-        /// GDRAWRECTANGLE(int ID, int x, int y, int width, int height)
-        /// Error checking is done by caller only.
-        /// </summary>
-        //public void GDrawRectangle(Rectangle rect)
-        //{
-        //	if (g == null)
-        //		throw new NullReferenceException();
-        //	if (pen != null)
-        //	{
-        //		g.DrawRectangle(pen, rect);
-        //	}
-        //	else
-        //	{
-        //		using (Pen p = new Pen(Config.ForeColor))
-        //			g.DrawRectangle(p, rect);
-        //	}
-        //}
-
-        /// <summary>
-        /// GFILLRECTANGLE(int ID, int x, int y, int width, int height)
-        /// Error checking is done by caller only.
-        /// </summary>
-        public void GFillRectangle(Rectangle rect)
-        {
-        //	if (g == null)
-        //		throw new NullReferenceException();
-        //	if (brush != null)
-        //	{
-        //		g.FillRectangle(brush, rect);
-        //	}
-        //	else
-        //	{
-        //		using (SolidBrush b = new SolidBrush(Config.BackColor))
-        //			g.FillRectangle(b, rect);
-        //	}
-        }
-
-		/// <summary>
-		/// GDRAWCIMG(int ID, str imgName, int destX, int destY, int destWidth, int destHeight)
-		/// Error checking is done by caller only.
-		/// </summary>
-		public void GDrawCImg(ASprite img, Rectangle destRect)
-		{
-			//if (g == null)
-			//	throw new NullReferenceException();
-			//img.GraphicsDraw(g, destRect);
-		}
-
-		/// <summary>
-		/// GDRAWCIMG(int ID, str imgName, int destX, int destY, int destWidth, int destHeight, float[][] cm)
-		/// Error checking is done by caller only.
-		/// </summary>
-		public void GDrawCImg(ASprite img, Rectangle destRect, float[][] cm)
-		{
-			//if (g == null)
-			//	throw new NullReferenceException();
-			//ImageAttributes imageAttributes = new ImageAttributes();
-			//ColorMatrix colorMatrix = new ColorMatrix(cm);
-			//imageAttributes.SetColorMatrix(colorMatrix, ColorMatrixFlag.Default, ColorAdjustType.Bitmap);
-
-			//img.GraphicsDraw(g, destRect, imageAttributes);
-		}
-
-        /// <summary>
-        /// GDRAWG(int ID, int srcID, int destX, int destY, int destWidth, int destHeight, int srcX, int srcY, int srcWidth, int srcHeight)
-        /// Error checking is done by caller only.
-        /// </summary>
-        public void GDrawG(GraphicsImage srcGra, Rectangle destRect, Rectangle srcRect)
-        {
-        //	if (g == null)
-        //		throw new NullReferenceException();
-        //	Bitmap src = srcGra.GetBitmap();
-        //	g.DrawImage(src, destRect, srcRect, GraphicsUnit.Pixel);
-        }
-
-
-        /// <summary>
-        /// GDRAWG(int ID, int srcID, int destX, int destY, int destWidth, int destHeight, int srcX, int srcY, int srcWidth, int srcHeight, float[][] cm)
-        /// Error checking is done by caller only.
-        /// </summary>
-        public void GDrawG(GraphicsImage srcGra, Rectangle destRect, Rectangle srcRect, float[][] cm)
-        {
-        //	if (g == null)
-        //		throw new NullReferenceException();
-        //	Bitmap src = srcGra.GetBitmap();
-        //	ImageAttributes imageAttributes = new ImageAttributes();
-        //	ColorMatrix colorMatrix = new ColorMatrix(cm);
-        //	imageAttributes.SetColorMatrix(colorMatrix, ColorMatrixFlag.Default,ColorAdjustType.Bitmap);
-        //	//g.DrawImage(img.Bitmap, destRect, srcRect, GraphicsUnit.Pixel, imageAttributes); Why doesn't this overload exist?
-        //	g.DrawImage(src, destRect, srcRect.X, srcRect.Y, srcRect.Width, srcRect.Height, GraphicsUnit.Pixel, imageAttributes);
-
-        }
-
-
-        /// <summary>
-        /// GDRAWGWITHMASK(int ID, int srcID, int maskID, int destX, int destY)
-        /// Error checking is done by caller only.
-        /// </summary>
-        public void GDrawGWithMask(GraphicsImage srcGra, GraphicsImage maskGra, Point destPoint)
-        {
-        //	if (g == null)
-        //		throw new NullReferenceException();
-        //	Bitmap destImg = this.GetBitmap();
-        //	byte[] srcBytes = BytesFromBitmap(srcGra.GetBitmap());
-        //	byte[] srcMaskBytes = BytesFromBitmap(maskGra.GetBitmap());
-        //	Rectangle destRect = new Rectangle(destPoint.X, destPoint.Y, srcGra.Width, srcGra.Height);
-
-        //	System.Drawing.Imaging.BitmapData bmpData =
-        //		destImg.LockBits(new Rectangle(0,0, destImg.Width,destImg.Height),
-        //		System.Drawing.Imaging.ImageLockMode.ReadWrite,
-        //		PixelFormat.Format32bppArgb);
-        //	try
-        //	{
-        //		IntPtr ptr = bmpData.Scan0;
-        //		byte[] pixels = new byte[bmpData.Stride * destImg.Height];
-        //		System.Runtime.InteropServices.Marshal.Copy(ptr, pixels, 0, pixels.Length);
-
-
-        //		for (int y = 0; y < srcGra.Height; y++)
-        //		{
-
-        //			int destIndex = ((destPoint.Y + y) * destImg.Width + destPoint.X) * 4;
-        //			int srcIndex = ((0 + y) * srcGra.Width + 0) * 4;
-        //			for (int x = 0; x < srcGra.Width; x++)
-        //			{
-        //				if (srcMaskBytes[srcIndex] == 255)//Fully opaque
-        //				{
-        //					pixels[destIndex++] = srcBytes[srcIndex++];
-        //					pixels[destIndex++] = srcBytes[srcIndex++];
-        //					pixels[destIndex++] = srcBytes[srcIndex++];
-        //					pixels[destIndex++] = srcBytes[srcIndex++];
-        //				}
-        //				else if (srcMaskBytes[srcIndex] == 0)//Fully transparent
-        //				{
-        //					destIndex += 4;
-        //					srcIndex += 4;
-        //				}
-        //				else//Semi-transparent. Using (alpha+1)/256 instead of alpha/255, but probably negligible error
-        //				{
-        //					int mask = srcMaskBytes[srcIndex]; mask++;
-        //					pixels[destIndex] = (byte)((srcBytes[srcIndex] * mask + pixels[destIndex] * (256 - mask)) >> 8); srcIndex++; destIndex++;
-        //					pixels[destIndex] = (byte)((srcBytes[srcIndex] * mask + pixels[destIndex] * (256 - mask)) >> 8); srcIndex++; destIndex++;
-        //					pixels[destIndex] = (byte)((srcBytes[srcIndex] * mask + pixels[destIndex] * (256 - mask)) >> 8); srcIndex++; destIndex++;
-        //					pixels[destIndex] = (byte)((srcBytes[srcIndex] * mask + pixels[destIndex] * (256 - mask)) >> 8); srcIndex++; destIndex++;
-        //				}
-        //			}
-        //		}
-
-        //		// Copy to Bitmap
-        //		System.Runtime.InteropServices.Marshal.Copy(pixels, 0, ptr, pixels.Length);
-        //	}
-        //	finally
-        //	{
-        //		destImg.UnlockBits(bmpData);
-        //	}
-        }
-
-        public void GSetFont(uEmuera.Drawing.Font r)
-        {
-        //	if (font != null)
-        //		font.Dispose();
-        //	font = r;
-        }
-        public void GSetBrush(Brush r)
-        {
-        //	if (brush != null)
-        //		brush.Dispose();
-        //	brush = r;
-        }
-        public void GSetPen(Pen r)
-        {
-        //	if (pen != null)
-        //		pen.Dispose();
-        //	pen = r;
-        }
-        //private static byte[] BytesFromBitmap(Bitmap bmp)
-        //{
-        //	BitmapData bmpData = bmp.LockBits(
-        //	  new Rectangle(0, 0, bmp.Width, bmp.Height),
-        //	  ImageLockMode.ReadOnly,  // Use ReadAndWrite when writing
-        //	  PixelFormat.Format32bppArgb
-        //	);
-        //	if (bmpData.Stride < 0)
-        //		throw new Exception();//Unusual format should not be sent, but just in case
-        //	byte[] pixels = new byte[bmpData.Stride * bmp.Height];
-        //	try
-        //	{ 
-        //		IntPtr ptr = bmpData.Scan0;
-        //		System.Runtime.InteropServices.Marshal.Copy(ptr, pixels, 0, pixels.Length);
-        //	}
-        //	finally
-        //	{
-        //		bmp.UnlockBits(bmpData);
-
-        //	}
-        //	return pixels;
-        //}
-
-        /// <summary>
-        /// GTOARRAY int ID, var array
-        /// Error checking is done by caller only.
-        /// <returns></returns>
-        //public bool GBitmapToInt64Array(Int64[,] array, int xstart, int ystart)
-        //{
-        //	if (g == null || Bitmap == null)
-        //		throw new NullReferenceException();
-        //	int w = Bitmap.Width;
-        //	int h = Bitmap.Height;
-        //	if (xstart + w > array.GetLength(0) || ystart + h > array.GetLength(1))
-        //		return false;
-        //	Rectangle rect = new Rectangle(0, 0, w, h);
-        //	System.Drawing.Imaging.BitmapData bmpData =
-        //		Bitmap.LockBits(rect, System.Drawing.Imaging.ImageLockMode.ReadOnly,
-        //		PixelFormat.Format32bppArgb);
-        //	IntPtr ptr = bmpData.Scan0;
-        //	byte[] rgbValues = new byte[w * h * 4];
-        //	Marshal.Copy(ptr, rgbValues, 0, rgbValues.Length);
-        //	Bitmap.UnlockBits(bmpData);
-        //	int i = 0;
-        //	for (int y = 0; y < h; y++)
-        //	{
-        //		for (int x = 0; x < w; x++)
-        //		{
-        //			array[x + xstart, y + ystart] =
-        //			rgbValues[i++] + //B
-        //			(((Int64)rgbValues[i++]) << 8) + //G
-        //			(((Int64)rgbValues[i++]) << 16) + //R
-        //			(((Int64)rgbValues[i++]) << 24);  //A
-        //		}
-        //	}
-        //	return true;
-        //}
-
-
-        /// <summary>
-        /// GFROMARRAY int ID, var array
-        /// Error checking is done by caller only.
-        /// <returns></returns>
-        //public bool GByteArrayToBitmap(Int64[,] array, int xstart, int ystart)
-        //{
-        //	if (g == null || Bitmap == null)
-        //		throw new NullReferenceException();
-        //	int w = Bitmap.Width;
-        //	int h = Bitmap.Height;
-        //	if (xstart + w > array.GetLength(0) || ystart + h > array.GetLength(1))
-        //		return false;
-
-        //	byte[] rgbValues = new byte[w * h * 4];
-        //	int i = 0;
-        //	for (int y = 0; y < h; y++)
-        //	{
-        //		for (int x = 0; x < w; x++)
-        //		{
-        //			Int64 c = array[x + xstart, y + ystart];
-        //			rgbValues[i++] = (byte)(c & 0xFF);//B
-        //			rgbValues[i++] = (byte)((c >> 8) & 0xFF);//G
-        //			rgbValues[i++] = (byte)((c >> 16) & 0xFF);//R
-        //			rgbValues[i++] = (byte)((c >> 24) & 0xFF);//A
-        //		}
-        //	}
-        //	Rectangle rect = new Rectangle(0, 0, w, h);
-        //	System.Drawing.Imaging.BitmapData bmpData =
-        //		Bitmap.LockBits(rect, System.Drawing.Imaging.ImageLockMode.WriteOnly,
-        //		PixelFormat.Format32bppArgb);
-        //	IntPtr ptr = bmpData.Scan0;
-        //	Marshal.Copy(rgbValues, 0, ptr, rgbValues.Length);
-        //	Bitmap.UnlockBits(bmpData);
-        //	return true;
-        //}
-        #endregion
-        #region Bitmap loading and deletion
-        /// <summary>
-        /// Error if not created
-        /// </summary>
-        //public Bitmap GetBitmap()
-        //{
-        //	if (Bitmap == null)
-        //		throw new NullReferenceException();
-        //	//UnlockGraphics();
-        //	return Bitmap;
-        //}
-        /// <summary>
-        /// GSETCOLOR(int ID, int cARGB, int x, int y)
-        /// Error checking is done by caller only.
-        /// </summary>
-        public void GSetColor(uEmuera.Drawing.Color c, int x, int y)
-        {
-        	if (Bitmap == null)
-        		throw new NullReferenceException();
-            //	//UnlockGraphics();
-            //	Bitmap.SetPixel(x, y, c);
-        }
-
-        /// <summary>
-        /// GGETCOLOR(int ID, int x, int y)
-        /// Error checking is done by caller only. Be sure to check if coordinates are within image bounds.
-        /// </summary>
-        public uEmuera.Drawing.Color GGetColor(int x, int y)
-        {
-        	if (Bitmap == null)
-        		throw new NullReferenceException();
-        	//UnlockGraphics();
-        	return Bitmap.GetPixel(x, y);
-        }
-
-
-        /// <summary>
-        /// GDISPOSE(int ID)
-        /// </summary>
         public void GDispose()
         {
-            //	size = new Size(0, 0);
-            //	if (Bitmap == null)
-            //		return;
-            //	if (gdi)
-            //	{
-            //		GDI.SelectObject(GDIhDC, hDefaultImg);
-            //		GDI.DeleteObject(hBitmap);
-            //		g.ReleaseHdc(GDIhDC);
-            //	}
-            //	if (g != null)
-            //		g.Dispose();
-            //	if (Bitmap != null)
-            //		Bitmap.Dispose();
-            //	if (brush != null)
-            //		brush.Dispose();
-            //	if (pen != null)
-            //		pen.Dispose();
-            //	if (font != null)
-            //		font.Dispose();
-            //	g = null;
-            //	Bitmap = null;
-            //	brush = null;
-            //	pen = null;
-            //	font = null;
-
-
+            lock (pendingOpLock)
+            {
+                if (pendingOps != null)
+                    pendingOps.Clear();
+            }
+            GraphicsSurface old = surface;
+            surface = null;
+            old = null;
             is_created = false;
             width = 0;
             height = 0;
@@ -485,35 +66,431 @@ namespace MinorShift.Emuera.Content
 
         public override void Dispose()
         {
-            //	this.GDispose();
-            //if(render_texture != null)
-            //{
-            //    UnityEngine.Object.Destroy(render_texture);
-            //}
-            this.GDispose();
+            GDispose();
         }
 
         ~GraphicsImage()
         {
-            Dispose();
+            GDispose();
         }
+
+        public override bool IsCreated
+        {
+            get { return is_created && surface != null; }
+        }
+
+        int width;
+        int height;
+        bool is_created;
+        GraphicsSurface surface;
+
+        public int Width { get { return width; } }
+        public int Height { get { return height; } }
+
         #endregion
 
-//#region State determination (without Bitmap read/write)
-        //public override bool IsCreated { get { return g != null; } }
-        public override bool IsCreated { get { return is_created; } }
-        bool is_created = false;
+        #region paint state
+
+        Brush brush;
+        Pen pen;
+        Font font;
+
+        internal Color CurrentBrushColor
+        {
+            get
+            {
+                if (brush is SolidBrush sb)
+                    return sb.Color;
+                return new Color(0, 0, 0, 0);
+            }
+        }
+
+        #endregion
+
+        #region drawing primitives
 
         /// <summary>
-        /// int GWIDTH(int ID)
+        /// GCLEAR(int ID, Color) - overwrite every pixel.
         /// </summary>
-        public int Width { get { return width; } }
-        int width = 0;
-		/// <summary>
-		/// int GHEIGHT(int ID)
-		/// </summary>
-		public int Height { get { return height; } }
-        int height = 0;
-        //#endregion
-	}
+        public void GClear(Color c)
+        {
+            GraphicsSurface s = surface;
+            if (s == null)
+                throw new NullReferenceException();
+            lock (pixelLock)
+            {
+                s.Clear(c);
+            }
+            WhileDirty();
+        }
+
+        /// <summary>
+        /// GFILLRECTANGLE(int ID, Rectangle).
+        /// </summary>
+        public void GFillRectangle(Rectangle rect)
+        {
+            GraphicsSurface s = surface;
+            if (s == null)
+                throw new NullReferenceException();
+            Color c = CurrentBrushColor;
+            lock (pixelLock)
+            {
+                s.FillRectangle(rect, c);
+            }
+            WhileDirty();
+        }
+
+        /// <summary>
+        /// GSETCOLOR(int ID, Color, int x, int y) - overwrite a single pixel.
+        /// </summary>
+        public void GSetColor(Color c, int x, int y)
+        {
+            GraphicsSurface s = surface;
+            if (s == null)
+                throw new NullReferenceException();
+            lock (pixelLock)
+            {
+                s.SetPixel(c, x, y);
+            }
+            WhileDirty();
+        }
+
+        /// <summary>
+        /// GGETCOLOR(int ID, int x, int y). Assumes coordinates are in bounds.
+        /// </summary>
+        public Color GGetColor(int x, int y)
+        {
+            GraphicsSurface s = surface;
+            if (s == null)
+                throw new NullReferenceException();
+            lock (pixelLock)
+                return s.GetPixel(x, y);
+        }
+
+        public void GSetBrush(Brush r)
+        {
+            brush = r;
+        }
+
+        public void GSetPen(Pen r)
+        {
+            pen = r;
+        }
+
+        public void GSetFont(Font r)
+        {
+            font = r;
+        }
+
+        /// <summary>
+        /// GDRAWCIMG(int ID, str imgName, ...). Graphics-backed sprites (SpriteG) can
+        /// be composited straight from the source CPU surface; texture-backed sprites
+        /// are queued to the main thread.
+        /// </summary>
+        public void GDrawCImg(ASprite img, Rectangle destRect)
+        {
+            DrawSpriteInternal(img, destRect, null);
+        }
+
+        public void GDrawCImg(ASprite img, Rectangle destRect, float[][] cm)
+        {
+            DrawSpriteInternal(img, destRect, cm);
+        }
+
+        void DrawSpriteInternal(ASprite img, Rectangle destRect, float[][] cm)
+        {
+            GraphicsSurface s = surface;
+            if (s == null)
+                throw new NullReferenceException();
+            if (img == null)
+                return;
+            if (img is ASpriteSingle single && single.BaseImage is GraphicsImage srcG &&
+                srcG.InternalSurface != null)
+            {
+                Rectangle srcRect = single.SrcRectangle;
+                lock (pixelLock)
+                {
+                    lock (srcG.pixelLock)
+                    {
+                        s.DrawImage(srcG.InternalSurface, destRect, srcRect);
+                    }
+                }
+                WhileDirty();
+                return;
+            }
+            enqueueOp(new BlitSpriteOp(img, destRect, cm));
+        }
+
+        /// <summary>
+        /// GDRAWG(int ID, int srcID, ...)... surface-to-surface compositing.
+        /// </summary>
+        public void GDrawG(GraphicsImage srcGra, Rectangle destRect, Rectangle srcRect)
+        {
+            GraphicsSurface s = surface;
+            if (s == null)
+                throw new NullReferenceException();
+            if (srcGra == null || srcGra.InternalSurface == null)
+                return;
+            lock (pixelLock)
+            {
+                GraphicsSurface srcSurf = srcGra.InternalSurface;
+                lock (srcGra.pixelLock)
+                {
+                    s.DrawImage(srcSurf, destRect, srcRect);
+                }
+            }
+            WhileDirty();
+        }
+
+        public void GDrawG(GraphicsImage srcGra, Rectangle destRect, Rectangle srcRect, float[][] cm)
+        {
+            GraphicsSurface s = surface;
+            if (s == null)
+                throw new NullReferenceException();
+            if (srcGra == null || srcGra.InternalSurface == null)
+                return;
+            lock (pixelLock)
+            {
+                GraphicsSurface srcSurf = srcGra.InternalSurface;
+                lock (srcGra.pixelLock)
+                {
+// Apply matrix through a temporary surface so the source is 1:1
+                    // composited (matrix + source-over) into the dest rect.
+                    GraphicsSurface tmp = new GraphicsSurface(
+                        destRect.Width > 0 ? destRect.Width : -destRect.Width,
+                        destRect.Height > 0 ? destRect.Height : -destRect.Height);
+                    tmp.DrawImage(srcSurf, new Rectangle(0, 0, tmp.Width, tmp.Height), srcRect);
+                    tmp.ApplyColorMatrixInPlace(cm);
+                    s.DrawImage(tmp, destRect, new Rectangle(0, 0, tmp.Width, tmp.Height));
+                }
+            }
+            WhileDirty();
+        }
+
+        /// <summary>
+        /// GDRAWGWITHMASK. Mask alpha scales the source opacity per pixel.
+        /// </summary>
+        public void GDrawGWithMask(GraphicsImage srcGra, GraphicsImage maskGra, Point destPoint)
+        {
+            GraphicsSurface s = surface;
+            if (s == null)
+                throw new NullReferenceException();
+            if (srcGra == null || srcGra.InternalSurface == null || maskGra == null || maskGra.InternalSurface == null)
+                return;
+            lock (pixelLock)
+            {
+                GraphicsSurface src = srcGra.InternalSurface;
+                GraphicsSurface mask = maskGra.InternalSurface;
+                lock (srcGra.pixelLock)
+                {
+                    lock (maskGra.pixelLock)
+                    {
+                        s.DrawImageMasked(src, mask, destPoint);
+                    }
+                }
+            }
+            WhileDirty();
+        }
+
+        #endregion
+
+        #region array conversion
+
+        /// <summary>
+        /// GTOARRAY equivalent - pack the surface into a 2D Int64 array at (xstart, ystart).
+        /// Packing matches reference Emuera: ABGR byte order within each pixel.
+        /// </summary>
+        public bool GBitmapToInt64Array(Int64[,] array, int xstart, int ystart)
+        {
+            GraphicsSurface s = surface;
+            if (s == null)
+                throw new NullReferenceException();
+            if (xstart + s.Width > array.GetLength(0) || ystart + s.Height > array.GetLength(1))
+                return false;
+            lock (pixelLock)
+            {
+                uint[] p = s.Raw;
+                for (int y = 0; y < s.Height; y++)
+                {
+                    int row = y * s.Width;
+                    for (int x = 0; x < s.Width; x++)
+                    {
+                        uint v = p[row + x];
+                        array[x + xstart, y + ystart] = (Int64)(v & 0xFF) |
+                            ((Int64)((v >> 8) & 0xFF) << 8) |
+                            ((Int64)((v >> 16) & 0xFF) << 16) |
+                            ((Int64)((v >> 24) & 0xFF) << 24);
+                    }
+                }
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// GFROMARRAY equivalent - write a 2D Int64 array (ABGR packed) into the surface
+        /// starting at (xstart, ystart).
+        /// </summary>
+        public bool GByteArrayToBitmap(Int64[,] array, int xstart, int ystart)
+        {
+            GraphicsSurface s = surface;
+            if (s == null)
+                throw new NullReferenceException();
+            int w = s.Width, h = s.Height;
+            if (xstart + w > array.GetLength(0) || ystart + h > array.GetLength(1))
+                return false;
+            lock (pixelLock)
+            {
+                uint[] p = s.Raw;
+                for (int y = 0; y < h; y++)
+                {
+                    int row = y * w;
+                    for (int x = 0; x < w; x++)
+                    {
+                        Int64 c = array[x + xstart, y + ystart];
+                        p[row + x] = ((uint)((c >> 24) & 0xFF) << 24) |
+                                     ((uint)((c >> 16) & 0xFF) << 16) |
+                                     ((uint)((c >> 8) & 0xFF) << 8) |
+                                     ((uint)(c & 0xFF));
+                    }
+                }
+            }
+            WhileDirty();
+            return true;
+        }
+
+        #endregion
+
+        #region main-thread deferred ops
+
+        internal abstract class MainThreadOp
+        {
+            public abstract void Apply(GraphicsImage owner, GraphicsSurface target);
+        }
+
+        /// <summary>File/texture-backed bitmap → surface blit.</summary>
+        sealed class BlitBitmapOp : MainThreadOp
+        {
+            readonly Bitmap bmp;
+            readonly Rectangle srcRect;
+            readonly Rectangle destRect;
+            readonly float[][] cm;
+            public BlitBitmapOp(Bitmap bmp, Rectangle srcRect, Rectangle destRect, float[][] cm)
+            {
+                this.bmp = bmp;
+                this.srcRect = srcRect;
+                this.destRect = destRect;
+                this.cm = cm;
+            }
+            public override void Apply(GraphicsImage owner, GraphicsSurface target)
+            {
+                target.DrawBitmap(bmp, destRect, srcRect, cm);
+            }
+        }
+
+        /// <summary>Texture-backed sprite blit (should only reach here for file sprites).</summary>
+        sealed class BlitSpriteOp : MainThreadOp
+        {
+            readonly ASprite img;
+            readonly Rectangle destRect;
+            readonly float[][] cm;
+            public BlitSpriteOp(ASprite img, Rectangle destRect, float[][] cm)
+            {
+                this.img = img;
+                this.destRect = destRect;
+                this.cm = cm;
+            }
+            public override void Apply(GraphicsImage owner, GraphicsSurface target)
+            {
+                if (img is ASpriteSingle single && single.BaseImage != null)
+                {
+                    Bitmap bmp = single.BaseImage.Bitmap;
+                    if (bmp == null || bmp.Width <= 0 || bmp.Height <= 0)
+                        return;
+                    Rectangle srcRect = single.SrcRectangle;
+                    if (srcRect.Width == 0 || srcRect.Height == 0)
+                        srcRect = new Rectangle(0, 0, bmp.Width, bmp.Height);
+                    target.DrawBitmap(bmp, destRect, srcRect, cm);
+                }
+            }
+        }
+
+        void enqueueOp(MainThreadOp op)
+        {
+            lock (pendingOpLock)
+            {
+                if (pendingOps == null)
+                    pendingOps = new List<MainThreadOp>(4);
+                pendingOps.Add(op);
+            }
+        }
+
+        /// <summary>
+        /// Runs any queued main-thread-only ops. Must be called from the Unity main
+        /// thread (typically from the game's update loop / renderer synchronization).
+        /// </summary>
+        internal void ExecutePendingMainThreadOps()
+        {
+            List<MainThreadOp> ops;
+            lock (pendingOpLock)
+            {
+                if (pendingOps == null || pendingOps.Count == 0)
+                    return;
+                ops = pendingOps;
+                pendingOps = new List<MainThreadOp>(4);
+            }
+            GraphicsSurface s = surface;
+            if (s == null)
+                return;
+            lock (pixelLock)
+            {
+                for (int i = 0; i < ops.Count; i++)
+                {
+                    try
+                    {
+                        ops[i].Apply(this, s);
+                    }
+                    catch (Exception e)
+                    {
+                        UnityEngine.Debug.LogWarning("GraphicsImage op failed: " + e.Message);
+                    }
+                }
+            }
+            WhileDirty();
+        }
+
+        List<MainThreadOp> pendingOps;
+        readonly object pendingOpLock = new object();
+        readonly object pixelLock = new object();
+
+        internal void WhileDirty()
+        {
+            System.Threading.Interlocked.Exchange(ref dirty, 1);
+        }
+        internal int dirty;
+
+        #endregion
+
+        internal GraphicsSurface InternalSurface
+        {
+            get { return is_created ? surface : null; }
+        }
+
+        internal uint[] SampleSurface()
+        {
+            GraphicsSurface s = surface;
+            if (s == null)
+                return null;
+            lock (pixelLock)
+            {
+                uint[] copy = new uint[s.Raw.Length];
+                Array.Copy(s.Raw, copy, copy.Length);
+                return copy;
+            }
+        }
+
+        internal bool IsDirty
+        {
+            get { return dirty != 0; }
+        }
+    }
 }

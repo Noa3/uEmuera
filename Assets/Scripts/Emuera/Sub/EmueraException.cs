@@ -41,7 +41,7 @@ namespace MinorShift.Emuera.Sub
 	}
 
 	/// <summary>
-	/// スクリプト側に起因すると思われるError
+	/// Error that appears to originate from the script side
 	/// </summary>
     [Serializable]
     internal class CodeEE : EmueraException
@@ -57,7 +57,7 @@ namespace MinorShift.Emuera.Sub
 	}
 
 	/// <summary>
-	/// スクリプト側に起因すると思われるErrorのうち、未定義の識別子に関連するもの
+	/// Error that appears to originate from the script side; related to undefined identifiers
 	/// </summary>
 	[Serializable]
 	internal class IdentifierNotFoundCodeEE : CodeEE
@@ -73,7 +73,7 @@ namespace MinorShift.Emuera.Sub
 	}
 
 	/// <summary>
-	/// 未実装Error
+	/// Not-implemented Error
 	/// </summary>
     [Serializable]
     internal sealed class NotImplCodeEE : CodeEE
@@ -89,7 +89,7 @@ namespace MinorShift.Emuera.Sub
 	}
 
 	/// <summary>
-	/// Save, Load中のError
+	/// Error during Save, Load
 	/// </summary>
     [Serializable]
     internal sealed class FileEE : EmueraException
@@ -100,7 +100,7 @@ namespace MinorShift.Emuera.Sub
 	}
 
 	/// <summary>
-	/// Error箇所を表示するための位置データ。整形前のデータなのでError表示以外の理由で参照するべきではない。
+	/// Position data used to show where the error occurred. This is unformatted data, so it should not be referenced for any purpose other than error display.
 	/// </summary>
 	internal sealed class ScriptPosition : IEquatable<ScriptPosition>, IEqualityComparer<ScriptPosition>
 	{
@@ -127,7 +127,7 @@ namespace MinorShift.Emuera.Sub
 			return Filename + ":" + LineNo.ToString();
 		}
 
-		#region IEqualityComparer<ScriptPosition> メンバ
+		#region IEqualityComparer<ScriptPosition> Members
 
 		public bool Equals(ScriptPosition x, ScriptPosition y)
 		{
@@ -143,7 +143,7 @@ namespace MinorShift.Emuera.Sub
 
 		#endregion
 
-		#region IEquatable<ScriptPosition> メンバ
+		#region IEquatable<ScriptPosition> Members
 
 		public bool Equals(ScriptPosition other)
 		{

@@ -10,7 +10,7 @@ namespace MinorShift.Emuera.Sub
     /// Provides efficient deserialization of game save data including
     /// integers, strings, arrays, and character data.
     /// </summary>
-    #region reader/writer共通データ
+    #region Common reader/writer data
     public enum EraSaveFileType : byte
     {
 		Normal = 0x00,
@@ -29,31 +29,31 @@ namespace MinorShift.Emuera.Sub
 		StrArray = 0x11,
 		StrArray2D = 0x12,
 		StrArray3D = 0x13,
-		//SOC = 0xFD,//キャラデータ始まり
-		Separator = 0xFD,//データ区切り
-		EOC = 0xFE,//キャラデータ終わり
-		EOF = 0xFF,//ファイル終端
+		//SOC = 0xFD,//start of character data
+		Separator = 0xFD,//data separator
+		EOC = 0xFE,//end of character data
+		EOF = 0xFF,//end of file
 	}
 
-	static class Ebdb//EraBinaryData中のマジックナンバーなバイト
+	static class Ebdb//magic-number bytes in EraBinaryData
 	{
 		public const byte Byte = 0xCF;
-		public const byte Int16 = 0xD0;//直後の2バイトがInt16
-		public const byte Int32 = 0xD1;//直後の4バイトがInt32
-		public const byte Int64 = 0xD2;//直後の8バイトがInt64
-		public const byte String = 0xD8;//直後がString
+		public const byte Int16 = 0xD0;//the following 2 bytes form an Int16
+		public const byte Int32 = 0xD1;//the following 4 bytes form an Int32
+		public const byte Int64 = 0xD2;//the following 8 bytes form an Int64
+		public const byte String = 0xD8;//a String follows immediately
 
-		public const byte EoA1 = 0xE0;//データ区切り（一次元
-		public const byte EoA2 = 0xE1;//データ区切り（二次元
-		public const byte Zero = 0xF0;//直後にゼロが連続する数
-		public const byte ZeroA1 = 0xF1;//直後に空配列が連続する数（一次元
-		public const byte ZeroA2 = 0xF2;//直後に空配列が連続する数（二次元
-		public const byte EoD = 0xFF;//変数データ終わり
+		public const byte EoA1 = 0xE0;//data separator (one-dimensional
+		public const byte EoA2 = 0xE1;//data separator (two-dimensional
+		public const byte Zero = 0xF0;//number of consecutive zeros following
+		public const byte ZeroA1 = 0xF1;//number of consecutive empty arrays following (one-dimensional
+		public const byte ZeroA2 = 0xF2;//number of consecutive empty arrays following (two-dimensional
+		public const byte EoD = 0xFF;//end of variable data
 	}
 
 	static class EraBDConst
 	{
-		//Headerはpngのパクリ
+		//Header is copied from png
 		public const UInt64 Header = 0x0A1A0A0D41524589UL;
 		public const UInt32 Version1808 = 1808;
 		public const UInt32 DataCount = 0;
@@ -61,8 +61,8 @@ namespace MinorShift.Emuera.Sub
 	#endregion
 
 	/// <summary>
-	/// 1808追加 新しいデータ保存形式
-	/// 将来形式を変更したときのためにabstractにしておく
+	/// Added in 1808: new data save format
+	/// Made abstract in case the format changes in the future
 	/// </summary>
 	internal abstract class EraBinaryDataReader : IDisposable
 	{
@@ -80,8 +80,8 @@ namespace MinorShift.Emuera.Sub
 
 		public abstract int ReaderVersion { get; }
 		/// <summary>
-		/// FileStreamからReaderを作成
-		/// Invalid ファイルの場合はnullを返す・Exceptionは投げない
+		/// Create a reader from a FileStream
+		/// Returns null if the file is invalid, does not throw an exception
 		/// </summary>
 		/// <param name="fs"></param>
 		/// <returns></returns>
@@ -114,7 +114,7 @@ namespace MinorShift.Emuera.Sub
 		public abstract EraSaveFileType ReadFileType();
 
 		/// <summary>
-		/// システム用の特殊処理・圧縮なし
+		/// Special processing for system use, no compression
 		/// </summary>
 		/// <returns></returns>
 		public abstract Int64 ReadInt64();
@@ -128,7 +128,7 @@ namespace MinorShift.Emuera.Sub
 		public abstract void ReadStrArray2D(string[,] refArray, bool needInit);
 		public abstract void ReadStrArray3D(string[, ,] refArray, bool needInit);
 		public abstract KeyValuePair<string, EraSaveDataType> ReadVariableCode();
-		#region IDisposable メンバ
+		#region IDisposable Members
 
 		public void Dispose()
 		{
@@ -195,7 +195,7 @@ namespace MinorShift.Emuera.Sub
 				return new KeyValuePair<string, EraSaveDataType>(key, type);
 			}
 
-			//配列じゃないやつは特殊処理
+			//non-array values use special processing
 			public override Int64 ReadInt()
 			{
 				return m_ReadInt();
@@ -213,16 +213,16 @@ namespace MinorShift.Emuera.Sub
 				byte b;
 				int x = 0;
 				int saveLength0 = reader.ReadInt32();
-				if (refArray == null)//読み捨て。レアケースのはず
+				if (refArray == null)//discard the data; this should be a rare case
 					refArray = new Int64[saveLength0];
 
 				int length0 = refArray.Length;
 
-				//保存されたデータの方が大きいとき。レアケースのはず
+				//when the saved data is larger; this should be a rare case
 				if (length0 < saveLength0)
 				{
                     oriArray = refArray;
-                    //1818修正 サイズ違いの時にあふれないように/配列は最大まで確保、作業するのは重複部分だけ
+                    //1818 fix: prevent overflow when sizes differ / allocate the array to the maximum and only work on the overlapping part
                     refArray = new Int64[Math.Max(length0, saveLength0)];
 
                     length0 = Math.Min(length0, saveLength0);
@@ -279,7 +279,7 @@ namespace MinorShift.Emuera.Sub
 				if (length0 < saveLength0 || length1 < saveLength1)
 				{
                     oriArray = refArray;
-                    //1818修正 サイズ違いの時にあふれないように/配列は最大まで確保、作業するのは重複部分だけ
+                    //1818 fix: prevent overflow when sizes differ / allocate the array to the maximum and only work on the overlapping part
                     refArray = new Int64[Math.Max(length0, saveLength0), Math.Max(length1, saveLength1)];
 
                     length0 = Math.Min(length0, saveLength0);
@@ -353,8 +353,8 @@ namespace MinorShift.Emuera.Sub
 			/// <summary>
 			/// 
 			/// </summary>
-			/// <param name="refArray">データを書き出す先。読み捨てるならnull</param>
-			/// <param name="needInit">データがない部分を0で埋める必要があるか</param>
+			/// <param name="refArray">Data destination to write to. Pass null to discard it</param>
+			/// <param name="needInit">Whether parts with no data need to be filled with 0</param>
 			public override void ReadIntArray3D(Int64[, ,] refArray, bool needInit)
 			{
 				Int64[, ,] oriArray = null;
@@ -374,7 +374,7 @@ namespace MinorShift.Emuera.Sub
 				if (length0 < saveLength0 || length1 < saveLength1 || length2 < saveLength2)
 				{
 					oriArray = refArray;
-                    //1818修正 サイズ違いの時にあふれないように/配列は最大まで確保、作業するのは重複部分だけ
+                    //1818 fix: prevent overflow when sizes differ / allocate the array to the maximum and only work on the overlapping part
                     refArray = new Int64[Math.Max(length0, saveLength0), Math.Max(length1, saveLength1), Math.Max(length2, saveLength2)];
 
                     length0 = Math.Min(length0, saveLength0);
@@ -387,7 +387,7 @@ namespace MinorShift.Emuera.Sub
 					b = reader.ReadByte();
 					if (b == Ebdb.EoD)
 						break;
-					if (b == Ebdb.ZeroA2)//cnt分だけ空の行列が連続
+					if (b == Ebdb.ZeroA2)//cnt consecutive empty matrices
 					{
 						int cnt = (int)m_ReadInt();
 						if (needInit)
@@ -400,7 +400,7 @@ namespace MinorShift.Emuera.Sub
 						z = 0;
 						continue;
 					}
-					if (b == Ebdb.EoA2)//行列終わりor残りが全て0
+					if (b == Ebdb.EoA2)//end of matrix, or remaining elements are all 0
 					{
 						if (needInit)
 						{
@@ -417,7 +417,7 @@ namespace MinorShift.Emuera.Sub
 						continue;
 					}
 
-					if (b == Ebdb.ZeroA1)//cnt分だけ空の列が連続
+					if (b == Ebdb.ZeroA1)//cnt consecutive empty columns
 					{
 						int cnt = (int)m_ReadInt();
 						if (needInit)
@@ -428,7 +428,7 @@ namespace MinorShift.Emuera.Sub
 						z = 0;
 						continue;
 					}
-					if (b == Ebdb.EoA1)//列終わりor残り全て0
+					if (b == Ebdb.EoA1)//end of column, or all remaining are 0
 					{
 						if (needInit)
 							for (; z < length2; z++)
@@ -438,7 +438,7 @@ namespace MinorShift.Emuera.Sub
 						continue;
 					}
 
-					if (b == Ebdb.Zero)//cnt分だけ0が連続
+					if (b == Ebdb.Zero)//cnt consecutive zeros
 					{
 						int cnt = (int)m_ReadInt();
 						if (needInit)
@@ -488,16 +488,16 @@ namespace MinorShift.Emuera.Sub
 				byte b;
 				int x = 0;
 				int saveLength0 = reader.ReadInt32();
-				if (refArray == null)//読み捨て。レアケースのはず
+				if (refArray == null)//discard the data; this should be a rare case
 					refArray = new string[saveLength0];
 
 				int length0 = refArray.Length;
 
-				//保存されたデータの方が大きいとき。レアケースのはず
+				//when the saved data is larger; this should be a rare case
 				if (length0 < saveLength0)
 				{
                     oriArray = refArray;
-                    //1818修正 サイズ違いの時にあふれないように/配列は最大まで確保、作業するのは重複部分だけ
+                    //1818 fix: prevent overflow when sizes differ / allocate the array to the maximum and only work on the overlapping part
                     refArray = new string[Math.Max(length0, saveLength0)];
 
                     length0 = Math.Min(length0, saveLength0);
@@ -548,7 +548,7 @@ namespace MinorShift.Emuera.Sub
 				if (length0 < saveLength0 || length1 < saveLength1)
 				{
                     oriArray = refArray;
-                    //1818修正 サイズ違いの時にあふれないように/配列は最大まで確保、作業するのは重複部分だけ
+                    //1818 fix: prevent overflow when sizes differ / allocate the array to the maximum and only work on the overlapping part
                     refArray = new string[Math.Max(length0, saveLength0), Math.Max(length1, saveLength1)];
 
                     length0 = Math.Min(length0, saveLength0);
@@ -632,7 +632,7 @@ namespace MinorShift.Emuera.Sub
 				if (length0 < saveLength0 || length1 < saveLength1 || length2 < saveLength2)
 				{
                     oriArray = refArray;
-                    //1818修正 サイズ違いの時にあふれないように/配列は最大まで確保、作業するのは重複部分だけ
+                    //1818 fix: prevent overflow when sizes differ / allocate the array to the maximum and only work on the overlapping part
                     refArray = new string[Math.Max(length0, saveLength0), Math.Max(length1, saveLength1), Math.Max(length2, saveLength2)];
 
                     length0 = Math.Min(length0, saveLength0);
@@ -645,7 +645,7 @@ namespace MinorShift.Emuera.Sub
 					b = reader.ReadByte();
 					if (b == Ebdb.EoD)
 						break;
-					if (b == Ebdb.ZeroA2)//cnt分だけ空の行列が連続
+					if (b == Ebdb.ZeroA2)//cnt consecutive empty matrices
 					{
 						int cnt = (int)m_ReadInt();
 						if (needInit)
@@ -658,7 +658,7 @@ namespace MinorShift.Emuera.Sub
 						z = 0;
 						continue;
 					}
-					if (b == Ebdb.EoA2)//行列終わりor残りが全て0
+					if (b == Ebdb.EoA2)//end of matrix, or remaining elements are all 0
 					{
 						if (needInit)
 						{
@@ -675,7 +675,7 @@ namespace MinorShift.Emuera.Sub
 						continue;
 					}
 
-					if (b == Ebdb.ZeroA1)//cnt分だけ空の列が連続
+					if (b == Ebdb.ZeroA1)//cnt consecutive empty columns
 					{
 						int cnt = (int)m_ReadInt();
 						if (needInit)
@@ -686,7 +686,7 @@ namespace MinorShift.Emuera.Sub
 						z = 0;
 						continue;
 					}
-					if (b == Ebdb.EoA1)//列終わりor残り全て0
+					if (b == Ebdb.EoA1)//end of column, or all remaining are 0
 					{
 						if (needInit)
 							for (; z < length2; z++)
@@ -696,7 +696,7 @@ namespace MinorShift.Emuera.Sub
 						continue;
 					}
 
-					if (b == Ebdb.Zero)//cnt分だけ0が連続
+					if (b == Ebdb.Zero)//cnt consecutive zeros
 					{
 						int cnt = (int)m_ReadInt();
 						if (needInit)

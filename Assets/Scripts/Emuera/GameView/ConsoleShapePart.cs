@@ -42,7 +42,7 @@ namespace MinorShift.Emuera.GameView
 					else if (paramPixel.Length == 4)
 					{
 						rectF = new RectangleF(paramPixel[0], paramPixel[1], paramPixel[2], paramPixel[3]);
-						//1820a12 サイズ上限撤廃
+						//1820a12 size upper limit removed
 						if (rectF.X >= 0 && rectF.Width > 0 && rectF.Height > 0)
 						//	rectF.Y >= 0 && (rectF.Y + rectF.Height) <= lineHeight)
 						{
@@ -53,8 +53,7 @@ namespace MinorShift.Emuera.GameView
 				case "polygon":
 					break;
 			}
-#if UNITY_EDITOR
-            StringBuilder sb = new StringBuilder();
+StringBuilder sb = new StringBuilder();
             sb.Append("<shape type='");
             sb.Append(type);
             sb.Append("' param='");
@@ -83,14 +82,10 @@ namespace MinorShift.Emuera.GameView
 			{
 				ret = new ConsoleErrorShapePart(sb.ToString());
 			}
+			// Serialization for HTML_GETPRINTEDSTR must be available in release
+			// builds, not only under UNITY_EDITOR. Round-tripping the markup back
+			// requires the exact shape tag that was parsed.
 			ret.AltText = sb.ToString();
-#else
-            if (ret == null)
-			{
-				ret = new ConsoleErrorShapePart("");
-			}
-			ret.AltText = "";
-#endif
             ret.Color = color;
 			ret.ButtonColor = bcolor;
 			ret.colorChanged = colorchanged;

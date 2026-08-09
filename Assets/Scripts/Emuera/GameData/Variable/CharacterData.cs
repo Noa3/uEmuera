@@ -431,7 +431,7 @@ namespace MinorShift.Emuera.GameData.Variable
 
 		public void SaveToStreamBinary(EraBinaryDataWriter writer, VariableData varData)
 		{
-			//eramaker変数の保存
+			//Saving of eramaker variables
 			foreach (KeyValuePair<string, VariableToken> pair in varData.GetVarTokenDic())
 			{
 				VariableToken var = pair.Value;
@@ -469,11 +469,11 @@ namespace MinorShift.Emuera.GameData.Variable
 				}
 			}
 
-			//1813追加
+			//Added in 1813
 			if (UserDefCVarDataList.Count != 0)
 			{
 				writer.WriteSeparator();
-				//#DIM宣言変数の保存
+				//Saving of #DIM-declared variables
 				foreach (UserDefinedCharaVariableToken var in varData.UserDefinedCharaVarList)
 				{
 					if (!var.IsSavedata || !var.IsCharacterData || var.IsGlobal)
@@ -654,7 +654,7 @@ namespace MinorShift.Emuera.GameData.Variable
 					array[i, j] = value;
 		}
 
-		#region IDisposable メンバ
+		#region IDisposable Members
 
 		public void Dispose()
 		{
@@ -697,9 +697,9 @@ namespace MinorShift.Emuera.GameData.Variable
 
 		public void SetSortKey(VariableToken sortkey, Int64 elem64)
 		{
-			//チェック済み
+			//Already checked
 			//if (!sortkey.IsCharacterData)
-			//    throw new ExeEE("キャラクタ変数でない");
+			//    throw new ExeEE("not a character variable");
 			if (sortkey.IsString)
 			{
                 if (sortkey.IsArray2D)
@@ -731,7 +731,7 @@ namespace MinorShift.Emuera.GameData.Variable
                 }
                 else
                 {
-                    //ユーザー定義キャラ変数は非配列がない
+                    //User-defined character variables have no non-array variants
                     if (dataString[sortkey.CodeInt] != null)
                         temp_SortKey = dataString[sortkey.CodeInt];
                     else

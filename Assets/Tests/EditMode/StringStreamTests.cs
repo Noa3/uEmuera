@@ -269,7 +269,8 @@ namespace uEmuera.Tests.EditMode
             var stream = new MinorShift.Emuera.Sub.StringStream("hello");
             stream.ShiftNext();
             
-            Assert.AreEqual(2, stream.Find('l'));
+            // IndexOf('l', 1) = 2, relative to current position (1) = 1
+            Assert.AreEqual(1, stream.Find('l'));
         }
 
         [Test]

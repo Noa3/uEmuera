@@ -16,11 +16,11 @@ namespace MinorShift.Emuera.GameProc
 	{
 		public static bool ParseSharpLine(FunctionLabelLine label, StringStream st, ScriptPosition position, List<string> OnlyLabel)
 		{
-			st.ShiftNext();//'#'を飛ばす
-			string token = LexicalAnalyzer.ReadSingleIdentifier(st);//#～自体にはマクロ非適用
+			st.ShiftNext();//skip '#'
+			string token = LexicalAnalyzer.ReadSingleIdentifier(st);//macro not applied to #~ itself
 			if (Config.ICFunction)
 				token = token.ToUpper();
-            // 先に存在しない#～は弾いてしまう
+            // reject nonexistent #~ first
             if (token == null || (token != "SINGLE" && token != "LATER" && token != "PRI" && token != "ONLY" && token != "FUNCTION" && token != "FUNCTIONS" 
                 && token != "LOCALSIZE" && token != "LOCALSSIZE" && token != "DIM" && token != "DIMS"))
             {
@@ -210,7 +210,7 @@ namespace MinorShift.Emuera.GameProc
 								ParserMediator.Warn(string.Format(LocalizationHelper.GetMessageString("Sharp_LocalSize_MissingValue"), token), position, 2);
 								break;
 							}
-                            // イベント関数では指定しても無視される
+                            // ignored even if specified for event functions
                             if (label.IsEvent)
                             {
                                 ParserMediator.Warn(string.Format(LocalizationHelper.GetMessageString("Sharp_LocalSize_Ignored_OnEvent"), token, token.Substring(0, token.Length - 4)), position, 1);
@@ -306,7 +306,7 @@ namespace MinorShift.Emuera.GameProc
 			try
 			{
 				int warnLevel = -1;
-                stream.ShiftNext();//@か$を除去
+                stream.ShiftNext();//remove @ or $
 				WordCollection wc = LexicalAnalyzer.Analyse(stream, LexEndWith.EoL, LexAnalyzeFlag.AllowAssignment);
 				if (wc.EOL || !(wc.Current is IdentifierWord))
 				{
@@ -324,7 +324,7 @@ namespace MinorShift.Emuera.GameProc
 						goto err;
 					ParserMediator.Warn(errMes, position, warnLevel);
 				}
-				if (!isFunction)//$ならこの時点で終了
+				if (!isFunction)//ends here if $
 				{
 					if (!wc.EOL)
 					{
@@ -367,12 +367,12 @@ namespace MinorShift.Emuera.GameProc
 		public static LogicalLine ParseLine(StringStream stream, ScriptPosition position, EmueraConsole console)
 		{
 			string errMes;
-			LexicalAnalyzer.SkipWhiteSpace(stream);//先頭のホワイトスペースを読み飛ばす
+			LexicalAnalyzer.SkipWhiteSpace(stream);//skip leading whitespace
 			if (stream.EOS)
 				return null;
 			try
 			{
-				// 前置インクリメント、デクリメント行
+				// prefix increment/decrement line
 				if (stream.Current == '+' || stream.Current == '-')
 				{
 					char op = stream.Current;

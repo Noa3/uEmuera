@@ -36,13 +36,13 @@ namespace MinorShift.Emuera.GameProc
 		bool noError = true;
 
 		/// <summary>
-		/// 複数のファイルを読む
+		/// Read multiple files
 		/// </summary>
 		/// <param name="filepath"></param>
 		public bool LoadErbFiles(string erbDir, bool displayReport, LabelDictionary labelDictionary)
 		{
-			//1.713 labelDicをnewする位置を変更。
-			//checkScript();の時点でExpressionPerserがProcess.instance.LabelDicを必要とするから。
+			//1.713 changed the position where labelDic is newed.
+			//Because ExpressionParser requires Process.instance.LabelDic at the point of checkScript();
 			labelDic = labelDictionary;
 			labelDic.Initialized = false;
 			List<KeyValuePair<string, string>> erbFiles = Config.GetFiles(erbDir, "*.ERB");
@@ -117,7 +117,7 @@ namespace MinorShift.Emuera.GameProc
 		}
 
 		/// <summary>
-		/// 指定されたファイルを読み込む
+		/// Load the specified file
 		/// </summary>
 		/// <param name="filename"></param>
 		public bool loadErbs(List<string> path, LabelDictionary labelDictionary)
@@ -306,13 +306,13 @@ namespace MinorShift.Emuera.GameProc
 		}
 
 		/// <summary>
-		/// ファイル一つを読む
+		/// Read one file
 		/// </summary>
 		/// <param name="filepath"></param>
 		private void loadErb(string filepath, string filename, List<string> isOnlyEvent)
 		{
-			//読み込んだファイルのパスを記録
-			//一部ファイルの再読み込み時の処理用
+			//record the path of the loaded file
+			//for processing when some files are reloaded
 			labelDic.AddFilename(filename);
 			EraStreamReader eReader = new EraStreamReader(Config.UseRenameFile && ParserMediator.RenameDic != null);
 			if (!eReader.Open(filepath, filename))
@@ -334,8 +334,8 @@ namespace MinorShift.Emuera.GameProc
 				while ((st = eReader.ReadEnabledLine(ppstate.Disabled)) != null)
 				{
 					position = new ScriptPosition(eReader.Filename, eReader.LineNo);
-					//rename処理をEraStreamReaderに移管
-					//変換できなかった[[～～]]についてはLexAnalyzerがErrorを投げる
+					//rename processing moved to EraStreamReader
+					//LexAnalyzer throws an Error for [[～～]] that could not be converted
 					if (st.Current == '[' && st.Next != '[')
 					{
 						st.ShiftNext();
@@ -354,7 +354,7 @@ namespace MinorShift.Emuera.GameProc
 					//	continue;
 					if (ppstate.Disabled)
 						continue;
-					//ここまでプリプロセッサ
+					//up to here is the preprocessor
 
 					if (st.Current == '#')
 					{
@@ -422,9 +422,9 @@ namespace MinorShift.Emuera.GameProc
 					}
 					else
 					{
-						//1808alpha006 処理位置変更
-                        ////全置換はここで対応
-                        ////1756beta1+++　最初に全置換してしまうと関数定義を_Renameでとか論外なことができてしまうので永久封印した
+						//1808alpha006 changed processing position
+                        ////full replacement handled here
+                        ////1756beta1+++ if replaced all at the start, function definitions could be reprocessed via _Rename and so on, which is out of the question, so it was permanently sealed
                         //if (ParserMediator.RenameDic != null && st.CurrentEqualTo("[[") && (rowLine.TrimEnd().IndexOf("]]") == rowLine.TrimEnd().Length - 2))
                         //{
                         //    string replacedLine = st.Substring();
@@ -505,7 +505,7 @@ namespace MinorShift.Emuera.GameProc
 			SingleTerm[] defs = new SingleTerm[0];
 			int maxArg = -1;
 			int maxArgs = -1;
-			//1807 非イベント関数のシステム関数については警告レベル低下＆Error解除＆argumentを設定するように。
+			//1807 for system functions of non-event functions, lower the warning level, clear Error, and set the argument.
 			if (label.IsEvent)
 			{
 				if (!wc.EOL)
@@ -526,7 +526,7 @@ namespace MinorShift.Emuera.GameProc
 				wc.ShiftNext();
                 if (symbol == null)
 				{ errMes = "argumentの書式が間違っています"; goto err; }
-				if (symbol.Type == '[')//TODO:subNames 結局実装しないかも
+				if (symbol.Type == '[')//TODO:subNames maybe not implemented after all
 				{
 					IOperandTerm[] subNamesRow = ExpressionParser.ReduceArguments(wc, ArgsEndWith.RightBracket, false);
 					if (subNamesRow.Length == 0)
@@ -562,7 +562,7 @@ namespace MinorShift.Emuera.GameProc
 					{
 						SingleTerm def = null;
 						IOperandTerm term = argsRow[i * 2];
-                        //argument読み取り時点で判別されないといけない
+                        //must be determined at the point of argument reading
                         //if (term == null)
                         //{ errMes = "関数定義のargumentは省略できません"; goto err; }
                         if ((!(term.Restructure(exm) is VariableTerm vTerm)) || (vTerm.Identifier.IsConst))
@@ -636,7 +636,7 @@ namespace MinorShift.Emuera.GameProc
 
 		public bool useCallForm = false;
 		/// <summary>
-		/// 読込終わったファイルをチェックする
+		/// Check files that have finished loading
 		/// </summary>
 		private void checkScript()
 		{
@@ -652,7 +652,7 @@ namespace MinorShift.Emuera.GameProc
 				{
 					if (label.Depth != labelDepth)
 						continue;
-					//1756beta003 なんで追加したんだろう デバグ中になんかやったのか とりあえずコメントアウトしておく
+					//1756beta003 why did I add this? Did I do something while debugging? Commented out for now
 					//if (label.LabelName == "EVENTTURNEND")
 					//    useCallForm = true;
 					usedLabelCount++;
@@ -676,7 +676,7 @@ namespace MinorShift.Emuera.GameProc
 					break;
 			}
 			if (useCallForm)
-			{//callform系が使われたら全ての関数が呼び出されたとみなす。
+			{//if the callform family is used, consider all functions called.
                 if (Program.AnalysisMode)
 					output.PrintSystemLine(GameMessages.CallformUsedNoCheck);
 				foreach (FunctionLabelLine label in labelList)
@@ -693,7 +693,7 @@ namespace MinorShift.Emuera.GameProc
 				{
 					if (label.Depth != labelDepth)
 						continue;
-                    //解析モード時は呼ばれなかったものをここで解析
+                    //in analysis mode, analyze the ones not called here
                     if (Program.AnalysisMode)
                         checkFunctionWithCatch(label);
 					bool ignore = false;
@@ -837,7 +837,7 @@ namespace MinorShift.Emuera.GameProc
 		}
 
 		private void checkFunctionWithCatch(FunctionLabelLine label)
-		{//ここでErrorを捕まえることは本来はないはず。ExeEE相当。
+		{//catching an Error here should normally never happen. Equivalent to ExeEE.
 			try
 			{
 				//System.Windows.Forms.//Application.DoEvents();
@@ -849,7 +849,7 @@ namespace MinorShift.Emuera.GameProc
 			catch (Exception exc)
 			{
 				uEmuera.Media.SystemSounds.Hand.Play();
-                //1756beta2+v6.1 修正の効率化のために何かパース関係でハンドリングできてないErrorが出た場合はスタックトレースを投げるようにした
+                //1756beta2+v6.1 to make fixes more efficient, if any Error not handled in parsing comes out, throw a stack trace
                 string errmes = (exc is EmueraException) ? exc.Message : exc.GetType().ToString() + ":" + exc.Message;
                 ParserMediator.Warn("@" + label.LabelName + " の解析中にError:" + errmes, label, 2, true, false, !(exc is EmueraException) ? exc.StackTrace : null);
                 label.ErrMes = "ロード時に解析に失敗した関数が呼び出されました";
@@ -863,8 +863,8 @@ namespace MinorShift.Emuera.GameProc
 
 		private void setArgument(FunctionLabelLine label)
 		{
-			//1周目/3周
-			//argumentの解析とか
+			//pass 1/3
+			//argument analysis etc.
 			LogicalLine nextLine = label;
 			bool inMethod = label.IsMethod;
 			while (true)
@@ -892,9 +892,9 @@ namespace MinorShift.Emuera.GameProc
 
 		private void nestCheck(FunctionLabelLine label)
 		{
-			//2周目/3周
-			//IF-ELSEIF-ENDIF、REPEAT-RENDの対応チェックなど
-			//PRINTDATA系もここでチェック
+			//pass 2/3
+			//correspondence checks such as IF-ELSEIF-ENDIF, REPEAT-REND
+			//PRINTDATA family also checked here
 			LogicalLine nextLine = label;
 			List<InstructionLine> tempLineList = new List<InstructionLine>();
 			Stack<InstructionLine> nestStack = new Stack<InstructionLine>();
@@ -1008,11 +1008,11 @@ namespace MinorShift.Emuera.GameProc
                         SelectcaseStack.Push(func);
 						break;
 					case FunctionCode.FOR:
-                        //ネストErrorチェックのためにコストはかかるが、ここでチェックする
+                        //costly but check here for nested Error checks
                         if (func.Argument == null)
                             ArgumentParser.SetArgumentTo(func);
-                        //上でargument解析がなされていることは保証されているので、
-                        //それでこれがfalseになるのは、argument解析でErrorが起きた場合のみ
+                        //since argument analysis above is guaranteed to have been done,
+                        //this only becomes false when an Error occurred in argument analysis
                         if (func.Argument != null)
                         {
                             VariableTerm Cnt = ((SpForNextArgment)func.Argument).Cnt;
@@ -1074,7 +1074,7 @@ namespace MinorShift.Emuera.GameProc
 					case FunctionCode.ELSEIF:
 					case FunctionCode.ELSE:
 						{
-							//1.725 Stack<T>.Peek()はStackが空の時はnullを返す仕様だと思いこんでおりました。
+							//1.725 I had assumed the design that Stack<T>.Peek() returns null when the Stack is empty.
 							InstructionLine ifLine = nestStack.Count == 0 ? null : nestStack.Peek();
 							if ((ifLine == null) || (ifLine.FunctionCode != FunctionCode.IF))
 							{
@@ -1115,10 +1115,10 @@ namespace MinorShift.Emuera.GameProc
                                 do
                                 {
                                     ParserMediator.Warn(selectLine.Function.Name + "文に対応する" + FunctionIdentifier.getMatchFunction(selectLine.FunctionCode) + "がない状態で" + func.Function.Name + "文に到達しました", func, 2, true, false);
-                                    //これを跨いでIF等が閉じられることがないようにする。
+                                    //so that IF etc. cannot be closed across this.
                                     nestStack.Pop();
-                                    //if (nestStack.Count > 0)　//空になってるかは下で判定できるので、これを見る必要がない
-                                    selectLine = nestStack.Count == 0 ? null : nestStack.Peek(); //ちなみにnullになることはない（SELECTCASEがない場合は上で弾けるから）
+                                    //if (nestStack.Count > 0)　//whether it's empty can be determined below, so there is no need to check this
+                                    selectLine = nestStack.Count == 0 ? null : nestStack.Peek(); //incidentally it will never be null (because when there is no SELECTCASE it is filtered above)
                                 } while (selectLine != null && selectLine.FunctionCode != FunctionCode.SELECTCASE);
                                 break;
                             }
@@ -1141,14 +1141,14 @@ namespace MinorShift.Emuera.GameProc
                                 do
                                 {
                                     ParserMediator.Warn(selectLine.Function.Name + "文に対応する" + FunctionIdentifier.getMatchFunction(selectLine.FunctionCode) + "がない状態で" + func.Function.Name + "文に到達しました", func, 2, true, false);
-                                    //これを跨いでIF等が閉じられることがないようにする。
+                                    //so that IF etc. cannot be closed across this.
                                     nestStack.Pop();
-                                    //if (nestStack.Count > 0)　//空になってるかは下で判定できるので、これを見る必要がない
-                                    selectLine = nestStack.Count == 0 ? null : nestStack.Peek(); //ちなみにnullになることはない（SELECTCASEがない場合は上で弾けるから）
+                                    //if (nestStack.Count > 0)　//whether it's empty can be determined below, so there is no need to check this
+                                    selectLine = nestStack.Count == 0 ? null : nestStack.Peek(); //incidentally it will never be null (because when there is no SELECTCASE it is filtered above)
                                 } while (selectLine != null && selectLine.FunctionCode != FunctionCode.SELECTCASE);　
-                                //とりあえず、対応するSELECTCASE跨ぎは閉じる
+                                //for now, close the spanning matching SELECTCASE
                                 SelectcaseStack.Pop();
-                                //こっちでも抜かないとSELECTCASEが2つのENDSELECTに対応してしまう
+                                //if this one isn't popped, SELECTCASE will be paired with 2 ENDSELECTs
                                 nestStack.Pop();
                                 break;
                             }
@@ -1189,7 +1189,7 @@ namespace MinorShift.Emuera.GameProc
 					case FunctionCode.LOOP:
 						FunctionCode parentFunc = FunctionIdentifier.getParentFunc(func.FunctionCode);
 						//if (parentFunc == FunctionCode.__NULL__)
-						//    throw new ExeEE("何か変？");
+						//    throw new ExeEE("something wrong?");
 						if ((nestStack.Count == 0)
 							|| (nestStack.Peek().FunctionCode != parentFunc))
 						{
@@ -1416,7 +1416,7 @@ namespace MinorShift.Emuera.GameProc
 							ParserMediator.Warn("対応するNOSKIP系命令のない" + func.Function.Name + "です", func, 2, true, false);
 							break;
 						}
-						//Errorハンドリング用
+						//for Error handling
 						pfunc.JumpTo = func;
 						func.JumpTo = pfunc;
 						nestStack.Pop();
@@ -1435,14 +1435,14 @@ namespace MinorShift.Emuera.GameProc
 				else
 					ParserMediator.Warn("ディフォルトError（Emuera設定漏れ）", func, 2, true, false);
 			}
-            //使ったスタックをクリア
+            //clear the used stacks
             SelectcaseStack.Clear();
 		}
 
 		private void setJumpTo(FunctionLabelLine label)
 		{
-			//3周目/3周
-			//フロー制御命令のジャンプ先を設定
+			//pass 3/3
+			//set the jump targets of flow control instructions
 			LogicalLine nextLine = label;
 			int depth = label.Depth;
 			if (depth < 0)

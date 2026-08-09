@@ -11,8 +11,8 @@ namespace MinorShift.Emuera.GameView
 {
 
 	/// <summary>
-	/// テキスト長計測装置
-	/// 1819 必要になるたびにCreateGraphicsする方式をやめてあらかじめGraphicsを用意しておくことにする
+	/// Text length measurement device
+	/// 1819 Stop calling CreateGraphics each time it is needed; prepare a Graphics in advance instead
 	/// </summary>
 	internal sealed class StringMeasure : IDisposable
 	{
@@ -21,7 +21,7 @@ namespace MinorShift.Emuera.GameView
 			textDrawingMode = Config.TextDrawingMode;
 			//layoutSize = new Size(Config.WindowX * 2, Config.LineHeight);
 			//layoutRect = new RectangleF(0, 0, Config.WindowX * 2, Config.LineHeight);
-			//fontDisplaySize = Config.Font.Size / 2 * 1.04f;//実際には指定したフォントより若干幅をとる？
+			//fontDisplaySize = Config.Font.Size / 2 * 1.04f;//in practice it takes a bit more width than the specified font?
 			////bmp = new Bitmap(Config.WindowX, Config.LineHeight, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
 			//bmp = new Bitmap(16, 16, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
 			//graph = Graphics.FromImage(bmp);
@@ -52,7 +52,7 @@ namespace MinorShift.Emuera.GameView
             //	sf.SetMeasurableCharacterRanges(ranges);
             //	Region[] regions = graph.MeasureCharacterRanges(s, font, layoutRect, sf);
             //	RectangleF rectF = regions[0].GetBounds(graph);
-            //	//return (int)rectF.Width;//プロポーショナルでなくても数ピクセルずれる
+            //	//return (int)rectF.Width;//off by a few pixels even when not proportional
             //	return (int)((int)((rectF.Width - 1) / fontDisplaySize + 0.95f) * fontDisplaySize);
             }
             //else if (textDrawingMode == TextDrawingMode.TEXTRENDERER)
@@ -66,7 +66,7 @@ namespace MinorShift.Emuera.GameView
             //	Size size = GDI.MeasureText(s, font);
             //	return size.Width;
             //}
-            ////来るわけがない
+            ////Will never be reached
             ////else
             ////    throw new ExeEE("描画モード不明");
 

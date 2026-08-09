@@ -129,7 +129,7 @@ namespace uEmuera.Window
             var console_count = console_.GetDisplayLinesCount();
             if(console_count == 0)
             {
-                //清空
+                //clear
                 GenericUtils.ClearText();
                 return;
             }
@@ -144,7 +144,7 @@ namespace uEmuera.Window
                 var con_lineno = cl.LineNo;
                 var clindex = console_count - 1;
 
-                //LineNo 匹配
+                //LineNo match
                 if(con_lineno > dis_lineno)
                     clindex -= (con_lineno - dis_lineno);
                 else

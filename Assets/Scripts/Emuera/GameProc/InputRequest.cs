@@ -6,25 +6,25 @@ namespace MinorShift.Emuera.GameProc
 {
 	enum InputType
 	{
-		EnterKey = 1,//Enterキーかクリック
-		AnyKey = 2,//なんでもいいから入力
-		IntValue = 3,//整数値。OneInputかどうかは別の変数で
-		StrValue = 4,//文字列。
-		Void = 5,//入力不能。待つしかない→スキップ中orマクロ中ならなかったことになる
+		EnterKey = 1,//Enter key or click
+		AnyKey = 2,//any input is fine
+		IntValue = 3,//integer value. whether OneInput is decided by another variable
+		StrValue = 4,//string.
+		Void = 5,//no input possible. can only wait → treated as if it didn't happen when skipping or in a macro
 
 		//1823
 		PrimitiveMouseKey = 11,
 
 		// Emuera EM/EE Extensions - BINPUT types (button-only input)
-		BIntValue = 21,//ボタンのみ整数値入力
-		BStrValue = 22,//ボタンのみ文字列入力
+		BIntValue = 21,//button-only integer input
+		BStrValue = 22,//button-only string input
 	}
 	
 
-	// 1819追加 入力・表示系とData、Process系の結合を弱くしよう計画の一つ
-	// できるだけ間にクッションをおいていきたい。最終的には別スレッドに
+	// 1819 addition one of the plans to loosen the coupling between input/display related, Data, and Process systems
+	// want to put a cushion in between as much as possible. eventually on a separate thread
 
-	//クラスを毎回使い捨てるのはどうなんだろう 使いまわすべきか
+	//not sure throwing away the class each time is best. should it be reused?
 	internal sealed class InputRequest
 	{
 		public InputRequest()

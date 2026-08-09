@@ -241,27 +241,27 @@ public abstract class EmueraBehaviour : MonoBehaviour
             }
         }
         /// <summary>
-        /// 对其方式
+        /// Alignment
         /// </summary>
         public Align align { get { return (Align)display_line.Align; } }
         /// <summary>
-        /// 行号
+        /// Line number
         /// </summary>
         public int LineNo { get { return display_line.LineNo; } }
         /// <summary>
-        /// 是否为逻辑行
+        /// Whether it is a logical line
         /// </summary>
         public bool IsLogicalLine { get { return display_line.IsLogicalLine; } }
         /// <summary>
-        /// 坐标Y
+        /// Coordinate Y
         /// </summary>
         public float position_y = 0.0f;
         /// <summary>
-        /// 高度
+        /// Height
         /// </summary>
         public float height = 0.0f;
         /// <summary>
-        /// 子对象
+        /// Child objects
         /// </summary>
         public List<UnitDesc> units = null;
     }

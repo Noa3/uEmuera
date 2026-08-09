@@ -371,7 +371,11 @@ namespace uEmuera
             if (File.Exists(path))
                 return path;
             var resolved = ResolvePathInsensitive(path, expectDirectory: false);
-            return string.IsNullOrEmpty(resolved) ? null : resolved;
+            if (string.IsNullOrEmpty(resolved))
+                return null;
+            // On Windows, ResolvePathInsensitive returns the input path unchanged even for
+            // non-existent files, so verify existence on the resolved result too.
+            return File.Exists(resolved) ? resolved : null;
         }
 
         /// <summary>

@@ -16,24 +16,24 @@ namespace MinorShift.Emuera.GameData.Expression
     {
         None,
         EoL,
-        RightParenthesis,//)終端
-        RightBracket,//]終端
+        RightParenthesis,//')' terminator
+        RightBracket,//']' terminator
     }
 
     internal enum TermEndWith
     {
         None = 0x0000,
         EoL = 0x0001,
-        Comma = 0x0002,//','終端
-        RightParenthesis = 0x0004,//')'終端
-        RightBracket = 0x0008,//')'終端
-        Assignment = 0x0010,//')'終端
+        Comma = 0x0002,//',' terminator
+        RightParenthesis = 0x0004,//')' terminator
+        RightBracket = 0x0008,//')' terminator
+        Assignment = 0x0010,//')' terminator
 
-        RightParenthesis_Comma = RightParenthesis | Comma,//',' or ')'終端
-        RightBracket_Comma = RightBracket | Comma,//',' or ']'終端
-        Comma_Assignment = Comma | Assignment,//',' or '='終端
-        RightParenthesis_Comma_Assignment = RightParenthesis | Comma | Assignment,//',' or ')' or '='終端
-        RightBracket_Comma_Assignment = RightBracket | Comma | Assignment,//',' or ']' or '='終端
+        RightParenthesis_Comma = RightParenthesis | Comma,//',' or ')' terminator
+        RightBracket_Comma = RightBracket | Comma,//',' or ']' terminator
+        Comma_Assignment = Comma | Assignment,//',' or '=' terminator
+        RightParenthesis_Comma_Assignment = RightParenthesis | Comma | Assignment,//',' or ')' or '=' terminator
+        RightBracket_Comma_Assignment = RightBracket | Comma | Assignment,//',' or ']' or '=' terminator
     }
 
     /// <summary>
@@ -105,7 +105,7 @@ namespace MinorShift.Emuera.GameData.Expression
                     if (terms[terms.Count - 1] == null)
                         throw new CodeEE("関数定義のargumentは省略できません");
                     if (wc.Current is OperatorWord)
-                    {//=がある
+                    {//there is '='
                         wc.ShiftNext();
                         IOperandTerm term = reduceTerm(wc, false, termEndWith, VariableCode.__NULL__);
                         if (term == null)
@@ -237,15 +237,15 @@ namespace MinorShift.Emuera.GameData.Expression
             wc.ShiftNext();
             SymbolWord symbol = wc.Current as SymbolWord;
             if (symbol != null && symbol.Type == '.')
-            {//名前空間
+            {//namespace
                 throw new NotImplCodeEE();
             }
             else if (symbol != null && (symbol.Type == '(' || symbol.Type == '['))
-            {//関数
+            {//function
                 wc.ShiftNext();
-                if (symbol.Type == '[')//1810 多分永久に実装されない
+                if (symbol.Type == '[')//1810 Probably never implemented
                     throw new CodeEE("[]を使った機能はまだ実装されていません");
-                //argumentを処理
+                //Process the arguments
                 IOperandTerm[] args = ReduceArguments(wc, ArgsEndWith.RightParenthesis, false);
                 IOperandTerm mToken = GlobalStatic.IdentifierDictionary.GetFunctionMethod(GlobalStatic.LabelDictionary, idStr, args, false);
                 if (mToken == null)
@@ -263,20 +263,20 @@ namespace MinorShift.Emuera.GameData.Expression
                 return mToken;
             }
             else
-            {//変数 or キーワード
+            {//variable or keyword
                 VariableToken id = ReduceVariableIdentifier(wc, idStr);
-                if (id != null)//idStrが変数名の場合、
+                if (id != null)//If idStr is a variable name,
                 {
-                    if (varCode != VariableCode.__NULL__)//変数のargumentがargumentを持つことはない
+                    if (varCode != VariableCode.__NULL__)//A variable's argument never has an argument
                         return VariableParser.ReduceVariable(id, null, null, null);
                     else
                         return VariableParser.ReduceVariable(id, wc);
                 }
-                //idStrが変数名でない場合、
+                //If idStr is not a variable name,
                 IOperandTerm refToken = GlobalStatic.IdentifierDictionary.GetFunctionMethod(GlobalStatic.LabelDictionary, idStr, null, false);
-                if (refToken != null)//関数参照と名前が一致したらそれを返す。実際に使うとError
+                if (refToken != null)//If a function reference matches the name, return it. Actually using it causes an Error
                     return refToken;
-                if (varCode != VariableCode.__NULL__ && GlobalStatic.ConstantData.isDefined(varCode, idStr))//連想配列的な可能性アリ
+                if (varCode != VariableCode.__NULL__ && GlobalStatic.ConstantData.isDefined(varCode, idStr))//Possibly an associative array-like use
                     return new SingleTerm(idStr);
                 // Warn and track unknown variable/keyword identifier
                 ScriptPosition pos2 = GlobalStatic.Process.GetScaningLine()?.Position ?? new ScriptPosition();
@@ -288,7 +288,7 @@ namespace MinorShift.Emuera.GameData.Expression
                     GlobalStatic.tempDic.Add(idStr, 1);
                 return new NullTerm(0);
             }
-            throw new ExeEE("Error投げ損ねた");//ここまででthrowかreturnのどちらかをするはず。
+            throw new ExeEE("Error投げ損ねた");//By this point either a throw or a return should have been made.
         }
 
         #endregion
@@ -490,7 +490,7 @@ namespace MinorShift.Emuera.GameData.Expression
                 }
                 if (state == 1)
                 {
-                    //後置単項演算子の場合は特殊処理へ
+                    //Redirect to special handling for postfix unary operators
                     if (OperatorManager.IsUnaryAfter(op))
                     {
                         if (hasAfter)
@@ -505,7 +505,7 @@ namespace MinorShift.Emuera.GameData.Expression
                         }
                         stack.Push(op);
                         reduceUnaryAfter();
-                        //前置単項演算子が処理を待っている場合はここで解決
+                        //If a prefix unary operator is awaiting processing, resolve it here
                         if (waitAfter)
                             reduceUnary();
                         hasBefore = false;
@@ -515,11 +515,11 @@ namespace MinorShift.Emuera.GameData.Expression
                     }
                     if (!OperatorManager.IsBinary(op) && !OperatorManager.IsTernary(op))
                         throw new CodeEE("式が異常です");
-                    //先に未解決の前置演算子解決
+                    //Resolve unresolved prefix operators first
                     if (waitAfter)
                         reduceUnary();
                     int priority = OperatorManager.GetPriority(op);
-                    //直前の計算の優先度が同じか高いなら還元。
+                    //Reduce when the priority of the preceding operation is equal or higher.
                     while (lastPriority() >= priority)
                     {
                         this.reduceLastThree();
@@ -569,7 +569,7 @@ namespace MinorShift.Emuera.GameData.Expression
                     return null;
                 if (state != 1)
                     throw new CodeEE("式が異常です");
-                //単項演算子の待ちが未解決の時はここで解決
+                //If a unary operator is pending unresolved, resolve it here
                 if (waitAfter)
                     reduceUnary();
                 waitAfter = false;
@@ -608,7 +608,7 @@ namespace MinorShift.Emuera.GameData.Expression
             {
                 //if (stack.Count < 2)
                 //    throw new ExeEE("Invalid 時期の呼び出し");
-                IOperandTerm right = (IOperandTerm)stack.Pop();//後から入れたほうが右側
+                IOperandTerm right = (IOperandTerm)stack.Pop();//The one pushed later is on the right side
                 OperatorCode op = (OperatorCode)stack.Pop();
                 IOperandTerm left = (IOperandTerm)stack.Pop();
                 if (OperatorManager.IsTernary(op))

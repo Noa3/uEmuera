@@ -2,38 +2,38 @@
 namespace MinorShift.Emuera.GameProc.Function
 {
 	/// <summary>
-	/// 命令コード
+	/// Function code
 	/// </summary>
 	//Obfuscation attribute. Set (Exclude=true) when using enum.ToString() or enum.Parse().
 	[global::System.Reflection.Obfuscation(Exclude = true)]
 	enum FunctionCode
-	{//数値不要
-		//FunctionCodeを定義したらstatic FunctionIdentifier()内でaddFunctionすること。
-		//その際に適切なFunctionArgとフラグを選ぶ。
+	{//no value needed
+		//When a FunctionCode is defined, addFunction must be called in static FunctionIdentifier().
+		//At that time choose an appropriate FunctionArg and flags.
 
-		//FunctionMethod(式中関数)を定義した場合には自動で拾うので何もしなくてよい。
-		//ただし、式中関数バージョンと命令バージョンで動作が違うなら追加する必要がある。
+		//If a FunctionMethod (in-expression function) is defined, it is picked up automatically so nothing needs to be done.
+		//However, if the in-expression function version and the instruction version behave differently, it is necessary to add it.
 
 		__NULL__ = 0x0000,
-		SET,//数値代入文 or 文字列代入文
-		//SETS,//文字列代入文
-		PRINT,//文字を表示する
-		PRINTL,//改行
-		PRINTW,//入力待ち(実質改行)
+		SET,//numeric assignment statement or string assignment statement
+		//SETS,//string assignment statement
+		PRINT,//display characters
+		PRINTL,//newline
+		PRINTW,//wait for input (effectively newline)
 
-		PRINTV,//変数の内容
+		PRINTV,//variable contents
 		PRINTVL,
 		PRINTVW,
 
-		PRINTS,//文字列変数の内容
+		PRINTS,//string variable contents
 		PRINTSL,
 		PRINTSW,
 
-		PRINTFORM,//{数式}、%文字列変数%などの書式が使える。
+		PRINTFORM,//formats such as {expression}, %string variable%, etc. are available.
 		PRINTFORML,
 		PRINTFORMW,
 
-		PRINTFORMS,//文字列変数の内容を変換して表示。
+		PRINTFORMS,//convert and display the contents of string variables.
 		PRINTFORMSL,
 		PRINTFORMSW,
 
@@ -42,70 +42,70 @@ namespace MinorShift.Emuera.GameProc.Function
 		CLEARLINE,
 		REUSELASTLINE,
 
-		WAIT,//改行待ち。
-		INPUT,//整数入力。入力はRESULTへ。
-		INPUTS,//文字列入力。入力はRESULTSへ。
+		WAIT,//wait for newline.
+		INPUT,//integer input. Input goes to RESULT.
+		INPUTS,//string input. Input goes to RESULTS.
 		TINPUT,
 		TINPUTS,
 		TWAIT,
 		WAITANYKEY,
-		FORCEWAIT,//スキップで省略できないWAIT、強制TWAITと違い、スキップを打ち切る
+		FORCEWAIT,//WAIT that cannot be omitted by skipping. Unlike forced TWAIT, it breaks the skip
 		ONEINPUT,
 		ONEINPUTS,
 		TONEINPUT,
 		TONEINPUTS,
-		AWAIT,//入力不可 DoEvents
+		AWAIT,//no input possible DoEvents
 
-		DRAWLINE,//画面の左端から右端まで----と線を引く。
-		BAR,//[*****....]のようなグラフを書く。BAR (変数) , (最大値), (長さ)
-		BARL,//改行付き。
-		TIMES,//小数計算。TIMES (変数) , (小数値)という形で使う。
+		DRAWLINE,//draw a ---- line from the left edge to the right edge of the screen.
+		BAR,//draw a graph like [*****....]. BAR (variable), (max value), (length)
+		BARL,//with newline.
+		TIMES,//decimal calculation. Used in the form TIMES (variable), (decimal value).
 
-		PRINT_ABL,//能力。argumentは登録番号
-		PRINT_TALENT,//素質
-		PRINT_MARK,//刻印
-		PRINT_EXP,//経験
-		PRINT_PALAM,//パラメータ
-		PRINT_ITEM,//所持アイテム
-		PRINT_SHOPITEM,//ショップで売っているアイテム
+		PRINT_ABL,//ability. argument is the registration number
+		PRINT_TALENT,//talent
+		PRINT_MARK,//mark (imprint)
+		PRINT_EXP,//experience
+		PRINT_PALAM,//parameter
+		PRINT_ITEM,//held item
+		PRINT_SHOPITEM,//item sold in shop
 
-		UPCHECK,//パラメータの変動
+		UPCHECK,//parameter fluctuation
 		CUPCHECK,
-		ADDCHARA,//(キャラ番号)のキャラクタを追加
-		ADDSPCHARA,//(キャラ番号)のSPキャラクタを追加（フラグ0を1にして作成）
+		ADDCHARA,//add character (character number)
+		ADDSPCHARA,//add SP character (character number) (created with flag 0 set to 1)
 		ADDDEFCHARA,
-		ADDVOIDCHARA,//変数に何の設定のないキャラを作成
-		DELCHARA,//(キャラ登録番号)のキャラクタを削除。
+		ADDVOIDCHARA,//create a character with no settings in the variable
+		DELCHARA,//delete character (character registration number).
 
-		PUTFORM,//@SAVEINFO関数でのみ使用可能。PRINTFORMと同様の書式でセーブデータに概要をつける。
-		QUIT,//ゲームを終了
+		PUTFORM,//only valid in the @SAVEINFO function. Adds an overview to save data in the same format as PRINTFORM.
+		QUIT,//end the game
 		OUTPUTLOG,
 
-		BEGIN,//システム関数の実行。実行するとCALLの呼び出し元などを忘れてしまう。
+		BEGIN,//executes a system function. Once executed, the CALL caller etc. is forgotten.
 
-		SAVEGAME,//セーブ画面を呼ぶ。ショップのみ。
+		SAVEGAME,//calls the save screen. Only in the shop.
 		LOADGAME,//
 
-		SIF,//一行のみIF
+		SIF,//one-line IF
 		IF,
 		ELSE,
 		ELSEIF,
 		ENDIF,
 
-		REPEAT,//RENDまで繰り返し。繰り返した回数がCOUNTへ。ネスト不可。
+		REPEAT,//repeat until REND. Repeat count goes to COUNT. Nesting not allowed.
 		REND,
-		CONTINUE,//REPEATに戻る
-		BREAK,//RENDの次の行まで
+		CONTINUE,//return to REPEAT
+		BREAK,//to the line after REND
 
-		GOTO,//$ラベルへジャンプ
+		GOTO,//jump to $label
 
-		JUMP,//関数に移動
-		CALL,//関数に移動。移動元を記憶し、RETURNで帰る。
+		JUMP,//move to function
+		CALL,//move to function. Remembers the origin and returns via RETURN.
 		CALLEVENT,
-		RETURN,//__INT_EXPRESSION__,//関数の終了。RESULTに整数を格納可能。省略した場合、０。(次の@～～がRETURNと見なされる。)  
-		RETURNFORM,//__FORM_STR__,//関数の終了。RESULTに整数を格納可能。省略した場合、０。(次の@～～がRETURNと見なされる。)  
+		RETURN,//__INT_EXPRESSION__,//function end. Integer can be stored in RESULT. If omitted, 0. (The next @~~ is considered RETURN.)  
+		RETURNFORM,//__FORM_STR__,//function end. Integer can be stored in RESULT. If omitted, 0. (The next @~~ is considered RETURN.)  
 		RETURNF,
-		RESTART,//関数の再開。関数の最初に戻る。
+		RESTART,//restart the function. Return to the beginning of the function.
 
 
 		STRLEN,
@@ -122,7 +122,7 @@ namespace MinorShift.Emuera.GameProc.Function
 		SWAPCHARA,
 		COPYCHARA,
 		ADDCOPYCHARA,
-		VARSIZE,//動作が違うので__METHOD__化できない
+		VARSIZE,//behavior differs so cannot be made a __METHOD__
 		SPLIT,
 
 		PRINTSINGLE,
@@ -141,7 +141,7 @@ namespace MinorShift.Emuera.GameProc.Function
 		SAVEDATA,
 		LOADDATA,
 		DELDATA,
-		GETTIME,//2つに代入する必要があるので__METHOD__化できない
+		GETTIME,//needs to assign to 2 values so cannot be made a __METHOD__
 
 		TRYJUMP,
 		TRYCALL,
@@ -193,7 +193,7 @@ namespace MinorShift.Emuera.GameProc.Function
 		WHILE,
 		WEND,
 
-		POWER,//argumentが違うのでMETHOD化できない。
+		POWER,//argument differs so cannot be made a METHOD.
 		SAVEGLOBAL,
 		LOADGLOBAL,
 		SWAP,
@@ -226,7 +226,7 @@ namespace MinorShift.Emuera.GameProc.Function
 		ENDLIST,
 		STRDATA,
 
-		PRINTCPERLINE,//よく考えたらargumentの仕様違うや
+		PRINTCPERLINE,//on reflection the argument spec differs
 
 
 		SETBIT,
@@ -240,7 +240,7 @@ namespace MinorShift.Emuera.GameProc.Function
 
 		RESET_STAIN,
 
-		SAVENOS,//argumentの仕様が違うので(ry
+		SAVENOS,//argument spec differs so (ry
 
 		FORCEKANA,
 
@@ -277,19 +277,19 @@ namespace MinorShift.Emuera.GameProc.Function
 		PRINTKL,
 		PRINTKW,
 
-		PRINTVK,//変数の内容
+		PRINTVK,//variable contents
 		PRINTVKL,
 		PRINTVKW,
 
-		PRINTSK,//文字列変数の内容
+		PRINTSK,//string variable contents
 		PRINTSKL,
 		PRINTSKW,
 
-		PRINTFORMK,//{数式}、%文字列変数%などの書式が使える。
+		PRINTFORMK,//formats such as {expression}, %string variable%, etc. are available.
 		PRINTFORMKL,
 		PRINTFORMKW,
 
-		PRINTFORMSK,//文字列変数の内容を変換して表示。
+		PRINTFORMSK,//convert and display the contents of string variables.
 		PRINTFORMSKL,
 		PRINTFORMSKW,
 
@@ -308,23 +308,23 @@ namespace MinorShift.Emuera.GameProc.Function
 		PRINTDATAKL,
 		PRINTDATAKW,
 
-		PRINTD,//文字を表示する
-		PRINTDL,//改行
-		PRINTDW,//入力待ち(実質改行)
+		PRINTD,//display characters
+		PRINTDL,//newline
+		PRINTDW,//wait for input (effectively newline)
 
-		PRINTVD,//変数の内容
+		PRINTVD,//variable contents
 		PRINTVDL,
 		PRINTVDW,
 
-		PRINTSD,//文字列変数の内容
+		PRINTSD,//string variable contents
 		PRINTSDL,
 		PRINTSDW,
 
-		PRINTFORMD,//{数式}、%文字列変数%などの書式が使える。
+		PRINTFORMD,//formats such as {expression}, %string variable%, etc. are available.
 		PRINTFORMDL,
 		PRINTFORMDW,
 
-		PRINTFORMSD,//文字列変数の内容を変換して表示。
+		PRINTFORMSD,//convert and display the contents of string variables.
 		PRINTFORMSDL,
 		PRINTFORMSDW,
 
@@ -357,25 +357,25 @@ namespace MinorShift.Emuera.GameProc.Function
 		INPUTMOUSEKEY,
 
 		// Emuera EM/EE Extensions
-		BINPUT,//ボタンのみ入力。整数入力。入力はRESULTへ。
-		BINPUTS,//ボタンのみ入力。文字列入力。入力はRESULTSへ。
+		BINPUT,//button-only input. Integer input. Input goes to RESULT.
+		BINPUTS,//button-only input. String input. Input goes to RESULTS.
 		
 		TRYCALLF,//TRY pattern for CALLF
 		TRYCALLFORMF,//TRY pattern for CALLFORMF
 
 		// Sound commands
-		PLAYSOUND,//サウンドファイルを再生
-		STOPSOUND,//サウンド再生を停止
-		PLAYBGM,//BGMを再生
-		STOPBGM,//BGM再生を停止
-		SETSOUNDVOLUME,//効果音の音量を設定
-		SETBGMVOLUME,//BGMの音量を設定
+		PLAYSOUND,//play a sound file
+		STOPSOUND,//stop sound playback
+		PLAYBGM,//play BGM
+		STOPBGM,//stop BGM playback
+		SETSOUNDVOLUME,//set sound effect volume
+		SETBGMVOLUME,//set BGM volume
 
 		// Extended graphics commands
-		GDRAWTEXT,//テキストを描画
-		GDRAWSPRITE,//スプライトを描画
+		GDRAWTEXT,//draw text
+		GDRAWSPRITE,//draw sprite
 
 		// Extended output log command
-		OUTPUTLOG_EXTENDED,//拡張版OUTPUTLOG
+		OUTPUTLOG_EXTENDED,//extended version OUTPUTLOG
 	}
 }

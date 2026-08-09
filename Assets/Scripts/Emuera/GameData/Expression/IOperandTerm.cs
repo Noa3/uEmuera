@@ -42,8 +42,8 @@ namespace MinorShift.Emuera.GameData.Expression
         readonly Type type;
         
 		/// <summary>
-		/// 定数を解体して可能ならSingleTerm化する
-		/// defineの都合上、2回以上呼ばれる可能性がある
+		/// Dismantles constants and converts them to SingleTerm if possible
+		/// May be called more than once, because of how define works
 		/// </summary>
         public virtual IOperandTerm Restructure(ExpressionMediator exm)
         {

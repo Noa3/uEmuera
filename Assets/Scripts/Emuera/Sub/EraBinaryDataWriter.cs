@@ -5,12 +5,12 @@ using System.IO;
 
 namespace MinorShift.Emuera.Sub
 {
-	//reader/writer共通のデータはreaderの方に
+	//data common to reader/writer is defined in the reader
 
 
 	/// <summary>
-	/// 1808追加 新しいデータ保存形式
-	/// Reader と違ってWriterは最新の書き込み方式だけ知っていればよい
+	/// Added in 1808: new data save format
+	/// Unlike the Reader, the Writer only needs to know the newest write format
 	/// WriteHeader -> WriteFileType -> ... -> WriteEFO
 	/// </summary>
 	internal sealed class EraBinaryDataWriter : IDisposable
@@ -39,16 +39,16 @@ namespace MinorShift.Emuera.Sub
 
 
 		/// <summary>
-		/// システム用。keyなしでInt64を保存
+		/// For system use. Saves an Int64 without a key
 		/// </summary>
 		/// <param name="v"></param>
 		public void WriteInt64(Int64 v)
 		{
-			//圧縮しない
+			//no compression
 			writer.Write(v);
 		}
 		/// <summary>
-		/// システム用。keyなしでstringを保存
+		/// For system use. Saves a string without a key
 		/// </summary>
 		/// <param name="s"></param>
 		public void WriteString(string s)
@@ -126,10 +126,10 @@ namespace MinorShift.Emuera.Sub
 
 		private void m_WriteInt(Int64 v)
 		{
-			//セーブデータ容量の爆発を避けるためにできるだけWrite(Int64)はしない
-			if (v >= 0 && v <= Ebdb.Byte)//0～207まではそのままbyteに詰め込む
+			//avoid Write(Int64) whenever possible to prevent save data size explosion
+			if (v >= 0 && v <= Ebdb.Byte)//0-207 are packed directly into a byte
 				writer.Write((byte)v);
-			else if (v >= Int16.MinValue && v <= Int16.MaxValue)//整数の範囲に応じて適当に
+			else if (v >= Int16.MinValue && v <= Int16.MaxValue)//choose according to the integer range
 			{
 				writer.Write(Ebdb.Int16);
 				writer.Write((Int16)v);
@@ -153,9 +153,9 @@ namespace MinorShift.Emuera.Sub
 
 		private void writeData(Int64[] array)
 		{
-			//配列の記憶。0が連続する場合には圧縮を試みる。
+			//Array data. Compression attempted when 0s are consecutive.
 			writer.Write((Int32)array.Length);
-			int countZero = 0;//0については0が連続する数を記憶する。その他の数はそのまま記憶する。
+			int countZero = 0;//for 0s, store the count of consecutive 0s. Other values are stored as-is.
 			for(int x = 0; x < array.Length; x++)
 			{
 				if (array[x] == 0)
@@ -171,14 +171,14 @@ namespace MinorShift.Emuera.Sub
 					this.m_WriteInt(array[x]);
 				}
 			}
-			//記憶途中で配列の残りが全部0であるなら0の数も記憶せず配列の終わりを記憶
+			//if the rest of the array is all 0 midway through, the end of the array is stored instead of the zero count
 			writer.Write(Ebdb.EoD);
 		}
 
 		private void writeData(Int64[,] array)
 		{
-			int countZero = 0;//0については0が連続する数を記憶する。その他はそのまま記憶する。
-			int countAllZero = 0;//列の要素が全て0である列の連続する数を記憶する。列の要素に一つでも非0があるなら通常の記憶方式。
+			int countZero = 0;//for 0s, store the count of consecutive 0s. Other values are stored as-is.
+			int countAllZero = 0;//store the count of consecutive columns whose elements are all 0. Normal encoding is used if any column element is non-zero.
 			int length0 = array.GetLength(0);
 			int length1 = array.GetLength(1);
 			writer.Write(length0);
@@ -207,10 +207,10 @@ namespace MinorShift.Emuera.Sub
 						this.m_WriteInt(array[x,y]);
 					}
 				}
-				if (countZero == length1)//列の要素が全部0
+				if (countZero == length1)//column's elements are all 0
 					countAllZero++;
 				else
-					writer.Write(Ebdb.EoA1);//非0があるなら列終端記号を記憶
+					writer.Write(Ebdb.EoA1);//store end-of-column marker when a non-zero exists
 				countZero = 0;
 			}
 			writer.Write(Ebdb.EoD);
@@ -218,9 +218,9 @@ namespace MinorShift.Emuera.Sub
 
 		private void writeData(Int64[, ,] array)
 		{
-			int countZero = 0;//0については0が連続する数を記憶する。その他はそのまま記憶する。
-			int countAllZero = 0;//列の要素が全て0である列の連続する数を記憶する。列の要素に一つでも非0があるなら通常の記憶方式。
-			int countAllZero2D = 0;//行列の要素が全て0である行列の･･･
+			int countZero = 0;//for 0s, store the count of consecutive 0s. Other values are stored as-is.
+			int countAllZero = 0;//store the count of consecutive columns whose elements are all 0. Normal encoding is used if any column element is non-zero.
+			int countAllZero2D = 0;//for matrices: count of consecutive matrices whose elements are all 0
 			int length0 = array.GetLength(0);
 			int length1 = array.GetLength(1);
 			int length2 = array.GetLength(2);
@@ -403,7 +403,7 @@ namespace MinorShift.Emuera.Sub
 			writer.Write(Ebdb.EoD);
 		}
 		#endregion
-		#region IDisposable メンバ
+		#region IDisposable Members
 
 		public void Dispose()
 		{

@@ -131,7 +131,7 @@ namespace MinorShift.Emuera
             AllowLongInputByMouse = instance.GetConfigValue<bool>(ConfigCode.AllowLongInputByMouse);
 
            TimesNotRigorousCalculation = instance.GetConfigValue<bool>(ConfigCode.TimesNotRigorousCalculation);
-            //一文字変数の禁止オプションを考えた名残
+//Remnant of considering a ban on one-character variable options
 		   //ForbidOneCodeVariable = instance.GetConfigValue<bool>(ConfigCode.ForbidOneCodeVariable);
 		   SystemNoTarget = instance.GetConfigValue<bool>(ConfigCode.SystemNoTarget);
 			
@@ -455,7 +455,7 @@ namespace MinorShift.Emuera
 		public static TextDrawingMode TextDrawingMode { get { return TextDrawingMode.GRAPHICS; } private set { } }
 		public static int WindowX { get; private set; }
 		/// <summary>
-		/// 実際に描画可能な横幅
+		/// The actual drawable width
 		/// </summary>
 		public static int DrawableWidth { get; private set; }
 		public static int WindowY { get; private set; }
@@ -528,7 +528,7 @@ namespace MinorShift.Emuera
         public static bool AllowLongInputByMouse { get; private set; }
 
         public static bool TimesNotRigorousCalculation { get; private set; }
-        //一文字変数の禁止オプションを考えた名残
+        //Remnant of the 'ban on one-character variables' option
         //public static bool ForbidOneCodeVariable { get; private set; }
 		#endregion
 

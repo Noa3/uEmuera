@@ -441,6 +441,7 @@ internal static class SpriteManager
         kPastTime = 300.0f;
         GenericUtils.StartCoroutine(Update());
         GenericUtils.StartCoroutine(UpdateRenderOP());
+        GenericUtils.StartCoroutine(UpdateGraphicsSurface());
 #else
         var memorysize = SystemInfo.systemMemorySize;
         if(memorysize <= 4096)
@@ -1046,6 +1047,19 @@ internal static class SpriteManager
             }
         }
     }
+    /// <summary>
+    /// Runs pending Graphics (G) main-thread blit operations on the Unity main thread
+    /// once per frame. CPU-only operations never enter this queue.
+    /// </summary>
+    static IEnumerator UpdateGraphicsSurface()
+    {
+        while(true)
+        {
+            AppContents.ExecutePendingGraphicsOps();
+            yield return null;
+        }
+    }
+
     static IEnumerator UpdateRenderOP()
     {
         while(true)

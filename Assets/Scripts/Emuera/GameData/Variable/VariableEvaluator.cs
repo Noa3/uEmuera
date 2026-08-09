@@ -76,15 +76,15 @@ namespace MinorShift.Emuera.GameData.Variable
 		public void SetValueAll(FixedVariableTerm p, Int64 srcValue, int start, int end)
 		{
             var identifier = p.Identifier;
-            //呼び出し元で判定済み
+            //Already determined by the caller
             //if (!p.Identifier.IsInteger)
-            //    throw new CodeEE("整数型でない変数" + p.Identifier.Name + "に整数値を代入しようとしました");
+            //    throw new CodeEE("attempted to assign an integer value to the non-integer variable " + p.Identifier.Name);
             //if (p.Identifier.Readonly)
-            //    throw new CodeEE("読み取り専用の変数" + p.Identifier.Name + "に代入しようとしました");
+            //    throw new CodeEE("attempted to assign to the read-only variable " + p.Identifier.Name);
             if (identifier.IsCalc)
 				return;
-			//一応チェック済み
-			//throw new ExeEE("READONLYでないCALC変数の代入処理が設定されていない");
+			//Checked anyway for safety
+			//throw new ExeEE("assignment handling for non-READONLY CALC variables is not set");
 
 			else
 			{
@@ -107,11 +107,11 @@ namespace MinorShift.Emuera.GameData.Variable
 		public void SetValueAll(FixedVariableTerm p, string srcValue, int start, int end)
 		{
             var identifier = p.Identifier;
-            //呼び出し元で判定済み
+            //Already determined by the caller
             //if (!identifier.IsString)
-            //    throw new CodeEE("文字列型でない変数" + identifier.Name + "に文字列型を代入しようとしました");
+            //    throw new CodeEE("attempted to assign a string to the non-string variable " + identifier.Name);
             //if (identifier.Readonly)
-            //    throw new CodeEE("読み取り専用の変数" + identifier.Name + "に代入しようとしました");
+            //    throw new CodeEE("attempted to assign to the read-only variable " + identifier.Name);
             if (identifier.IsCalc)
 			{
 				if (identifier.Code == VariableCode.WINDOW_TITLE)
@@ -120,8 +120,8 @@ namespace MinorShift.Emuera.GameData.Variable
 					return;
 				}
 				return;
-				//一応チェック済み
-				//throw new ExeEE("READONLYでないCALC変数の代入処理が設定されていない");
+				//Checked anyway for safety
+				//throw new ExeEE("assignment handling for non-READONLY CALC variables is not set");
 			}
 			else
 			{
@@ -150,8 +150,8 @@ namespace MinorShift.Emuera.GameData.Variable
 				throw new CodeEE("読み取り専用の変数" + identifier.Name + "に代入しようとしました");
 			if (identifier.IsCalc)
 				return;
-			//一応チェック済み
-			//throw new ExeEE("READONLYでないCALC変数の代入処理が設定されていない");
+			//Checked anyway for safety
+			//throw new ExeEE("assignment handling for non-READONLY CALC variables is not set");
 			if (varData.CharacterList.Count == 0)
 				return;
 
@@ -190,8 +190,8 @@ namespace MinorShift.Emuera.GameData.Variable
 					GlobalStatic.Console.SetWindowTitle(srcValue);
 					return;
 				}
-				//一応チェック済み
-				//throw new ExeEE("READONLYでないCALC変数の代入処理が設定されていない");
+				//Checked anyway for safety
+				//throw new ExeEE("assignment handling for non-READONLY CALC variables is not set");
 				return;
 			}
 			if (varData.CharacterList.Count == 0)
@@ -442,7 +442,7 @@ namespace MinorShift.Emuera.GameData.Variable
 			Int64[] array;
             var identifier = p.Identifier;
 
-            //指定値の配列要素の範囲外かのチェックは済んでるので、これだけでよい
+            //The out-of-range check for the specified array element is already done, so this alone suffices
             if (start >= end)
 				return -1;
 
@@ -474,7 +474,7 @@ namespace MinorShift.Emuera.GameData.Variable
 		{
 			string[] array;
 
-			//指定値の配列要素の範囲外かのチェックは済んでるので、これだけでよい
+			//The out-of-range check for the specified array element is already done, so this alone suffices
 			if (start >= end)
 				return -1;
             var identifier = p.Identifier;
@@ -487,18 +487,18 @@ namespace MinorShift.Emuera.GameData.Variable
 			{
 				for (int i = (int)end - 1; i >= (int)start; --i)
 				{
-					//1823 Nullなら空文字列として扱う
+					//1823 Treat null as an empty string
 					string str = array[i] ?? "";
 					if (isExact)
 					{
 						Match match = target.Match(str);
-						//正規表現に引っかかった文字列の長さ＝元の文字列の長さなら完全一致
+						//Exact match when the length of the string caught by the regex equals the length of the original string
 						if (match.Success && str.Length == match.Length)
 							return (Int64)i;
 					}
 					else
 					{
-						//部分一致なのでひっかかればOK
+						//Partial match, so a hit is enough
 						if (target.IsMatch(str))
 							return (Int64)i;
 					}
@@ -508,18 +508,18 @@ namespace MinorShift.Emuera.GameData.Variable
 			{
 				for (int i = (int)start; i < (int)end; ++i)
 				{
-					//1823 Nullなら空文字列として扱う
+					//1823 Treat null as an empty string
 					string str = array[i] ?? "";
 					if (isExact)
 					{
-						//正規表現に引っかかった文字列の長さ＝元の文字列の長さなら完全一致
+						//Exact match when the length of the string caught by the regex equals the length of the original string
 						Match match = target.Match(str);
 						if (match.Success && str.Length == match.Length)
 							return (Int64)i;
 					}
 					else
 					{
-						//部分一致なのでひっかかればOK
+						//Partial match, so a hit is enough
 						if (target.IsMatch(str))
 							return (Int64)i;
 					}
@@ -674,7 +674,7 @@ namespace MinorShift.Emuera.GameData.Variable
 			Int64[] temp = new Int64[num];
 			Buffer.BlockCopy(array, start * 8, temp, 0, 8 * num);
 
-			//これを満たすのはshift > 0であることは自明
+			//It is self-evident that only shift > 0 satisfies this
 			if (sourceStart == 0)
 			{
 				if (length > 0)
@@ -1090,9 +1090,9 @@ namespace MinorShift.Emuera.GameData.Variable
 						builder.Append(" ");
 					}
 					break;
-				//現状ここに来ることはないはず
+				//In practice this path should never be reached
 				//default:
-				//    throw new ExeEE("未定義の関数");
+				//    throw new ExeEE("undefined function");
 			}
 			return builder.ToString();
 		}
@@ -1101,9 +1101,9 @@ namespace MinorShift.Emuera.GameData.Variable
 		{
 			if ((target < 0) || (target >= varData.CharacterList.Count))
 				throw new CodeEE("存在しない登録キャラクタを参照しようとしました");
-			//そもそも呼び出し元がint i = 0; i < 100; i++)でこの条件が満たされる可能性0
+			//In the first place, the caller uses int i = 0; i < 100; i++), so this condition has zero chance of being met
 			//if ((paramCode < 0) || (paramCode >= constant.ParamName.Length))
-			//    throw new ExeEE("存在しない名称を取得しようとした");
+			//    throw new ExeEE("attempted to obtain a non-existent name");
 			CharacterData chara = varData.CharacterList[(int)target];
 			Int64 param = chara.DataIntegerArray[(int)(VariableCode.PALAM & VariableCode.__LOWERCASE__)][paramCode];
 			Int64[] paramlv = varData.DataIntegerArray[(int)(VariableCode.PALAMLV & VariableCode.__LOWERCASE__)];
@@ -1172,7 +1172,7 @@ namespace MinorShift.Emuera.GameData.Variable
 		{
 			CharacterTemplate tmpl = constant.GetCharacterTemplateFromCsvNo(CsvNo);
 			if (tmpl == null)
-				//throw new CodeEE("定義していないキャラクタを作成しようとしました");
+				//throw new CodeEE("attempted to create an undefined character");
 				tmpl = constant.GetPseudoChara();
 			CharacterData chara = new CharacterData(constant, tmpl, varData);
 			varData.CharacterList.Add(chara);
@@ -1228,7 +1228,7 @@ namespace MinorShift.Emuera.GameData.Variable
 			this.TARGET = -1;
 			this.ASSI = -1;
 			this.MASTER = -1;
-			//同じキャラが複数出てこないようにリストを整理
+			//Organize the list so the same character does not appear more than once
 			for (int i = 0; i < NoList.Length; i++)
 			{
 				if (!pickList.Contains(NoList[i]) && NoList[i] >= 0)
@@ -1258,7 +1258,7 @@ namespace MinorShift.Emuera.GameData.Variable
 
 		public void ResetData()
 		{
-			//グローバルは初期化しない方が都合がよい。
+			//It is more convenient not to initialize globals.
 			//varData.SetDefaultGlobalValue();
 			varData.SetDefaultLocalValue();
 			varData.SetDefaultValue(constant);
@@ -1333,9 +1333,9 @@ namespace MinorShift.Emuera.GameData.Variable
 				varData.CharacterList.Sort(CharacterData.AscCharacterComparison);
 			else// if (sortorder == SortOrder.DESENDING)
 				varData.CharacterList.Sort(CharacterData.DescCharacterComparison);
-			//argument解析でチェック済み
+			//Already checked in argument parsing
 			//else
-			//    throw new ExeEE("ソート順序不明");
+			//    throw new ExeEE("unknown sort order");
 
 			if ((fixMaster) && (masterChara != null))
 			{
@@ -1433,7 +1433,7 @@ namespace MinorShift.Emuera.GameData.Variable
 		
 		public Int64 GetChara_UseSp(Int64 charaNo, bool getSp)
 		{
-			//後天的にNOを変更する場合も考慮し、chara*.csvで定義されているかどうかは調べない。
+			//Considering that NO may be changed later, do not check whether the character is defined in chara*.csv.
 			//CharacterTemplate tmpl = constant.GetCharacterTemplate(charaNo, false);
 			//if (tmpl == null)
 			//    return -1;
@@ -1452,7 +1452,7 @@ namespace MinorShift.Emuera.GameData.Variable
 
 		public Int64 ExistCsv(Int64 charaNo, bool getSp)
 		{
-			//SPキャラ廃止に伴う問題は呼び出し元で処理
+			//Problems accompanying the abolition of SP characters are handled by the caller
 			CharacterTemplate tmpl = constant.GetCharacterTemplate_UseSp(charaNo, getSp);
 			if (tmpl == null)
 				return 0;
@@ -1462,7 +1462,7 @@ namespace MinorShift.Emuera.GameData.Variable
 
 		public string GetCharacterStrfromCSVData(Int64 charaTmplNo, CharacterStrData type, bool isSp, Int64 arg2Long)
 		{
-			//SPキャラ廃止に伴う問題は呼び出し元で処理
+			//Problems accompanying the abolition of SP characters are handled by the caller
 			CharacterTemplate tmpl = constant.GetCharacterTemplate_UseSp(charaTmplNo, isSp);
 			if (tmpl == null)
 				throw new CodeEE("定義していないキャラクタを参照しようとしました");
@@ -1509,7 +1509,7 @@ namespace MinorShift.Emuera.GameData.Variable
 
 		public Int64 GetCharacterIntfromCSVData(Int64 charaTmplNo, CharacterIntData type, bool isSp, Int64 arg2Long)
 		{
-			//SPキャラ廃止に伴う問題は呼び出し元で処理
+			//Problems accompanying the abolition of SP characters are handled by the caller
 			CharacterTemplate tmpl = constant.GetCharacterTemplate_UseSp(charaTmplNo, isSp);
 			if (tmpl == null)
 				throw new CodeEE("定義していないキャラクタを参照しようとしました");
@@ -1559,7 +1559,7 @@ namespace MinorShift.Emuera.GameData.Variable
 			sarray = varData.DataStringArray[(int)(VariableCode.TSTR & VariableCode.__LOWERCASE__)];
 			for (int i = 0; i < sarray.Length; i++)
 				sarray[i] = "";
-			//本家の仕様にあわせ、選択中以外のキャラクタも全部リセット。
+			//To match the original spec, also reset all characters other than the currently selected one.
 			foreach (CharacterData chara in varData.CharacterList)
 			{
 				array = chara.DataIntegerArray[(int)(VariableCode.GOTJUEL & VariableCode.__LOWERCASE__)];
@@ -1571,17 +1571,17 @@ namespace MinorShift.Emuera.GameData.Variable
 				array = chara.DataIntegerArray[(int)(VariableCode.EX & VariableCode.__LOWERCASE__)];
 				for (int i = 0; i < array.Length; i++)
 					array[i] = 0;
-				//STAINは関数に切り出す（RESET_STAIN対応のため）
+				//STAIN is factored out into a function (to support RESET_STAIN)
 				setDefaultStain(chara);
 				array = chara.DataIntegerArray[(int)(VariableCode.PALAM & VariableCode.__LOWERCASE__)];
 				for (int i = 0; i < array.Length; i++)
 					array[i] = 0;
-				//1.728 このタイミングでSOURCEも更新されていた
+				//1.728 SOURCE was also updated at this timing
 				array = chara.DataIntegerArray[(int)(VariableCode.SOURCE & VariableCode.__LOWERCASE__)];
 				for (int i = 0; i < array.Length; i++)
 					array[i] = 0;
-				//1.728 NOWEXはここでは更新されていない
-				//1736f CTFLAGはTFLAGと同じ仕様で
+				//1.728 NOWEX is not updated here
+				//1736f CTFLAG follows the same spec as TFLAG
 				array = chara.DataIntegerArray[(int)(VariableCode.TCVAR & VariableCode.__LOWERCASE__)];
 				for (int i = 0; i < array.Length; i++)
 					array[i] = 0;
@@ -1614,16 +1614,16 @@ namespace MinorShift.Emuera.GameData.Variable
 					array[i] = 0;
 			}
 
-			//SOURCEはリセットタイミングが違うので消し
-			//1.728 NOWEXも微妙に違うので移動
+			//SOURCE has a different reset timing, so remove it here
+			//1.728 NOWEX also differs slightly, so it was moved
 		}
 
-		//1.728 NOWEXもリセットタイミングが違うので移動
-		//UP,DOWN,LOSEBASEはUSERCOMに移動する場合にもリセットされるがNOWEXはCOMが実行される場合のみ更新される
-		//なのでEVENTCOM直前に呼ぶ
+		//1.728 NOWEX was also moved because its reset timing differs
+		//UP, DOWN, LOSEBASE are also reset on transition to USERCOM, but NOWEX is updated only when a COM is executed
+		//Therefore call it right before EVENTCOM
 		public void UpdateAfterInputCom()
 		{
-			//本家の仕様にあわせ、選択中以外のキャラクタも全部リセット。
+			//To match the original spec, also reset all characters other than the currently selected one.
 			Int64[] array;
 			foreach (CharacterData chara in varData.CharacterList)
 			{
@@ -1633,10 +1633,10 @@ namespace MinorShift.Emuera.GameData.Variable
 			}
 		}
 
-		//SOURCEのリセットタイミングはUP、DOWN、LOSEBASE、NOWEXと違いSOURCECHECK終了後なので切り分け
+		//Because SOURCE resets after SOURCECHECK, unlike UP, DOWN, LOSEBASE and NOWEX, it is separated out
 		public void UpdateAfterSourceCheck()
 		{
-			//本家の仕様にあわせ、選択中以外のキャラクタも全部リセット。
+			//To match the original spec, also reset all characters other than the currently selected one.
 			Int64[] array;
 			foreach (CharacterData chara in varData.CharacterList)
 			{
@@ -1646,9 +1646,9 @@ namespace MinorShift.Emuera.GameData.Variable
 			}
 		}
 
-		//PREVCOMは更新されない。スクリプトの方で更新する必要がある。
-		//Data側からEmueraConsoleを操作するのはここだけ。
-		//1756 ↑だったのは今は昔の話である
+		//PREVCOM is not updated. It must be updated on the script side.
+		//This is the only place where EmueraConsole is operated from the Data side.
+		//1756 That ↑ was a thing of the past
 		public void UpdateInUpcheck(EmueraConsole window, bool skipPrint)
 		{
 			Int64[] up, down, param;
@@ -1668,7 +1668,7 @@ namespace MinorShift.Emuera.GameData.Variable
 
 			for (int i = 0; i < length; i++)
 			{
-				//本家の仕様では負の値は無効。
+				//In the original spec negative values are invalid.
 				if ((up[i] <= 0) && (down[i] <= 0))
 					continue;
 				StringBuilder builder = new StringBuilder();
@@ -1723,7 +1723,7 @@ namespace MinorShift.Emuera.GameData.Variable
 
 			for (int i = 0; i < length; i++)
 			{
-				//本家の仕様では負の値は無効。
+				//In the original spec negative values are invalid.
 				if ((up[i] <= 0) && (down[i] <= 0))
 					continue;
 				StringBuilder builder = new StringBuilder();
@@ -1761,7 +1761,7 @@ namespace MinorShift.Emuera.GameData.Variable
 		private void setDefaultStain(CharacterData chara)
 		{
 			long[] array = chara.DataIntegerArray[(int)(VariableCode.STAIN & VariableCode.__LOWERCASE__)];
-			//STAINの配列要素数 < _REPLACE.CSVのSTAIN初期値の指定数の時Errorになるのを対処
+			//Handle the Error that occurs when the STAIN array size < the number of STAIN defaults specified in _REPLACE.CSV
 			if (array.Length >= Config.StainDefault.Count)
 			{
 				Config.StainDefault.CopyTo(array);
@@ -1784,7 +1784,7 @@ namespace MinorShift.Emuera.GameData.Variable
 		}
 
 		/// <summary>
-		/// RESULTに配列のサイズを代入。二次元配列ならRESULT:1に二番目のサイズを代入。三次元配列ならRESULT:1に二番目、RESULT:2に三番目のサイズを代入
+		/// Assigns the array size to RESULT. For a 2D array RESULT:1 receives the second size; for a 3D array RESULT:1 and RESULT:2 receive the second and third sizes
 		/// </summary>
 		/// <param name="varID"></param>
 		/// <returns></returns>
@@ -1845,7 +1845,7 @@ namespace MinorShift.Emuera.GameData.Variable
 
 		#endregion
 
-		//ちーと
+		//Cheat
 		public void IamaMunchkin()
 		{
 			if ((MASTER < 0) || (MASTER >= varData.CharacterList.Count))
@@ -1866,7 +1866,7 @@ namespace MinorShift.Emuera.GameData.Variable
 			}
 		}
 
-		#region File操作
+		#region File operations
 
 
 		private string getSaveDataPathG() { return Config.SavDir + "global.sav"; }
@@ -1879,7 +1879,7 @@ namespace MinorShift.Emuera.GameData.Variable
 		private string getSaveDataPathC(string s) { return Program.DatDir + "chara_" + s + ".dat"; }
 
 		/// <summary>
-		/// DatFolderが存在せず、かつ作成に失敗したらErrorを投げる
+		/// Throws an error if DatFolder does not exist and creation fails
 		/// </summary>
 		/// <returns></returns>
 		public void CreateDatFolder()
@@ -1923,10 +1923,10 @@ namespace MinorShift.Emuera.GameData.Variable
 		}
 
 		/// <summary>
-		/// 文字列がファイル名の一部として適切かどうか調べる
+		/// Checks whether the string is valid as part of a filename
 		/// </summary>
 		/// <param name="datfilename"></param>
-		/// <returns>適切ならnull、不適切ならErrorメッセージ</returns>
+		/// <returns>null if valid, otherwise an Error message</returns>
 		public string CheckDatFilename(string datfilename)
 		{
 			if (string.IsNullOrEmpty(datfilename))
@@ -1987,7 +1987,7 @@ namespace MinorShift.Emuera.GameData.Variable
 			{
 				fs = new FileStream(filename, FileMode.Open, FileAccess.Read);
 				bReader = EraBinaryDataReader.CreateReader(fs);
-				if (bReader == null)//eramaker形式
+				if (bReader == null)//eramaker format
 				{
 					reader = new EraDataReader(fs);
 					if (!gamebase.UniqueCodeEqualTo(reader.ReadInt64()))
@@ -2007,7 +2007,7 @@ namespace MinorShift.Emuera.GameData.Variable
 					result.DataMes = reader.ReadString();
 					return result;
 					//result.State = EraDataState.ETC_ERROR;
-					//result.DataMes = "セーブデータが壊れています";
+					//result.DataMes = "save data is corrupted";
 					//return result;
 				}
 				EraSaveFileType fileType = bReader.ReadFileType();
@@ -2056,7 +2056,7 @@ namespace MinorShift.Emuera.GameData.Variable
 			return result;
 		}
 
-		////これは理屈上VariableEvaluator上で動くはず
+		////This should logically work on VariableEvaluator
 		//public EraDataResult checkData(int saveIndex)
 		//{
 		//    string filename = getSaveDataPath(saveIndex);
@@ -2074,14 +2074,14 @@ namespace MinorShift.Emuera.GameData.Variable
 		//        if (!gamebase.UniqueCodeEqualTo(reader.ReadInt64()))
 		//        {
 		//            result.State = EraDataState.GAME_ERROR;
-		//            result.DataMes = "異なるゲームのセーブデータです";
+		//            result.DataMes = "save data of a different game";
 		//            return result;
 		//        }
 		//        Int64 version = reader.ReadInt64();
 		//        if (!gamebase.CheckVersion(version))
 		//        {
 		//            result.State = EraDataState.VIRSION_ERROR;
-		//            result.DataMes = "セーブデータのバーションが異なります";
+		//            result.DataMes = "the save data version differs";
 		//            return result;
 		//        }
 		//        result.State = EraDataState.OK;
@@ -2096,7 +2096,7 @@ namespace MinorShift.Emuera.GameData.Variable
 		//    catch (Exception)
 		//    {
 		//        result.State = EraDataState.ETC_ERROR;
-		//        result.DataMes = "読み込み中にErrorが発生しました";
+		//        result.DataMes = "an error occurred during reading";
 		//    }
 		//    finally
 		//    {
@@ -2123,7 +2123,7 @@ namespace MinorShift.Emuera.GameData.Variable
 				bWriter.WriteInt64(gamebase.ScriptUniqueCode);
 				bWriter.WriteInt64(gamebase.ScriptVersion);
 				bWriter.WriteString(savMes);
-				bWriter.WriteInt64(charas.Length);//保存するキャラ数
+				bWriter.WriteInt64(charas.Length);//Number of characters to save
 				for (int i = 0; i < charas.Length; i++)
 				{
 					varData.CharacterList[charas[i]].SaveToStreamBinary(bWriter, varData);
@@ -2134,7 +2134,7 @@ namespace MinorShift.Emuera.GameData.Variable
 			}
 			//catch (Exception)
 			//{
-			//	throw new CodeEE("セーブ中にErrorが発生しました");
+			//	throw new CodeEE("an error occurred during saving");
 			//}
 			finally
 			{
@@ -2219,7 +2219,7 @@ namespace MinorShift.Emuera.GameData.Variable
 			}
 			//catch (Exception)
 			//{
-			//	throw new CodeEE("セーブ中にErrorが発生しました");
+			//	throw new CodeEE("an error occurred during saving");
 			//}
 			finally
 			{
@@ -2314,7 +2314,7 @@ namespace MinorShift.Emuera.GameData.Variable
 			varData.LoadFromStream(reader);
 			if (reader.SeekEmuStart())
 			{
-				if (reader.DataVersion < 1803)//キャラ2次元配列追加以前
+				if (reader.DataVersion < 1803)//Before character 2D arrays were added
 					for (int i = 0; i < charaCount; i++)
 						varData.CharacterList[i].LoadFromStreamExtended_Old1802(reader);
 				else
@@ -2562,7 +2562,7 @@ namespace MinorShift.Emuera.GameData.Variable
 				throw new CodeEE("指定されたファイル\"" + filepath + "\"は読み込み専用のため削除できません");
 			//{
 
-			//    console.PrintError("指定されたファイル\"" + filepath + "\"は読み込み専用のため削除できません");
+			//    console.PrintError("the specified file \"" + filepath + "\" is read-only and cannot be deleted");
 			//    return;
 			//}
 			File.Delete(filepath);
@@ -2572,7 +2572,7 @@ namespace MinorShift.Emuera.GameData.Variable
 
 
 		#endregion
-		#region IDisposable メンバ
+		#region IDisposable Members
 
 		public void Dispose()
 		{

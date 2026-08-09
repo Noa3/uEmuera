@@ -71,8 +71,8 @@ namespace MinorShift.Emuera.GameProc
 	}
 
 	/// <summary>
-	/// 現在呼び出し中の関数
-	/// イベント関数を除いて実行中に内部状態は変化しないので使いまわしても良い
+	/// Function currently being called
+	/// Reusable because internal state does not change during execution except for event functions
 	/// </summary>
 	internal sealed class CalledFunction
 	{
@@ -138,9 +138,9 @@ namespace MinorShift.Emuera.GameProc
 		
 		static FunctionMethod tostrMethod = null;
 		/// <summary>
-		/// 1803beta005 予めargumentの数を合わせて規定値を代入しておく
-        /// 1806+v6.99 式中関数のargumentに無効な#DIM変数を与えている場合にExceptionになるのを修正
-		/// 1808beta009 REF型に対応
+		/// 1803beta005 Assign default values in advance to match the number of arguments
+        /// 1806+v6.99 Fixed being an Exception when an invalid #DIM variable is given to an in-expression function argument
+		/// 1808beta009 Support for REF type
 		/// </summary>
 		public UserDefinedFunctionArgument ConvertArg(IOperandTerm[] srcArgs, out string errMes)
 		{
@@ -165,7 +165,7 @@ namespace MinorShift.Emuera.GameProc
 				term = (i < srcArgs.Length) ? srcArgs[i] : null;
 				destArg = func.Arg[i];
 				//isString = destArg.IsString;
-				if (destArg.Identifier.IsReference)//参照渡しの場合
+				if (destArg.Identifier.IsReference)//pass by reference case
 				{
 					if (term == null)
 					{
@@ -178,19 +178,19 @@ namespace MinorShift.Emuera.GameProc
 						errMes = "\"@" + func.LabelName + "\"の" + (i + 1).ToString() + "番目のargumentは参照渡しのための配列変数でなければなりません";
 						return null;
 					}
-					//TODO 1810alpha007 キャラ型を認めるかどうかはっきりしたい 今のところ認めない方向
-					//型チェック
+					//TODO 1810alpha007 want to decide clearly whether to allow chara type. currently leaning to not allow
+					//type check
 					if (!((ReferenceToken)destArg.Identifier).MatchType(vTerm.Identifier, false, out errMes))
 					{
 						errMes = "\"@" + func.LabelName + "\"の" + (i + 1).ToString() + "番目のargument:" + errMes;
 						return null;
 					}
 				}
-				else if (term == null)//argumentが省略されたとき
+				else if (term == null)//when the argument is omitted
 				{
-					term = func.Def[i];//デフォルト値を代入
-					//1808beta001 デフォルト値がない場合はErrorにする
-					//一応逃がす
+					term = func.Def[i];//assign default value
+					//1808beta001 Error when no default value exists
+					//escape for now
 					if (term == null && !Config.CompatiFuncArgOptional)
 					{
 						errMes = "\"@" + func.LabelName + "\"の" + (i + 1).ToString() + "番目のargumentは省略できません(この警告は互換性オプション「" + Config.GetConfigName(ConfigCode.CompatiFuncArgOptional) + "」により無視できます)";
@@ -271,7 +271,7 @@ namespace MinorShift.Emuera.GameProc
 		}
 
 
-		#region イベント関数専用
+		#region Exclusively for event functions
 		public void ShiftNext()
 		{
 			while (true)

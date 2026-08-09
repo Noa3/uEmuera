@@ -7,8 +7,8 @@ using MinorShift.Emuera.GameData.Expression;
 
 namespace MinorShift.Emuera.GameData.Variable
 {
-	//IndexOutOfRangeException, ArgumentOutOfRangeExceptionを投げることがある。VariableTermの方で処理すること。
-	//argumentは整数しか受け付けない。*.csvを利用した置換はVariableTermの方で処理すること
+	//May throw IndexOutOfRangeException or ArgumentOutOfRangeException. Handle them in VariableTerm.
+	//Only integer arguments are accepted. Replacement using *.csv is handled in VariableTerm
 	internal abstract class VariableToken
 	{
 		protected VariableToken(VariableCode varCode, VariableData varData)
@@ -92,7 +92,7 @@ namespace MinorShift.Emuera.GameData.Variable
 		public string Name { get { return varName; } }
 
 
-		//CodeEEにしているけど実際はExeEEかもしれない
+		//Made a CodeEE, but it may actually be an ExeEE
 		public virtual Int64 GetIntValue(ExpressionMediator exm, Int64[] arguments)
 		{ throw new CodeEE("整数型でない変数" + varName + "を整数型として呼び出しました"); }
 		public virtual string GetStrValue(ExpressionMediator exm, Int64[] arguments)
@@ -199,7 +199,7 @@ namespace MinorShift.Emuera.GameData.Variable
 			}
 		}
 		/// <summary>
-		/// 1810alpha007 諸事情によりReadOnlyからIsConstに改名。
+		/// 1810alpha007 Renamed from ReadOnly to IsConst for various reasons.
 		/// </summary>
 		public virtual bool IsConst
 		{
@@ -342,7 +342,7 @@ namespace MinorShift.Emuera.GameData.Variable
 		public override void CheckElement(Int64[] arguments, bool[] doCheck)
 		{
 			//if (array == null)
-			//	throw new ExeEE("プライベート変数" + varName + "の配列が用意されていない");
+			//	throw new ExeEE("no array is prepared for private variable " + varName);
 
 			if (doCheck[0] && ((arguments[0] < 0) || (arguments[0] >= sizes[0])))
 				throw new CodeEE("配列型変数" + varName + "の第１argument(" + arguments[0].ToString() + ")は配列の範囲外です");
@@ -390,7 +390,7 @@ namespace MinorShift.Emuera.GameData.Variable
 
 	}
 
-	//1808beta009 廃止 UserDefinedVariableTokenで一括して扱う
+	//1808beta009 Obsoleted and handled uniformly by UserDefinedVariableToken
 	//internal abstract class PrivateVariableToken : UserDefinedVariableToken
 	//{
 	//    protected PrivateVariableToken(VariableCode varCode, UserDefinedVariableData data)
@@ -401,8 +401,8 @@ namespace MinorShift.Emuera.GameData.Variable
 	//}
 
 	/// <summary>
-	/// 1808beta009 追加
-	/// 参照型。public もあるよ
+	/// 1808beta009 Added
+	/// Reference type. There are also public ones
 	/// </summary>
 	internal abstract class ReferenceToken : UserDefinedVariableToken
 	{
@@ -419,7 +419,7 @@ namespace MinorShift.Emuera.GameData.Variable
 		protected Array array = null;
 
 		public override void SetDefault()
-		{//Defaultのセットは参照元がやるべき
+		{//Setting the default is the referrer's responsibility
 		}
 		public override Int32 GetLength()
 		{
@@ -492,7 +492,7 @@ namespace MinorShift.Emuera.GameData.Variable
 		}
 
 		/// <summary>
-		/// 型が一致するかどうか（参照可能かどうか）
+		/// Whether the types match (whether it can be referenced)
 		/// </summary>
 		/// <param name="rother"></param>
 		/// <returns></returns>
@@ -503,17 +503,17 @@ namespace MinorShift.Emuera.GameData.Variable
 			{ errMes = "参照先変数は省略できません"; return false; }
 			if (rother.IsCalc)
 			{ errMes = "疑似変数は参照できません"; return false; }
-			//TODO constの参照
+			//TODO reference to const
 			//if (rother.IsConst != this.isConst)
 			if (rother.IsConst)
 			{ errMes = "定数は参照できません"; return false; }
-			//1812 ローカル参照の条件変更
-			//ローカルかつDYNAMICなREFはローカル参照できる
+			//1812 Changed the conditions for local references
+			//A REF that is local and DYNAMIC can reference locals
 			if ((!this.IsPrivate) && (rother.IsPrivate || rother.IsLocal))
 			{ errMes = "広域の参照変数はローカル変数を参照できません"; return false; }
-			////1810beta002 ローカル参照禁止
+			////1810beta002 Local references forbidden
 			//if ((!rother.IsReference) && (rother.IsPrivate || rother.IsLocal))
-			//{ errMes = "ローカル変数は参照できません"; return false; }
+			//{ errMes = "local variables cannot be referenced"; return false; }
 			if (rother.IsCharacterData && !allowChara)
 			{ errMes = "キャラ変数は参照できません"; return false; }
 			if (this.IsInteger != rother.IsInteger)
@@ -550,7 +550,7 @@ namespace MinorShift.Emuera.GameData.Variable
 		public override void CheckElement(Int64[] arguments, bool[] doCheck)
 		{
 			//if (array == null)
-			//	throw new ExeEE("プライベート変数" + varName + "の配列が用意されていない");
+			//	throw new ExeEE("no array is prepared for private variable " + varName);
 			if (doCheck[0] && ((arguments[0] < 0) || (arguments[0] >= size)))
 				throw new CodeEE("配列変数" + varName + "の第１argument(" + arguments[0].ToString() + ")は配列の範囲外です");
 		}
@@ -566,10 +566,10 @@ namespace MinorShift.Emuera.GameData.Variable
 
 
 
-	//サブクラスの詳細はVariableData以外は知らなくてよい
+	//No one but VariableData needs to know subclass details
 	internal sealed partial class VariableData
 	{
-		#region 変数
+		#region Variables
 		private sealed class IntVariableToken : VariableToken
 		{
 			public IntVariableToken(VariableCode varCode, VariableData varData)
@@ -1290,7 +1290,7 @@ namespace MinorShift.Emuera.GameData.Variable
 
 		}
 		#endregion
-		#region 定数
+		#region Constants
 		private abstract class ConstantToken : VariableToken
 		{
 			public ConstantToken(VariableCode varCode, VariableData varData)
@@ -1420,7 +1420,7 @@ namespace MinorShift.Emuera.GameData.Variable
 		}
 
 		#endregion
-		#region 特殊処理
+		#region Special handling
 
 		private abstract class PseudoVariableToken : VariableToken
 		{
@@ -1475,7 +1475,7 @@ namespace MinorShift.Emuera.GameData.Variable
 					return 0L;
 				else if (i < 0)
 					i = -i;
-				return exm.VEvaluator.GetNextRand(32768) % i;//0-32767の乱数をargumentで除算した余り
+				return exm.VEvaluator.GetNextRand(32768) % i;//Remainder of a 0-32767 random number divided by the argument
 			}
 		}
 
@@ -1633,7 +1633,7 @@ namespace MinorShift.Emuera.GameData.Variable
 			{
 				LogicalLine line = exm.Process.GetScaningLine();
 				if ((line == null) || (line.ParentLabelLine == null))
-					return "";//システム待機中のデバッグモードから呼び出し
+					return "";//Called from debug mode while the system is waiting
 				return line.ParentLabelLine.LabelName;
 			}
 		}
@@ -1840,10 +1840,10 @@ namespace MinorShift.Emuera.GameData.Variable
 		#endregion
 		#region userdef
 
-		//1808beta009 廃止 private static と統合
+		//1808beta009 Obsoleted; unified with private static
 		//private sealed class UserDefinedInt1DVariableToken : UserDefinedVariableToken
 
-		#region static (広域変数とprivate static の両方を含む)
+		#region static (includes both wide-area variables and private static variables)
 		private sealed class StaticInt1DVariableToken : UserDefinedVariableToken
 		{
 			public StaticInt1DVariableToken(UserDefinedVariableData data)
@@ -2543,10 +2543,10 @@ namespace MinorShift.Emuera.GameData.Variable
 
 		#endregion
 		#region ref
-		//1808beta009で追加
+		//Added in 1808beta009
 		/// <summary>
-		/// public staticとprivate dynamicをクラスレベルでは区別しない
-		/// 1808beta009時点ではprivate dynamicのみ
+		/// public static and private dynamic are not distinguished at the class level
+		/// As of 1808beta009 only private dynamic exists
 		/// </summary>
 		private sealed class ReferenceInt1DToken : ReferenceToken
 		{
@@ -2838,7 +2838,7 @@ namespace MinorShift.Emuera.GameData.Variable
 
 		}
 		#endregion
-		#region chara (広域のみ)
+		#region chara (wide-area only)
 
 		private sealed class UserDefinedCharaInt1DVariableToken : UserDefinedCharaVariableToken
 		{

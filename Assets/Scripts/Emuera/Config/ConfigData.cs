@@ -109,7 +109,7 @@ static ConfigData() { }
 			configArray[i++] = new ConfigItem<bool>(ConfigCode.CompatiFuncArgAutoConvert, "ユーザー関数のargumentに自動的にTOSTRを補完する", false);
 			configArray[i++] = new ConfigItem<bool>(ConfigCode.SystemIgnoreTripleSymbol, "FORM中の三連記号を展開しない", false);
             configArray[i++] = new ConfigItem<bool>(ConfigCode.TimesNotRigorousCalculation, "TIMESの計算をeramakerにあわせる", false);
-            //一文字変数の禁止オプションを考えた名残
+            //Remnant of considering a ban on one-character variable options
 			//configArray[i++] = new ConfigItem<bool>(ConfigCode.ForbidOneCodeVariable, "一文字変数の使用を禁止する", false);
 			configArray[i++] = new ConfigItem<bool>(ConfigCode.SystemNoTarget, "キャラクタ変数のargumentを補完しない", false);
 			configArray[i++] = new ConfigItem<bool>(ConfigCode.SystemIgnoreStringSet, "文字列変数の代入に文字列式を強制する", false);
@@ -457,7 +457,7 @@ static ConfigData() { }
 			if (!eReader.Open(confPath))
 				return false;
 
-			//加载二进制数据
+			//Load binary data
 			var bytes = File.ReadAllBytes(confPath);
 			var md5s = GenericUtils.CalcMd5ListForConfig(bytes);
 

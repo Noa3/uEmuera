@@ -27,7 +27,7 @@ namespace MinorShift.Emuera.GameView
 		RIGHT = 2,
 	}
 	/// <summary>
-	/// 表示行。1つ以上のボタン（ConsoleButtonString）からなる
+	/// A display line. consists of one or more buttons (ConsoleButtonString).
 	/// </summary>
 	internal sealed class ConsoleDisplayLine
 	{
@@ -48,7 +48,7 @@ namespace MinorShift.Emuera.GameView
 		}
 		public int LineNo = -1;
 		
-		///論理行の最初となる場合だけtrue。表示の都合で改行された2行目以降はfalse
+		///true only when it is the first logical line; from the 2nd line onward, split for display purposes, it is false
 		readonly public bool IsLogicalLine = true;
 		readonly public bool IsTemporary = false;
 		//EmueraConsole parent;
@@ -65,18 +65,18 @@ namespace MinorShift.Emuera.GameView
 			this.align = align;
 			if (buttons.Length == 0)
 				return;
-			//DisplayLineの幅
+			//DisplayLine width
 			int width = 0;
             for(var i = 0; i < buttons.Length; ++i)
                 width += buttons[i].Width;
-			//現在位置
+			//current position
 			int pointX = buttons[0].PointX;
 
-			//目標位置
+			//target position
 			int movetoX = 0;
 			if (align == DisplayLineAlignment.LEFT)
 			{
-				//位置固定に対応
+				//supports fixed positions
 				if (IsLogicalLine)
 					return;
 				movetoX = 0;
@@ -86,7 +86,7 @@ namespace MinorShift.Emuera.GameView
 			else if (align == DisplayLineAlignment.RIGHT)
 				movetoX = Config.WindowX - width;
 
-			//移動距離
+			//movement distance
 			int shiftX = movetoX - pointX;
 			if(shiftX != 0)
 				this.ShiftPositionX(shiftX);
@@ -116,8 +116,8 @@ namespace MinorShift.Emuera.GameView
 
 		//public ConsoleButtonString GetPointingButton(int pointX)
 		//{
-		//	////1815 優先順位を逆順にする
-		//	////後から描画されるボタンが優先されるように
+		//	////1815 reverse the priority
+		//	////so that buttons drawn later are given priority
 		//	for (int i = 0; i < buttons.Length; i++)
 		//	{
 		//		ConsoleButtonString button = buttons[buttons.Length - i - 1];
@@ -142,7 +142,7 @@ namespace MinorShift.Emuera.GameView
 		{
 			//foreach (ConsoleButtonString button in buttons)
 			//	button.GDIDrawTo(pointY, isBackLog);
-			//1819 毎回全消去するので穴埋め処理は不要になった
+			//1819 since everything is cleared every time, the gap-filling process is no longer needed
 			//int pointX = 0;
 			//foreach (ConsoleButtonString button in buttons)
 			//{
@@ -154,7 +154,7 @@ namespace MinorShift.Emuera.GameView
 			//		GDI.FillRectBGColor(rect);
 			//	}
 			//	button.GDIDrawTo(pointY, isBackLog);
-			//	//フォントの実高さ＜行間の場合隙間ができてしまうので埋める処理
+			//	//fill-in process to prevent gaps when the actual font height < line spacing
 			//	GDI.FillGap(Config.LineHeight, button.Width + (button.PointX - pointX), new Point(pointX, pointY));
 			//	pointX = button.PointX + button.Width;
 			//}

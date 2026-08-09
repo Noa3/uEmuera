@@ -93,7 +93,7 @@ namespace MinorShift.Emuera.GameProc
                         KeyMacro.LoadMacroFile(macroPath);
                     }
 				}
-				//_replace.csv読み込み
+				//load _replace.csv
                 if (Config.UseReplaceFile && !Program.AnalysisMode)
                 {
 					string replacePath = uEmuera.Utils.ResolveExistingFilePath(Program.CsvDir + "_Replace.csv");

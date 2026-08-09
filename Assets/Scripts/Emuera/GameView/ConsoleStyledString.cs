@@ -11,7 +11,7 @@ using uEmuera.Forms;
 namespace MinorShift.Emuera.GameView
 {
 	/// <summary>
-	/// 装飾付文字列。stringとStringStyleからなる。
+	/// A decorated string. consists of a string and a StringStyle.
 	/// </summary>
 	internal sealed class ConsoleStyledString : AConsoleColoredPart
 	{
@@ -42,9 +42,9 @@ namespace MinorShift.Emuera.GameView
 		{
 			get { return true; }
 		}
-		//単一のボタンフラグ
+		//single-button flag
 		//public bool IsButton { get; set; }
-		//indexの文字数の前方文字列とindex以降の後方文字列に分割
+		//split into a string of the leading index chars and a string of the trailing chars from index onward
 		public ConsoleStyledString DivideAt(int index, StringMeasure sm)
 		{
 			//if ((index <= 0)||(index > Str.Length)||this.Error)

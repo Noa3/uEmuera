@@ -52,10 +52,10 @@ namespace MinorShift.Emuera.GameProc
 						break;
 					//System.Windows.Forms.//Application.DoEvents();
 				}
-				//Errorが起きてる場合でも読み込めてる分だけはチェックする
+				//even if an Error has occurred, check the portion that was loadable
 				if (dimlines.Count > 0)
 				{
-					//&=でないと、ここで起きたErrorをキャッチできない
+					//if not &=, an Error that occurs here cannot be caught
 					noError &= analyzeSharpDimLines();
 				}
 
@@ -178,14 +178,14 @@ namespace MinorShift.Emuera.GameProc
 
 		private void analyzeSharpDefine(StringStream st, ScriptPosition position)
 		{
-			//LexicalAnalyzer.SkipWhiteSpace(st);呼び出し前に行う。
+			//do it before calling LexicalAnalyzer.SkipWhiteSpace(st).
 			string srcID = LexicalAnalyzer.ReadSingleIdentifier(st);
 			if (srcID == null)
 				throw new CodeEE("置換元の識別子がありません", position);
 			if (Config.ICVariable)
 				srcID = srcID.ToUpper();
 
-            //ここで名称重複判定しないと、大変なことになる
+            //if name duplication isn't checked here, it becomes a serious problem
             string errMes = "";
             int errLevel = -1;
             idDic.CheckUserMacroName(ref errMes, ref errLevel, srcID);
@@ -199,13 +199,13 @@ namespace MinorShift.Emuera.GameProc
                 }
             }
             
-            bool hasArg = st.Current == '(';//argumentを指定する場合には直後に(が続いていなければならない。ホワイトスペースも禁止。
-			//1808a3 代入演算子許可（関数宣言用）
+            bool hasArg = st.Current == '(';//when specifying an argument, ( must immediately follow. Whitespace also forbidden.
+			//1808a3 assignment operator allowed (for function declarations)
 			WordCollection wc = LexicalAnalyzer.Analyse(st, LexEndWith.EoL, LexAnalyzeFlag.AllowAssignment);
 			if (wc.EOL)
 			{
 				//throw new CodeEE("置換先の式がありません", position);
-				//1808a3 空マクロの許可
+				//1808a3 empty macro allowed
 				DefineMacro nullmac = new DefineMacro(srcID, new WordCollection(), 0);
 				idDic.AddMacro(nullmac);
 				return;
@@ -293,7 +293,7 @@ namespace MinorShift.Emuera.GameProc
 		//	//idDic.AddUseDefinedVariable(var);
 		//}
 
-		//1822 #DIMだけまとめておいて後で処理
+		//1822 keep only #DIM together and process later
 		private bool analyzeSharpDimLines()
 		{
 			bool noError = true;
@@ -453,7 +453,7 @@ namespace MinorShift.Emuera.GameProc
 						}
 						catch (IdentifierNotFoundCodeEE e)
 						{
-							//繰り返すことで解決する見込みがあるならキューの最後に追加
+							//if there is a prospect of resolving it by repeating, add to the end of the queue
 							if (tryAgain)
 							{
 								dimline.WC.Pointer = 0;

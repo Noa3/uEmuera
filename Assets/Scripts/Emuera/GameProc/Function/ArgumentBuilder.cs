@@ -36,15 +36,15 @@ namespace MinorShift.Emuera.GameProc.Function
 			ParserMediator.Warn(mes, line, level, isError, isBackComp);
 		}
 		/// <summary>
-		/// argumentの型と数。typeof(void)で任意の型（あるいは個別にチェックするべきargument）。nullでそのargumentは省略可能
+		/// argument is type and number. typeof(void) for any type (or arguments that should be checked individually). null means the argument can be omitted
 		/// </summary>
 		protected Type[] argumentTypeArray;//
 		/// <summary>
-		/// 最低限必要なargumentの数。設定しないと全て省略不可。
+		/// Minimum required number of arguments. If not set, all are required.
 		/// </summary>
 		protected int minArg = -1;
 		/// <summary>
-		/// argumentの数に制限なし。
+		/// No limit on number of arguments.
 		/// </summary>
 		protected bool argAny = false;
 		protected bool checkArgumentType(InstructionLine line, ExpressionMediator exm, IOperandTerm[] arguments)
@@ -144,10 +144,10 @@ namespace MinorShift.Emuera.GameProc.Function
 		readonly static Dictionary<string, ArgumentBuilder> nargb = new Dictionary<string, ArgumentBuilder>();
 
 		/// <summary>
-		/// 一般的なargument作成器の呼び出し。数式と文字列式のいずれかのみをargumentとし、特殊なチェックが必要ないもの
+		/// General argument builder invocation. Only takes expressions or string expressions as arguments, no special checks needed
 		/// </summary>
-		/// <param name="argstr">大文字のIとSで"IIS"で(int, int, string )のようにargumentの数と順序を指定する。</param>
-		/// <param name="minArg">argumentの最低数。これ以降は省略可能</param>
+		/// <param name="argstr">Specify the number and order of arguments with uppercase I and S, e.g. "IIS" for (int, int, string).</param>
+		/// <param name="minArg">Minimum number of arguments. Can be omitted from here on</param>
 		/// <returns></returns>
 		public static ArgumentBuilder GetNormalArgumentBuilder(string argstr, int minArg)
 		{
@@ -358,7 +358,7 @@ namespace MinorShift.Emuera.GameProc.Function
 						return null;
 					}
 					rowStr = "";
-					//1756 処理変更のために完全に見分けが付かなくなってしまった
+					//1756 became completely indistinguishable because of processing changes
 					//if (line.FunctionCode == FunctionCode.PRINTL)
 					//	warn("PRINTLの後ろに空白がありません(eramaker：\'PRINTL\'を表示)", line, 0, true);
 				}
@@ -777,8 +777,8 @@ namespace MinorShift.Emuera.GameProc.Function
 					{
 						if (Config.SystemIgnoreStringSet)
 						{ assignwarn("文字列代入は禁止されています（'=を用いるかコンフィグオプションを変えてください)", line, 2, false); return null; }
-						LexicalAnalyzer.SkipHalfSpace(st);//文字列の代入なら半角スペースだけを読み飛ばす
-						//eramakerは代入文では妙なTrim()をする。半端にしか再現できないがとりあえずtrim = true
+						LexicalAnalyzer.SkipHalfSpace(st);//for string assignment, skip only half-width spaces
+						//eramaker does an odd Trim() in assignment statements. can only reproduce imperfectly but use trim = true for now
 						StrFormWord sfwt = LexicalAnalyzer.AnalyseFormattedString(st, FormStrEndWith.EoL, true);
 						IOperandTerm term = ExpressionParser.ToStrFormTerm(sfwt);
 						src = term.Restructure(exm);
@@ -865,7 +865,7 @@ namespace MinorShift.Emuera.GameProc.Function
             public SP_INPUTS_ArgumentBuilder()
             {
                 argumentTypeArray = new Type[] { typeof(string) };
-                //if (nullable)妥協
+                //if (nullable) compromise
                 minArg = 0;
             }
             public override Argument CreateArgument(InstructionLine line, ExpressionMediator exm)
@@ -907,14 +907,14 @@ namespace MinorShift.Emuera.GameProc.Function
             }
         }
         
-		#region 正規型 popTerms()とcheckArgumentType()を両方行うもの。考えることは最低限でよい。
+		#region Normal type: performs both popTerms() and checkArgumentType(). Minimal thought needed.
 
 		private sealed class INT_EXPRESSION_ArgumentBuilder : ArgumentBuilder
 		{
 			public INT_EXPRESSION_ArgumentBuilder(bool nullable)
 			{
 				argumentTypeArray = new Type[] { typeof(Int64) };
-				//if (nullable)妥協
+				//if (nullable) compromise
 				minArg = 0;
 				this.nullable = nullable;
 			}
@@ -1014,7 +1014,7 @@ namespace MinorShift.Emuera.GameProc.Function
                     }
                     else if (line.FunctionCode == FunctionCode.RETURN)
                     {
-                        //定数式は定数化してしまうので現行システムでは見つけられない
+                        //constant expressions become constants so cannot be found in the current system
                         if (terms[0] is VariableTerm)
                             warn("RETURNのargumentに変数が渡されています(eramaker：常に0を返します)", line, 0, true);
                         else
@@ -1101,7 +1101,7 @@ namespace MinorShift.Emuera.GameProc.Function
 
 		private sealed class SP_SWAP_ArgumentBuilder : ArgumentBuilder
 		{
-            //emuera1803beta2+v1 第2argument省略型に対応
+            //emuera1803beta2+v1 support for 2nd argument optional form
 			public SP_SWAP_ArgumentBuilder(bool nullable)
 			{
 				argumentTypeArray = new Type[] { typeof(Int64), typeof(Int64) };
@@ -1113,7 +1113,7 @@ namespace MinorShift.Emuera.GameProc.Function
 				IOperandTerm[] terms = popTerms(line);
 				if (!checkArgumentType(line, exm, terms))
 					return null;
-                //上の判定で省略不可時はここに来ないので即さばける
+                //when non-omissible, won't reach here from the above judgment so can handle immediately
                 if (terms.Length == 1)
                     terms = new IOperandTerm[] { terms[0], null };
 				return new SpSwapCharaArgument(terms[0], terms[1]);
@@ -1323,7 +1323,7 @@ namespace MinorShift.Emuera.GameProc.Function
 					return null;
                 List<IOperandTerm> termList = new List<IOperandTerm>();
                 termList.AddRange(terms);
-                //最初の項はいらない
+                //the first term is not needed
                 termList.RemoveAt(0);
 				BitArgument ret = new BitArgument(varTerm, termList.ToArray());
                 for (int i = 0; i < termList.Count; i++)
@@ -1415,7 +1415,7 @@ namespace MinorShift.Emuera.GameProc.Function
 					return null;
 				if (!varTerm.Identifier.IsCharacterData)
 				{ warn("第１argumentにキャラクタ変数以外の変数を指定することはできません", line, 2, false); return null; }
-				//1803beta004 暫定CDFLAGを弾く
+				//1803beta004 block provisional CDFLAG
 				if (varTerm.Identifier.IsArray2D)
 				{ warn("第１argumentに二次元配列の変数を指定することはできません", line, 2, false); return null; }
 				IOperandTerm index, term, term4 = null, term5 = null;
@@ -1806,7 +1806,7 @@ namespace MinorShift.Emuera.GameProc.Function
             public SP_INPUT_ArgumentBuilder()
             {
                 argumentTypeArray = new Type[] { typeof(Int64) };
-                //if (nullable)妥協
+                //if (nullable) compromise
                 minArg = 0;
             }
             public override Argument CreateArgument(InstructionLine line, ExpressionMediator exm)
@@ -1924,7 +1924,7 @@ namespace MinorShift.Emuera.GameProc.Function
         #endregion		
 
 		/// <summary>
-		/// 一般型。数式と文字列式の組み合わせのみをargumentとし、特殊なチェックが必要ないもの
+		/// General type. Only combinations of numeric and string expressions are used as arguments, no special checks needed
 		/// </summary>
 		private sealed class Expressions_ArgumentBuilder : ArgumentBuilder
 		{

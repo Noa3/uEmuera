@@ -13,52 +13,52 @@ namespace MinorShift.Emuera.Sub
     /// </summary>
     enum LexEndWith
     {
-		//いずれにせよEoLで強制終了
+		//Forced termination at EoL in any case
 		None = 0,
-		EoL,//常に最後まで解析
-		Operator,//演算子を見つけたら終了。代入式の左辺
-		Question,//三項演算子?により終了。\@～～?～～#～～\@
-		Percent,//%により終了。%～～%
-		RightCurlyBrace,//}により終了。{～～}
-		Comma,//,により終了。TIMES第一argument
-		//Single,//Identifier一つで終了//1807 Single削除
-		GreaterThan,//'>'により終了。Htmlタグ解析
+		EoL,//Always analyze to the very end
+		Operator,//Ends when an operator is found. Left side of an assignment expression
+		Question,//Ends at the ternary operator ?. \@～～?～～#～～\@
+		Percent,//Ends at %. %～～%
+		RightCurlyBrace,//Ends at }. {～～}
+		Comma,//Ends at ,. TIMES first argument
+		//Single,//Ends at a single Identifier//1807 Single removed
+		GreaterThan,//Ends at '>'. HTML tag parsing
 	}
 
 	enum FormStrEndWith
 	{
-		//いずれにせよEoLで強制終了
+		//Forced termination at EoL in any case
 		None = 0,
-		EoL,//常に最後まで解析
-		DoubleQuotation,//"で終了。@"～～"
-		Sharp,//#で終了。\@～～?～～#～～\@　の一つ目
-		YenAt,//\@で終了。\@～～?～～#～～\@　の二つ目
-		Comma,//,により終了。ANY_FORMargument
-		LeftParenthesis_Bracket_Comma_Semicolon,//[または(または,または;により終了。CALLFORM系の関数名部分。
+		EoL,//Always analyze to the very end
+		DoubleQuotation,//Ends at ". @"～～"
+		Sharp,//Ends at #. The first part of \@～～?～～#～～\@
+		YenAt,//Ends at \@. The second part of \@～～?～～#～～\@
+		Comma,//Ends at ,. ANY_FORM argument
+		LeftParenthesis_Bracket_Comma_Semicolon,//Ends at [ or ( or , or ;. Function name part of the CALLFORM family.
 	}
 
 	enum StrEndWith
 	{
-		//いずれにせよEoLで強制終了
+		//Forced termination at EoL in any case
 		None = 0,
-		EoL,//常に最後まで解析
-		SingleQuotation,//"で終了。'～～'
-		DoubleQuotation,//"で終了。"～～"
-		Comma,//,により終了。PRINTV'～～,
-		LeftParenthesis_Bracket_Comma_Semicolon,//[または(または,または;により終了。関数名部分。
+		EoL,//Always analyze to the very end
+		SingleQuotation,//Ends at '. '～～'
+		DoubleQuotation,//Ends at ". "～～"
+		Comma,//Ends at ,. PRINTV'～～,
+		LeftParenthesis_Bracket_Comma_Semicolon,//Ends at [ or ( or , or ;. Function name part.
 	}
 
 	enum LexAnalyzeFlag
 	{
 		None = 0,
-		AnalyzePrintV = 1,//PRINTVのargumentで'に続けて文字列を書くと数式ではないが文字列として表示される
-		AllowAssignment = 2,//代入演算子が使用できる場面であるFlag。このFlagなしで=が途中に出てきたらError
-		AllowSingleQuotationStr = 4,//HTML_PRINT解析用。''で囲まれた文字列を許可する。
+		AnalyzePrintV = 1,//In PRINTV's argument, text following ' is displayed as a string even though it is not an expression
+		AllowAssignment = 2,//Flag indicating scenes where an assignment operator can be used. A = appearing mid-way without this flag causes an Error
+		AllowSingleQuotationStr = 4,//For HTML_PRINT parsing. Allows strings enclosed in ''.
 	}
 
 	/// <summary>
-	/// 1756 TokenReaderより改名
-	/// Lexicalといいつつ構文解析を含む
+	/// Renamed from TokenReader in 1756
+	/// Lexical name notwithstanding, includes syntax analysis
 	/// </summary>
 	internal static class LexicalAnalyzer
 	{
@@ -74,7 +74,7 @@ namespace MinorShift.Emuera.Sub
 		//readonly static IList<char> decimalDigits = new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', };
 		readonly static IList<char> hexadecimalDigits = new char[] { 'a', 'b', 'c', 'd', 'e', 'f', 'A', 'B', 'C', 'D', 'E', 'F' };
 
-	//1819 正規表現使うとやや遅い。いずれdoubleにも対応させたい。そのうち考える
+	//1819 Using regular expressions is a bit slow. I would like to support double eventually. I will think about it
 		//readonly static Regex DigitsReg = new Regex("" +
 		//	"(" +
 		//	"((?<simple>[-]?[0-9]+)([^.xXbBeEpP]|$))" +
@@ -156,7 +156,7 @@ namespace MinorShift.Emuera.Sub
 					st.ShiftNext();
 					st.ShiftNext();
 				}
-				//8進法は互換性の問題から採用しない。
+				//Octal is not adopted for compatibility reasons.
 				//else if (dchar.IsDigit(c))
 				//{
 				//    fromBase = 8;
@@ -195,7 +195,7 @@ namespace MinorShift.Emuera.Sub
 		private static Int64 readDigits(StringStream st, int fromBase)
 		{
 			int start = st.CurrentPosition;
-			//1756 正規表現を使ってみたがほぼ変わらなかったので没
+			//1756 Tried regular expressions but there was almost no difference, so dropped
 			//Match m = reg.Match(st.RowString, st.CurrentPosition);
 			//st.Jump(m.Length);
 			//return m.Value;
@@ -267,23 +267,23 @@ namespace MinorShift.Emuera.Sub
 		}
 
 		/// <summary>
-		/// TIMES第二argumentのみが使用する。
-		/// Convertクラスが発行するExceptionをそのまま投げるので適切に処理すること。
+		/// Used only by the TIMES second argument.
+		/// Exceptions thrown by the Convert class are passed through as-is, so handle them appropriately.
 		/// </summary>
 		/// <param name="st"></param>
 		/// <returns></returns>
 		public static double ReadDouble(StringStream st)
 		{
 			int start = st.CurrentPosition;
-			//大雑把に読み込んでError処理はConvertクラスに任せる。
-			//仮数小数部
+			//Roughly read and leave the error handling to the Convert class.
+			//Significand and fractional part
 
 			if ((st.Current == '-') || (st.Current == '+'))
 			{
 				st.ShiftNext();
 			}
 			while (!st.EOS)
-			{//仮数部
+			{//Significand part
 				char c = st.Current;
 				if (char.IsDigit(c) || (c == '.'))
 				{
@@ -300,7 +300,7 @@ namespace MinorShift.Emuera.Sub
 					st.ShiftNext();
 				}
 				while (!st.EOS)
-				{//指数部
+				{//Exponent part
 					char c = st.Current;
 					if (char.IsDigit(c) || (c == '.'))
 					{
@@ -314,7 +314,7 @@ namespace MinorShift.Emuera.Sub
 		}
 
 		/// <summary>
-		/// 行頭の単語の取得。マクロ展開あり。ただし単語でないマクロ展開はしない。
+		/// Gets the word at the start of the line. With macro expansion. However, it does not expand macros that are not a single word.
 		/// </summary>
 		/// <param name="st"></param>
 		/// <returns></returns>
@@ -324,7 +324,7 @@ namespace MinorShift.Emuera.Sub
 			string str = ReadSingleIdentifier(st);
 			if (string.IsNullOrEmpty(str))
 				throw new CodeEE("Invalid 文字で行が始まっています");
-			//1808a3 先頭1単語の展開をやめる。－命令の置換を禁止。
+			//1808a3 Stop expanding the leading single word. Prohibit the replacement of commands.
 			//if (UseMacro)
 			//{
 			//    int i = 0;
@@ -336,11 +336,11 @@ namespace MinorShift.Emuera.Sub
 			//            throw new CodeEE("マクロの展開数が1文あたりの上限を超えました(自己参照・循環参照のおそれ)");
 			//        if (macro == null)
 			//            break;
-			//        //単語（識別子一個）でないマクロが出現したらここでは処理しない
+			//        //If a macro that is not a word (a single identifier) appears, it is not handled here
 			//        if (macro.IDWord == null)
 			//        {
 			//            st.CurrentPosition = startpos;
-			//            return null;//変数処理に任せる。
+			//            return null;//leave it to the variable processing.
 			//        }
 			//        str = macro.IDWord.Code;
 			//    }
@@ -349,7 +349,7 @@ namespace MinorShift.Emuera.Sub
 		}
 
 		/// <summary>
-		/// 単語の取得。マクロ展開あり。関数型マクロ展開なし
+		/// Gets a word. With macro expansion. Function-type macros are not expanded
 		/// </summary>
 		/// <param name="st"></param>
 		/// <returns></returns>
@@ -413,13 +413,13 @@ namespace MinorShift.Emuera.Sub
             ';',
         };
         /// <summary>
-        /// 単語を文字列で取得。マクロ適用なし
+        /// Gets a word as a string. No macro expansion
         /// </summary>
         /// <param name="st"></param>
         /// <returns></returns>
         public static string ReadSingleIdentifier(StringStream st)
 		{
-			//1819 やや遅い。でもいずれやりたい
+			//1819 Somewhat slow. But I want to do it eventually
 			//Match m = idReg.Match(st.RowString, st.CurrentPosition);
 			//st.Jump(m.Length);
 			//return m.Value;
@@ -460,7 +460,7 @@ namespace MinorShift.Emuera.Sub
                 //	case '\"':
                 //	case '@':
                 //	case '.':
-                //	case ';'://コメントに関しては直後に行われるであろうSkipWhiteSpaceなどが対応する。
+                //	case ';'://Comments are handled by the SkipWhiteSpace etc. that follows right after.
                 //		goto end;
                 //	case '　':
                 //		if (!Config.SystemAllowFullSpace)
@@ -484,8 +484,8 @@ namespace MinorShift.Emuera.Sub
 		}
 
 		/// <summary>
-		/// endWithが見つかるまで読み込む。始点と終端のチェックは呼び出し側で行うこと。
-		/// エスケープあり。
+		/// Reads until endWith is found. Checking the start point and end terminator is the caller's responsibility.
+		/// Escapes supported.
 		/// </summary>
 		/// <param name="st"></param>
 		/// <returns></returns>
@@ -516,8 +516,8 @@ namespace MinorShift.Emuera.Sub
 						if (endWith == StrEndWith.LeftParenthesis_Bracket_Comma_Semicolon)
 							goto end;
 						break;
-					case '\\'://エスケープ処理
-						st.ShiftNext();//\を読み飛ばす
+					case '\\'://Escape handling
+						st.ShiftNext();//Skip the \
 						switch (st.Current)
 						{
 							case StringStream.EndOfString:
@@ -529,7 +529,7 @@ namespace MinorShift.Emuera.Sub
 							case 'n': buffer.Append('\n'); break;
 							default: buffer.Append(st.Current); break;
 						}
-						st.ShiftNext();//\の次の文字を読み飛ばす
+						st.ShiftNext();//Skip the character after the \
 						continue;
 				}
 				buffer.Append(st.Current);
@@ -540,8 +540,8 @@ namespace MinorShift.Emuera.Sub
 		}
 
 		/// <summary>
-		/// 失敗したらCodeEE。OperatorManagerには頼らない
-		/// OperatorCode.Assignmentを返すことがある。
+		/// Throws CodeEE on failure. Does not rely on OperatorManager
+		/// May return OperatorCode.Assignment.
 		/// </summary>
 		/// <param name="st"></param>
 		/// <returns></returns>
@@ -655,8 +655,8 @@ namespace MinorShift.Emuera.Sub
 		}
 
 		/// <summary>
-		/// 失敗したらCodeEE。OperatorManagerには頼らない
-		/// "="の時、OperatorCode.Assignmentを返す。"=="の時はEqual
+		/// Throws CodeEE on failure. Does not rely on OperatorManager
+		/// "=" returns OperatorCode.Assignment, and "==" returns Equal
 		/// </summary>
 		/// <param name="st"></param>
 		/// <returns></returns>
@@ -752,7 +752,7 @@ namespace MinorShift.Emuera.Sub
 
 
 		/// <summary>
-		/// Consoleの文字表示用。字句解析や構文解析に使ってはならない
+		/// For displaying characters on the Console. Must not be used for lexical or syntax analysis
 		/// </summary>
 		public static int SkipAllSpace(StringStream st)
 		{
@@ -778,7 +778,7 @@ namespace MinorShift.Emuera.Sub
 		}
 
 		/// <summary>
-		/// 字句解析・構文解析用。ホワイトスペースの他、コメントも飛ばす。
+		/// For lexical and syntax analysis. Skips comments as well as whitespace.
 		/// </summary>
 		public static int SkipWhiteSpace(StringStream st)
 		{
@@ -815,7 +815,7 @@ namespace MinorShift.Emuera.Sub
 		}
 
 		/// <summary>
-		/// 字句解析・構文解析用。文字列直前の半角スペースを飛ばす。性質上、半角スペースのみを見る。
+		/// For lexical and syntax analysis. Skips half-width spaces immediately before a string. By nature, only looks at half-width spaces.
 		/// </summary>
 		public static int SkipHalfSpace(StringStream st)
 		{
@@ -832,8 +832,8 @@ namespace MinorShift.Emuera.Sub
 		#region analyse
 		
 		/// <summary>
-		/// 解析できるものは関数宣言や式のみ。FORM文字列や普通の文字列を送ってはいけない
-		/// return時にはendWithの文字がCurrentになっているはず。終端の適切さの検証は呼び出し元が行う。
+		/// Only function declarations and expressions can be analyzed. Do not send FORM strings or ordinary strings.
+		/// On return, the character of endWith should be Current. Verification of proper termination is done by the caller.
 		/// </summary>
 		/// <returns></returns>
 		public static WordCollection Analyse(StringStream st, LexEndWith endWith, LexAnalyzeFlag flag)
@@ -891,7 +891,7 @@ namespace MinorShift.Emuera.Sub
 						if ((nestBracketS == 0) && (nestBracketL == 0))
 						{
 							if (endWith == LexEndWith.Operator)
-								goto end;//代入演算子のはずである。呼び出し元がチェックするはず
+								goto end;//It should be an assignment operator. The caller should check
 							else if ((endWith == LexEndWith.Percent) && (st.Current == '%'))
 								goto end;
 							else if ((endWith == LexEndWith.Question) && (st.Current == '?'))
@@ -906,9 +906,9 @@ namespace MinorShift.Emuera.Sub
 						if (st.Next == '[')
 						{
 							//throw new CodeEE("字句解析中に予期しない文字'[['を発見しました");
-							////1808alpha006 rename処理変更
-							//1808beta009 ここだけ戻す
-							//現在の処理だとここに来た時点でrename失敗確定だが警告内容を元に戻すため
+							////1808alpha006 rename handling change
+							//1808beta009 Restore only this one
+							//Because with the current handling, by the time we reach here the rename has already failed, but to restore the warning content
 							if (ParserMediator.RenameDic == null)
 								throw new CodeEE("字句解析中に予期しない文字\"[[\"を発見しました");
 							int start = st.CurrentPosition;
@@ -921,14 +921,14 @@ namespace MinorShift.Emuera.Sub
 									throw new CodeEE("対応する\"]]\"のない\"[[\"です");
 							}
 							string key = st.Substring(start, find + 2);
-							//1810 ここまでで置換できなかったものは強制Errorにする
-							//行連結前に置換不能で行連結より置換することができるようになったものまで置換されていたため
+							//1810 Anything that could not be replaced up to this point is forced to Error
+							//Because even ones that were unreplaceable before line concatenation but became replaceable by it had been replaced
 							throw new CodeEE("字句解析中に置換(rename)できない符号" + key + "を発見しました");
 							//string value = null;
 							//if (!ParserMediator.RenameDic.TryGetValue(key, out value))
 							//    throw new CodeEE("字句解析中に置換(rename)できない符号" + key + "を発見しました");
 							//st.Replace(start, find + 2, value);
-							//continue;//その場から再度解析スタート
+							//continue;//Restart analysis from that spot
 						}
 						ret.Add(new SymbolWord('[')); nestBracketL++; st.ShiftNext(); continue;
 					case ':': ret.Add(new SymbolWord(':')); st.ShiftNext(); continue;
@@ -950,7 +950,7 @@ namespace MinorShift.Emuera.Sub
 						}
 						if ((flag & LexAnalyzeFlag.AnalyzePrintV) != LexAnalyzeFlag.AnalyzePrintV)
 						{
-							//AssignmentStr用特殊処理 代入文の代入演算子を探索中で'=の場合のみ許可
+							//AssignmentStr special handling. Only when '=' is found while searching for the assignment operator in an assignment statement
 							if ((endWith == LexEndWith.Operator) && (nestBracketS == 0) && (nestBracketL == 0) && st.Next == '=' )
 								goto end;
 							throw new CodeEE("字句解析中に予期しない文字'" + st.Current + "'を発見しました");
@@ -958,7 +958,7 @@ namespace MinorShift.Emuera.Sub
 						st.ShiftNext();
 						ret.Add(new LiteralStringWord(ReadString(st, StrEndWith.Comma)));
 						if (st.Current == ',')
-							goto case ',';//続きがあるなら,の処理へ。それ以外は行終端のはず
+							goto case ',';//If there is more, go to the , handling. Otherwise it should be the end of the line
 						goto end;
 					case '}':
 						if (endWith == LexEndWith.RightCurlyBrace)
@@ -1001,7 +1001,7 @@ namespace MinorShift.Emuera.Sub
 					case '{':
 					case '$':
 						throw new CodeEE("字句解析中に予期しない文字'" + st.Current + "'を発見しました");
-					case ';'://1807 行中コメント
+					case ';'://1807 Semicolon comment sections in a line
 						if (st.CurrentEqualTo(";#;") && Program.DebugMode)
 						{
 							st.Jump(3);
@@ -1054,7 +1054,7 @@ namespace MinorShift.Emuera.Sub
 
 	private static WordCollection expandMacro(WordCollection wc)
 	{
-			//マクロ展開
+			//Macro expansion
 			wc.Pointer = 0;
 			int count = 0;
 			while (!wc.EOL)
@@ -1081,7 +1081,7 @@ namespace MinorShift.Emuera.Sub
 					wc.InsertRange(macro.Statement);
 					continue;
 				}
-				//関数型マクロ
+				//Function-type macro
 				wc = expandFunctionlikeMacro(macro, wc);
 			}
 			wc.Pointer = 0;
@@ -1097,7 +1097,7 @@ namespace MinorShift.Emuera.Sub
 				throw new CodeEE("関数形式のマクロ" + macro.Keyword + "にargumentがありません");
 			WordCollection macroWC = macro.Statement.Clone();
 			WordCollection[] args = new WordCollection[macro.ArgCount];
-			//argument部読み取りループ
+			//argument part reading loop
 			for (int i = 0; i < macro.ArgCount; i++)
 			{
 				int macroNestBracketS = 0;
@@ -1137,7 +1137,7 @@ namespace MinorShift.Emuera.Sub
 					throw new CodeEE("関数形式のマクロ" + macro.Keyword + "のargumentを省略することはできません");
 				continue;
 			}
-		//argument部読み取りループ終端
+		//argument part reading loop end
 		exitfor:
 			symbol = wc.Current as SymbolWord;
 			if (symbol == null || symbol.Type != ')')
@@ -1164,8 +1164,8 @@ namespace MinorShift.Emuera.Sub
 		}
 
 		/// <summary>
-		/// @"などの直後からの開始
-		/// return時にはendWithの文字がCurrentになっているはず。終端の適切さの検証は呼び出し元が行う。
+		/// Starts from right after @" etc.
+		/// On return, the character of endWith should be Current. Verification of proper termination is done by the caller.
 		/// </summary>
 		/// <returns></returns>
 		public static StrFormWord AnalyseFormattedString(StringStream st, FormStrEndWith endWith, bool trim)
@@ -1235,7 +1235,7 @@ namespace MinorShift.Emuera.Sub
 						else
 							buffer.Append(cur);
 						break;
-					case '\\'://エスケープ文字の使用
+					case '\\'://Escape character usage
 
 						st.ShiftNext();
 						cur = st.Current;
@@ -1288,7 +1288,7 @@ namespace MinorShift.Emuera.Sub
 
 
 		/// <summary>
-		/// \@直後からの開始、\@の直後がCurrentになる
+		/// Starts from right after \@, and the character right after \@ becomes the Current
 		/// </summary>
 		/// <param name="st"></param>
 		/// <returns></returns>

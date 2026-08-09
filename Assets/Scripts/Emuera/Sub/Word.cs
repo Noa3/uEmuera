@@ -95,7 +95,7 @@ namespace MinorShift.Emuera.Sub
 		readonly SubWord[] subwords;
 		public string[] Strs { get { return strs; } }
 		public SubWord[] SubWords { get { return subwords; } }
-		public override char Type { get { return 'F'; } }//@はSymbolがつかっちゃった
+		public override char Type { get { return 'F'; } }//@ was already taken by Symbol
 		
 		public override void SetIsMacro()
 		{

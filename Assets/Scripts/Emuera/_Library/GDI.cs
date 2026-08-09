@@ -9,7 +9,7 @@ using uEmuera.Drawing;
 
 namespace MinorShift._Library
 {
-	//http://www.pinvoke.net/default.aspx/gdi32.BitBlt からコピペ
+	//copy-pasted from http://www.pinvoke.net/default.aspx/gdi32.BitBlt
 	/// <summary>
 	///     Specifies a raster-operation code. These codes define how the color data for the
 	///     source rectangle is to be combined with the color data for the destination
@@ -295,7 +295,7 @@ namespace MinorShift._Library
 		//}
 
 		/// <summary>
-		/// 必要に応じてStretch。アルファブレンドなし。
+		/// Stretch as necessary. No alpha blending.
 		/// </summary>
 		public static void DrawImage(int destX, int destY,int width, int height, IntPtr srchDC, Rectangle srcRect)
 		{
@@ -309,7 +309,7 @@ namespace MinorShift._Library
                     Bitmap texture, Rectangle srcrect)
         { }
 
-        #region MesureText用
+        #region For MesureText
 
         static IntPtr hDCMesureText;
 #pragma warning disable CS0414 // Field is assigned but its value is never used

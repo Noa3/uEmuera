@@ -236,14 +236,14 @@ namespace MinorShift.Emuera.GameData.Variable
 				}
 				else
 				{
-					//キャラクターデータの第1argumentはこの時点でチェックしても意味がないのと
-					//ARG系は限界超えてても必要な数に拡張されるのでチェックしなくていい
+					//Checking the first argument of character data at this point is meaningless, and
+					//ARG-family variables are expanded to the needed size even beyond the limit, so they need not be checked
 					if ((i == 0 && Identifier.IsCharacterData) || Identifier.Name == "ARG" || Identifier.Name == "ARGS")
 						canCheck[i] = false;
 					else
 						canCheck[i] = true;
 					//if (allArgIsConst)
-					//チェックのために値が必要
+					//A value is needed for the check
 					transporter[i] = arguments[i].GetIntValue(exm);
 				}
 			}
@@ -256,10 +256,10 @@ namespace MinorShift.Emuera.GameData.Variable
 			return this;
 		}
 
-        //以下添え字解析用の追加関数
+        //Additional functions below for subscript analysis
         public bool checkSameTerm(VariableTerm term)
         {
-            //添え字が全部定数があることがこの関数の前提(そもそもそうでないと使い道がない)
+            //This function assumes all subscripts are constants (otherwise there would be no use for it)
             if (!allArgIsConst)
                 return false;
             if (this.Identifier.Name != term.Identifier.Name)
@@ -277,7 +277,7 @@ namespace MinorShift.Emuera.GameData.Variable
 
         public string GetFullString()
         {
-            //添え字が全部定数があることがこの関数の前提(IOperandTermから変数名を取れないため)
+            //This assumes all subscripts are constants (because the variable name cannot be obtained from IOperandTerm)
             if (!allArgIsConst)
                 return "";
             if (Identifier.IsArray1D)
@@ -401,7 +401,7 @@ namespace MinorShift.Emuera.GameData.Variable
 
 
 	/// <summary>
-	/// argumentがない変数。値を参照、代入できない
+	/// Variable with no argument. Value cannot be referenced or assigned
 	/// </summary>
 	internal sealed class VariableNoArgTerm : VariableTerm
 	{

@@ -30,7 +30,7 @@ namespace MinorShift.Emuera.GameData.Variable
 		}
 
 		///// <summary>
-		///// まだ最初の識別子を読んでいない状態から決め打ちで変数を解読する
+		///// Decode a variable by hardcoding from the state before the first identifier has been read
 		///// </summary>
 		///// <param name="st"></param>
 		///// <returns></returns>
@@ -42,12 +42,12 @@ namespace MinorShift.Emuera.GameData.Variable
 		//    wc.ShiftNext();
 		//    VariableToken vid = ExpressionParser.ReduceVariableIdentifier(wc, id.Code);
 		//    if (vid == null)
-		//        throw new CodeEE("\"" + id.Code + "\"は解釈できない識別子です");
+		//        throw new CodeEE("\"" + id.Code + "\" cannot be interpreted as an identifier");
 		//    return ReduceVariable(vid, wc);
 		//}
 
 		/// <summary>
-		/// 識別子を読み終えた状態からの解析
+		/// Parsing from the state after the identifier has been read
 		/// </summary>
 		/// <param name="st"></param>
 		/// <returns></returns>
@@ -87,7 +87,7 @@ namespace MinorShift.Emuera.GameData.Variable
 			IOperandTerm op1 = p1;
 			IOperandTerm op2 = p2;
 			IOperandTerm op3 = p3;
-			//argumentの推測
+			//Inference of arguments
 			if (id.IsCharacterData)
 			{
 				if (id.IsArray2D)

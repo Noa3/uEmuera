@@ -190,7 +190,7 @@ namespace uEmuera.Tests.EditMode
         public void Green_IsCorrect()
         {
             Assert.AreEqual(0, Color.Green.R);
-            Assert.AreEqual(255, Color.Green.G);
+            Assert.AreEqual(128, Color.Green.G);
             Assert.AreEqual(0, Color.Green.B);
         }
 
@@ -272,6 +272,66 @@ namespace uEmuera.Tests.EditMode
         {
             var color = Color.FromName("UnknownColor");
             Assert.AreEqual(Color.Black, color);
+        }
+
+        [Test]
+        public void FromName_Yellow_ReturnsYellow()
+        {
+            var color = Color.FromName("Yellow");
+            Assert.AreEqual(255, color.R);
+            Assert.AreEqual(255, color.G);
+            Assert.AreEqual(0, color.B);
+        }
+
+        [Test]
+        public void FromName_CaseInsensitive_ReturnsSameColor()
+        {
+            Assert.AreEqual(Color.FromName("Yellow"), Color.FromName("yellow"));
+            Assert.AreEqual(Color.FromName("Yellow"), Color.FromName("YELLOW"));
+            Assert.AreEqual(Color.FromName("DeepSkyBlue"), Color.FromName("deepskyblue"));
+        }
+
+        [Test]
+        public void FromName_ExtendedKnownColors_Resolve()
+        {
+            // .NET known-color values, matching reference Emuera behavior
+            var orange = Color.FromName("Orange");
+            Assert.AreEqual(255, orange.R);
+            Assert.AreEqual(165, orange.G);
+            Assert.AreEqual(0, orange.B);
+
+            var silver = Color.FromName("Silver");
+            Assert.AreEqual(192, silver.R);
+            Assert.AreEqual(192, silver.G);
+            Assert.AreEqual(192, silver.B);
+
+            var navy = Color.FromName("Navy");
+            Assert.AreEqual(0, navy.R);
+            Assert.AreEqual(0, navy.G);
+            Assert.AreEqual(128, navy.B);
+
+            var fuchsia = Color.FromName("Fuchsia");
+            Assert.AreEqual(255, fuchsia.R);
+            Assert.AreEqual(0, fuchsia.G);
+            Assert.AreEqual(255, fuchsia.B);
+        }
+
+        [Test]
+        public void FromName_AllReturnOpaque()
+        {
+            // Only Transparent is allowed to have zero alpha; every other known
+            // color must be opaque or HtmlManager.stringToColorInt32 would treat it
+            // as an invalid color name.
+            Assert.AreEqual(255, Color.FromName("Yellow").A);
+            Assert.AreEqual(255, Color.FromName("DeepSkyBlue").A);
+            Assert.AreEqual(255, Color.FromName("Crimson").A);
+            Assert.AreEqual(0, Color.FromName("Transparent").A);
+        }
+
+        [Test]
+        public void FromName_Red_StillMatchesConstant()
+        {
+            Assert.AreEqual(Color.Red, Color.FromName("Red"));
         }
 
         #endregion

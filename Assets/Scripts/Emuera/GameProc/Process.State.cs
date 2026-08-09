@@ -8,55 +8,55 @@ using MinorShift.Emuera.GameData.Variable;
 
 namespace MinorShift.Emuera.GameProc
 {
-	//1756 インナークラス解除して一般に開放
+	//1756 Removed inner class, exposed to general use
 
 
 	//Obfuscation attribute. Set (Exclude=true) when using enum.ToString() or enum.Parse().
 	[global::System.Reflection.Obfuscation(Exclude = false)]
 	internal enum SystemStateCode
 	{
-		__CAN_SAVE__ = 0x10000,//セーブロード画面を呼び出し可能か？
-		__CAN_BEGIN__ = 0x20000,//BEGIN命令を呼び出し可能か？
-		Title_Begin = 0,//初期状態
-		Openning = 1,//最初の入力待ち
-		Train_Begin = 0x10,//BEGIN TRAINから。
-		Train_CallEventTrain = 0x11,//@EVENTTRAINの呼び出し中。スキップ可能
-		Train_CallShowStatus = 0x12,//@SHOW_STATUSの呼び出し中
-		Train_CallComAbleXX = 0x13,//@COM_ABLExxの呼び出し中。スキップの場合、RETURN 1とする。
-		Train_CallShowUserCom = 0x14,//@SHOW_USERCOMの呼び出し中
-		Train_WaitInput = 0x15,//入力待ち状態。選択が実行可能ならEVENTCOMからCOMxx、そうでなければ@USERCOMにRESULTを渡す
-		Train_CallEventCom = 0x16 | __CAN_BEGIN__,//@EVENTCOMの呼び出し中
+		__CAN_SAVE__ = 0x10000,//can the save/load screen be called?
+		__CAN_BEGIN__ = 0x20000,//can the BEGIN command be called?
+		Title_Begin = 0,//initial state
+		Openning = 1,//first input wait
+		Train_Begin = 0x10,//from BEGIN TRAIN.
+		Train_CallEventTrain = 0x11,//while @EVENTTRAIN is being called. skippable
+		Train_CallShowStatus = 0x12,//while @SHOW_STATUS is being called
+		Train_CallComAbleXX = 0x13,//while @COM_ABLExx is being called. if skipped, treat as RETURN 1.
+		Train_CallShowUserCom = 0x14,//while @SHOW_USERCOM is being called
+		Train_WaitInput = 0x15,//input wait state. if the selection can run pass from EVENTCOM to COMxx, otherwise pass RESULT to @USERCOM
+		Train_CallEventCom = 0x16 | __CAN_BEGIN__,//while @EVENTCOM is being called
 
-		Train_CallComXX = 0x17 | __CAN_BEGIN__,//@COMxxの呼び出し中
-		Train_CallSourceCheck = 0x18 | __CAN_BEGIN__,//@SOURCE_CHECKの呼び出し中
-		Train_CallEventComEnd = 0x19 | __CAN_BEGIN__,//@EVENTCOMENDの呼び出し中。スキップ可能。Train_CallEventTrainへ帰る。@USERCOMの呼び出し中もここ
+		Train_CallComXX = 0x17 | __CAN_BEGIN__,//while @COMxx is being called
+		Train_CallSourceCheck = 0x18 | __CAN_BEGIN__,//while @SOURCE_CHECK is being called
+		Train_CallEventComEnd = 0x19 | __CAN_BEGIN__,//while @EVENTCOMEND is being called. skippable. returns to Train_CallEventTrain. also here while @USERCOM is being called
 
 		Train_DoTrain = 0x1A,
 
-		AfterTrain_Begin = 0x20 | __CAN_BEGIN__,//BEGIN AFTERTRAINから。@EVENTENDを呼び出してNormalへ。
+		AfterTrain_Begin = 0x20 | __CAN_BEGIN__,//from BEGIN AFTERTRAIN. call @EVENTEND then move to Normal.
 
-		Ablup_Begin = 0x30,//BEGIN ABLUPから。
+		Ablup_Begin = 0x30,//from BEGIN ABLUP.
 		Ablup_CallShowJuel = 0x31,//@SHOW_JUEL
 		Ablup_CallShowAblupSelect = 0x32,//@SHOW_ABLUP_SELECT
 		Ablup_WaitInput = 0x33,//
-		Ablup_CallAblupXX = 0x34 | __CAN_BEGIN__,//@ABLUPxxがない場合は、@USERABLUPにRESULTを渡す。Ablup_CallShowJuelへ戻る。
+		Ablup_CallAblupXX = 0x34 | __CAN_BEGIN__,//if @ABLUPxx does not exist, pass RESULT to @USERABLUP. returns to Ablup_CallShowJuel.
 
-		Turnend_Begin = 0x40 | __CAN_BEGIN__,//BEGIN TURNENDから。@EVENTTURNENDを呼び出してNormalへ。
+		Turnend_Begin = 0x40 | __CAN_BEGIN__,//from BEGIN TURNEND. calls @EVENTTURNEND then moves to Normal.
 
-		Shop_Begin = 0x50 | __CAN_SAVE__,//BEGIN SHOPから
-		Shop_CallEventShop = 0x51 | __CAN_BEGIN__ | __CAN_SAVE__,//@EVENTSHOPの呼び出し中。スキップ可能
-		Shop_CallShowShop = 0x52 | __CAN_SAVE__,//@SHOW_SHOPの呼び出し中
-		Shop_WaitInput = 0x53 | __CAN_SAVE__,//入力待ち状態。アイテムが存在するならEVENTBUYにBOUGHT、そうでなければ@USERSHOPにRESULTを渡す
-		Shop_CallEventBuy = 0x54 | __CAN_BEGIN__ | __CAN_SAVE__,//@USERSHOPまた@EVENTBUYはの呼び出し中
+		Shop_Begin = 0x50 | __CAN_SAVE__,//from BEGIN SHOP
+		Shop_CallEventShop = 0x51 | __CAN_BEGIN__ | __CAN_SAVE__,//while @EVENTSHOP is being called. skippable
+		Shop_CallShowShop = 0x52 | __CAN_SAVE__,//while @SHOW_SHOP is being called
+		Shop_WaitInput = 0x53 | __CAN_SAVE__,//input wait state. if an item exists pass BOUGHT to EVENTBUY, otherwise pass RESULT to @USERSHOP
+		Shop_CallEventBuy = 0x54 | __CAN_BEGIN__ | __CAN_SAVE__,//while @USERSHOP or @EVENTBUY is being called
 
-		SaveGame_Begin = 0x100,//SAVEGAMEから
-		SaveGame_WaitInput = 0x101,//入力待ち
-		SaveGame_WaitInputOverwrite = 0x102,//上書きの許可待ち
-		SaveGame_CallSaveInfo = 0x103,//@SAVEINFO呼び出し中。20回。
-		LoadGame_Begin = 0x110,//LOADGAMEから
-		LoadGame_WaitInput = 0x111,//入力待ち
-		LoadGameOpenning_Begin = 0x120,//最初に[1]を選択したとき。
-		LoadGameOpenning_WaitInput = 0x121,//入力待ち
+		SaveGame_Begin = 0x100,//from SAVEGAME
+		SaveGame_WaitInput = 0x101,//input wait
+		SaveGame_WaitInputOverwrite = 0x102,//waiting for overwrite permission
+		SaveGame_CallSaveInfo = 0x103,//while @SAVEINFO is being called. 20 times.
+		LoadGame_Begin = 0x110,//from LOADGAME
+		LoadGame_WaitInput = 0x111,//input wait
+		LoadGameOpenning_Begin = 0x120,//when [1] is selected for the first time.
+		LoadGameOpenning_WaitInput = 0x121,//input wait
 
 
 		//AutoSave_Begin = 0x200,
@@ -64,16 +64,16 @@ namespace MinorShift.Emuera.GameProc
 		AutoSave_CallUniqueAutosave = 0x202,
 		AutoSave_Skipped = 0x203,
 
-		LoadData_DataLoaded = 0x210,//データロード直後
-		LoadData_CallSystemLoad = 0x211 | __CAN_BEGIN__,//データロード直後
-		LoadData_CallEventLoad = 0x212 | __CAN_BEGIN__,//@EVENTLOADの呼び出し中。スキップ可能
+		LoadData_DataLoaded = 0x210,//right after data load
+		LoadData_CallSystemLoad = 0x211 | __CAN_BEGIN__,//right after data load
+		LoadData_CallEventLoad = 0x212 | __CAN_BEGIN__,//while @EVENTLOAD is being called. skippable
 
 		Openning_TitleLoadgame = 0x220,
 
 		System_Reloaderb = 0x230,
 		First_Begin = 0x240,
 
-		Normal = 0xFFFF | __CAN_BEGIN__ | __CAN_SAVE__,//特に何でもないとき。ScriptEndに達したらError
+		Normal = 0xFFFF | __CAN_BEGIN__ | __CAN_SAVE__,//when nothing in particular. Error when ScriptEnd is reached
 	}
 
 	//Obfuscation attribute. Set (Exclude=true) when using enum.ToString() or enum.Parse().
@@ -94,7 +94,7 @@ namespace MinorShift.Emuera.GameProc
 	{
 		public ProcessState(EmueraConsole console)
 		{
-			if (Program.DebugMode)//DebugModeでなければ知らなくて良い
+			if (Program.DebugMode)//only need to know if not DebugMode
 				this.console = console;
 		}
 		readonly EmueraConsole console = null;
@@ -136,17 +136,17 @@ namespace MinorShift.Emuera.GameProc
 			}
 		}
 
-		//IF文中でELSEIF文の中身をチェックするなどCurrentLineと作業中のLineが違う時にセットする
+		//set when the working Line differs from CurrentLine such as when checking the content of ELSEIF inside an IF statement
 		//public LogicalLine RunningLine { get; set; }
-		//1755a 呼び出し元消滅
+		//1755a caller eliminated
 		//public bool Sequential { get { return sequential; } }
 		public CalledFunction CurrentCalled
 		{
 			get
 			{
-				//実行関数なしの状態は一部のシステムINPUT以外では存在しないのでGOTO系の処理でしかここに来ない関係上、前提を満たしようがない
+				//a state with no executing function only exists for some system INPUT, so in relation to reaching here only via GOTO-type processing, the precondition cannot be met
 				//if (functionList.Count == 0)
-				//    throw new ExeEE("実行中関数がない");
+				//    throw new ExeEE("実行中関数がない");//no executing function
 				return functionList[functionList.Count - 1];
 			}
 		}
@@ -167,7 +167,7 @@ namespace MinorShift.Emuera.GameProc
 		}
 
 		/// <summary>
-		/// 関数内の移動。JUMPではなくGOTOやIF文など
+		/// Movement within a function. GOTO and IF statements, not JUMP
 		/// </summary>
 		/// <param name="line"></param>
 		public void JumpTo(LogicalLine line)
@@ -179,7 +179,7 @@ namespace MinorShift.Emuera.GameProc
 		}
 
 		public void SetBegin(string keyword)
-		{//TrimとToUpper済みのはず
+		{//should already be Trimmed and ToUpper'ed
 			switch (keyword)
 			{
 				case "SHOP":
@@ -217,10 +217,10 @@ namespace MinorShift.Emuera.GameProc
 						goto err;
 					}
 					break;
-				//1.729 BEGIN TITLEはどこでも使えるように
+				//1.729 allow BEGIN TITLE everywhere
 				case BeginType.TITLE:
 					break;
-				//BEGINの処理中でチェック済み
+				//already checked during BEGIN processing
 				//default:
 				//    throw new ExeEE("不適当なBEGIN呼び出し");
 			}
@@ -256,13 +256,13 @@ namespace MinorShift.Emuera.GameProc
 
 		public bool calledWhenNormal = true;
 		/// <summary>
-		/// BEGIN命令によるプログラム状態の変化
+		/// Program state transition caused by the BEGIN command
 		/// </summary>
 		/// <param name="key"></param>
 		/// <returns></returns>
 		public void Begin()
 		{
-			//@EVENTSHOPからの呼び出しは一旦破棄
+			//call from @EVENTSHOP is discarded for now
 			if (sysStateCode == SystemStateCode.Shop_CallEventShop)
 				return;
 
@@ -293,7 +293,7 @@ namespace MinorShift.Emuera.GameProc
 				case BeginType.TITLE:
 					sysStateCode = SystemStateCode.Title_Begin;
 					break;
-				//セット時に判定してるので、ここには来ないはず
+				//judged at set time, so should never reach here
 				//default:
 				//    throw new ExeEE("不適当なBEGIN呼び出し");
 			}
@@ -311,7 +311,7 @@ namespace MinorShift.Emuera.GameProc
 		}
 
 		/// <summary>
-		/// システムによる強制的なBEGIN
+		/// Forced BEGIN by the system
 		/// </summary>
 		/// <param name="type"></param>
 		public void Begin(BeginType type)
@@ -342,13 +342,13 @@ namespace MinorShift.Emuera.GameProc
 		{
 			get
 			{
-				//スクリプトの実行中処理からしか呼び出されないので、ここはない…はず
+				//only called from script execution processing, so should not be case here... probably
 				//if (functionList.Count == 0)
 				//{
 				//    throw new ExeEE("実行中の関数が存在しません");
 				//}
 				if (functionList.Count == 0)
-					return null;//1756 デバッグコマンドから呼び出されるようになったので
+					return null;//1756 now called from debug commands
 				return functionList[functionList.Count - 1].FunctionName;
 			}
 		}
@@ -360,15 +360,15 @@ namespace MinorShift.Emuera.GameProc
 				ReturnF(null);
 				return;
 			}
-			//sequential = false;//いずれにしろ順列ではない。
-			//呼び出し元は全部スクリプト処理
+			//sequential = false;//not sequential either way.
+			//all callers are script processing
 			//if (functionList.Count == 0)
 			//{
 			//    throw new ExeEE("実行中の関数が存在しません");
 			//}
 			CalledFunction called = functionList[functionList.Count - 1];
 			if (called.IsJump)
-			{//JUMPした場合。即座にRETURN RESULTする。
+			{//when JUMPed. immediately RETURN RESULT.
                 if (called.TopLabel.hasPrivDynamicVar)
                     called.TopLabel.Out();
 				functionList.Remove(called);
@@ -387,16 +387,16 @@ namespace MinorShift.Emuera.GameProc
 			{
                 if (called.CurrentLabel.hasPrivDynamicVar)
                     called.CurrentLabel.Out();
-				//#Singleフラグ付き関数で1が返された。
-				//1752 非0ではなく1と等価であることを見るように修正
-				//1756 全てを終了ではなく#PRIや#LATERのグループごとに修正
+				//1 was returned from a function with #Single flag.
+				//1752 corrected to check equivalence with 1 rather than non-zero
+				//1756 corrected to per-#PRI/#LATER group instead of ending everything
                 if (called.IsOnly)
                     called.FinishEvent();
 				else if ((called.HasSingleFlag) && (ret == 1))
 					called.ShiftNextGroup();
 				else
-                    called.ShiftNext();//次の同名関数に進む。
-                currentLine = called.CurrentLabel;//関数の始点(@～～)へ移動。呼ぶべき関数が無ければnull
+                    called.ShiftNext();//proceed to next same-name function.
+                currentLine = called.CurrentLabel;//move to function start (@~~). null if there is no function to call
                 if (called.CurrentLabel != null)
                 {
                     lineCount++;
@@ -406,16 +406,16 @@ namespace MinorShift.Emuera.GameProc
             }
 			if (Program.DebugMode)
 				console.DebugRemoveTraceLog();
-			//関数終了
+			//function end
             if (currentLine == null)
             {
                 currentLine = called.ReturnAddress;
                 functionList.RemoveAt(functionList.Count - 1);
 				if (currentLine == null)
 				{
-					//この時点でfunctionListは空のはず
-					//functionList.Clear();//全て終了。stateEndProcessに処理を返す
-					if (begintype != BeginType.NULL)//BEGIN XXが行なわれていれば
+					//functionList should be empty at this point
+					//functionList.Clear();//all finished. return processing to stateEndProcess
+					if (begintype != BeginType.NULL)//if BEGIN XX was done
 					{
 						Begin();
 					}
@@ -456,12 +456,12 @@ namespace MinorShift.Emuera.GameProc
 			}
             if (srcArgs != null)
             {
-                //argumentの値を確定させる
+                //finalize argument values
                 srcArgs.SetTransporter(exm);
-                //プライベート変数更新
+                //update private variables
                 if (call.TopLabel.hasPrivDynamicVar)
                     call.TopLabel.In();
-                //更新した変数へargumentを代入
+                //assign arguments to the updated variables
                 for (int i = 0; i < call.TopLabel.Arg.Length; i++)
                 {
                     if (srcArgs.Arguments[i] != null)
@@ -475,9 +475,9 @@ namespace MinorShift.Emuera.GameProc
                     }
                 }
             }
-            else//こっちに来るのはシステムからの呼び出し=argumentは存在しない関数のみ ifネストの外に出していい気もしないでもないがはてさて
+            else//reach here only from system calls = functions with no arguments only. could move outside the if nest but ah well
             {
-                //プライベート変数更新
+                //update private variables
                 if (call.TopLabel.hasPrivDynamicVar)
                     call.TopLabel.In();
             }
@@ -501,21 +501,21 @@ namespace MinorShift.Emuera.GameProc
 
 		public void ReturnF(SingleTerm ret)
 		{
-			//読み込み時のチェック済みのはず
+			//should already be checked at load time
 			//if (!IsFunctionMethod)
 			//    throw new ExeEE("ReturnFと#FUNCTIONのチェックがおかしい");
-			//sequential = false;//いずれにしろ順列ではない。
-			//呼び出し元はRETURNFコマンドか関数終了時のみ
+			//sequential = false;//not sequential either way anyway
+			//callers are only the RETURNF command or function end
 			//if (functionList.Count == 0)
 			//    throw new ExeEE("実行中の関数が存在しません");
-			//非イベント呼び出しなので、これは起こりえない
+			//since this is a non-event call, this cannot happen
 			//else if (functionList.Count != 1)
 			//    throw new ExeEE("関数が複数ある");
 			if (Program.DebugMode)
 			{
 				console.DebugRemoveTraceLog();
 			}
-			//OutはGetValue側で行う
+			//Out is done on the GetValue side
 			//functionList[0].TopLabel.Out();
             currentLine = functionList[functionList.Count - 1].ReturnAddress;
             functionList.RemoveAt(functionList.Count - 1);
@@ -529,12 +529,12 @@ namespace MinorShift.Emuera.GameProc
 		bool isClone = false;
         public bool IsClone { get { return isClone; } set { isClone = value; } }
 
-		// functionListのコピーを必要とする呼び出し元が無かったのでコピーしないことにする。
+		// decided not to copy since there was no caller that needed a copy of functionList
 		public ProcessState Clone()
 		{
 			ProcessState ret = new ProcessState(console);
 			ret.isClone = true;
-			//どうせ消すからコピー不要
+//it will be discarded anyway so no copy needed
 			//foreach (CalledFunction func in functionList)
 			//	ret.functionList.Add(func.Clone());
 			ret.currentLine = this.currentLine;
@@ -551,7 +551,7 @@ namespace MinorShift.Emuera.GameProc
 		//    ProcessState ret = new ProcessState(console);
 		//    ret.isClone = true;
 
-		//    //どうせ消すからコピー不要
+		//    //it will be discarded anyway so no copy needed
 		//    //foreach (CalledFunction func in functionList)
 		//    //	ret.functionList.Add(func.Clone());
 		//    ret.currentLine = this.currentLine;

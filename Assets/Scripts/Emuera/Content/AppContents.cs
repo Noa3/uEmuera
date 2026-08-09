@@ -44,6 +44,27 @@ namespace MinorShift.Emuera.Content
 			return g;
 		}
 
+        /// <summary>
+        /// Runs any queued main-thread-only Graphics (G) blit operations. Called from
+        /// the Unity main thread each frame (see SpriteManager.UpdateGraphicsSurface).
+        /// </summary>
+        static public void ExecutePendingGraphicsOps()
+        {
+            foreach (var kv in gList)
+            {
+                GraphicsImage g = kv.Value;
+                try
+                {
+                    if (g != null)
+                        g.ExecutePendingMainThreadOps();
+                }
+                catch (System.Exception e)
+                {
+                    UnityEngine.Debug.LogWarning("Graphics op failed: " + e.Message);
+                }
+            }
+        }
+
 		static public ASprite GetSprite(string name)
 		{
 			if (name == null)
@@ -127,11 +148,24 @@ namespace MinorShift.Emuera.Content
 				// Pre-index all image files for fast case-insensitive lookups
 				SpriteManager.InitializeFileIndex(Program.ContentDir);
 				
-				//Search all csv files in the resources folder
-				List<string> csvFiles = new List<string>(Directory.GetFiles(Program.ContentDir, "*.csv", SearchOption.TopDirectoryOnly));
-#if(UNITY_ANDROID || UNITY_IOS) && !UNITY_EDITOR
-                csvFiles.AddRange(Directory.GetFiles(Program.ContentDir, "*.CSV", SearchOption.TopDirectoryOnly));
-#endif
+				//Search all csv files in the resources folder (recursive, matching reference Emuera behavior)
+				//Reference Emuera (0x00000FF/Emuera) uses SearchOption.AllDirectories so nested CSV
+				//folders (e.g. era games with per-directory resource CSVs) are also loaded.
+				var csvFiles = new List<string>(Directory.GetFiles(Program.ContentDir, "*.csv", SearchOption.AllDirectories));
+				csvFiles.AddRange(Directory.GetFiles(Program.ContentDir, "*.CSV", SearchOption.AllDirectories));
+
+				// De-duplicate (case-insensitive) and sort deterministically so animation frame
+				// declarations are processed in a stable order across platforms.
+				var uniqueCsvs = new List<string>();
+				var seenCsv = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+				foreach (var f in csvFiles)
+				{
+					if (seenCsv.Add(f))
+						uniqueCsvs.Add(f);
+				}
+				uniqueCsvs.Sort(StringComparer.OrdinalIgnoreCase);
+				csvFiles = uniqueCsvs;
+
                 UnityEngine.Debug.Log($"AppContents.LoadContents: Found {csvFiles.Count} CSV files in Resources folder");
                 
                 var count = csvFiles.Count;

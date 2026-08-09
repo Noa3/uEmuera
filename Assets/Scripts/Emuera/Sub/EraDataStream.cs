@@ -14,11 +14,11 @@ namespace MinorShift.Emuera.Sub
     [global::System.Reflection.Obfuscation(Exclude = false)]
     internal enum EraDataState
     {
-		OK = 0,//ロード可能
-		FILENOTFOUND = 1,//ファイルが存在せず
-		GAME_ERROR = 2,//ゲームが違う
-		VIRSION_ERROR = 3,//バージョンが違う
-		ETC_ERROR = 4,//その他のError
+		OK = 0,//Loadable
+		FILENOTFOUND = 1,//File not found
+		GAME_ERROR = 2,//Different game
+		VIRSION_ERROR = 3,//Different version
+		ETC_ERROR = 4,//Other error
 
 	}
 
@@ -29,7 +29,7 @@ namespace MinorShift.Emuera.Sub
 	}
 
 	/// <summary>
-	/// セーブデータ読み取り
+	/// Reads save data
 	/// </summary>
 	internal sealed class EraDataReader : IDisposable
 	{
@@ -93,13 +93,13 @@ namespace MinorShift.Emuera.Sub
                     throw new FileEE("予期しないセーブデータの終端です");
                 if (str.Equals(FINISHER, StringComparison.Ordinal))
                     break;
-                if (i >= array.Length)//配列を超えて保存されていても動じないで読み飛ばす。
+                if (i >= array.Length)//Skip values saved beyond the array length.
                     continue;
                 if (!Int64.TryParse(str, out long integer))
                     throw new FileEE("数値として認識できません");
                 array[i] = integer;
             }
-            for (; i < array.Length; i++)//保存されている値が無いなら0に初期化
+            for (; i < array.Length; i++)//If no value is saved at the index, initialize to 0
 				array[i] = 0;
 		}
 
@@ -119,11 +119,11 @@ namespace MinorShift.Emuera.Sub
 					throw new FileEE("予期しないセーブデータの終端です");
 				if (str.Equals(FINISHER, StringComparison.Ordinal))
 					break;
-				if (i >= array.Length)//配列を超えて保存されていても動じないで読み飛ばす。
+				if (i >= array.Length)//Skip values saved beyond the array length.
 					continue;
 				array[i] = str;
 			}
-			for (; i < array.Length; i++)//保存されている値が無いなら""に初期化
+			for (; i < array.Length; i++)//If no value is saved at the index, initialize to ""
 				array[i] = "";
 		}
 		#endregion
@@ -443,7 +443,7 @@ namespace MinorShift.Emuera.Sub
 		}
 
 		#endregion
-		#region IDisposable メンバ
+		#region IDisposable Members
 
 		public void Dispose()
 		{
@@ -464,7 +464,7 @@ namespace MinorShift.Emuera.Sub
 	}
 
 	/// <summary>
-	/// セーブデータ書き込み
+	/// Writes save data
 	/// </summary>
 	internal sealed class EraDataWriter : IDisposable
 	{
@@ -661,7 +661,45 @@ namespace MinorShift.Emuera.Sub
 
 		public void WriteExtended(string key, string[,] array2D)
 		{
-			throw new NotImplementedException("まだ実装してないよ");
+			if (writer == null)
+				throw new FileEE("無効なストリームです");
+			if (array2D == null)
+				throw new FileEE("無効な配列が渡されました");
+			int countX = 0;
+			int length0 = array2D.GetLength(0);
+			int length1 = array2D.GetLength(1);
+			int[] countY = new int[length0];
+			for (int x = 0; x < length0; x++)
+			{
+				for (int y = 0; y < length1; y++)
+				{
+					if (!string.IsNullOrEmpty(array2D[x, y]))
+					{
+						countX = x + 1;
+						countY[x] = y + 1;
+					}
+				}
+			}
+			if (countX == 0)
+				return;
+			writer.WriteLine(key);
+			for (int x = 0; x < countX; x++)
+			{
+				if (countY[x] == 0)
+				{
+					writer.WriteLine("");
+					continue;
+				}
+				StringBuilder builder = new StringBuilder("");
+				for (int y = 0; y < countY[x]; y++)
+				{
+					builder.Append(array2D[x, y] ?? "");
+					if (y != countY[x] - 1)
+						builder.Append(",");
+				}
+				writer.WriteLine(builder.ToString());
+			}
+			writer.WriteLine(FINISHER);
 		}
 
 		public void WriteExtended(string key, Int64[, ,] array3D)
@@ -723,13 +761,71 @@ namespace MinorShift.Emuera.Sub
 			writer.WriteLine(FINISHER);
 		}
 
-		public void WriteExtended(string key, string[, ,] array2D)
+		public void WriteExtended(string key, string[, ,] array3D)
 		{
-			throw new NotImplementedException("まだ実装してないよ");
+			if (writer == null)
+				throw new FileEE("無効なストリームです");
+			if (array3D == null)
+				throw new FileEE("無効な配列が渡されました");
+			// Mirror the Int64 3D layout so reads stay symmetric: per row
+			// "x{", per empty row just "}", rows joined on ','.
+			// Empty strings are counted as data, matching single/2D string writers.
+			int countX = 0;
+			int length0 = array3D.GetLength(0);
+			int length1 = array3D.GetLength(1);
+			int length2 = array3D.GetLength(2);
+			int[] countY = new int[length0];
+			int[,] countZ = new int[length0, length1];
+			for (int x = 0; x < length0; x++)
+			{
+				for (int y = 0; y < length1; y++)
+				{
+					for (int z = 0; z < length2; z++)
+					{
+						if (!string.IsNullOrEmpty(array3D[x, y, z]))
+						{
+							countX = x + 1;
+							countY[x] = y + 1;
+							countZ[x, y] = z + 1;
+						}
+					}
+				}
+			}
+			if (countX == 0)
+				return;
+			writer.WriteLine(key);
+			for (int x = 0; x < countX; x++)
+			{
+				writer.WriteLine(x.ToString() + "{");
+				if (countY[x] == 0)
+				{
+					writer.WriteLine("}");
+					continue;
+				}
+				for (int y = 0; y < countY[x]; y++)
+				{
+					StringBuilder builder = new StringBuilder("");
+					if (countZ[x, y] == 0)
+					{
+						writer.WriteLine("");
+						continue;
+					}
+					for (int z = 0; z < countZ[x, y]; z++)
+					{
+						builder.Append(array3D[x, y, z] ?? "");
+						if (z != countZ[x, y] - 1)
+							builder.Append(",");
+					}
+					writer.WriteLine(builder.ToString());
+				}
+				writer.WriteLine("}");
+			}
+			writer.WriteLine(FINISHER);
 		}
+
 		#endregion
 
-		#region IDisposable メンバ
+#region IDisposable Members
 
 		public void Dispose()
 		{

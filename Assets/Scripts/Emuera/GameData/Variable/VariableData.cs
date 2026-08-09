@@ -9,7 +9,7 @@ using MinorShift.Emuera.GameProc;
 namespace MinorShift.Emuera.GameData.Variable
 {
 	/// <summary>
-	/// 変数全部
+	/// All variables
 	/// </summary>
 	internal sealed partial class VariableData : IDisposable
 	{
@@ -53,23 +53,23 @@ namespace MinorShift.Emuera.GameData.Variable
 		Dictionary<string, VariableLocal> localvarTokenDic = new Dictionary<string, VariableLocal>();
 
 		/// <summary>
-		/// ユーザー変数のうちStaticかつ非Globalなもの。ERHでのDIM(非GLOBAL) と関数でのDIM (STATIC)の両方。ロードやリセットで初期化が必要。キャラクタ変数は除く。
+		/// User variables that are Static and not Global. Covers both DIM (non-GLOBAL) in ERH and DIM (STATIC) in functions. Need to be initialized on load or reset. Character variables excluded.
 		/// </summary>
 		List<UserDefinedVariableToken> userDefinedStaticVarList = new List<UserDefinedVariableToken>();
 		/// <summary>
-		/// ユーザー広域変数のうちグローバル属性持ち。
+		/// User wide-area variables that carry the global attribute.
 		/// </summary>
 		List<UserDefinedVariableToken> userDefinedGlobalVarList = new List<UserDefinedVariableToken>();
 		/// <summary>
-		/// ユーザー広域変数のうちセーブされるもの。グローバル、キャラクタ変数は除く。
+		/// User wide-area variables that are saved. Global and character variables excluded.
 		/// </summary>
 		List<UserDefinedVariableToken>[] userDefinedSaveVarList = new List<UserDefinedVariableToken>[6];
 		/// <summary>
-		/// ユーザー広域変数のうち、グローバルかつセーブされるもの。
+		/// User wide-area variables that are both global and saved.
 		/// </summary>
 		List<UserDefinedVariableToken>[] userDefinedGlobalSaveVarList = new List<UserDefinedVariableToken>[6];
 		/// <summary>
-		/// ユーザー広域変数のうち、キャラクタ変数であるもの。初期化やセーブされるかどうかはCharacterDataの方で判断。
+		/// User wide-area variables that are character variables. Whether they are initialized or saved is decided on the CharacterData side.
 		/// </summary>
 		public List<UserDefinedCharaVariableToken> UserDefinedCharaVarList = new List<UserDefinedCharaVariableToken>();
 
@@ -425,8 +425,8 @@ namespace MinorShift.Emuera.GameData.Variable
 		public UserDefinedVariableToken CreatePrivateVariable(UserDefinedVariableData data)
 		{
 			UserDefinedVariableToken ret = null;
-			if (data.Reference)//参照型
-			{//すべて非Staticなはず
+			if (data.Reference)//Reference type
+			{//All should be non-Static
 				if (data.TypeIsStr)
 				{
 					switch (data.Dimension)
@@ -527,7 +527,7 @@ namespace MinorShift.Emuera.GameData.Variable
 
 
 		/// <summary>
-		/// ローカルとグローバル以外初期化
+		/// Initialize everything except locals and globals
 		/// </summary>
 		public void SetDefaultValue(ConstantData constant)
 		{
@@ -715,7 +715,7 @@ namespace MinorShift.Emuera.GameData.Variable
 			writer.EmuSeparete();
 
 			//dataStringArray2D
-			//StringArray2Dの保存は未実装
+			//Saving of StringArray2D is not implemented
 			codeList = VariableIdentifier.GetExtSaveList(VariableCode.__ARRAY_2D__ | VariableCode.__STRING__);
 			foreach (VariableCode code in codeList)
 				writer.WriteExtended(code.ToString(), dataStringArray2D[(int)VariableCode.__LOWERCASE__ & (int)code]);
@@ -728,7 +728,7 @@ namespace MinorShift.Emuera.GameData.Variable
 			writer.EmuSeparete();
 
 			//dataStringArray3D
-			//StringArray3Dの保存は未実装
+			//Saving of StringArray3D is not implemented
 			codeList = VariableIdentifier.GetExtSaveList(VariableCode.__ARRAY_3D__ | VariableCode.__STRING__);
 			foreach (VariableCode code in codeList)
 				writer.WriteExtended(code.ToString(), dataStringArray3D[(int)VariableCode.__LOWERCASE__ & (int)code]);
@@ -813,7 +813,7 @@ namespace MinorShift.Emuera.GameData.Variable
 				if (int3DListDic.TryGetValue(code.ToString(), out var listlistlongarrfound))
 					copyListToArray3D(listlistlongarrfound, dataIntegerArray3D[(int)VariableCode.__LOWERCASE__ & (int)code]);
 
-			if (version < 1808)//ユーザー定義変数の保存の実装前
+			if (version < 1808)//Before saving of user-defined variables was implemented
 				return;
 
 			strListDic = reader.ReadStringArrayExtended();
@@ -1017,8 +1017,8 @@ namespace MinorShift.Emuera.GameData.Variable
 		}
 
 		/// <summary>
-		/// 1808 キャラクタ型でない変数を一つ読む
-		/// ファイル終端の場合はfalseを返す
+		/// 1808 Read one non-character-type variable
+		/// Returns false at end of file
 		/// </summary>
 		/// <param name="reader"></param>
 		public bool LoadVariableBinary(EraBinaryDataReader reader)
@@ -1035,7 +1035,7 @@ namespace MinorShift.Emuera.GameData.Variable
 					return false;
 				case EraSaveDataType.Int:
 					if (vToken == null || !vToken.IsInteger || vToken.Dimension != 0)
-						reader.ReadInt();//該当変数なし、or型不一致なら読み捨てる
+						reader.ReadInt();//Discard when there is no matching variable or the type does not match
 					else
 						vToken.SetValue(reader.ReadInt(), null);
 					break;
@@ -1086,7 +1086,7 @@ namespace MinorShift.Emuera.GameData.Variable
 			}
 			return true;
 		}
-		#region IDisposable メンバ
+		#region IDisposable Members
 
 		public void Dispose()
 		{
