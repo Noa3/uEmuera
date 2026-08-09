@@ -186,12 +186,22 @@ public class EmueraImage : EmueraBehaviour, IPointerEnterHandler, IPointerExitHa
             //   - Container height is (maxy - miny)
             //   - Y position from bottom = container_height - (Top - miny) - image_height - scaled_sprite_y_offset
             //   - Simplified: maxy - image_part.Top - image_rect.Height - sprite_y_offset
-            rt.anchoredPosition = new Vector2(
-                image_part.PointX - ud.posx + sprite_x_offset, 
-                maxy - image_part.Top - image_rect.Height - sprite_y_offset);
-            rt.sizeDelta = new Vector2(image_rect.Width, image_rect.Height);
+            float posX = image_part.PointX - ud.posx + sprite_x_offset;
+            float posY = maxy - image_part.Top - image_rect.Height - sprite_y_offset;
+
             float scaleX = image_part.FlipX ? -1f : 1f;
             float scaleY = image_part.FlipY ? -1f : 1f;
+
+            // Pivot is at top-left (0,1): when scale is -1 along X or Y, the content flips
+            // around the pivot edge, shifting the visible area. Compensate by offsetting
+            // anchoredPosition so the flipped image occupies the same screen region.
+            // FlipX: content would extend left instead of right → shift right by width
+            // FlipY: content would extend up instead of down → shift down by height
+            if (image_part.FlipX) posX += image_rect.Width;
+            if (image_part.FlipY) posY += image_rect.Height;
+
+            rt.anchoredPosition = new Vector2(posX, posY);
+            rt.sizeDelta = new Vector2(image_rect.Width, image_rect.Height);
             rt.localScale = new Vector3(scaleX, scaleY, 1f);
 
             width = Mathf.Max(image_part.PointX - ud.posx + sprite_x_offset + image_rect.Width, width);
