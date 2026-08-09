@@ -169,9 +169,14 @@ namespace uEmuera.Drawing
     public sealed class Pen
     {
         public Pen()
-        { }
+        {
+            Color = Color.Black;
+        }
         public Pen(Color c, Int64 width)
-        { }
+        {
+            Color = c;
+        }
+        public Color Color { get; }
     }
 
     public enum FontStyle

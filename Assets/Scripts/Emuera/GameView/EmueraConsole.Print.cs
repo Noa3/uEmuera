@@ -365,6 +365,34 @@ namespace MinorShift.Emuera.GameView
 			RefreshStrings(false);
 		}
 
+		private readonly System.Text.StringBuilder htmlIslandBuffer = new System.Text.StringBuilder();
+
+		/// <summary>
+		/// HTML_PRINT_ISLAND — appends HTML to the island buffer and displays it immediately.
+		/// Simplified implementation: displays on each call (no deferred flush needed).
+		/// </summary>
+		public void PrintHTMLIsland(string html)
+		{
+			if (string.IsNullOrEmpty(html)) return;
+			if (!this.Enabled) return;
+			htmlIslandBuffer.Append(html);
+			if (!printBuffer.IsEmpty)
+			{
+				ConsoleDisplayLine[] dispList = printBuffer.Flush(stringMeasure, force_temporary);
+				addRangeDisplayLine(dispList);
+			}
+			addRangeDisplayLine(HtmlManager.Html2DisplayLine(html, stringMeasure, this));
+			RefreshStrings(false);
+		}
+
+		/// <summary>
+		/// HTML_PRINT_ISLAND_CLEAR — clears the island buffer.
+		/// </summary>
+		public void ClearHTMLIsland()
+		{
+			htmlIslandBuffer.Clear();
+		}
+
 		private int printCWidth = -1;
 		private int printCWidthL = -1;
 		private int printCWidthL2 = -1;

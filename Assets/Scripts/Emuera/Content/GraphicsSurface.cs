@@ -96,6 +96,33 @@ namespace MinorShift.Emuera.Content
                 pixels[i] = v;
         }
 
+        /// <summary>Draws a line using Bresenham's line algorithm with source-over blending.</summary>
+        public void DrawLine(Color c, int x1, int y1, int x2, int y2)
+        {
+            uint src = PackColor(c);
+            int sa = (int)(src >> 24) & 0xFF;
+            if (sa == 0) return;
+            int dx = Math.Abs(x2 - x1), sx = x1 < x2 ? 1 : -1;
+            int dy = -Math.Abs(y2 - y1), sy = y1 < y2 ? 1 : -1;
+            int err = dx + dy;
+            while (true)
+            {
+                SetPixelRaw(src, sa, x1, y1);
+                if (x1 == x2 && y1 == y2) break;
+                int e2 = 2 * err;
+                if (e2 >= dy) { err += dy; x1 += sx; }
+                if (e2 <= dx) { err += dx; y1 += sy; }
+            }
+        }
+
+        private void SetPixelRaw(uint src, int sa, int x, int y)
+        {
+            if (x < 0 || y < 0 || x >= width || y >= height) return;
+            int idx = y * width + x;
+            if (sa >= 255) pixels[idx] = src;
+            else pixels[idx] = BlendOver(src, pixels[idx]);
+        }
+
         /// <summary>
         /// GFILLRECTANGLE - fills a rectangle, clipping to surface bounds.
         /// Semantics of reference Emuera: an alpha 255 brush overwrites, a

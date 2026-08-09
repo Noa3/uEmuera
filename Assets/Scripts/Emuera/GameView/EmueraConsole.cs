@@ -303,6 +303,16 @@ namespace MinorShift.Emuera.GameView
 		public int ClientWidth { get { return UnityEngine.Screen.width; } }
 		public int ClientHeight { get { return UnityEngine.Screen.height; } }
 
+		/// <summary>
+		/// Called by EmuleraCbgRenderer when a CBG button is clicked.
+		/// Sends the button's integer value as player input, identical to a normal int button.
+		/// </summary>
+		public void OnCBGButtonClick(int buttonValue)
+		{
+			if (state != ConsoleState.WaitInput) return;
+			callEmueraProgram(buttonValue.ToString());
+		}
+
 		/// <summary>Snapshot of a single CBG layer entry for the Unity renderer.</summary>
 		internal struct CbgEntry
 		{

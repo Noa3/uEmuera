@@ -9,6 +9,14 @@ namespace MinorShift.Emuera.GameProc
 	internal sealed partial class Process
 	{
 		private string[] TrainName = null;
+
+		// FLOWINPUT / FLOWINPUTS state
+		public long flowinputDef = 0;
+		public bool flowinput = false;
+		public bool flowinputCanSkip = false;
+		public string flowinputDefString = "";
+		public bool flowinputString = false;
+		public bool flowinputForceSkip = false;
 		delegate void SystemProcess();
 		Dictionary<SystemStateCode, SystemProcess> systemProcessDictionary = new Dictionary<SystemStateCode, SystemProcess>();
 		private void initSystemProcess()

@@ -118,6 +118,22 @@ namespace MinorShift.Emuera.Content
             }
 		}
 
+		static public int SpriteDisposeAll(bool includeG)
+		{
+			int count = 0;
+			var toRemove = new List<string>();
+			foreach (var kv in imageDictionary)
+			{
+				if (!includeG && kv.Value is SpriteG) continue;
+				kv.Value.Dispose();
+				toRemove.Add(kv.Key);
+				count++;
+			}
+			foreach (var key in toRemove)
+				imageDictionary.Remove(key);
+			return count;
+		}
+
 		static public void CreateSpriteG(string imgName, GraphicsImage parent,Rectangle rect)
 		{
 			if (string.IsNullOrEmpty(imgName))

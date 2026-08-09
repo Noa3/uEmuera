@@ -49,6 +49,10 @@ namespace MinorShift.Emuera.GameData.Variable
 		public Int64 LastLoadNo = -1;
 		public string LastLoadText = "";
 
+		/// <summary>Runtime MAP objects. Key = map name (uppercased), value = the map dictionary.</summary>
+		public readonly Dictionary<string, Dictionary<string, string>> DataMaps =
+			new Dictionary<string, Dictionary<string, string>>(StringComparer.OrdinalIgnoreCase);
+
 		Dictionary<string, VariableToken> varTokenDic = new Dictionary<string, VariableToken>();
 		Dictionary<string, VariableLocal> localvarTokenDic = new Dictionary<string, VariableLocal>();
 
@@ -72,6 +76,14 @@ namespace MinorShift.Emuera.GameData.Variable
 		/// User wide-area variables that are character variables. Whether they are initialized or saved is decided on the CharacterData side.
 		/// </summary>
 		public List<UserDefinedCharaVariableToken> UserDefinedCharaVarList = new List<UserDefinedCharaVariableToken>();
+
+		/// <summary>Runtime XML document objects. Key = document name (uppercased).</summary>
+		public readonly Dictionary<string, System.Xml.XmlDocument> DataXmlDocuments =
+			new Dictionary<string, System.Xml.XmlDocument>(StringComparer.OrdinalIgnoreCase);
+
+		/// <summary>Runtime DataTable objects for DT_* commands. Key = table name (case-insensitive).</summary>
+		public readonly Dictionary<string, MinorShift.Emuera.GameData.EraDataTable> DataDataTables =
+			new Dictionary<string, MinorShift.Emuera.GameData.EraDataTable>(StringComparer.OrdinalIgnoreCase);
 
 		public VariableData(GameBase gamebase, ConstantData constant)
 		{
@@ -653,6 +665,8 @@ namespace MinorShift.Emuera.GameData.Variable
 			LastLoadVersion = -1;
 			LastLoadNo = -1;
 			LastLoadText = "";
+			DataMaps.Clear();
+			DataDataTables.Clear();
 		}
 
 
@@ -1098,6 +1112,8 @@ namespace MinorShift.Emuera.GameData.Variable
 			for (int i = 0; i < characterList.Count; i++)
 				characterList[i].Dispose();
 			characterList.Clear();
+			DataXmlDocuments.Clear();
+			DataDataTables.Clear();
 		}
 
 		#endregion

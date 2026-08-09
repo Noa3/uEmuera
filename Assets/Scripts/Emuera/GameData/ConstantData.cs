@@ -668,6 +668,44 @@ check1break:
 		}
 
         
+		/// <summary>
+		/// Reverse lookup: given an integer value, return the keyword name for that index.
+		/// Used by ERDNAME. varname is the base variable name (e.g. "ABL" or "ABLNAME").
+		/// </summary>
+		public bool TryIntegerToKeyword(out string ret, long value, string varname)
+		{
+			ret = "";
+			// Map base variable name or *NAME variant to the correct VariableCode for the NAME array
+			VariableCode code = VariableCode.__NULL__;
+			string upper = (varname ?? "").ToUpperInvariant().TrimEnd('@', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9');
+			switch (upper)
+			{
+				case "ABL": case "ABLNAME": code = VariableCode.ABLNAME; break;
+				case "EXP": case "EXPNAME": code = VariableCode.EXPNAME; break;
+				case "TALENT": case "TALENTNAME": code = VariableCode.TALENTNAME; break;
+				case "PALAM": case "PALAMNAME": code = VariableCode.PALAMNAME; break;
+				case "TRAIN": case "TRAINNAME": code = VariableCode.TRAINNAME; break;
+				case "MARK": case "MARKNAME": code = VariableCode.MARKNAME; break;
+				case "ITEM": case "ITEMNAME": code = VariableCode.ITEMNAME; break;
+				case "BASE": case "BASENAME": code = VariableCode.BASENAME; break;
+				case "SOURCE": case "SOURCENAME": code = VariableCode.SOURCENAME; break;
+				case "EX": case "EXNAME": code = VariableCode.EXNAME; break;
+				case "EQUIP": case "EQUIPNAME": code = VariableCode.EQUIPNAME; break;
+				case "TEQUIP": case "TEQUIPNAME": code = VariableCode.TEQUIPNAME; break;
+				case "FLAG": case "FLAGNAME": code = VariableCode.FLAGNAME; break;
+				case "TFLAG": case "TFLAGNAME": code = VariableCode.TFLAGNAME; break;
+				case "CFLAG": case "CFLAGNAME": code = VariableCode.CFLAGNAME; break;
+				default: return false;
+			}
+			Dictionary<string, int> dic;
+			try { dic = GetKeywordDictionary(out _, code, -1); }
+			catch { return false; }
+			if (dic == null) return false;
+			foreach (var kv in dic)
+				if (kv.Value == (int)value) { ret = kv.Key; return true; }
+			return false;
+		}
+
 		public bool TryKeywordToInteger(out int ret, VariableCode code, string key, int index)
         {
             ret = 0;

@@ -377,5 +377,9 @@ namespace MinorShift.Emuera.GameProc.Function
 
 		// Extended output log command
 		OUTPUTLOG_EXTENDED,//extended version OUTPUTLOG
+
+		// HTML island buffering (EM/EE)
+		HTML_PRINT_ISLAND,//accumulate HTML into island buffer and display
+		HTML_PRINT_ISLAND_CLEAR,//clear the HTML island buffer
 	}
 }

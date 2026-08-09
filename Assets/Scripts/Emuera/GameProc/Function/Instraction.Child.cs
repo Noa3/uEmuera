@@ -282,6 +282,35 @@ namespace MinorShift.Emuera.GameProc.Function
 				Array.Copy(strs, output, outputlength);
 			}
 		}
+
+		private sealed class HTML_PRINT_ISLAND_Instruction : AbstractInstruction
+		{
+			public HTML_PRINT_ISLAND_Instruction()
+			{
+				flag = EXTENDED | METHOD_SAFE;
+				ArgBuilder = ArgumentParser.GetArgumentBuilder(FunctionArgType.SP_HTML_PRINT);
+			}
+			public override void DoInstruction(ExpressionMediator exm, InstructionLine func, ProcessState state)
+			{
+				if (GlobalStatic.Process.SkipPrint) return;
+				var arg = (SpHtmlPrintArgument)func.Argument;
+				string str = arg.HtmlStr.GetStrValue(exm);
+				exm.Console.PrintHTMLIsland(str);
+			}
+		}
+
+		private sealed class HTML_PRINT_ISLAND_CLEAR_Instruction : AbstractInstruction
+		{
+			public HTML_PRINT_ISLAND_CLEAR_Instruction()
+			{
+				flag = EXTENDED | METHOD_SAFE;
+				ArgBuilder = ArgumentParser.GetArgumentBuilder(FunctionArgType.VOID);
+			}
+			public override void DoInstruction(ExpressionMediator exm, InstructionLine func, ProcessState state)
+			{
+				exm.Console.ClearHTMLIsland();
+			}
+		}
 		
 		
 		private sealed class PRINT_IMG_Instruction : AbstractInstruction

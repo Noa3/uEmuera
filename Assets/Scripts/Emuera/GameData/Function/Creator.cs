@@ -147,6 +147,7 @@ namespace MinorShift.Emuera.GameData.Function
                 ["HTML_TOPLAINTEXT"] = new HtmlToPlainTextMethod(),
                 ["HTML_ESCAPE"] = new HtmlEscapeMethod(),
                 ["HTML_STRINGLINES"] = new HtmlStringLinesMethod(),
+                ["ERDNAME"] = new ErdNameMethod(),
 
 
                 //画像処理系
@@ -157,6 +158,7 @@ namespace MinorShift.Emuera.GameData.Function
                 ["SPRITESETPOS"] = new SpriteSetPosMethod(),
                 ["SPRITEPOSX"] = new SpriteStateMethod(),
                 ["SPRITEPOSY"] = new SpriteStateMethod(),
+                ["SPRITEEXIST"] = new SpriteStateMethod(),
 
                 ["CLIENTWIDTH"] = new ClientSizeMethod(),
                 ["CLIENTHEIGHT"] = new ClientSizeMethod(),
@@ -180,6 +182,7 @@ namespace MinorShift.Emuera.GameData.Function
                 ["GDISPOSE"] = new GraphicsDisposeMethod(),
                 ["GCLEAR"] = new GraphicsClearMethod(),
                 ["GFILLRECTANGLE"] = new GraphicsFillRectangleMethod(),
+                ["GDRAWLINE"] = new GraphicsDrawLineMethod(),
                 ["GDRAWSPRITE"] = new GraphicsDrawSpriteMethod(),
                 ["GSETCOLOR"] = new GraphicsSetColorMethod(),
                 ["GDRAWG"] = new GraphicsDrawGMethod(),
@@ -191,6 +194,7 @@ namespace MinorShift.Emuera.GameData.Function
 
                 ["SPRITECREATE"] = new SpriteCreateMethod(),
                 ["SPRITEDISPOSE"] = new SpriteDisposeMethod(),
+                ["SPRITEDISPOSEALL"] = new SpriteDisposeAllMethod(),
 
                 ["CBGSETG"] = new CBGSetGraphicsMethod(),
                 ["CBGSETSPRITE"] = new CBGSetCIMGMethod(),
@@ -215,7 +219,63 @@ namespace MinorShift.Emuera.GameData.Function
                 ["EXISTSOUND"] = new ExistSoundMethod(),
                 ["FLOOR"] = new FloorMethod(),
                 ["CEILING"] = new CeilingMethod(),
-                ["ROUND"] = new RoundMethod()
+                ["ROUND"] = new RoundMethod(),
+
+                // XML document commands
+                ["XML_DOCUMENT"] = new XmlDocumentMethod(XmlDocumentMethod.Operation.Create),
+                ["XML_RELEASE"] = new XmlDocumentMethod(XmlDocumentMethod.Operation.Release),
+                ["XML_EXIST"] = new XmlDocumentMethod(XmlDocumentMethod.Operation.Check),
+                ["XML_GET"] = new XmlGetMethod(),
+                ["XML_GET_BYNAME"] = new XmlGetMethod(true),
+                ["XML_SET"] = new XmlSetMethod(),
+                ["XML_SET_BYNAME"] = new XmlSetMethod(true),
+                ["XML_TOSTR"] = new XmlToStrMethod(),
+                ["XML_ADDNODE"] = new XmlAddNodeMethod(XmlAddNodeMethod.Operation.Node),
+                ["XML_ADDNODE_BYNAME"] = new XmlAddNodeMethod(XmlAddNodeMethod.Operation.Node, true),
+                ["XML_REMOVENODE"] = new XmlRemoveNodeMethod(XmlRemoveNodeMethod.Operation.Node),
+                ["XML_REMOVENODE_BYNAME"] = new XmlRemoveNodeMethod(XmlRemoveNodeMethod.Operation.Node, true),
+                ["XML_ADDATTRIBUTE"] = new XmlAddNodeMethod(XmlAddNodeMethod.Operation.Attribute),
+                ["XML_ADDATTRIBUTE_BYNAME"] = new XmlAddNodeMethod(XmlAddNodeMethod.Operation.Attribute, true),
+                ["XML_REMOVEATTRIBUTE"] = new XmlRemoveNodeMethod(XmlRemoveNodeMethod.Operation.Attribute),
+                ["XML_REMOVEATTRIBUTE_BYNAME"] = new XmlRemoveNodeMethod(XmlRemoveNodeMethod.Operation.Attribute, true),
+                ["XML_REPLACE"] = new XmlReplaceMethod(),
+                ["XML_REPLACE_BYNAME"] = new XmlReplaceMethod(true),
+                ["MAP_CREATE"] = new MapCreateMethod(),
+                ["MAP_EXIST"] = new MapExistMethod(),
+                ["MAP_RELEASE"] = new MapReleaseMethod(),
+                ["MAP_GET"] = new MapGetMethod(),
+                ["MAP_HAS"] = new MapHasMethod(),
+                ["MAP_SET"] = new MapSetMethod(),
+                ["MAP_REMOVE"] = new MapRemoveMethod(),
+                ["MAP_CLEAR"] = new MapClearMethod(),
+                ["MAP_SIZE"] = new MapSizeMethod(),
+                ["MAP_GETKEYS"] = new MapGetKeysMethod(),
+                ["MAP_TOXML"] = new MapToXmlMethod(),
+                ["MAP_FROMXML"] = new MapFromXmlMethod(),
+                ["FLOWINPUT"] = new FlowInputMethod(),
+                ["FLOWINPUTS"] = new FlowInputsMethod(),
+
+                // DataTable commands (DT_*)
+                ["DT_CREATE"] = new DtManageMethod(DtManageMethod.Op.Create),
+                ["DT_EXIST"] = new DtManageMethod(DtManageMethod.Op.Check),
+                ["DT_RELEASE"] = new DtManageMethod(DtManageMethod.Op.Release),
+                ["DT_NOCASE"] = new DtManageMethod(DtManageMethod.Op.Case),
+                ["DT_CLEAR"] = new DtManageMethod(DtManageMethod.Op.Clear),
+                ["DT_ROW_COUNT"] = new DtManageMethod(DtManageMethod.Op.RowCount),
+                ["DT_ROW_ADD"] = new DtManageMethod(DtManageMethod.Op.RowAdd),
+                ["DT_COLUMN_ADD"] = new DtColMethod(DtColMethod.Op.Add),
+                ["DT_COLUMN_NAMES"] = new DtColMethod(DtColMethod.Op.Names),
+                ["DT_COLUMN_EXIST"] = new DtColMethod(DtColMethod.Op.Check),
+                ["DT_COLUMN_REMOVE"] = new DtColMethod(DtColMethod.Op.Remove),
+                ["DT_ROW_REMOVE"] = new DtRowOpMethod(DtRowOpMethod.Op.Remove),
+                ["DT_GET"] = new DtRowOpMethod(DtRowOpMethod.Op.GetStr),
+                ["DT_GETINT"] = new DtRowOpMethod(DtRowOpMethod.Op.GetInt),
+                ["DT_SET"] = new DtRowOpMethod(DtRowOpMethod.Op.SetStr),
+                ["DT_SETINT"] = new DtRowOpMethod(DtRowOpMethod.Op.SetInt),
+                ["DT_FIND"] = new DtRowOpMethod(DtRowOpMethod.Op.Find),
+                ["DT_SORT"] = new DtRowOpMethod(DtRowOpMethod.Op.Sort),
+                ["DT_TOCSV"] = new DtRowOpMethod(DtRowOpMethod.Op.ToCsv),
+                ["DT_TOXML"] = new DtRowOpMethod(DtRowOpMethod.Op.ToXml),
             };
 
 

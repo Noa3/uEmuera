@@ -369,6 +369,8 @@ namespace MinorShift.Emuera.GameProc.Function
 			addFunction(FunctionCode.REFBYNAME, new REF_Instruction(true));
 			addFunction(FunctionCode.HTML_PRINT, new HTML_PRINT_Instruction());
 			addFunction(FunctionCode.HTML_TAGSPLIT, new HTML_TAGSPLIT_Instruction());
+			addFunction(FunctionCode.HTML_PRINT_ISLAND, new HTML_PRINT_ISLAND_Instruction());
+			addFunction(FunctionCode.HTML_PRINT_ISLAND_CLEAR, new HTML_PRINT_ISLAND_CLEAR_Instruction());
 			addFunction(FunctionCode.PRINT_IMG, new PRINT_IMG_Instruction());
 			addFunction(FunctionCode.PRINT_RECT, new PRINT_RECT_Instruction());
 			addFunction(FunctionCode.PRINT_SPACE, new PRINT_SPACE_Instruction());

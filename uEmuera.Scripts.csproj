@@ -153,6 +153,7 @@
     <Compile Include="Assets\Scripts\Emuera\GameData\Variable\VariableEvaluator.cs" />
     <Compile Include="Assets\Scripts\Emuera\GameData\ParserMediator.cs" />
     <Compile Include="Assets\Scripts\LocalizedTextComponent.cs" />
+    <Compile Include="Assets\Scripts\Emuera\GameData\EraDataTable.cs" />
     <Compile Include="Assets\Scripts\MathUtilities.cs" />
     <Compile Include="Assets\Scripts\Emuera\Sub\EmueraException.cs" />
     <Compile Include="Assets\Scripts\uEmuera\Properties.cs" />

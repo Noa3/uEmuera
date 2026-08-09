@@ -125,6 +125,22 @@ namespace MinorShift.Emuera.Content
         }
 
         /// <summary>
+        /// GDRAWLINE(int ID, int x1, int y1, int x2, int y2) - draws a line using the current pen color.
+        /// </summary>
+        public void GDrawLine(int x1, int y1, int x2, int y2)
+        {
+            GraphicsSurface s = surface;
+            if (s == null)
+                throw new NullReferenceException();
+            Color c = (pen != null) ? pen.Color : CurrentBrushColor;
+            lock (pixelLock)
+            {
+                s.DrawLine(c, x1, y1, x2, y2);
+            }
+            WhileDirty();
+        }
+
+        /// <summary>
         /// GFILLRECTANGLE(int ID, Rectangle).
         /// </summary>
         public void GFillRectangle(Rectangle rect)

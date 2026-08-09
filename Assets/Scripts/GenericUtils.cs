@@ -458,6 +458,58 @@ public static class GenericUtils
         l.callbacks.Clear();
     }
 
+    class PointerEnterListener : BaseEventListener<PointerEnterListener>, IPointerEnterHandler
+    {
+        public void OnPointerEnter(PointerEventData eventData)
+        {
+            InvokeCallbacks(eventData);
+        }
+    }
+    public static void SetListenerOnPointerEnter(GameObject obj, Action<PointerEventData> callback)
+    {
+        if (!obj || callback == null)
+            return;
+        var l = obj.GetComponent<PointerEnterListener>();
+        if (!l)
+            l = obj.AddComponent<PointerEnterListener>();
+        l.callbacks.Add(callback);
+    }
+    public static void RemoveListenerOnPointerEnter(GameObject obj, Action<PointerEventData> callback)
+    {
+        if (!obj || callback == null)
+            return;
+        var l = obj.GetComponent<PointerEnterListener>();
+        if (!l)
+            return;
+        l.callbacks.Remove(callback);
+    }
+
+    class PointerExitListener : BaseEventListener<PointerExitListener>, IPointerExitHandler
+    {
+        public void OnPointerExit(PointerEventData eventData)
+        {
+            InvokeCallbacks(eventData);
+        }
+    }
+    public static void SetListenerOnPointerExit(GameObject obj, Action<PointerEventData> callback)
+    {
+        if (!obj || callback == null)
+            return;
+        var l = obj.GetComponent<PointerExitListener>();
+        if (!l)
+            l = obj.AddComponent<PointerExitListener>();
+        l.callbacks.Add(callback);
+    }
+    public static void RemoveListenerOnPointerExit(GameObject obj, Action<PointerEventData> callback)
+    {
+        if (!obj || callback == null)
+            return;
+        var l = obj.GetComponent<PointerExitListener>();
+        if (!l)
+            return;
+        l.callbacks.Remove(callback);
+    }
+
     class BeginDragListener : BaseEventListener<BeginDragListener>, IBeginDragHandler
     {
         public void OnBeginDrag(PointerEventData eventData)

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using MinorShift.Emuera;
 using MinorShift.Emuera.GameView;
@@ -117,7 +118,6 @@ public class EmuleraCbgRenderer : MonoBehaviour
         go.transform.SetParent(parent, false);
 
         var img = go.GetComponent<Image>();
-        img.raycastTarget = false;
         img.sprite = null;
         img.color = new Color(0, 0, 0, 0); // transparent until sprite arrives
 
@@ -137,6 +137,36 @@ public class EmuleraCbgRenderer : MonoBehaviour
             hoverSprite  = entry.ImageB,
             buttonValue  = entry.IsButton ? entry.ButtonValue : -1,
         };
+
+        if (entry.IsButton)
+        {
+            img.raycastTarget = true;
+            int val = entry.ButtonValue; // capture for closures
+
+            // Hover: swap to hoverSprite on enter, back on exit
+            GenericUtils.SetListenerOnPointerEnter(go, _ =>
+            {
+                if (handle.hoverSprite != null)
+                    SpriteManager.GetSprite(handle.hoverSprite, handle, OnSpriteLoaded);
+            });
+            GenericUtils.SetListenerOnPointerExit(go, _ =>
+            {
+                if (handle.normalSprite != null)
+                    SpriteManager.GetSprite(handle.normalSprite, handle, OnSpriteLoaded);
+            });
+
+            // Click: send button value as integer input
+            GenericUtils.SetListenerOnClick(go, () =>
+            {
+                var console = GlobalStatic.Console;
+                if (console != null)
+                    console.OnCBGButtonClick(val);
+            });
+        }
+        else
+        {
+            img.raycastTarget = false;
+        }
 
         SpriteManager.GetSprite(entry.Image, handle, OnSpriteLoaded);
         return handle;
