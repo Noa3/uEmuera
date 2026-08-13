@@ -34,12 +34,6 @@ namespace uEmuera.Runtime.EraElectron
         // Current line count (incremented by output APIs)
         int _lineCount;
 
-        // Cached default state
-        string _alignDefault  = "left";
-        int    _offsetDefault;
-        int    _widthDefault  = 24;
-        string _colorDefault  = "#ffffff";
-
         // era.version object — injected by the JS bridge wrapper
         // Engine version read from the game's .ere-min-version at runtime start.
         string _engineVersion = string.Empty;
@@ -141,11 +135,11 @@ namespace uEmuera.Runtime.EraElectron
                 case "replaceInColRows": return StubLineNumber();
                 case "setToBottom":    return StubLineNumber();
 
-                // --- Layout state ---
-                case "setAlign":           _alignDefault = "left";  return "null";
-                case "setColor":           _colorDefault = "#fff";  return "null";
-                case "setOffset":          _offsetDefault = 0;      return "null";
-                case "setWidth":           _widthDefault = 24;      return "null";
+                // --- Layout state (stub: values not yet forwarded to renderer) ---
+                case "setAlign":           return "null";
+                case "setColor":           return "null";
+                case "setOffset":          return "null";
+                case "setWidth":           return "null";
                 case "setHorizontalAlign": return "null";
                 case "setVerticalAlign":   return "null";
                 case "setBack":            return "null";

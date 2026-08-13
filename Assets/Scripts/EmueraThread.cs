@@ -152,12 +152,21 @@ public class EmueraThread
         {
             var cancel_token = cancel_token_source_.Token;
             
+            // Record this thread as the single authoritative interpreter thread.
+            // Any semantic mutation (LabelDictionary, GlobalStatic, …) from a
+            // different thread will trigger an assert in UEMUERA_DEBUG builds.
+            // (Phase 6 #76 / InterpreterThreadGuard)
+            MinorShift.Emuera.GameProc.InterpreterThreadGuard.SetOwner();
+
+            // Profile: start clock at interpreter thread entry.
+            MinorShift.Emuera.GameProc.StartupProfiler.Begin();
+            MinorShift.Emuera.GameProc.StartupProfiler.Mark("InterpreterThreadStarted");
+            
             // Initialize game
             MinorShift.Emuera.Program.debugMode = debugmode_;
             MinorShift.Emuera.Program.Main(Array.Empty<string>());
 
             uEmuera.Utils.ResourceClear();
-            GC.Collect();
 
             input_ = null;
             
@@ -172,8 +181,6 @@ public class EmueraThread
                     try
                     {
                         // Use WaitHandle.WaitAny with cancellation token for proper timeout handling
-                        int wait_result = WaitHandle.WaitTimeout;
-                        
                         // Sleep in short intervals to check for input and cancellation
                         for (int i = 0; i < TIMER_UPDATE_INTERVAL_MS; i += 5)
                         {
@@ -259,9 +266,20 @@ public class EmueraThread
         {
             // Thread was cancelled - expected during shutdown
         }
+        catch (ThreadAbortException)
+        {
+            // Thread was aborted (play-mode stop or application exit) - expected, not an error
+        }
         catch (Exception ex)
         {
             uEmuera.Logger.Exception(ex, "Game thread error");
+        }
+        finally
+        {
+            // Clear interpreter-thread ownership so a restarted interpreter on a
+            // potentially different thread starts with a clean state.
+            // (Phase 6 #76 / InterpreterThreadGuard)
+            MinorShift.Emuera.GameProc.InterpreterThreadGuard.ClearOwner();
         }
     }
 }

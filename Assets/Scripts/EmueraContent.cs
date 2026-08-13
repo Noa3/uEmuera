@@ -86,12 +86,13 @@ public class EmueraContent : MonoBehaviour
     void Awake()
     {
         FontUtils.SetDefaultFont(default_fontname);
-        main_camere = Object.FindFirstObjectByType<Camera>();
+        main_camere = Object.FindAnyObjectByType<Camera>();
     }
 
     void Start()
     {
         instance_ = this;
+        EmueraCoordinateMapper.Bind(rect_transform, main_camere);
         background = GetComponent<Image>();
         mask2d = GetComponent<RectMask2D>();
 

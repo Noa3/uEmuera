@@ -101,7 +101,7 @@ public class MainEntry : MonoBehaviour
         LoadConfigMaps();
         if(!MultiLanguage.SetLanguage())
         {
-            Object.FindFirstObjectByType<OptionWindow>().ShowLanguageBox();
+            Object.FindAnyObjectByType<OptionWindow>().ShowLanguageBox();
         }
     }
     

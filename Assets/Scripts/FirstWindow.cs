@@ -22,22 +22,38 @@ public class FirstWindow : MonoBehaviour
     public static FirstWindow instance { get; private set; }
     
     /// <summary>
-    /// Shows the first window by loading it from resources.
+    /// Shows the scene-owned first window. The Resources prefab remains a
+    /// compatibility fallback for scenes that do not contain the picker.
     /// </summary>
     public static void Show()
     {
+        var existing = instance;
+        if(existing == null)
+            existing = Object.FindAnyObjectByType<FirstWindow>();
+
+        if(existing != null)
+        {
+            existing.gameObject.SetActive(true);
+            existing.RebuildGameList();
+            return;
+        }
+
         var obj = Resources.Load<GameObject>("Prefab/FirstWindow");
+        if(obj == null)
+            return;
         obj = GameObject.Instantiate(obj);
         obj.name = "FirstWindow";
     }
     
     /// <summary>
-    /// Runs the selected ERA game.
+    /// Runs a game directory that already contains the game files.
     /// </summary>
-    /// <param name="workspace">The workspace directory path.</param>
-    /// <param name="era">The ERA game folder name.</param>
-    static System.Collections.IEnumerator Run(string workspace, string era)
+    /// <param name="gamePath">The directory containing emuera.config or ERB.</param>
+    static System.Collections.IEnumerator Run(string gamePath)
     {
+        MinorShift.Emuera.GameProc.StartupProfiler.Begin();
+        MinorShift.Emuera.GameProc.StartupProfiler.Mark("SelectGame");
+
         var async = Resources.UnloadUnusedAssets();
         while(!async.isDone)
             yield return null;
@@ -48,30 +64,64 @@ public class FirstWindow : MonoBehaviour
         ow.ShowInProgress(true);
         yield return null;
 
-        System.GC.Collect();
+        // NOTE (Phase 6): forced System.GC.Collect() removed from the critical boot
+        // path. The single UnloadUnusedAssets above already reclaims the previous
+        // game's assets; a synchronous full GC here only delayed time-to-title.
+        // See Docs/STARTUP_REGRESSIONS.md.
         SpriteManager.Init();
+        MinorShift.Emuera.GameProc.StartupProfiler.Mark("GamePathPrepared");
 
-        // Resolve and set folders case-insensitively for cross-platform
-        var resolvedWorkspace = uEmuera.Utils.NormalizeExistingDirectoryPath(workspace);
-        var resolvedEraDir = uEmuera.Utils.NormalizeExistingDirectoryPath(Path.Combine(workspace, era));
-        if (!string.IsNullOrEmpty(resolvedWorkspace))
-            Sys.SetWorkFolder(resolvedWorkspace);
-        else
-            Sys.SetWorkFolder(workspace);
-        if (!string.IsNullOrEmpty(resolvedEraDir))
-            Sys.SetSourceFolder(Path.GetFileName(resolvedEraDir));
-        else
-            Sys.SetSourceFolder(era);
+        var resolvedGamePath = uEmuera.Utils.NormalizeExistingDirectoryPath(gamePath);
+        if (string.IsNullOrEmpty(resolvedGamePath) || !GameDiscovery.IsGameDirectory(resolvedGamePath))
+        {
+            ow.ShowMessageBoxPublic(MultiLanguage.GetText("[Error]"), "Game directory not found: " + gamePath);
+            ow.ShowInProgress(false);
+            yield break;
+        }
 
-        uEmuera.Utils.ResourcePrepare();
+        try
+        {
+            LoadedFileTracker.Reset(resolvedGamePath);
+            Sys.SetGameFolder(resolvedGamePath);
+            uEmuera.Utils.ResourcePrepare();
+        }
+        catch (System.Exception ex)
+        {
+            ow.ShowInProgress(false);
+            ow.ShowMessageBoxPublic(
+                MultiLanguage.GetText("[Error]"),
+                "Failed to load game: " + gamePath + "\n\n" + ex.Message);
+            FirstWindow.Show();
+            yield break;
+        }
 
-        async = Resources.UnloadUnusedAssets();
-        while(!async.isDone)
-            yield return null;
+        // NOTE (Phase 6): the second Resources.UnloadUnusedAssets() that used to run
+        // here (right before EmueraMain.Run) was removed from the critical path — it
+        // duplicated the unload at the top of Run() and stalled time-to-title.
+        // See Docs/STARTUP_REGRESSIONS.md.
+        try
+        {
+            EmueraContent.instance.SetNoReady();
+            var emuera = Object.FindAnyObjectByType<EmueraMain>();
+            if (emuera != null)
+                emuera.Run();
+        }
+        catch (System.Exception ex)
+        {
+            ow.ShowInProgress(false);
+            ow.ShowMessageBoxPublic(
+                MultiLanguage.GetText("[Error]"),
+                "Failed to load game: " + gamePath + "\n\n" + ex.Message);
+            FirstWindow.Show();
+        }
+    }
 
-        EmueraContent.instance.SetNoReady();
-        var emuera = Object.FindFirstObjectByType<EmueraMain>();
-        emuera.Run();
+    IEnumerator StartSingleGame(string gamePath)
+    {
+        yield return null;
+        var path = gamePath;
+        gameObject.SetActive(false);
+        yield return Run(path);
     }
 
     void Awake()
@@ -101,42 +151,8 @@ public class FirstWindow : MonoBehaviour
         // Apply dark theme styling
         ApplyDarkTheme();
 
-        GetList(Application.persistentDataPath);
         setting_.SetActive(true);
-
-#if UNITY_EDITOR
-        var main_entry = Object.FindFirstObjectByType<MainEntry>();
-        if(!string.IsNullOrEmpty(main_entry.era_path))
-            GetList(main_entry.era_path);
-        // In editor, also allow standalone directory logic for testing
-        // Only show dialog if no valid custom directory is set
-        string customDir = PlayerPrefs.GetString(CUSTOM_DIR_KEY, "");
-        if(string.IsNullOrEmpty(customDir) || !uEmuera.Utils.DirectoryExistsInsensitive(customDir))
-        {
-            InitStandaloneDirectory();
-        }
-#endif
-#if UNITY_ANDROID && !UNITY_EDITOR
-        // Android: Check and request storage permissions before accessing external storage
-        GenericUtils.StartCoroutine(InitAndroidStorage());
-#endif
-#if UNITY_STANDALONE && !UNITY_EDITOR
-        // Standalone (Windows, Linux, macOS): Prioritize custom directory from PlayerPrefs if set
-        string customDir = PlayerPrefs.GetString(CUSTOM_DIR_KEY, "");
-        
-        if(!string.IsNullOrEmpty(customDir) && uEmuera.Utils.DirectoryExistsInsensitive(customDir))
-        {
-            // Custom directory exists - use only this directory
-            var normalized = uEmuera.Utils.NormalizeExistingDirectoryPath(customDir);
-            GetList(normalized);
-        }
-        else
-        {
-            // No valid custom directory - use default path and show dialog
-            GetList(Path.GetFullPath(Application.dataPath + "/.."));
-            InitStandaloneDirectory();
-        }
-#endif
+        PopulateGameList(true);
     }
     
 #if UNITY_ANDROID && !UNITY_EDITOR
@@ -327,26 +343,110 @@ public class FirstWindow : MonoBehaviour
     }
     
     /// <summary>
-    /// Refreshes the game list by reloading the FirstWindow.
+    /// Rebuilds the dynamic game rows while retaining the scene-owned picker.
+    /// </summary>
+    void RebuildGameList()
+    {
+        EnsureListReferences();
+        ClearGameItems();
+        PopulateGameList(false);
+    }
+
+    void EnsureListReferences()
+    {
+        if(scroll_rect_ == null)
+            scroll_rect_ = GenericUtils.FindChildByName<ScrollRect>(gameObject, "ScrollRect");
+        if(item_ == null)
+            item_ = GenericUtils.FindChildByName(gameObject, "Item", true);
+        if(setting_ == null)
+        {
+            setting_ = GenericUtils.FindChildByName(gameObject, "optionbtn", true);
+            GenericUtils.SetListenerOnClick(setting_, OnOptionClick);
+        }
+    }
+
+    void ClearGameItems()
+    {
+        for(var i = 0; i < game_items_.Count; i++)
+        {
+            if(game_items_[i] != null)
+                GameObject.Destroy(game_items_[i]);
+        }
+        game_items_.Clear();
+        listed_game_paths_.Clear();
+        itemcount_ = 0;
+
+        if(scroll_rect_ != null && scroll_rect_.content != null)
+        {
+            var size = scroll_rect_.content.sizeDelta;
+            size.y = 0f;
+            scroll_rect_.content.sizeDelta = size;
+        }
+    }
+
+    void PopulateGameList(bool openDirectoryDialog)
+    {
+#if UNITY_WEBGL && !UNITY_EDITOR
+        HideWebGLDownloadButton();
+#endif
+        GetList(Application.persistentDataPath);
+
+#if UNITY_EDITOR
+        var main_entry = Object.FindAnyObjectByType<MainEntry>();
+        if(main_entry != null && !string.IsNullOrEmpty(main_entry.era_path))
+            GetList(main_entry.era_path);
+
+        // Keep editor game data in a project-local, non-Assets directory.
+        var editorGamesRoot = GetEditorGamesRoot();
+        Directory.CreateDirectory(editorGamesRoot);
+        GetList(editorGamesRoot);
+
+        string customDir = PlayerPrefs.GetString(CUSTOM_DIR_KEY, "");
+        if(!string.IsNullOrEmpty(customDir) && uEmuera.Utils.DirectoryExistsInsensitive(customDir))
+        {
+            var normalizedCustomDir = uEmuera.Utils.NormalizeExistingDirectoryPath(customDir);
+            if(!string.Equals(normalizedCustomDir, editorGamesRoot, System.StringComparison.OrdinalIgnoreCase))
+                GetList(normalizedCustomDir);
+        }
+#endif
+#if UNITY_ANDROID && !UNITY_EDITOR
+        GenericUtils.StartCoroutine(InitAndroidStorage());
+#endif
+#if UNITY_STANDALONE && !UNITY_EDITOR
+        string customDir = PlayerPrefs.GetString(CUSTOM_DIR_KEY, "");
+        if(!string.IsNullOrEmpty(customDir) && uEmuera.Utils.DirectoryExistsInsensitive(customDir))
+        {
+            var normalized = uEmuera.Utils.NormalizeExistingDirectoryPath(customDir);
+            if(!openDirectoryDialog || !TryAutoStart(normalized))
+                GetList(normalized);
+        }
+        else
+        {
+            var executableRoot = Path.GetFullPath(Path.Combine(Application.dataPath, ".."));
+            if(openDirectoryDialog && TryAutoStart(executableRoot))
+                return;
+
+            GetList(executableRoot);
+            if(openDirectoryDialog)
+                InitStandaloneDirectory();
+        }
+#endif
+    }
+
+    /// <summary>
+    /// Refreshes the game list by reusing the scene-owned picker shell.
     /// </summary>
     public void RefreshGameList()
     {
-        // Use coroutine to properly handle the destroy/create sequence
         GenericUtils.StartCoroutine(RefreshGameListCoroutine());
     }
-    
-    /// <summary>
-    /// Coroutine that handles refreshing the game list.
-    /// Waits for the current frame to end before creating a new window.
-    /// </summary>
+
     System.Collections.IEnumerator RefreshGameListCoroutine()
     {
-        // Destroy current FirstWindow
-        GameObject.Destroy(gameObject);
-        // Wait for the end of frame to ensure destruction is processed
+        EnsureListReferences();
+        ClearGameItems();
         yield return null;
-        // Show a new FirstWindow
-        Show();
+        PopulateGameList(false);
     }
 
     void OnOptionClick()
@@ -395,24 +495,23 @@ public class FirstWindow : MonoBehaviour
     /// <summary>
     /// Adds a game item to the list.
     /// </summary>
-    /// <param name="folder">The folder name.</param>
-    /// <param name="workspace">The workspace path.</param>
-    void AddItem(string folder, string workspace)
+    /// <param name="gamePath">The complete path to the game directory.</param>
+    void AddItem(string gamePath)
     {
+        if(!listed_game_paths_.Add(gamePath))
+            return;
+
         var rrt = item_.transform as UnityEngine.RectTransform;
         var obj = GameObject.Instantiate(item_);
         var text = GenericUtils.FindChildByName<UnityEngine.UI.Text>(obj, "name");
-        text.text = folder;
+        text.text = Path.GetFileName(gamePath);
         text = GenericUtils.FindChildByName<UnityEngine.UI.Text>(obj, "path");
-        text.text = workspace + "/" + folder;
+        text.text = gamePath;
 
         GenericUtils.SetListenerOnClick(obj, () =>
         {
-            scroll_rect_ = null;
-            item_ = null;
-            GameObject.Destroy(gameObject);
-            // Start Game
-            GenericUtils.StartCoroutine(Run(workspace, folder));
+            gameObject.SetActive(false);
+            GenericUtils.StartCoroutine(Run(gamePath));
         });
 
         var rt = obj.transform as UnityEngine.RectTransform;
@@ -432,7 +531,168 @@ public class FirstWindow : MonoBehaviour
         {
             content.sizeDelta = new Vector2(content.sizeDelta.x, ih);
         }
+        game_items_.Add(obj);
         obj.SetActive(true);
+    }
+
+    /// <summary>
+    /// Adds a game item from a multi-runtime <see cref="uEmuera.Runtime.GameDescriptor"/>.
+    /// Shows a runtime badge and routes Emuera / EraElectron games to the correct runtime.
+    /// </summary>
+    void AddItemDescriptor(uEmuera.Runtime.GameDescriptor descriptor)
+    {
+        if (descriptor == null) return;
+        string root = descriptor.GameRoot ?? "";
+        if (!listed_game_paths_.Add(root)) return;
+
+        string badge = descriptor.RuntimeKind == uEmuera.Runtime.RuntimeKind.EraElectron
+            ? "[EraElectron] "
+            : "";
+        string title = string.IsNullOrEmpty(descriptor.Title)
+            ? Path.GetFileName(root.TrimEnd('/', '\\'))
+            : descriptor.Title;
+
+        var rrt = item_.transform as UnityEngine.RectTransform;
+        var obj = GameObject.Instantiate(item_);
+        var nameText = GenericUtils.FindChildByName<UnityEngine.UI.Text>(obj, "name");
+        nameText.text = badge + title;
+        var pathText = GenericUtils.FindChildByName<UnityEngine.UI.Text>(obj, "path");
+        pathText.text = root;
+
+        // Capture for closure
+        var desc = descriptor;
+        GenericUtils.SetListenerOnClick(obj, () =>
+        {
+            gameObject.SetActive(false);
+            if (desc.RuntimeKind == uEmuera.Runtime.RuntimeKind.EraElectron)
+                GenericUtils.StartCoroutine(LaunchEreGameCoroutine(desc));
+            else
+                GenericUtils.StartCoroutine(Run(desc.GameRoot));
+        });
+
+        var rt = obj.transform as UnityEngine.RectTransform;
+        var content = scroll_rect_.content;
+        rt.SetParent(content);
+        rt.localScale = Vector3.one;
+        rt.anchorMax = rrt.anchorMax;
+        rt.anchorMin = rrt.anchorMin;
+        rt.offsetMax = rrt.offsetMax;
+        rt.offsetMin = rrt.offsetMin;
+        rt.sizeDelta = rrt.sizeDelta;
+        rt.localPosition = new Vector2(0, -rt.sizeDelta.y * itemcount_);
+        itemcount_ += 1;
+
+        var ih = rt.sizeDelta.y * itemcount_;
+        if (ih > content.sizeDelta.y)
+            content.sizeDelta = new Vector2(content.sizeDelta.x, ih);
+
+        game_items_.Add(obj);
+        obj.SetActive(true);
+    }
+
+    /// <summary>
+    /// Launches an EraElectron game via <see cref="uEmuera.Runtime.GameRuntimeManager"/>.
+    /// Currently routes to the EraElectronRuntime stub (logs STUB warning).
+    /// Full implementation requires WebView host spike (see Docs/ADR/WEB_RUNTIME_HOST.md).
+    /// </summary>
+    System.Collections.IEnumerator LaunchEreGameCoroutine(uEmuera.Runtime.GameDescriptor descriptor)
+    {
+        var ctx = new uEmuera.Runtime.RuntimeContext
+        {
+            SessionId = System.Guid.NewGuid().ToString("N"),
+            Logger    = new uEmuera.Runtime.UnityRuntimeLogger("[EraElectron]"),
+        };
+
+        var task = uEmuera.Runtime.GameRuntimeManager.Instance
+            .LaunchAsync(descriptor, ctx);
+
+        // Poll until the async task completes, yielding each frame.
+        while (!task.IsCompleted)
+            yield return null;
+
+        if (task.IsFaulted)
+        {
+            var ex = task.Exception?.GetBaseException();
+            string userMsg = ex is System.NotSupportedException
+                ? ex.Message
+                : "EraElectron launch failed.\n\n" + ex?.Message;
+            uEmuera.Logger.Error("[FirstWindow] EraElectron launch failed: " + ex?.Message);
+            var ow = EmueraContent.instance?.option_window;
+            if (ow != null)
+                ow.ShowMessageBoxPublic(
+                    "EraElectron",
+                    userMsg);
+            gameObject.SetActive(true);
+        }
+    }
+
+#if UNITY_WEBGL && !UNITY_EDITOR
+    void OnWebGLImportClick()
+    {
+        WebGLGameImporter.RequestFolder(gameObject.name);
+    }
+
+    void HideWebGLDownloadButton()
+    {
+        var names = new[] { "download", "Download", "downloadbtn", "DownloadButton" };
+        for(var i = 0; i < names.Length; i++)
+        {
+            var download = GenericUtils.FindChildByName(gameObject, names[i], true);
+            if(download == null)
+                continue;
+
+            var button = download.GetComponent<Button>();
+            if(button != null)
+                button.interactable = false;
+            download.SetActive(false);
+        }
+    }
+
+    /// <summary>
+    /// Called by the JavaScript folder importer after files have been copied into
+    /// Unity's browser-persistent virtual filesystem.
+    /// </summary>
+    public void OnWebGLFolderImportFinished(string status)
+    {
+        if (string.Equals(status, "ok", System.StringComparison.OrdinalIgnoreCase))
+        {
+            RefreshGameList();
+            return;
+        }
+
+        if (!string.Equals(status, "cancelled", System.StringComparison.OrdinalIgnoreCase))
+        {
+            var ow = EmueraContent.instance != null ? EmueraContent.instance.option_window : null;
+            if (ow != null)
+                ow.ShowMessageBoxPublic(MultiLanguage.GetText("[Error]"), "WebGL game import failed: " + status);
+        }
+    }
+#endif
+
+#if UNITY_EDITOR
+    static string GetEditorGamesRoot()
+    {
+        return Path.GetFullPath(Path.Combine(Application.dataPath, "..", ".games"));
+    }
+#endif
+
+    /// <summary>
+    /// Tries the packaged-build convention: exactly one game in the executable
+    /// directory or in its one-level game/ directory is started automatically.
+    /// Ambiguous or empty roots remain in the picker.
+    /// </summary>
+    bool TryAutoStart(string root)
+    {
+#if UNITY_WEBGL
+        return false;
+#else
+        var gamePath = GameDiscovery.FindSingle(root);
+        if (string.IsNullOrEmpty(gamePath))
+            return false;
+
+        GenericUtils.StartCoroutine(StartSingleGame(gamePath));
+        return true;
+#endif
     }
 
     /// <summary>
@@ -441,39 +701,13 @@ public class FirstWindow : MonoBehaviour
     /// <param name="workspace">The workspace path to scan.</param>
     void GetList(string workspace)
     {
-        // Normalize and resolve workspace path across platforms
-        var normalized = uEmuera.Utils.NormalizePath(workspace);
-        var resolvedWorkspace = uEmuera.Utils.NormalizeExistingDirectoryPath(normalized);
-        workspace = string.IsNullOrEmpty(resolvedWorkspace) ? normalized : resolvedWorkspace;
-
-        if(!uEmuera.Utils.DirectoryExistsInsensitive(workspace))
-            return;
-        try
-        {
-            var paths = Directory.GetDirectories(workspace, "*", SearchOption.TopDirectoryOnly);
-            foreach(var p in paths)
-            {
-                var path = uEmuera.Utils.NormalizePath(p);
-                // Resolve each entry to actual casing to build robust UI strings
-                var eraDir = uEmuera.Utils.NormalizeExistingDirectoryPath(path);
-                var effectivePath = string.IsNullOrEmpty(eraDir) ? path : eraDir;
-
-                // robust check: emuera.config name can vary in casing, ERB folder can be ERB/erb/Erb
-                var hasConfig = uEmuera.Utils.FileExistsInsensitive(Path.Combine(effectivePath, "emuera.config"));
-                var hasErbDir = uEmuera.Utils.DirectoryExistsInsensitive(Path.Combine(effectivePath, "ERB"))
-                                 || uEmuera.Utils.DirectoryExistsInsensitive(Path.Combine(effectivePath, "erb"))
-                                 || uEmuera.Utils.DirectoryExistsInsensitive(Path.Combine(effectivePath, "Erb"));
-
-                if(hasConfig || hasErbDir)
-                {
-                    // Use actual folder name from resolved path when available
-                    var folderName = Path.GetFileName(effectivePath);
-                    AddItem(folderName, workspace);
-                }
-            }
-        }
-        catch(DirectoryNotFoundException)
-        { }
+        // Multi-runtime detection: GameDetector recognises both Emuera and
+        // EraElectron packages. GameDiscovery (Emuera-only) is kept for
+        // backward-compatible callers that bypass GetList directly.
+        var games = uEmuera.Runtime.Detection.GameDetector.CreateDefault()
+            .DiscoverAll(workspace);
+        for (var i = 0; i < games.Count; i++)
+            AddItemDescriptor(games[i]);
     }
 
     /// <summary>
@@ -485,5 +719,7 @@ public class FirstWindow : MonoBehaviour
     ScrollRect scroll_rect_ = null;
     GameObject item_ = null;
     GameObject setting_ = null;
+    readonly List<GameObject> game_items_ = new List<GameObject>();
+    readonly HashSet<string> listed_game_paths_ = new HashSet<string>(System.StringComparer.OrdinalIgnoreCase);
     int itemcount_ = 0;
 }
