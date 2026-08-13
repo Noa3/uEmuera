@@ -49,14 +49,16 @@ namespace uEmuera.Runtime.EraElectron
             switch (resolved)
             {
                 case EraElectronHostMode.Embedded:
-                    // TODO (Milestone 3 spike): return real platform WebView host.
-                    // Windows:  return new WebView2Host();
-                    // Android:  return new AndroidWebViewHost();
-                    // Linux:    return new WebKitGtkHost();
-                    Debug.LogWarning("[PlatformWebViewBridge] Embedded WebView host not yet implemented. Returning NullHost.");
+                    // Return the real platform host where implemented.
+#if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
+                    Debug.Log("[PlatformWebViewBridge] Creating Windows WebView2Host.");
+                    return new WebView2Host();
+#else
+                    Debug.LogWarning("[PlatformWebViewBridge] Embedded WebView host not yet implemented on this platform. Returning NullHost.");
                     return new NullEraElectronHost(EraElectronHostMode.Embedded,
-                        "Embedded WebView (WebView2/AndroidWebView) not yet implemented. " +
+                        "Embedded WebView not yet implemented on this platform. " +
                         "See Docs/ADR/WEB_RUNTIME_HOST.md.");
+#endif
 
                 case EraElectronHostMode.OfficialSidecar:
                     // TODO (Milestone 13): locate and launch official EraElectron sidecar.
@@ -157,7 +159,7 @@ namespace uEmuera.Runtime.EraElectron
             return Task.CompletedTask;
         }
 
-        public Task LoadGameAsync(CancellationToken cancellationToken = default)
+        public Task LoadGameAsync(string gameOriginUrl, CancellationToken cancellationToken = default)
         {
             // Surface as NotSupportedException so EraElectronRuntime propagates
             // a user-readable message via LaunchEreGameCoroutine's error dialog.

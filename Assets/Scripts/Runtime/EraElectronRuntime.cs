@@ -112,9 +112,9 @@ namespace uEmuera.Runtime
             await _host.InitializeAsync(_game, bridge, cancellationToken);
             _context?.Profiler?.Mark("EreRuntime_HostReady");
 
-            // Load the game JS bundles — throws NotSupportedException on NullHost
-            // which LaunchEreGameCoroutine catches and shows as an error dialog.
-            await _host.LoadGameAsync(cancellationToken);
+            // Load the game JS bundles — passes file server URL to the host.
+            // NullHost throws NotSupportedException (surfaced as error dialog).
+            await _host.LoadGameAsync(_fileServer.BaseUrl, cancellationToken);
 
             _host.Show();
             _context?.Profiler?.Mark("EreRuntime_GameVisible");
