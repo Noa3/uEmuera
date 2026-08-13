@@ -1,0 +1,67 @@
+{
+  "generated_at": "2026-08-12T00:00:00Z",
+  "note": "Generated from erauma-master/csv/_config.json and _fixed.json inspection.",
+  "files": {
+    "_config.json": {
+      "description": "User-modifiable game configuration. Loaded at startup; user changes are persisted separately.",
+      "fields": {
+        "system": {
+          "_replace": {"type": "boolean", "default": false, "description": "Enable _Replace.csv substitutions"},
+          "hideUserInput": {"type": "boolean", "default": false, "description": "Hide text the player types"},
+          "saveCompressedData": {"type": "boolean", "default": false, "description": "Compress save file data"}
+        },
+        "window": {
+          "audio": {"type": "number", "default": 0, "description": "Master audio volume (0=max?)"},
+          "autoMax": {"type": "boolean", "default": false, "description": "Maximize window on start"},
+          "height": {"type": "number", "default": 916, "description": "Window height in pixels"},
+          "width": {"type": "number", "default": 1000, "description": "Window width in pixels"}
+        }
+      }
+    },
+    "_fixed.json": {
+      "description": "Game-fixed settings that the player cannot override.",
+      "fields": {
+        "system": {
+          "collapseBlankLines": {"type": "boolean", "default": false, "description": "Collapse consecutive blank lines in output"},
+          "extendedCharaTables": {"type": "string[]", "default": [], "description": "Additional per-character CSV table names (e.g. ['Skill','Status'])"}
+        },
+        "window": {
+          "orientation": {"type": "number", "default": 0, "description": "0=any, 1=portrait, 2=landscape; Android only"}
+        }
+      }
+    }
+  },
+  "standard_csv_tables": [
+    {"name": "GameBase.csv", "description": "Game metadata (title, author, version)"},
+    {"name": "Abl.csv",      "description": "Ability / stat names"},
+    {"name": "Base.csv",     "description": "Base stat names"},
+    {"name": "CFlag.csv",    "description": "Character-flag names"},
+    {"name": "Cstr.csv",     "description": "Character string variable names"},
+    {"name": "Equip.csv",    "description": "Equipment slot names"},
+    {"name": "Ex.csv",       "description": "Experience table names"},
+    {"name": "Exp.csv",      "description": "Exp? table names"},
+    {"name": "Flag.csv",     "description": "Global flag names"},
+    {"name": "Global.csv",   "description": "Global variable names"},
+    {"name": "Item.csv",     "description": "Item names"},
+    {"name": "Mark.csv",     "description": "Mark/achievement names"},
+    {"name": "Param.csv",    "description": "Parameter names"},
+    {"name": "Skill.csv",    "description": "Skill names"},
+    {"name": "Stain.csv",    "description": "Stain table names"},
+    {"name": "Status.csv",   "description": "Status table names"},
+    {"name": "Talent.csv",   "description": "Talent names"},
+    {"name": "TCVar.csv",    "description": "Train character variable names"},
+    {"name": "TEquip.csv",   "description": "Train equipment names"},
+    {"name": "TFlag.csv",    "description": "Train flag names"},
+    {"name": "Chara/*.csv",  "description": "Per-character data files (Chara0000.csv, etc.)"}
+  ],
+  "variable_addressing": {
+    "format": "'varname:charIndex:arrayIndex'",
+    "examples": [
+      {"key": "callname:1",   "description": "Character 1's callname string"},
+      {"key": "flag:5",       "description": "Global flag 5"},
+      {"key": "abl:0:3",      "description": "Character 0's Abl index 3"},
+      {"key": "skill:2:10",   "description": "Character 2's Skill index 10"}
+    ],
+    "note": "Colon-delimited. First segment is variable name; subsequent segments are indices."
+  }
+}

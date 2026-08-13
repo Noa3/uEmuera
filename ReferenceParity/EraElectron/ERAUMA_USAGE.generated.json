@@ -1,0 +1,409 @@
+{
+  "generated_at": "2026-08-12T23:00:50.747203+00:00",
+  "game_name": "erauma",
+  "game_version": "3.0.00",
+  "ere_min_version": "2200",
+  "game_root": ".games\\erauma-master",
+  "js_file_count": 3003,
+  "kojo_file_count": 91,
+  "kojo_files": [
+    "i18n/zh-CN/timon/mejiro/cum-events.kojo",
+    "i18n/zh-CN/kojo/100100-Special-Week/rec-1.kojo",
+    "i18n/zh-CN/kojo/100200-Silence-Suzuka/daily-2.kojo",
+    "i18n/zh-CN/kojo/100200-Silence-Suzuka/edu-2.kojo",
+    "i18n/zh-CN/kojo/100200-Silence-Suzuka/ero-2.kojo",
+    "i18n/zh-CN/kojo/100200-Silence-Suzuka/love-2.kojo",
+    "i18n/zh-CN/kojo/100200-Silence-Suzuka/rec-2.kojo",
+    "i18n/zh-CN/kojo/100600-Oguri-Cap/daily-6.kojo",
+    "i18n/zh-CN/kojo/100600-Oguri-Cap/edu-6.kojo",
+    "i18n/zh-CN/kojo/100600-Oguri-Cap/love-6.kojo",
+    "i18n/zh-CN/kojo/100600-Oguri-Cap/rec-6.kojo",
+    "i18n/zh-CN/kojo/101300-Mejiro-McQueen/base-13.kojo",
+    "i18n/zh-CN/kojo/101300-Mejiro-McQueen/daily-13.kojo",
+    "i18n/zh-CN/kojo/101300-Mejiro-McQueen/edu-13.kojo",
+    "i18n/zh-CN/kojo/101300-Mejiro-McQueen/ero-13.kojo",
+    "i18n/zh-CN/kojo/101300-Mejiro-McQueen/love-13.kojo",
+    "i18n/zh-CN/kojo/101300-Mejiro-McQueen/rec-13.kojo",
+    "i18n/zh-CN/kojo/102000-Seiun-Sky/rec-20.kojo",
+    "i18n/zh-CN/kojo/102100-Tamamo-Cross/daily-21.kojo",
+    "i18n/zh-CN/kojo/102100-Tamamo-Cross/edu-21.kojo"
+  ],
+  "total_era_calls": 44382,
+  "era_api_usage": [
+    {
+      "name": "printAndWait",
+      "call_count": 21359
+    },
+    {
+      "name": "get",
+      "call_count": 5809
+    },
+    {
+      "name": "println",
+      "call_count": 4266
+    },
+    {
+      "name": "printButton",
+      "call_count": 4054
+    },
+    {
+      "name": "input",
+      "call_count": 3412
+    },
+    {
+      "name": "set",
+      "call_count": 2244
+    },
+    {
+      "name": "print",
+      "call_count": 890
+    },
+    {
+      "name": "drawLine",
+      "call_count": 869
+    },
+    {
+      "name": "add",
+      "call_count": 562
+    },
+    {
+      "name": "waitAnyKey",
+      "call_count": 388
+    },
+    {
+      "name": "printMultiColumns",
+      "call_count": 102
+    },
+    {
+      "name": "clear",
+      "call_count": 84
+    },
+    {
+      "name": "printInColRows",
+      "call_count": 50
+    },
+    {
+      "name": "getLineCount",
+      "call_count": 45
+    },
+    {
+      "name": "logger.debug",
+      "call_count": 27
+    },
+    {
+      "name": "setAlign",
+      "call_count": 22
+    },
+    {
+      "name": "getCharactersInTrain",
+      "call_count": 20
+    },
+    {
+      "name": "setOffset",
+      "call_count": 19
+    },
+    {
+      "name": "setWidth",
+      "call_count": 19
+    },
+    {
+      "name": "setHorizontalAlign",
+      "call_count": 16
+    },
+    {
+      "name": "getAddedCharacters",
+      "call_count": 16
+    },
+    {
+      "name": "setVerticalAlign",
+      "call_count": 14
+    },
+    {
+      "name": "setToBottom",
+      "call_count": 12
+    },
+    {
+      "name": "version",
+      "call_count": 8
+    },
+    {
+      "name": "checkImage",
+      "call_count": 8
+    },
+    {
+      "name": "delay",
+      "call_count": 7
+    },
+    {
+      "name": "saveData",
+      "call_count": 6
+    },
+    {
+      "name": "setColor",
+      "call_count": 6
+    },
+    {
+      "name": "playMusic",
+      "call_count": 5
+    },
+    {
+      "name": "printLineChart",
+      "call_count": 5
+    },
+    {
+      "name": "logger.error",
+      "call_count": 4
+    },
+    {
+      "name": "replaceInColRows",
+      "call_count": 4
+    },
+    {
+      "name": "saveGlobal",
+      "call_count": 3
+    },
+    {
+      "name": "stopMusic",
+      "call_count": 3
+    },
+    {
+      "name": "printWholeImage",
+      "call_count": 3
+    },
+    {
+      "name": "getAllCharacters",
+      "call_count": 2
+    },
+    {
+      "name": "loadData",
+      "call_count": 2
+    },
+    {
+      "name": "rmData",
+      "call_count": 2
+    },
+    {
+      "name": "endTrain",
+      "call_count": 2
+    },
+    {
+      "name": "notify",
+      "call_count": 2
+    },
+    {
+      "name": "setOverlay",
+      "call_count": 2
+    },
+    {
+      "name": "logger.assert",
+      "call_count": 1
+    },
+    {
+      "name": "logger.info",
+      "call_count": 1
+    },
+    {
+      "name": "logger.warn",
+      "call_count": 1
+    },
+    {
+      "name": "quit",
+      "call_count": 1
+    },
+    {
+      "name": "addCharacter",
+      "call_count": 1
+    },
+    {
+      "name": "addCharacterForTrain",
+      "call_count": 1
+    },
+    {
+      "name": "beginTrain",
+      "call_count": 1
+    },
+    {
+      "name": "resetData",
+      "call_count": 1
+    },
+    {
+      "name": "replaceText",
+      "call_count": 1
+    }
+  ],
+  "era_apis_used": [
+    "add",
+    "addCharacter",
+    "addCharacterForTrain",
+    "beginTrain",
+    "checkImage",
+    "clear",
+    "delay",
+    "drawLine",
+    "endTrain",
+    "get",
+    "getAddedCharacters",
+    "getAllCharacters",
+    "getCharactersInTrain",
+    "getLineCount",
+    "input",
+    "loadData",
+    "logger.assert",
+    "logger.debug",
+    "logger.error",
+    "logger.info",
+    "logger.warn",
+    "notify",
+    "playMusic",
+    "print",
+    "printAndWait",
+    "printButton",
+    "printInColRows",
+    "printLineChart",
+    "printMultiColumns",
+    "printWholeImage",
+    "println",
+    "quit",
+    "replaceInColRows",
+    "replaceText",
+    "resetData",
+    "rmData",
+    "saveData",
+    "saveGlobal",
+    "set",
+    "setAlign",
+    "setColor",
+    "setHorizontalAlign",
+    "setOffset",
+    "setOverlay",
+    "setToBottom",
+    "setVerticalAlign",
+    "setWidth",
+    "stopMusic",
+    "version",
+    "waitAnyKey"
+  ],
+  "era_apis_count": 50,
+  "internal_modules": {
+    "count": 3106,
+    "top_20": [
+      [
+        "#/data/race/model/uma-skill",
+        1358
+      ],
+      [
+        "#/era-electron",
+        719
+      ],
+      [
+        "#/i18n/selector",
+        430
+      ],
+      [
+        "#/data/race/model/race-info",
+        270
+      ],
+      [
+        "#/utils/chara-talk-factory",
+        238
+      ],
+      [
+        "#/data/race/race-const",
+        230
+      ],
+      [
+        "#/system/sys-calc-chara-others",
+        178
+      ],
+      [
+        "#/data/race/model/uma-gene",
+        174
+      ],
+      [
+        "#/data/event/recruit-flags",
+        160
+      ],
+      [
+        "#/data/event/event-hooks",
+        143
+      ],
+      [
+        "#/event/snippets/check-aim-race",
+        141
+      ],
+      [
+        "#/data/race/model/uma-skill-gene",
+        136
+      ],
+      [
+        "#/event/check/snippets/get-aim-race-index",
+        134
+      ],
+      [
+        "#/event/queue",
+        133
+      ],
+      [
+        "#/event/check/snippets/check-aim-and-get-entry",
+        133
+      ],
+      [
+        "#/utils/list-utils",
+        128
+      ],
+      [
+        "#/i18n/extended-def",
+        128
+      ],
+      [
+        "#/data/color-const",
+        124
+      ],
+      [
+        "#/event/snippets/print-title-with-kojo",
+        124
+      ],
+      [
+        "#/utils/value-utils",
+        119
+      ]
+    ]
+  },
+  "npm_packages": {
+    "count": 0,
+    "packages": []
+  },
+  "node_builtins": {
+    "count": 0,
+    "builtins": []
+  },
+  "dev_dependencies": [
+    "7zip-bin",
+    "@babel/core",
+    "@babel/preset-env",
+    "@eslint/js",
+    "@prisma/client",
+    "archiver",
+    "archiver-zip-encrypted",
+    "babel-loader",
+    "compressing",
+    "ere-webpack-plugin",
+    "eslint",
+    "eslint-config-prettier",
+    "eslint-plugin-n",
+    "eslint-plugin-prettier",
+    "eslint-plugin-require-sort",
+    "eslint-plugin-sort-requires-by-path",
+    "fs-extra",
+    "husky",
+    "kojo-loader",
+    "lint-staged",
+    "prettier",
+    "prisma",
+    "unimported",
+    "webpack",
+    "webpack-cli",
+    "yamljs"
+  ],
+  "scan_errors": []
+}

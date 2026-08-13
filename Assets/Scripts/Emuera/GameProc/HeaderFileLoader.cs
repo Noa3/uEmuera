@@ -85,12 +85,12 @@ namespace MinorShift.Emuera.GameProc
 				if (System.IO.File.Exists(filepath))
 				{
 					UnityEngine.Debug.LogError($"[HeaderFileLoader] File exists but failed to open: {filename} - possible encoding or permission issue");
-					throw new CodeEE(filename + "のオープンに失敗しました(ファイルは存在します - エンコーディング/パーミッション問題の可能性)");
+					throw new CodeEE(filename + GameMessages.T(" failed to open (file exists - possible encoding/permission issue)"));
 				}
 				else
 				{
 					UnityEngine.Debug.LogError($"[HeaderFileLoader] File not found: {filepath}");
-					throw new CodeEE(filename + "のオープンに失敗しました(ファイルが見つかりません)");
+					throw new CodeEE(filename + GameMessages.T(" failed to open (file not found)"));
 				}
 			}
 			
@@ -108,12 +108,12 @@ namespace MinorShift.Emuera.GameProc
 					position = new ScriptPosition(filename, eReader.LineNo);
 					LexicalAnalyzer.SkipWhiteSpace(st);
 					if (st.Current != '#')
-						throw new CodeEE("ヘッダーの中に#で始まらない行があります", position);
+						throw new CodeEE(GameMessages.T("There is a line in the header that does not start with #"), position);
 					st.ShiftNext();
 					string sharpID = LexicalAnalyzer.ReadSingleIdentifier(st);
 					if (sharpID == null)
 					{
-						ParserMediator.Warn("解釈できない#行です", position, 1);
+						ParserMediator.Warn(GameMessages.T("Unrecognizable # line"), position, 1);
 						return false;
 					}
 					if (Config.ICFunction)
@@ -147,7 +147,7 @@ namespace MinorShift.Emuera.GameProc
 							}
 							break;
 						default:
-							throw new CodeEE("#" + sharpID + "は解釈できないプリプロセッサです", position);
+							throw new CodeEE("#" + sharpID + GameMessages.T(" is an unrecognizable preprocessor"), position);
 					}
 				}
 #if UEMUERA_DEBUG
@@ -169,8 +169,8 @@ namespace MinorShift.Emuera.GameProc
 			return true;
 		}
 
-		//#define FOO (～～)     id to wc
-		//#define BAR($1) (～～)     idwithargs to wc(replaced)
+			//#define FOO (...)     id to wc
+			//#define BAR($1) (...)     idwithargs to wc(replaced)
 		//#diseble FOOBAR             
 		//#dim piyo, i
 		//#dims puyo, j
@@ -181,7 +181,7 @@ namespace MinorShift.Emuera.GameProc
 			//do it before calling LexicalAnalyzer.SkipWhiteSpace(st).
 			string srcID = LexicalAnalyzer.ReadSingleIdentifier(st);
 			if (srcID == null)
-				throw new CodeEE("置換元の識別子がありません", position);
+				throw new CodeEE(GameMessages.T("No replacement source identifier"), position);
 			if (Config.ICVariable)
 				srcID = srcID.ToUpper();
 
@@ -204,7 +204,7 @@ namespace MinorShift.Emuera.GameProc
 			WordCollection wc = LexicalAnalyzer.Analyse(st, LexEndWith.EoL, LexAnalyzeFlag.AllowAssignment);
 			if (wc.EOL)
 			{
-				//throw new CodeEE("置換先の式がありません", position);
+				//throw new CodeEE(GameMessages.T("No replacement expression"), position);
 				//1808a3 empty macro allowed
 				DefineMacro nullmac = new DefineMacro(srcID, new WordCollection(), 0);
 				idDic.AddMacro(nullmac);
@@ -212,20 +212,20 @@ namespace MinorShift.Emuera.GameProc
 			}
 
 			List<string> argID = new List<string>();
-			if (hasArg)//関数型マクロのargument解析
+			if (hasArg)//Function-type macro argument analysis
 			{
-				wc.ShiftNext();//'('を読み飛ばす
+				wc.ShiftNext();//Skip past '('
 				if (wc.Current.Type == ')')
-					throw new CodeEE("関数型マクロのargumentを0個にすることはできません", position);
+					throw new CodeEE(GameMessages.T("Function-type macro cannot have 0 arguments"), position);
 				while (!wc.EOL)
 				{
 					IdentifierWord word = wc.Current as IdentifierWord;
 					if (word == null)
-						throw new CodeEE("置換元のargument指定の書式が間違っています", position);
+						throw new CodeEE(GameMessages.T("Incorrect format for the replacement source argument specification"), position);
 					word.SetIsMacro();
 					string id = word.Code;
 					if (argID.Contains(id))
-						throw new CodeEE("置換元のargumentに同じ文字が2回以上使われています", position);
+						throw new CodeEE(GameMessages.T("The same argument is used more than once in the replacement source"), position);
 					argID.Add(id);
 					wc.ShiftNext();
 					if (wc.Current.Type == ',')
@@ -235,22 +235,22 @@ namespace MinorShift.Emuera.GameProc
 					}
 					if (wc.Current.Type == ')')
 						break;
-					throw new CodeEE("置換元のargument指定の書式が間違っています", position);
+					throw new CodeEE(GameMessages.T("Incorrect format for the replacement source argument specification"), position);
 				}
 				if (wc.EOL)
-					throw new CodeEE("')'が閉じられていません", position);
+					throw new CodeEE(GameMessages.T("')' is not closed"), position);
 
 				wc.ShiftNext();
 			}
 			if (wc.EOL)
-				throw new CodeEE("置換先の式がありません", position);
+throw new CodeEE(GameMessages.T("No replacement expression"), position);
 			WordCollection destWc = new WordCollection();
 			while (!wc.EOL)
 			{
 				destWc.Add(wc.Current);
 				wc.ShiftNext();
 			}
-			if (hasArg)//関数型マクロのargumentセット
+			if (hasArg)//Function-type macro argument set
 			{
 				while (!destWc.EOL)
 				{
@@ -273,8 +273,8 @@ namespace MinorShift.Emuera.GameProc
 				}
 				destWc.Pointer = 0;
 			}
-			if (hasArg)//1808a3 関数型マクロの封印
-				throw new CodeEE("関数型マクロは宣言できません", position);
+			if (hasArg)//1808a3 function-type macros sealed
+				throw new CodeEE(GameMessages.T("Function-type macros cannot be declared"), position);
 			DefineMacro mac = new DefineMacro(srcID, destWc, argID.Count);
 			idDic.AddMacro(mac);
 		}
@@ -360,13 +360,20 @@ namespace MinorShift.Emuera.GameProc
 							if (data.Reference)
 								throw new NotImplCodeEE();
 							
-							// Register CONST as a macro so other DIM lines can use it
-							if (data.Const && data.DefaultInt != null && data.DefaultInt.Length == 1)
-							{
-								idDic.AddIntegerMacro(data.Name, data.DefaultInt[0]);
-								// Update UseMacro since we added a new macro
-								LexicalAnalyzer.UseMacro = idDic.UseMacro();
-							}
+						// Register CONST as a macro so other DIM lines can use it
+						if (data.Const && data.DefaultInt != null && data.DefaultInt.Length == 1)
+						{
+							idDic.AddIntegerMacro(data.Name, data.DefaultInt[0]);
+							// Update UseMacro since we added a new macro
+							LexicalAnalyzer.UseMacro = idDic.UseMacro();
+						}
+						// Register string CONST as a macro so DIMS CONST chain declarations work
+						// (e.g. #DIMS CONST B = A + "suffix" requires A to be a macro first)
+						if (data.Const && data.TypeIsStr && data.DefaultStr != null && data.DefaultStr.Length == 1)
+						{
+							idDic.AddStringMacro(data.Name, data.DefaultStr[0]);
+							LexicalAnalyzer.UseMacro = idDic.UseMacro();
+						}
 							
 							VariableToken var = null;
 							if (data.CharaData)
@@ -391,17 +398,25 @@ namespace MinorShift.Emuera.GameProc
 								noError = false;
 							}
 						}
-						catch (CodeEE e)
+					catch (CodeEE e)
+					{
+						// Retry if the error is likely caused by a CONST dependency not yet registered.
+						// "unrecognized identifier"    — unknown name (defined by a later CONST)
+						// "Only constants can be"      — variable found instead of a constant literal;
+						//                               happens when a dependent macro wasn't in macroDic yet
+						// "String type and number type"— type mismatch from an unresolved string CONST
+						bool retryable = constTryAgain && (
+							e.Message.Contains("unrecognized identifier") ||
+							e.Message.Contains("Only constants can be") ||
+							e.Message.Contains("String type and number type"));
+						if (retryable)
 						{
-							// Check if this is an "unrecognized identifier" error that might be resolved by retry
-							if (constTryAgain && e.Message.Contains("unrecognized identifier"))
-							{
-								dimline.WC.Pointer = 0;
-								constLines.Enqueue(dimline);
-							}
-							else
-							{
-								UnityEngine.Debug.LogError($"[HeaderFileLoader] CONST error at {dimline.SC.Filename}:{dimline.SC.LineNo}: {e.Message}");
+							dimline.WC.Pointer = 0;
+							constLines.Enqueue(dimline);
+						}
+						else
+						{
+							UnityEngine.Debug.LogError($"[HeaderFileLoader] CONST error at {dimline.SC.Filename}:{dimline.SC.LineNo}: {e.Message}");
 								ParserMediator.Warn(e.Message, dimline.SC, 2);
 								noError = false;
 							}

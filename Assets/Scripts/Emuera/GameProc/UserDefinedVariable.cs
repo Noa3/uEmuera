@@ -62,113 +62,113 @@ namespace MinorShift.Emuera.GameProc
 				{
 					case "CONST":
 						if (ret.CharaData)
-							throw new CodeEE(keyword + "とCHARADATAキーワードは同時に指定できません", sc);
+							throw new CodeEE(keyword + GameMessages.T(" cannot be specified together with the CHARADATA keyword"), sc);
 						if (ret.Global)
-							throw new CodeEE(keyword + "とGLOBALキーワードは同時に指定できません", sc);
+							throw new CodeEE(keyword + GameMessages.T(" cannot be specified together with the GLOBAL keyword"), sc);
 						if (ret.Save)
-							throw new CodeEE(keyword + "とSAVEDATAキーワードは同時に指定できません", sc);
+							throw new CodeEE(keyword + GameMessages.T(" cannot be specified together with the SAVEDATA keyword"), sc);
 						if (ret.Reference)
-							throw new CodeEE(keyword + "とREFキーワードは同時に指定できません", sc);
+							throw new CodeEE(keyword + GameMessages.T(" cannot be specified together with the REF keyword"), sc);
 						if (!ret.Static)
-							throw new CodeEE(keyword + "とDYNAMICキーワードは同時に指定できません", sc);
+							throw new CodeEE(keyword + GameMessages.T(" cannot be specified together with the DYNAMIC keyword"), sc);
 						if (ret.Const)
-							throw new CodeEE(keyword + "キーワードが二重に指定されています", sc);
+							throw new CodeEE(keyword + GameMessages.T(" keyword specified twice"), sc);
 						ret.Const = true;
 						break;
 					case "REF":
 						if (staticDefined && ret.Static)
-							throw new CodeEE(keyword + "とSTATICキーワードは同時に指定できません", sc);
+							throw new CodeEE(keyword + GameMessages.T(" cannot be specified together with the STATIC keyword"), sc);
 						if (ret.CharaData)
-							throw new CodeEE(keyword + "とCHARADATAキーワードは同時に指定できません", sc);
+							throw new CodeEE(keyword + GameMessages.T(" cannot be specified together with the CHARADATA keyword"), sc);
 						if (ret.Global)
-							throw new CodeEE(keyword + "とGLOBALキーワードは同時に指定できません", sc);
+							throw new CodeEE(keyword + GameMessages.T(" cannot be specified together with the GLOBAL keyword"), sc);
 						if (ret.Save)
-							throw new CodeEE(keyword + "とSAVEDATAキーワードは同時に指定できません", sc);
+							throw new CodeEE(keyword + GameMessages.T(" cannot be specified together with the SAVEDATA keyword"), sc);
 						if (ret.Const)
-							throw new CodeEE(keyword + "とCONSTキーワードは同時に指定できません", sc);
+							throw new CodeEE(keyword + GameMessages.T(" cannot be specified together with the CONST keyword"), sc);
 						if (ret.Reference)
-							throw new CodeEE(keyword + "キーワードが二重に指定されています", sc);
+							throw new CodeEE(keyword + GameMessages.T(" keyword specified twice"), sc);
 						ret.Reference = true;
 						ret.Static = false;
 						break;
 					case "DYNAMIC":
 						if (!isPrivate)
-							throw new CodeEE("広域変数の宣言に" + keyword + "キーワードは指定できません", sc);
+							throw new CodeEE(GameMessages.T("Global variable declarations cannot use the ") + keyword + GameMessages.T(" keyword"), sc);
 						if (ret.CharaData)
-							throw new CodeEE(keyword + "とCHARADATAキーワードは同時に指定できません", sc);
+							throw new CodeEE(keyword + GameMessages.T(" cannot be specified together with the CHARADATA keyword"), sc);
 						if (ret.Const)
-							throw new CodeEE(keyword + "とCONSTキーワードは同時に指定できません", sc);
+							throw new CodeEE(keyword + GameMessages.T(" cannot be specified together with the CONST keyword"), sc);
 						if (staticDefined)
 							if (ret.Static)
-								throw new CodeEE("STATICとDYNAMICキーワードは同時に指定できません", sc);
+								throw new CodeEE(GameMessages.T("STATIC and DYNAMIC keywords cannot be specified together"), sc);
 							else
-								throw new CodeEE(keyword + "キーワードが二重に指定されています", sc);
+								throw new CodeEE(keyword + GameMessages.T(" keyword specified twice"), sc);
 						staticDefined = true;
 						ret.Static = false;
 						break;
 					case "STATIC":
 						if (!isPrivate)
-							throw new CodeEE("広域変数の宣言に" + keyword + "キーワードは指定できません", sc);
+							throw new CodeEE(GameMessages.T("Global variable declarations cannot use the ") + keyword + GameMessages.T(" keyword"), sc);
 						if (ret.CharaData)
-							throw new CodeEE(keyword + "とCHARADATAキーワードは同時に指定できません", sc);
+							throw new CodeEE(keyword + GameMessages.T(" cannot be specified together with the CHARADATA keyword"), sc);
 						if (staticDefined)
 							if (!ret.Static)
-								throw new CodeEE("STATICとDYNAMICキーワードは同時に指定できません", sc);
+								throw new CodeEE(GameMessages.T("STATIC and DYNAMIC keywords cannot be specified together"), sc);
 							else
-								throw new CodeEE(keyword + "キーワードが二重に指定されています", sc);
+								throw new CodeEE(keyword + GameMessages.T(" keyword specified twice"), sc);
 						if (ret.Reference)
-							throw new CodeEE(keyword + "とREFキーワードは同時に指定できません", sc);
+							throw new CodeEE(keyword + GameMessages.T(" cannot be specified together with the REF keyword"), sc);
 						staticDefined = true;
 						ret.Static = true;
 						break;
 					case "GLOBAL":
 						if (isPrivate)
-							throw new CodeEE("ローカル変数の宣言に" + keyword + "キーワードは指定できません", sc);
+							throw new CodeEE(GameMessages.T("Local variable declarations cannot use the ") + keyword + GameMessages.T(" keyword"), sc);
 						if (ret.CharaData)
-							throw new CodeEE(keyword + "とCHARADATAキーワードは同時に指定できません", sc);
+							throw new CodeEE(keyword + GameMessages.T(" cannot be specified together with the CHARADATA keyword"), sc);
 						if (ret.Reference)
-							throw new CodeEE(keyword + "とREFキーワードは同時に指定できません", sc);
+							throw new CodeEE(keyword + GameMessages.T(" cannot be specified together with the REF keyword"), sc);
 						if (ret.Const)
-							throw new CodeEE(keyword + "とCONSTキーワードは同時に指定できません", sc);
+							throw new CodeEE(keyword + GameMessages.T(" cannot be specified together with the CONST keyword"), sc);
 						if (staticDefined)
 							if (ret.Static)
-								throw new CodeEE("STATICとGLOBALキーワードは同時に指定できません", sc);
+								throw new CodeEE(GameMessages.T("STATIC and GLOBAL keywords cannot be specified together"), sc);
 							else
-								throw new CodeEE("DYNAMICとGLOBALキーワードは同時に指定できません", sc);
+								throw new CodeEE(GameMessages.T("DYNAMIC and GLOBAL keywords cannot be specified together"), sc);
 						ret.Global = true;
 						break;
 					case "SAVEDATA":
 						if (isPrivate)
-							throw new CodeEE("ローカル変数の宣言に" + keyword + "キーワードは指定できません", sc);
+							throw new CodeEE(GameMessages.T("Local variable declarations cannot use the ") + keyword + GameMessages.T(" keyword"), sc);
 						if (staticDefined)
 							if (ret.Static)
-								throw new CodeEE("STATICとSAVEDATAキーワードは同時に指定できません", sc);
+								throw new CodeEE(GameMessages.T("STATIC and SAVEDATA keywords cannot be specified together"), sc);
 							else
-								throw new CodeEE("DYNAMICとSAVEDATAキーワードは同時に指定できません", sc);
+								throw new CodeEE(GameMessages.T("DYNAMIC and SAVEDATA keywords cannot be specified together"), sc);
 						if (ret.Reference)
-							throw new CodeEE(keyword + "とREFキーワードは同時に指定できません", sc);
+							throw new CodeEE(keyword + GameMessages.T(" cannot be specified together with the REF keyword"), sc);
 						if (ret.Const)
-							throw new CodeEE(keyword + "とCONSTキーワードは同時に指定できません", sc);
+							throw new CodeEE(keyword + GameMessages.T(" cannot be specified together with the CONST keyword"), sc);
 						if (ret.Save)
-							throw new CodeEE(keyword + "キーワードが二重に指定されています", sc);
+							throw new CodeEE(keyword + GameMessages.T(" keyword specified twice"), sc);
 						ret.Save = true;
 						break;
 					case "CHARADATA":
 						if (isPrivate)
-							throw new CodeEE("ローカル変数の宣言に" + keyword + "キーワードは指定できません", sc);
+							throw new CodeEE(GameMessages.T("Local variable declarations cannot use the ") + keyword + GameMessages.T(" keyword"), sc);
 						if (ret.Reference)
-							throw new CodeEE(keyword + "とREFキーワードは同時に指定できません", sc);
+							throw new CodeEE(keyword + GameMessages.T(" cannot be specified together with the REF keyword"), sc);
 						if (ret.Const)
-							throw new CodeEE(keyword + "とCONSTキーワードは同時に指定できません", sc);
+							throw new CodeEE(keyword + GameMessages.T(" cannot be specified together with the CONST keyword"), sc);
 						if (staticDefined)
 							if (ret.Static)
-                                throw new CodeEE(keyword + "とSTATICキーワードは同時に指定できません", sc);
+                                throw new CodeEE(keyword + GameMessages.T(" cannot be specified together with the STATIC keyword"), sc);
 							else
-                                throw new CodeEE(keyword + "とDYNAMICキーワードは同時に指定できません", sc);
+                                throw new CodeEE(keyword + GameMessages.T(" cannot be specified together with the DYNAMIC keyword"), sc);
 						if (ret.Global)
-                            throw new CodeEE(keyword + "とGLOBALキーワードは同時に指定できません", sc);
+                            throw new CodeEE(keyword + GameMessages.T(" cannot be specified together with the GLOBAL keyword"), sc);
 						if (ret.CharaData)
-							throw new CodeEE(keyword + "キーワードが二重に指定されています", sc);
+							throw new CodeEE(keyword + GameMessages.T(" keyword specified twice"), sc);
 						ret.CharaData = true;
 						break;
 					default:
@@ -181,7 +181,7 @@ namespace MinorShift.Emuera.GameProc
 			{
 				string contextMsg = (sc != null) ? $" at {sc.Filename}:{sc.LineNo}" : "";
 				UnityEngine.Debug.LogError($"[UserDefinedVariable] CONST parsing error: No valid variable name after '{keyword}'{contextMsg}");
-				throw new CodeEE(keyword + "の後に有効な変数名が指定されていません", sc);
+				throw new CodeEE(keyword + GameMessages.T(" was not followed by a valid variable name"), sc);
 			}
 			
 			// Now that we have the variable name, expand macros for the remaining tokens (size specifications)
@@ -234,7 +234,7 @@ namespace MinorShift.Emuera.GameProc
 			if (wc.EOL)//size omitted
 			{
 				if (ret.Const)
-					throw new CodeEE("CONSTキーワードが指定されていますが初期値が設定されていません");
+					throw new CodeEE(GameMessages.T("The CONST keyword is specified but no initial value is set"));
 				sizeNum.Add(1);
 			}
 			else if (wc.Current.Type == ',')//size specified
@@ -244,7 +244,7 @@ namespace MinorShift.Emuera.GameProc
 					if (wc.Current.Type == '=')//size specification fully read & initial value specified
 						break;
 					if (wc.Current.Type != ',')
-						throw new CodeEE("書式が間違っています", sc);
+						throw new CodeEE(GameMessages.T("Incorrect format"), sc);
 					wc.ShiftNext();
 					if (ret.Reference)//element count not needed for reference type
 					{
@@ -254,21 +254,26 @@ namespace MinorShift.Emuera.GameProc
 						if (wc.Current.Type == ',')
 							continue;
 					}
-					if (wc.EOL)
-						throw new CodeEE("カンマの後に有効な定数式が指定されていません", sc);
-					IOperandTerm arg = ExpressionParser.ReduceIntegerTerm(wc, TermEndWith.Comma_Assignment);
-					SingleTerm sizeTerm = arg.Restructure(null) as SingleTerm;
-					if ((sizeTerm == null) || (sizeTerm.GetOperandType() != typeof(Int64)))
-						throw new CodeEE("カンマの後に有効な定数式が指定されていません", sc);
+				if (wc.EOL)
+					throw new CodeEE(GameMessages.T("No valid constant expression was specified after the comma"), sc);
+				IOperandTerm arg = ExpressionParser.ReduceIntegerTerm(wc, TermEndWith.Comma_Assignment);
+				// Use EMediator so user-defined CONST variables (e.g. #DIM CONST OBJ_ID_LAST = ...) can be
+				// resolved as array sizes — Restructure(null) cannot evaluate them, but EMediator can.
+				SingleTerm sizeTerm = arg.Restructure(GlobalStatic.EMediator) as SingleTerm;
+				if ((sizeTerm == null) || (sizeTerm.GetOperandType() != typeof(Int64)))
+					// Throw retryable exception so multi-pass DIM resolution can handle forward-references
+					// to other CONST DIM variables (e.g. #DIM Arr, OBJ_ID_LAST where OBJ_ID_LAST is itself
+					// a #DIM CONST resolved in a later pass).
+					throw new IdentifierNotFoundCodeEE(GameMessages.T("No valid constant expression was specified after the comma"), sc);
 					if (ret.Reference)//element count cannot be specified for reference type (either write 0 or omit)
 					{
 						if (sizeTerm.Int != 0)
-							throw new CodeEE("参照型変数にはサイズを指定できません(サイズを省略するか0を指定してください)", sc);
+							throw new CodeEE(GameMessages.T("Sizes cannot be specified for reference-type variables (omit the size or specify 0)"), sc);
 
 						continue;
 					}
 					else if ((sizeTerm.Int <= 0) || (sizeTerm.Int > 1000000))
-						throw new CodeEE("ユーザー定義変数のサイズは1以上1000000以下でなければなりません", sc);
+						throw new CodeEE(GameMessages.T("The size of a user-defined variable must be between 1 and 1000000"), sc);
 					sizeNum.Add((int)sizeTerm.Int);
 				}
 			}
@@ -277,31 +282,31 @@ namespace MinorShift.Emuera.GameProc
 			if (wc.Current.Type != '=')//no initial value specified
 			{
 				if (ret.Const)
-					throw new CodeEE("CONSTキーワードが指定されていますが初期値が設定されていません");
+					throw new CodeEE(GameMessages.T("The CONST keyword is specified but no initial value is set"));
 			}
 			else//initial value specified
 			{
 				if (((OperatorWord)wc.Current).Code != OperatorCode.Assignment)
-					throw new CodeEE("予期しない演算子を発見しました");
+					throw new CodeEE(GameMessages.T("Unexpected operator found"));
 				if (ret.Reference)
-					throw new CodeEE("参照型変数には初期値を設定できません");
+					throw new CodeEE(GameMessages.T("Initial values cannot be set for reference-type variables"));
 				if (sizeNum.Count >= 2)
-					throw new CodeEE("多次元変数には初期値を設定できません");
+					throw new CodeEE(GameMessages.T("Initial values cannot be set for multidimensional variables"));
 				if (ret.CharaData)
-					throw new CodeEE("キャラ型変数には初期値を設定できません");
+					throw new CodeEE(GameMessages.T("Initial values cannot be set for character-type variables"));
 				int size = 0;
 				if (sizeNum.Count == 1)
 					size = sizeNum[0];
 				wc.ShiftNext();
 				IOperandTerm[] terms = ExpressionParser.ReduceArguments(wc, ArgsEndWith.EoL, false);
 				if (terms.Length == 0)
-					throw new CodeEE("配列の初期値は省略できません");
+					throw new CodeEE(GameMessages.T("Initial values for arrays cannot be omitted"));
 				if (size > 0)
 				{
 					if (terms.Length > size)
-						throw new CodeEE("初期値の数が配列のサイズを超えています");
+						throw new CodeEE(GameMessages.T("The number of initial values exceeds the array size"));
 					if (ret.Const && terms.Length != size)
-						throw new CodeEE("定数の初期値の数が配列のサイズと一致しません");
+						throw new CodeEE(GameMessages.T("The number of initial values for a constant does not match the array size"));
 				}
 				if (dims)
 					ret.DefaultStr = new string[terms.Length];
@@ -311,13 +316,13 @@ namespace MinorShift.Emuera.GameProc
 				for (int i = 0; i < terms.Length; i++)
 				{
 					if (terms[i] == null)
-						throw new CodeEE("配列の初期値は省略できません");
+						throw new CodeEE(GameMessages.T("Initial values for arrays cannot be omitted"));
 					terms[i] = terms[i].Restructure(GlobalStatic.EMediator);
 					SingleTerm sTerm = terms[i] as SingleTerm;
 					if (sTerm == null)
-						throw new CodeEE("配列の初期値には定数のみ指定できます");
+						throw new CodeEE(GameMessages.T("Only constants can be specified as initial values for arrays"));
 					if (dims != sTerm.IsString)
-						throw new CodeEE("変数の型と初期値の型が一致していません");
+						throw new CodeEE(GameMessages.T("The variable type does not match the initial value type"));
 					if (dims)
 						ret.DefaultStr[i] = sTerm.Str;
 					else
@@ -327,7 +332,7 @@ namespace MinorShift.Emuera.GameProc
 					sizeNum.Add(terms.Length);
 			}
 			if (!wc.EOL)
-				throw new CodeEE("書式が間違っています", sc);
+				throw new CodeEE(GameMessages.T("Incorrect format"), sc);
 
 			if (sizeNum.Count == 0)
 				sizeNum.Add(1);
@@ -335,11 +340,11 @@ namespace MinorShift.Emuera.GameProc
 			ret.Private = isPrivate;
 			ret.Dimension = sizeNum.Count;
 			if (ret.Const && ret.Dimension > 1)
-				throw new CodeEE("CONSTキーワードが指定された変数を多次元配列にはできません");
+				throw new CodeEE(GameMessages.T("Variables with the CONST keyword cannot be multidimensional arrays"));
 			if (ret.CharaData && ret.Dimension > 2)
-				throw new CodeEE("3次元以上のキャラ型変数を宣言することはできません", sc);
+				throw new CodeEE(GameMessages.T("Cannot declare character-type variables with 3 or more dimensions"), sc);
 			if (ret.Dimension > 3)
-				throw new CodeEE("4次元以上の配列変数を宣言することはできません", sc);
+				throw new CodeEE(GameMessages.T("Cannot declare array variables with 4 or more dimensions"), sc);
 			ret.Lengths = new int[sizeNum.Count];
 			if (ret.Reference)
 				return ret;
@@ -350,13 +355,13 @@ namespace MinorShift.Emuera.GameProc
 				totalBytes *= ret.Lengths[i];
 			}
 			if ((totalBytes <= 0) || (totalBytes > 1000000))
-				throw new CodeEE("ユーザー定義変数のサイズは1以上1000000以下でなければなりません", sc);
+				throw new CodeEE(GameMessages.T("The size of a user-defined variable must be between 1 and 1000000"), sc);
 			if (!isPrivate && ret.Save && !Config.SystemSaveInBinary)
 			{
 				if (dims && ret.Dimension > 1)
-					throw new CodeEE("文字列型の多次元配列変数にSAVEDATAフラグを付ける場合には「バイナリ型セーブ」オプションが必須です", sc);
+					throw new CodeEE(GameMessages.T("The \"Binary Save\" option is required when adding the SAVEDATA flag to a string-type multidimensional array variable"), sc);
 				else if (ret.CharaData)
-					throw new CodeEE("キャラ型変数にSAVEDATAフラグを付ける場合には「バイナリ型セーブ」オプションが必須です", sc);
+					throw new CodeEE(GameMessages.T("The \"Binary Save\" option is required when adding the SAVEDATA flag to a character-type variable"), sc);
 			}
 			return ret;
 		}

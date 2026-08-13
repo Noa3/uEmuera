@@ -15,8 +15,8 @@ using MinorShift._Library;
 
 namespace MinorShift.Emuera
 {
-	//1756 新設。
-	//また、使用されている名前を記憶し衝突を検出する。
+	//1756 Newly created.
+	//Also remembers used names and detects conflicts.
 	internal sealed class IdentifierDictionary
 	{
 		private enum DefinedNameType
@@ -38,7 +38,7 @@ namespace MinorShift.Emuera
 			' ', '　', '\t' ,
 			'\"','(', ')', '{', '}', '[', ']', ',', '.', ':',
 			'\\', '@', '$', '#', '?', ';', '\'',
-			//'_'はOK
+			//'_' is OK
 		};
 		readonly static Regex regexCom = new Regex("^COM[0-9]+$");
 		readonly static Regex regexComAble = new Regex("^COM_ABLE[0-9]+$");
@@ -127,8 +127,8 @@ namespace MinorShift.Emuera
 		{
 			this.varData = varData;
 			nameDic.Clear();
-			//予約語を登録。式中に登場すると構文解析が崩壊する名前群。
-			//ただしeramaker用スクリプトなら特に気にすることはない。式中に出てこない単語も同様。
+			//Register reserved words. A group of names whose appearance in an expression would break syntax analysis.
+			//However, there is nothing to worry about for eramaker scripts. The same applies to words that do not appear in expressions.
 			nameDic.Add("IS", DefinedNameType.Reserved);
 			nameDic.Add("TO", DefinedNameType.Reserved);
 			nameDic.Add("INT", DefinedNameType.Reserved);
@@ -139,7 +139,7 @@ namespace MinorShift.Emuera
 			nameDic.Add("GLOBAL", DefinedNameType.Reserved);
 			nameDic.Add("PRIVATE", DefinedNameType.Reserved);
 			nameDic.Add("SAVEDATA", DefinedNameType.Reserved);
-			nameDic.Add("CHARADATA", DefinedNameType.Reserved);//CHARDATAから変更
+			nameDic.Add("CHARADATA", DefinedNameType.Reserved);//Changed from CHARDATA
 			nameDic.Add("REF", DefinedNameType.Reserved);
 			nameDic.Add("__DEBUG__", DefinedNameType.Reserved);
 			nameDic.Add("__SKIP__", DefinedNameType.Reserved);
@@ -158,9 +158,9 @@ namespace MinorShift.Emuera
 
 			foreach (KeyValuePair<string, VariableToken> pair in varTokenDic)
 			{
-				//RANDが衝突している
-				//1808a3 GLOBAL、PRIVATEも
-				//1808beta009 REFも
+				//RAND conflicts
+				//1808a3 Also GLOBAL and PRIVATE
+				//1808beta009 Also REF
 				if (!nameDic.ContainsKey(pair.Key)) 
 					nameDic.Add(pair.Key, DefinedNameType.SystemVariable);
 			}
@@ -172,8 +172,8 @@ namespace MinorShift.Emuera
 
 			foreach (KeyValuePair<string, FunctionIdentifier> pair in instructionDic)
 			{
-				//Methodと被る
-				//1808a3 SAVEDATAも
+				//Overlaps with Method
+				//1808a3 Also SAVEDATA
 				if (!nameDic.ContainsKey(pair.Key))
 					nameDic.Add(pair.Key, DefinedNameType.SystemInstrument);
 			}
@@ -187,20 +187,20 @@ namespace MinorShift.Emuera
 		{
 			if (labelName.Length == 0)
 			{
-				errMes = "ラベル名がありません";
+				errMes = GameMessages.T("No label name.");
 				warnLevel = 2;
 				return;
 			}
-			//1.721 記号をサポートしない方向に変更
+			//1.721 Changed to not support symbols
 			if (labelName.IndexOfAny(badSymbolAsIdentifier) >= 0)
 			{
-				errMes = "ラベル名" + labelName + "に\"_\"以外の記号が含まれています";
+				errMes = GameMessages.T("Label name ") + labelName + GameMessages.T(" contains a symbol other than \"_\".");
 				warnLevel = 1;
 				return;
 			}
 			if (char.IsDigit(labelName[0]) && (labelName[0].ToString()).Length == LangManager.GetStrlenLang(labelName[0].ToString()))
 			{
-                errMes = "ラベル名" + labelName + "が半角数字から始まっています";
+                errMes = GameMessages.T("Label name ") + labelName + GameMessages.T(" starts with a half-width digit.");
 				warnLevel = 0;
 				return;
 			}
@@ -217,42 +217,42 @@ namespace MinorShift.Emuera
 					case DefinedNameType.Reserved:
 						if (Config.AllowFunctionOverloading)
 						{
-							errMes = "関数名" + labelName + "はEmueraの予約語と衝突しています。Emuera専用構文の構文解析に支障をきたす恐れがあります";
+							errMes = GameMessages.T("Function name ") + labelName + GameMessages.T(" conflicts with an Emuera reserved word and may interfere with the syntax analysis of Emuera-specific syntax.");
 							warnLevel = 1;
 						}
 						else
 						{
-							errMes = "関数名" + labelName + "はEmueraの予約語です";
+							errMes = GameMessages.T("Function name ") + labelName + GameMessages.T(" is an Emuera reserved word.");
 							warnLevel = 2;
 						}
 						break;
 					case DefinedNameType.SystemMethod:
 						if (Config.AllowFunctionOverloading)
 						{
-							errMes = "関数名" + labelName + "はEmueraの式中関数を上書きします";
+							errMes = GameMessages.T("Function name ") + labelName + GameMessages.T(" overrides an Emuera built-in function.");
 							warnLevel = 1;
 						}
 						else
 						{
-							errMes = "関数名" + labelName + "はEmueraの式中関数名として使われています";
+							errMes = GameMessages.T("Function name ") + labelName + GameMessages.T(" is already used as an Emuera built-in function name.");
 							warnLevel = 2;
 						}
 						break;
 					case DefinedNameType.SystemVariable:
-						errMes = "関数名" + labelName + "はEmueraの変数で使われています";
+						errMes = GameMessages.T("Function name ") + labelName + GameMessages.T(" is used as an Emuera variable.");
 						warnLevel = 1;
 						break;
 					case DefinedNameType.SystemInstrument:
-						errMes = "関数名" + labelName + "はEmueraの変数もしくは命令で使われています";
+						errMes = GameMessages.T("Function name ") + labelName + GameMessages.T(" is used as an Emuera variable or command.");
 						warnLevel = 1;
 						break;
 					case DefinedNameType.UserMacro:
-						//字句解析がうまくいっていれば本来あり得ないはず
-						errMes = "関数名" + labelName + "はマクロに使用されています";
+						//Should be impossible if lexical analysis works correctly
+						errMes = GameMessages.T("Function name ") + labelName + GameMessages.T(" is used as a macro name.");
 						warnLevel = 2;
 						break;
 					case DefinedNameType.UserRefMethod:
-						errMes = "関数名" + labelName + "は参照型関数の名称に使用されています";
+						errMes = GameMessages.T("Function name ") + labelName + GameMessages.T(" is used as the name of a reference-type function.");
 						warnLevel = 2;
 						break;
 				}
@@ -263,20 +263,20 @@ namespace MinorShift.Emuera
 		{
 			//if (varName.Length == 0)
 			//{
-			//    errMes = "変数名がありません";
+			//    errMes = "No variable name.";
 			//    warnLevel = 2;
 			//    return;
 			//}
-			//1.721 記号をサポートしない方向に変更
+			//1.721 Changed to not support symbols
 			if (varName.IndexOfAny(badSymbolAsIdentifier) >= 0)
 			{
-				errMes = "変数名" + varName + "に\"_\"以外の記号が含まれています";
+				errMes = GameMessages.T("Variable name ") + varName + GameMessages.T(" contains a symbol other than \"_\".");
 				warnLevel = 2;
 				return;
 			}
             //if (char.IsDigit(varName[0]))
             //{
-            //    errMes = "変数名" + varName + "が半角数字から始まっています";
+            //    errMes = "Variable name " + varName + " starts with a half-width digit.";
             //    warnLevel = 2;
             //    return;
             //}
@@ -287,29 +287,29 @@ namespace MinorShift.Emuera
 				switch (nametype)
 				{
 					case DefinedNameType.Reserved:
-						errMes = "変数名" + varName + "はEmueraの予約語です";
+						errMes = GameMessages.T("Variable name ") + varName + GameMessages.T(" is an Emuera reserved word.");
 						warnLevel = 2;
 						break;
 					case DefinedNameType.SystemInstrument:
 					case DefinedNameType.SystemMethod:
-						//代入文が使えなくなるために命令名との衝突は致命的。
-						errMes = "変数名" + varName + "はEmueraの命令名として使われています";
+						//Collision with a command name is fatal because assignment statements become unusable.
+						errMes = GameMessages.T("Variable name ") + varName + GameMessages.T(" is used as an Emuera command name.");
 						warnLevel = 2;
 						break;
 					case DefinedNameType.SystemVariable:
-						errMes = "変数名" + varName + "はEmueraの変数名として使われています";
+						errMes = GameMessages.T("Variable name ") + varName + GameMessages.T(" is used as an Emuera variable name.");
 						warnLevel = 2;
 						break;
 					case DefinedNameType.UserMacro:
-						errMes = "変数名" + varName + "は既にマクロ名に使用されています";
+						errMes = GameMessages.T("Variable name ") + varName + GameMessages.T(" is already used as a macro name.");
 						warnLevel = 2;
 						break;
 					case DefinedNameType.UserGlobalVariable:
-						errMes = "変数名" + varName + "はユーザー定義の広域変数名に使用されています";
+						errMes = GameMessages.T("Variable name ") + varName + GameMessages.T(" is used as a user-defined global variable name.");
 						warnLevel = 2;
 						break;
 					case DefinedNameType.UserRefMethod:
-						errMes = "変数名" + varName + "は参照型関数の名称に使用されています";
+						errMes = GameMessages.T("Variable name ") + varName + GameMessages.T(" is used as the name of a reference-type function.");
 						warnLevel = 2;
 						break;
 				}
@@ -320,7 +320,7 @@ namespace MinorShift.Emuera
 		{
 			if (macroName.IndexOfAny(badSymbolAsIdentifier) >= 0)
 			{
-				errMes = "マクロ名" + macroName + "に\"_\"以外の記号が含まれています";
+				errMes = GameMessages.T("Macro name ") + macroName + GameMessages.T(" contains a symbol other than \"_\".");
 				warnLevel = 2;
 				return;
 			}
@@ -330,30 +330,30 @@ namespace MinorShift.Emuera
 				switch (nametype)
 				{
 					case DefinedNameType.Reserved:
-						errMes = "マクロ名" + macroName + "はEmueraの予約語です";
+						errMes = GameMessages.T("Macro name ") + macroName + GameMessages.T(" is an Emuera reserved word.");
 						warnLevel = 2;
 						break;
 					case DefinedNameType.SystemInstrument:
 					case DefinedNameType.SystemMethod:
-						//命令名を上書きした時が面倒なのでとりあえず許可しない
-						errMes = "マクロ名" + macroName + "はEmueraの命令名として使われています";
+						//Overwriting a command name would be troublesome, so it is not allowed for now
+						errMes = GameMessages.T("Macro name ") + macroName + GameMessages.T(" is used as an Emuera command name.");
 						warnLevel = 2;
 						break;
 					case DefinedNameType.SystemVariable:
-						//別に上書きしてもいいがとりあえず許可しないでおく。いずれ解放するかもしれない
-						errMes = "マクロ名" + macroName + "はEmueraの変数名として使われています";
+						//Overwriting would be acceptable, but it is not allowed for now. It may be permitted in the future
+						errMes = GameMessages.T("Macro name ") + macroName + GameMessages.T(" is used as an Emuera variable name.");
 						warnLevel = 2;
 						break;
 					case DefinedNameType.UserMacro:
-						errMes = "マクロ名" + macroName + "は既にマクロ名に使用されています";
+						errMes = GameMessages.T("Macro name ") + macroName + GameMessages.T(" is already used as a macro name.");
 						warnLevel = 2;
 						break;
 					case DefinedNameType.UserGlobalVariable:
-						errMes = "マクロ名" + macroName + "はユーザー定義の広域変数名に使用されています";
+						errMes = GameMessages.T("Macro name ") + macroName + GameMessages.T(" is used as a user-defined global variable name.");
 						warnLevel = 2;
 						break;
 					case DefinedNameType.UserRefMethod:
-						errMes = "マクロ名" + macroName + "は参照型関数の名称に使用されています";
+						errMes = GameMessages.T("Macro name ") + macroName + GameMessages.T(" is used as the name of a reference-type function.");
 						warnLevel = 2;
 						break;
 				}
@@ -364,20 +364,20 @@ namespace MinorShift.Emuera
 		{
 			if (varName.Length == 0)
 			{
-				errMes = "変数名がありません";
+				errMes = GameMessages.T("No variable name.");
 				warnLevel = 2;
 				return;
 			}
-			//1.721 記号をサポートしない方向に変更
+			//1.721 Changed to not support symbols
 			if (varName.IndexOfAny(badSymbolAsIdentifier) >= 0)
 			{
-				errMes = "変数名" + varName + "に\"_\"以外の記号が含まれています";
+				errMes = GameMessages.T("Variable name ") + varName + GameMessages.T(" contains a symbol other than \"_\".");
 				warnLevel = 2;
 				return;
 			}
 			if (char.IsDigit(varName[0]))
 			{
-				errMes = "変数名" + varName + "が半角数字から始まっています";
+				errMes = GameMessages.T("Variable name ") + varName + GameMessages.T(" starts with a half-width digit.");
 				warnLevel = 2;
 				return;
 			}
@@ -387,32 +387,32 @@ namespace MinorShift.Emuera
 				switch(nametype)
 				{
 					case DefinedNameType.Reserved:
-						errMes = "変数名" + varName + "はEmueraの予約語です";
+						errMes = GameMessages.T("Variable name ") + varName + GameMessages.T(" is an Emuera reserved word.");
 						warnLevel = 2;
 						return;
 					case DefinedNameType.SystemInstrument:
 					case DefinedNameType.SystemMethod:
-						//代入文が使えなくなるために命令名との衝突は致命的。
-						errMes = "変数名" + varName + "はEmueraの命令名として使われています";
+						//Collision with a command name is fatal because assignment statements become unusable.
+						errMes = GameMessages.T("Variable name ") + varName + GameMessages.T(" is used as an Emuera command name.");
 						warnLevel = 2;
 						return;
 					case DefinedNameType.SystemVariable:
-						//システム変数の上書きは不可
-                        errMes = "変数名" + varName + "はEmueraの変数名として使われています";
+						//System variables cannot be overwritten
+                        errMes = GameMessages.T("Variable name ") + varName + GameMessages.T(" is used as an Emuera variable name.");
                         warnLevel = 2;
 						break;
 					case DefinedNameType.UserMacro:
-						//字句解析がうまくいっていれば本来あり得ないはず
-						errMes = "変数名" + varName + "はマクロに使用されています";
+						//Should be impossible if lexical analysis works correctly
+						errMes = GameMessages.T("Variable name ") + varName + GameMessages.T(" is used as a macro name.");
 						warnLevel = 2;
 						break;
 					case DefinedNameType.UserGlobalVariable:
-						//広域変数の上書きは禁止しておく
-						errMes = "変数名" + varName + "はユーザー定義の広域変数名に使用されています";
+						//Overwriting global variables is prohibited
+						errMes = GameMessages.T("Variable name ") + varName + GameMessages.T(" is used as a user-defined global variable name.");
 						warnLevel = 2;
 						break;
 					case DefinedNameType.UserRefMethod:
-						errMes = "変数名" + varName + "は参照型関数の名称に使用されています";
+						errMes = GameMessages.T("Variable name ") + varName + GameMessages.T(" is used as the name of a reference-type function.");
 						warnLevel = 2;
 						break;
                 }
@@ -422,7 +422,7 @@ namespace MinorShift.Emuera
 		#endregion
 
 		#region header.erb
-		//1807 ErbLoaderに移動
+		//1807 Moved to ErbLoader
 		Dictionary<string, DefineMacro> macroDic = new Dictionary<string, DefineMacro>();
 
 		internal void AddUseDefinedVariable(VariableToken var)
@@ -430,14 +430,26 @@ namespace MinorShift.Emuera
 			// Check if variable already exists to avoid duplicate key exception
 			if (varTokenDic.ContainsKey(var.Name))
 			{
+	#if UNITY_EDITOR
 				UnityEngine.Debug.LogWarning($"[IdentifierDictionary] Variable '{var.Name}' already defined, skipping duplicate");
+#endif
 				return;
 			}
 			
 			// Also check nameDic to avoid conflicts
 			if (nameDic.ContainsKey(var.Name))
 			{
-				UnityEngine.Debug.LogWarning($"[IdentifierDictionary] Name '{var.Name}' already registered in nameDic, skipping");
+#if UNITY_EDITOR
+				// Suppress the warning when the name was legitimately registered by
+				// AddIntegerMacro for a #DIM CONST declaration.  In that code path the
+				// macro is registered first and AddUseDefinedVariable is called right
+				// after — the "conflict" is intentional and the variable doesn't need
+				// runtime storage.
+				DefinedNameType existingType = DefinedNameType.None;
+				nameDic.TryGetValue(var.Name, out existingType);
+				if (existingType != DefinedNameType.UserMacro)
+					UnityEngine.Debug.LogWarning($"[IdentifierDictionary] Name '{var.Name}' already registered in nameDic, skipping");
+#endif
 				return;
 			}
 			
@@ -453,12 +465,16 @@ namespace MinorShift.Emuera
 			// Check for duplicates to avoid ArgumentException
 			if (nameDic.ContainsKey(mac.Keyword))
 			{
+	#if UNITY_EDITOR
 				UnityEngine.Debug.LogWarning($"[IdentifierDictionary] Macro '{mac.Keyword}' already defined in nameDic, skipping");
+#endif
 				return;
 			}
 			if (macroDic.ContainsKey(mac.Keyword))
 			{
+	#if UNITY_EDITOR
 				UnityEngine.Debug.LogWarning($"[IdentifierDictionary] Macro '{mac.Keyword}' already defined in macroDic, skipping");
+#endif
 				return;
 			}
 			
@@ -477,20 +493,73 @@ namespace MinorShift.Emuera
 			if (Config.ICVariable)
 				name = name.ToUpper();
 			
-			// Skip if already defined
-			if (nameDic.ContainsKey(name))
+			// Check if name is already registered
+			DefinedNameType existingType = DefinedNameType.None;
+			if (nameDic.TryGetValue(name, out existingType))
 			{
+				if (existingType == DefinedNameType.SystemVariable)
+				{
+					// Standard Emuera behaviour: a #DIM CONST in an ERH file may shadow a
+					// system variable of the same name (e.g. キャラクタ数上限 = 165).
+					// The macro value takes precedence during constant evaluation so that
+					// derived CONSTs like OBJ_ID_LAST = キャラクタ数上限 resolve correctly.
+					WordCollection wcOvr = new WordCollection();
+					wcOvr.Add(new LiteralIntegerWord(value));
+					DefineMacro macOvr = new DefineMacro(name, wcOvr, 0);
+					nameDic[name]   = DefinedNameType.UserMacro; // replace, not Add
+					macroDic[name]  = macOvr;                   // replace or insert
+#if UNITY_EDITOR
+					UnityEngine.Debug.Log($"[IdentifierDictionary] System variable '{originalName}' shadowed by CONST macro = {value}");
+#endif
+					return;
+				}
+#if UNITY_EDITOR
 				UnityEngine.Debug.LogWarning($"[IdentifierDictionary] Macro '{originalName}' already defined, skipping");
+#endif
 				return;
 			}
 				
 			WordCollection wc = new WordCollection();
 			wc.Add(new LiteralIntegerWord(value));
 			DefineMacro mac = new DefineMacro(name, wc, 0);
+		nameDic.Add(mac.Keyword, DefinedNameType.UserMacro);
+		macroDic.Add(mac.Keyword, mac);
+		}
+
+		/// <summary>
+		/// Adds a simple string constant macro (equivalent to #DEFINE NAME "value").
+		/// Used to register #DIMS CONST declarations as macros so dependent DIMS CONST
+		/// declarations that concatenate them can resolve the values at compile time.
+		/// </summary>
+		internal void AddStringMacro(string name, string value)
+		{
+			string originalName = name;
+			if (Config.ICVariable)
+				name = name.ToUpper();
+
+			DefinedNameType existingType = DefinedNameType.None;
+			if (nameDic.TryGetValue(name, out existingType))
+			{
+				if (existingType == DefinedNameType.SystemVariable)
+				{
+					WordCollection wcOvr = new WordCollection();
+					wcOvr.Add(new LiteralStringWord(value));
+					DefineMacro macOvr = new DefineMacro(name, wcOvr, 0);
+					nameDic[name]  = DefinedNameType.UserMacro;
+					macroDic[name] = macOvr;
+					return;
+				}
+#if UNITY_EDITOR
+				UnityEngine.Debug.LogWarning($"[IdentifierDictionary] String macro '{originalName}' already defined, skipping");
+#endif
+				return;
+			}
+
+			WordCollection wc = new WordCollection();
+			wc.Add(new LiteralStringWord(value));
+			DefineMacro mac = new DefineMacro(name, wc, 0);
 			nameDic.Add(mac.Keyword, DefinedNameType.UserMacro);
 			macroDic.Add(mac.Keyword, mac);
-			
-			UnityEngine.Debug.Log($"[IdentifierDictionary] Added macro: {name} = {value}");
 		}
 
 		/// <summary>
@@ -514,7 +583,9 @@ namespace MinorShift.Emuera
 			// use a two-pass approach (first pass collects CONST definitions,
 			// second pass processes DIM lines that use those constants).
 			
+	#if UNITY_EDITOR
 			UnityEngine.Debug.Log("[IdentifierDictionary] Predefined constants initialization skipped - constants are defined in ERH files");
+#endif
 		}
 
 		internal void AddRefMethod(UserDefinedRefMethod refm)
@@ -555,7 +626,7 @@ namespace MinorShift.Emuera
 					if(ret != null)
 					{
 						if (subKey != null)
-							throw new CodeEE("プライベート変数" + key + "に対して@が使われました");
+							throw new CodeEE(GameMessages.T("Private variable ") + key + GameMessages.T(" was used with @."));
 						return ret;
 					}
 				}
@@ -565,19 +636,19 @@ namespace MinorShift.Emuera
 			{
 				if (vl.IsForbid)
                 {
-					throw new CodeEE("呼び出された変数\"" + key + "\"は設定により使用が禁止されています");
+					throw new CodeEE(GameMessages.T("The called variable \"") + key + GameMessages.T("\" is forbidden by the settings."));
                 }
 				LogicalLine line = GlobalStatic.Process.GetScaningLine();
 				if (string.IsNullOrEmpty(subKey))
 				{
-					//システムの入力待ち中にデバッグコマンドからLOCALを呼んだとき。
+					//When LOCAL is called from a debug command while the system is waiting for input.
 					if ((line == null) || (line.ParentLabelLine == null))
-						throw new CodeEE("実行中の関数が存在しないため" + key + "を取得又は変更できませんでした");
+						throw new CodeEE(GameMessages.T("Cannot get or change ") + key + GameMessages.T(" because there is no running function."));
 					subKey = line.ParentLabelLine.LabelName;
 				}
 				else
 				{
-					ParserMediator.Warn("コード中でローカル変数を@付きで呼ぶことは推奨されません(代わりに*.ERHファイルの利用を検討してください)", line, 1, false, false);
+					ParserMediator.Warn(GameMessages.T("Calling a local variable with @ in code is not recommended (consider using *.ERH files instead)"), line, 1, false, false);
 					if (Config.ICFunction)
 						subKey = subKey.ToUpper();
 				}
@@ -588,21 +659,21 @@ namespace MinorShift.Emuera
 			}
 			if (varTokenDic.TryGetValue(key, out ret))
 			{
-                //一文字変数の禁止オプションを考えた名残
+                //Remnant of the idea for an option to forbid single-character variables
                 //if (Config.ForbidOneCodeVariable && ret.CanForbid)
-                //    throw new CodeEE("設定によりシステム一文字数値変数の使用が禁止されています(呼び出された変数：" + ret.Name +")");
+                //    throw new CodeEE("The use of system single-character numeric variables is forbidden by the settings (variable called: " + ret.Name +")");
                 if (ret.IsForbid)
                 {
 					if(!ret.CanForbid)
-						throw new ExeEE("CanForbidでない変数\"" + ret.Name +"\"にIsForbidがついている");
-                    throw new CodeEE("呼び出された変数\"" + ret.Name +"\"は設定により使用が禁止されています");
+						throw new ExeEE(GameMessages.T("Variable without CanForbid \"") + ret.Name + GameMessages.T("\" has IsForbid set."));
+                    throw new CodeEE(GameMessages.T("The called variable \"") + ret.Name + GameMessages.T("\" is forbidden by the settings."));
                 }
 				if (subKey != null)
-					throw new CodeEE("ローカル変数でない変数" + key + "に対して@が使われました");
+					throw new CodeEE(GameMessages.T("Variable ") + key + GameMessages.T(" that is not a local variable was used with @."));
                 return ret;
             }
 			if (subKey != null)
-				throw new CodeEE("@の使い方が不正です");
+				throw new CodeEE(GameMessages.T("Invalid use of @."));
 			return null;
 		}
 
@@ -624,7 +695,7 @@ namespace MinorShift.Emuera
 			List<string> list = new List<string>();
 			foreach (KeyValuePair<string, FunctionMethod> pair in methodDic)
 			{
-				FunctionLabelLine func = labelDic.GetNonEventLabel(pair.Key);
+				FunctionLabelLine func = FunctionResolver.ResolveNormalLabel(labelDic, pair.Key);
 				if (func == null)
 					continue;
 				if (!func.IsMethod)
@@ -648,24 +719,24 @@ namespace MinorShift.Emuera
 		{
 			if (Config.ICFunction)
 				codeStr = codeStr.ToUpper();
-			if (arguments == null)//argumentなし、名前のみの探索
+			if (arguments == null)//Search by name only, without arguments
 			{
                 UserDefinedRefMethod ref_method = null;
 				if (refmethodDic.TryGetValue(codeStr, out ref_method))
 					return new UserDefinedRefMethodNoArgTerm(ref_method);
 				return null;
 			}
-			if ((labelDic != null) && (labelDic.Initialized))
-			{
+				if ((labelDic != null) && (labelDic.Initialized))
+				{
                 UserDefinedRefMethod ref_method = null;
                 if (refmethodDic.TryGetValue(codeStr, out ref_method))
-					return new UserDefinedRefMethodTerm(ref_method, arguments);
-				FunctionLabelLine func = labelDic.GetNonEventLabel(codeStr);
+						return new UserDefinedRefMethodTerm(ref_method, arguments);
+				FunctionLabelLine func = FunctionResolver.ResolveNormalLabel(labelDic, codeStr);
 				if (func != null)
 				{
 					if (userDefinedOnly && !func.IsMethod)
 					{
-						throw new CodeEE("#FUNCTIONが指定されていない関数\"@" + func.LabelName + "\"をCALLF系命令で呼び出そうとしました");
+						throw new CodeEE(GameMessages.T("Attempted to call function \"@") + func.LabelName + GameMessages.T("\" without #FUNCTION specified using a CALLF-family command."));
 					}
 					if (func.IsMethod)
 					{
@@ -675,9 +746,9 @@ namespace MinorShift.Emuera
 							throw new CodeEE(errMes);
 						return ret;
 					}
-					//1.721 #FUNCTIONが定義されていない関数は組み込み関数を上書きしない方向に。 PANCTION.ERBのRANDとか。
+					//1.721 Changed so that functions without #FUNCTION do not override built-in functions. E.g. RAND in PANCTION.ERB.
 					if (!methodDic.ContainsKey(codeStr))
-						throw new CodeEE("#FUNCTIONが定義されていない関数(" + func.Position.Filename + ":" + func.Position.LineNo + "行目)を式中で呼び出そうとしました");
+						throw new CodeEE(GameMessages.T("Attempted to call a function without #FUNCTION defined (") + func.Position.Filename + ":" + func.Position.LineNo + GameMessages.T(") in an expression."));
 				}
 			}
 			if (userDefinedOnly)
@@ -691,42 +762,42 @@ namespace MinorShift.Emuera
 			return new FunctionMethodTerm(method, arguments);
 		}
 
-		//1756 作成中途
-		//名前リストを元に何がやりたかったのかを推定してCodeEEを投げる
-		//1822 DIMリストの解決中にIdentifierNotFoundCodeEEが飛んだ場合にはやり直しの可能性がある
+		//1756 Half-finished creation
+		//Estimate what was intended from the name list and throw a CodeEE
+		//1822 If an IdentifierNotFoundCodeEE is thrown while resolving a DIM list, a retry may be possible
 		public void ThrowException(string str, bool isFunc)
 		{
 			string idStr = str;
-			if(Config.ICFunction || Config.ICVariable) //片方だけなのは互換性用オプションなのでレアケースのはず。対応しない。
+			if(Config.ICFunction || Config.ICVariable) //Having only one enabled is a compatibility option, so it should be a rare case. Not handled.
 				idStr = idStr.ToUpper();
 			if (disableList.Contains(idStr))
-				throw new CodeEE("\"" + str + "\"は#DISABLEが宣言されています");
+				throw new CodeEE("\"" + str + GameMessages.T("\" has #DISABLE declared."));
 			if (!isFunc && privateDimList.Contains(idStr))
-				throw new IdentifierNotFoundCodeEE("変数\"" + str + "\"はこの関数中では定義されていません");
+				throw new IdentifierNotFoundCodeEE(GameMessages.T("Variable \"") + str + GameMessages.T("\" is not defined in this function."));
             DefinedNameType type = DefinedNameType.None;
             if (nameDic.TryGetValue(idStr, out type))
 			{
 				switch (type)
 				{
 					case DefinedNameType.Reserved:
-						throw new CodeEE("Emueraの予約語\"" + str + "\"がInvalid 使われ方をしています");
+						throw new CodeEE(GameMessages.T("Emuera reserved word \"") + str + GameMessages.T("\" is being used in an invalid way."));
 					case DefinedNameType.SystemVariable:
 					case DefinedNameType.UserGlobalVariable:
 						if (isFunc)
-							throw new CodeEE("変数名\"" + str + "\"が関数のように使われています");
+							throw new CodeEE(GameMessages.T("Variable name \"") + str + GameMessages.T("\" is being used like a function."));
 						break;
 					case DefinedNameType.SystemMethod:
 					case DefinedNameType.UserRefMethod:
 						if (!isFunc)
-							throw new CodeEE("関数名\"" + str + "\"が変数のように使われています");
+							throw new CodeEE(GameMessages.T("Function name \"") + str + GameMessages.T("\" is being used like a variable."));
 						break;
 					case DefinedNameType.UserMacro:
-						throw new CodeEE("予期しないマクロ名\"" + str + "\"です");
+						throw new CodeEE(GameMessages.T("Unexpected macro name \"") + str + GameMessages.T("\"."));
 					case DefinedNameType.SystemInstrument:
 						if (isFunc)
-							throw new CodeEE("命令名\"" + str + "\"が関数のように使われています");
+							throw new CodeEE(GameMessages.T("Command name \"") + str + GameMessages.T("\" is being used like a function."));
 						else
-							throw new CodeEE("命令名\"" + str + "\"が変数のように使われています");
+							throw new CodeEE(GameMessages.T("Command name \"") + str + GameMessages.T("\" is being used like a variable."));
 			
 				}
 			}

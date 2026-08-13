@@ -1,0 +1,360 @@
+﻿{
+    "generated_at":  "2026-08-13T01:07:45Z",
+    "source":  "EraUma 3.0.00 / erauma-master scan Aug 2026",
+    "total_apis":  50,
+    "stub_count":  50,
+    "missing_count":  0,
+    "verified_count":  0,
+    "era_apis":  [
+                     {
+                         "name":  "printAndWait",
+                         "call_count":  21359,
+                         "async":  true,
+                         "uEmuera_status":  "STUB",
+                         "notes":  ""
+                     },
+                     {
+                         "name":  "get",
+                         "call_count":  5809,
+                         "async":  false,
+                         "uEmuera_status":  "STUB",
+                         "notes":  ""
+                     },
+                     {
+                         "name":  "println",
+                         "call_count":  4266,
+                         "async":  false,
+                         "uEmuera_status":  "STUB",
+                         "notes":  ""
+                     },
+                     {
+                         "name":  "printButton",
+                         "call_count":  4054,
+                         "async":  false,
+                         "uEmuera_status":  "STUB",
+                         "notes":  ""
+                     },
+                     {
+                         "name":  "input",
+                         "call_count":  3412,
+                         "async":  true,
+                         "uEmuera_status":  "STUB",
+                         "notes":  ""
+                     },
+                     {
+                         "name":  "set",
+                         "call_count":  2244,
+                         "async":  false,
+                         "uEmuera_status":  "STUB",
+                         "notes":  ""
+                     },
+                     {
+                         "name":  "print",
+                         "call_count":  890,
+                         "async":  false,
+                         "uEmuera_status":  "STUB",
+                         "notes":  ""
+                     },
+                     {
+                         "name":  "drawLine",
+                         "call_count":  869,
+                         "async":  false,
+                         "uEmuera_status":  "STUB",
+                         "notes":  ""
+                     },
+                     {
+                         "name":  "add",
+                         "call_count":  562,
+                         "async":  false,
+                         "uEmuera_status":  "STUB",
+                         "notes":  ""
+                     },
+                     {
+                         "name":  "waitAnyKey",
+                         "call_count":  388,
+                         "async":  true,
+                         "uEmuera_status":  "STUB",
+                         "notes":  ""
+                     },
+                     {
+                         "name":  "printMultiColumns",
+                         "call_count":  102,
+                         "async":  false,
+                         "uEmuera_status":  "STUB",
+                         "notes":  ""
+                     },
+                     {
+                         "name":  "clear",
+                         "call_count":  84,
+                         "async":  true,
+                         "uEmuera_status":  "STUB",
+                         "notes":  ""
+                     },
+                     {
+                         "name":  "printInColRows",
+                         "call_count":  50,
+                         "async":  false,
+                         "uEmuera_status":  "STUB",
+                         "notes":  ""
+                     },
+                     {
+                         "name":  "getLineCount",
+                         "call_count":  45,
+                         "async":  false,
+                         "uEmuera_status":  "STUB",
+                         "notes":  ""
+                     },
+                     {
+                         "name":  "logger.debug",
+                         "call_count":  27,
+                         "async":  false,
+                         "uEmuera_status":  "STUB",
+                         "notes":  "era.logger sub-object method"
+                     },
+                     {
+                         "name":  "setAlign",
+                         "call_count":  22,
+                         "async":  false,
+                         "uEmuera_status":  "STUB",
+                         "notes":  ""
+                     },
+                     {
+                         "name":  "getCharactersInTrain",
+                         "call_count":  20,
+                         "async":  false,
+                         "uEmuera_status":  "STUB",
+                         "notes":  ""
+                     },
+                     {
+                         "name":  "setOffset",
+                         "call_count":  19,
+                         "async":  false,
+                         "uEmuera_status":  "STUB",
+                         "notes":  ""
+                     },
+                     {
+                         "name":  "setWidth",
+                         "call_count":  19,
+                         "async":  false,
+                         "uEmuera_status":  "STUB",
+                         "notes":  ""
+                     },
+                     {
+                         "name":  "setHorizontalAlign",
+                         "call_count":  16,
+                         "async":  false,
+                         "uEmuera_status":  "STUB",
+                         "notes":  ""
+                     },
+                     {
+                         "name":  "getAddedCharacters",
+                         "call_count":  16,
+                         "async":  false,
+                         "uEmuera_status":  "STUB",
+                         "notes":  ""
+                     },
+                     {
+                         "name":  "setVerticalAlign",
+                         "call_count":  14,
+                         "async":  false,
+                         "uEmuera_status":  "STUB",
+                         "notes":  ""
+                     },
+                     {
+                         "name":  "setToBottom",
+                         "call_count":  12,
+                         "async":  false,
+                         "uEmuera_status":  "STUB",
+                         "notes":  ""
+                     },
+                     {
+                         "name":  "version",
+                         "call_count":  8,
+                         "async":  false,
+                         "uEmuera_status":  "STUB",
+                         "notes":  "property object {engine, sdk}; not a function"
+                     },
+                     {
+                         "name":  "checkImage",
+                         "call_count":  8,
+                         "async":  false,
+                         "uEmuera_status":  "STUB",
+                         "notes":  ""
+                     },
+                     {
+                         "name":  "delay",
+                         "call_count":  7,
+                         "async":  true,
+                         "uEmuera_status":  "STUB",
+                         "notes":  ""
+                     },
+                     {
+                         "name":  "saveData",
+                         "call_count":  6,
+                         "async":  true,
+                         "uEmuera_status":  "STUB",
+                         "notes":  ""
+                     },
+                     {
+                         "name":  "setColor",
+                         "call_count":  6,
+                         "async":  false,
+                         "uEmuera_status":  "STUB",
+                         "notes":  ""
+                     },
+                     {
+                         "name":  "playMusic",
+                         "call_count":  5,
+                         "async":  false,
+                         "uEmuera_status":  "STUB",
+                         "notes":  ""
+                     },
+                     {
+                         "name":  "printLineChart",
+                         "call_count":  5,
+                         "async":  false,
+                         "uEmuera_status":  "STUB",
+                         "notes":  ""
+                     },
+                     {
+                         "name":  "logger.error",
+                         "call_count":  4,
+                         "async":  false,
+                         "uEmuera_status":  "STUB",
+                         "notes":  "era.logger sub-object method"
+                     },
+                     {
+                         "name":  "replaceInColRows",
+                         "call_count":  4,
+                         "async":  false,
+                         "uEmuera_status":  "STUB",
+                         "notes":  ""
+                     },
+                     {
+                         "name":  "saveGlobal",
+                         "call_count":  3,
+                         "async":  true,
+                         "uEmuera_status":  "STUB",
+                         "notes":  ""
+                     },
+                     {
+                         "name":  "stopMusic",
+                         "call_count":  3,
+                         "async":  false,
+                         "uEmuera_status":  "STUB",
+                         "notes":  ""
+                     },
+                     {
+                         "name":  "printWholeImage",
+                         "call_count":  3,
+                         "async":  false,
+                         "uEmuera_status":  "STUB",
+                         "notes":  ""
+                     },
+                     {
+                         "name":  "getAllCharacters",
+                         "call_count":  2,
+                         "async":  false,
+                         "uEmuera_status":  "STUB",
+                         "notes":  ""
+                     },
+                     {
+                         "name":  "loadData",
+                         "call_count":  2,
+                         "async":  true,
+                         "uEmuera_status":  "STUB",
+                         "notes":  ""
+                     },
+                     {
+                         "name":  "rmData",
+                         "call_count":  2,
+                         "async":  true,
+                         "uEmuera_status":  "STUB",
+                         "notes":  ""
+                     },
+                     {
+                         "name":  "endTrain",
+                         "call_count":  2,
+                         "async":  false,
+                         "uEmuera_status":  "STUB",
+                         "notes":  ""
+                     },
+                     {
+                         "name":  "notify",
+                         "call_count":  2,
+                         "async":  false,
+                         "uEmuera_status":  "STUB",
+                         "notes":  ""
+                     },
+                     {
+                         "name":  "setOverlay",
+                         "call_count":  2,
+                         "async":  false,
+                         "uEmuera_status":  "STUB",
+                         "notes":  ""
+                     },
+                     {
+                         "name":  "logger.assert",
+                         "call_count":  1,
+                         "async":  false,
+                         "uEmuera_status":  "STUB",
+                         "notes":  "era.logger sub-object method"
+                     },
+                     {
+                         "name":  "logger.info",
+                         "call_count":  1,
+                         "async":  false,
+                         "uEmuera_status":  "STUB",
+                         "notes":  "era.logger sub-object method"
+                     },
+                     {
+                         "name":  "logger.warn",
+                         "call_count":  1,
+                         "async":  false,
+                         "uEmuera_status":  "STUB",
+                         "notes":  "era.logger sub-object method"
+                     },
+                     {
+                         "name":  "quit",
+                         "call_count":  1,
+                         "async":  false,
+                         "uEmuera_status":  "STUB",
+                         "notes":  ""
+                     },
+                     {
+                         "name":  "addCharacter",
+                         "call_count":  1,
+                         "async":  false,
+                         "uEmuera_status":  "STUB",
+                         "notes":  ""
+                     },
+                     {
+                         "name":  "addCharacterForTrain",
+                         "call_count":  1,
+                         "async":  false,
+                         "uEmuera_status":  "STUB",
+                         "notes":  ""
+                     },
+                     {
+                         "name":  "beginTrain",
+                         "call_count":  1,
+                         "async":  false,
+                         "uEmuera_status":  "STUB",
+                         "notes":  ""
+                     },
+                     {
+                         "name":  "resetData",
+                         "call_count":  1,
+                         "async":  false,
+                         "uEmuera_status":  "STUB",
+                         "notes":  ""
+                     },
+                     {
+                         "name":  "replaceText",
+                         "call_count":  1,
+                         "async":  false,
+                         "uEmuera_status":  "STUB",
+                         "notes":  ""
+                     }
+                 ]
+}
