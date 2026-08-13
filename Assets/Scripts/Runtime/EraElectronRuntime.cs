@@ -25,6 +25,7 @@ namespace uEmuera.Runtime
         RuntimeState           _state      = RuntimeState.Created;
         EraElectronHostMode    _hostMode   = EraElectronHostMode.Auto;
         IEraElectronHost       _host;
+        EreLocalFileServer     _fileServer;
         DateTime               _startedAt;
 
         // ------------------------------------------------------------------ //
@@ -100,6 +101,13 @@ namespace uEmuera.Runtime
             var bridge = new EreApiDispatcher(data, _context);
             bridge.SetEngineVersion(engineVersion);
 
+            // Start loopback file server — serves game files over a private HTTP
+            // origin. The WebView navigates to fileServer.BaseUrl/index.html.
+            string bootstrapJs = EraElectronBridgeScript.Build(engineVersion);
+            _fileServer = new EreLocalFileServer(_game.GameRoot, bootstrapJs);
+            _fileServer.Start();
+            _context?.Logger?.Info($"[EraElectronRuntime] File server: {_fileServer.BaseUrl}");
+
             // Initialize the host (creates WebView context, registers bridge).
             await _host.InitializeAsync(_game, bridge, cancellationToken);
             _context?.Profiler?.Mark("EreRuntime_HostReady");
@@ -147,6 +155,9 @@ namespace uEmuera.Runtime
                 _host = null;
             }
 
+            try { _fileServer?.Stop(); _fileServer?.Dispose(); } catch { }
+            _fileServer = null;
+
             _state = RuntimeState.Stopped;
             _context?.Logger?.Info("[EraElectronRuntime] Stopped.");
         }
@@ -165,6 +176,7 @@ namespace uEmuera.Runtime
                                   : 0L,
                 WebRuntimeState = _state.ToString(),
                 WebRuntimeHost  = _hostMode.ToString(),
+                SavePath        = _fileServer?.BaseUrl,
             };
 
         public void Dispose()
@@ -175,6 +187,8 @@ namespace uEmuera.Runtime
             }
             try { _host?.Dispose(); } catch { }
             _host  = null;
+            try { _fileServer?.Stop(); _fileServer?.Dispose(); } catch { }
+            _fileServer = null;
             _state = RuntimeState.Stopped;
         }
 
