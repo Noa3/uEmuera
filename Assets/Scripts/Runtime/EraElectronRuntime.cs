@@ -1,6 +1,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using uEmuera.Runtime.EraElectron;
 
 namespace uEmuera.Runtime
 {
@@ -74,7 +75,7 @@ namespace uEmuera.Runtime
             context.Logger?.Info("[EraElectronRuntime] Ready (stub).");
         }
 
-        public Task StartAsync(CancellationToken cancellationToken = default)
+        public async Task StartAsync(CancellationToken cancellationToken = default)
         {
             if (_state != RuntimeState.Ready)
                 throw new InvalidOperationException(
@@ -83,19 +84,32 @@ namespace uEmuera.Runtime
             cancellationToken.ThrowIfCancellationRequested();
 
             _context?.Profiler?.Mark("EreRuntime_Started");
+            _state     = RuntimeState.Running;
+            _startedAt = DateTime.UtcNow;
 
-            // WebView host not yet implemented (Milestone 3 spike pending).
-            // Fault the task so LaunchEreGameCoroutine shows an error dialog and
-            // returns the user to the launcher instead of a silent black screen.
-            _state = RuntimeState.Faulted;
-            string req = _game?.RequiredRuntimeVersion ?? "unknown";
-            throw new NotSupportedException(
-                $"EraElectron runtime not yet available.\n\n" +
-                $"Game:   {_game?.Title ?? "?"}\n" +
-                $"Requires engine version ≥ {req}\n\n" +
-                "The embedded EraElectron host (WebView2 / Android WebView) has not " +
-                "been implemented yet. Follow progress in:\n" +
-                "  Docs/ADR/WEB_RUNTIME_HOST.md");
+            // Create the platform host via bridge factory.
+            _host = PlatformWebViewBridge.Create(_hostMode);
+
+            // Read engine version for bridge injection.
+            string engineVersion = PlatformWebViewBridge.ReadEreMinVersion(_game);
+            _context?.Logger?.Info(
+                $"[EraElectronRuntime] Host={_host.HostMode}, ereMinVersion={engineVersion}");
+
+            // Build and configure the era.* bridge dispatcher.
+            var data   = EreDataModel.Create(_game);
+            var bridge = new EreApiDispatcher(data, _context);
+            bridge.SetEngineVersion(engineVersion);
+
+            // Initialize the host (creates WebView context, registers bridge).
+            await _host.InitializeAsync(_game, bridge, cancellationToken);
+            _context?.Profiler?.Mark("EreRuntime_HostReady");
+
+            // Load the game JS bundles — throws NotSupportedException on NullHost
+            // which LaunchEreGameCoroutine catches and shows as an error dialog.
+            await _host.LoadGameAsync(cancellationToken);
+
+            _host.Show();
+            _context?.Profiler?.Mark("EreRuntime_GameVisible");
         }
 
         public Task SuspendAsync()
