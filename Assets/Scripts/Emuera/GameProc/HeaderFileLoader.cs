@@ -106,9 +106,19 @@ namespace MinorShift.Emuera.GameProc
 					if (!noError)
 						return false;
 					position = new ScriptPosition(filename, eReader.LineNo);
-					LexicalAnalyzer.SkipWhiteSpace(st);
-					if (st.Current != '#')
-						throw new CodeEE(GameMessages.T("There is a line in the header that does not start with #"), position);
+				LexicalAnalyzer.SkipWhiteSpace(st);
+				if (st.Current != '#')
+				{
+					// Skip lines that don't start with '#'. Occurs in games that use
+					// multi-line expressions (e.g. MAX() spanning lines) without {} blocks.
+					// Warn and continue rather than aborting the whole file.
+					string preview = st.Substring();
+					if (preview.Length > 40) preview = preview.Substring(0, 40) + "...";
+					ParserMediator.Warn(
+						GameMessages.T("Line in header does not start with '#', skipping: ") + preview,
+						position, 1);
+					continue;
+				}
 					st.ShiftNext();
 					string sharpID = LexicalAnalyzer.ReadSingleIdentifier(st);
 					if (sharpID == null)
