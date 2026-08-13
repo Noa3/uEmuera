@@ -59,8 +59,9 @@ namespace uEmuera.Runtime.EraElectron
         CoreWebView2               _webView;
 
         Thread  _staThread;
-        string  _dataDirPath;          // captured on Unity main thread before STA start
-        System.Windows.Forms.Form _hostForm;
+        string  _dataDirPath;   // captured on Unity main thread before STA start
+        volatile bool _running = true;
+        IntPtr        _nativeHwnd;
         volatile bool _webViewReady;
         TaskCompletionSource<bool> _initTcs;
         TaskCompletionSource<bool> _loadTcs;
@@ -93,6 +94,9 @@ namespace uEmuera.Runtime.EraElectron
             _initTcs   = new TaskCompletionSource<bool>();
 
             cancellationToken.ThrowIfCancellationRequested();
+
+            // Register this host so the static WndProc can dispatch callbacks to it.
+            _allHosts.Add(this);
 
             // Capture Unity main-thread-only path BEFORE starting the STA thread.
             _dataDirPath = System.IO.Path.Combine(
@@ -131,8 +135,8 @@ namespace uEmuera.Runtime.EraElectron
             _startUrl = gameOriginUrl + "/index.html";
             _loadTcs  = new TaskCompletionSource<bool>();
 
-            // Create controller on the STA thread (requires parent HWND)
-            _hostForm.Invoke(new Action(CreateController));
+            // Post CreateController to run on the STA thread via a Windows message.
+            PostCallback(CreateController);
 
             await _loadTcs.Task;
             UnityEngine.Debug.Log("[WebView2Host] Game JS loaded.");
@@ -140,47 +144,44 @@ namespace uEmuera.Runtime.EraElectron
 
         public void Show()
         {
-            _hostForm?.Invoke(new Action(() =>
-            {
-                if (_controller != null)
-                    _controller.IsVisible = true;
-            }));
+            if (_controller != null)
+                PostCallback(() => { try { _controller.IsVisible = true; } catch { } });
         }
 
         public void Hide()
         {
-            _hostForm?.Invoke(new Action(() =>
-            {
-                if (_controller != null)
-                    _controller.IsVisible = false;
-            }));
+            if (_controller != null)
+                PostCallback(() => { try { _controller.IsVisible = false; } catch { } });
         }
 
         public async Task StopAsync()
         {
-            _hostForm?.Invoke(new Action(() =>
+            _running = false;
+            PostCallback(() =>
             {
-                try { _controller?.Close(); }   catch { }
-                try { _hostForm?.Close(); }     catch { }
-            }));
-            await Task.Delay(200);
+                try { _controller?.Close(); } catch { }
+                // WM_QUIT will stop RunMessageLoopUntil
+                PostMessage(_nativeHwnd, 0x0012 /* WM_QUIT */, IntPtr.Zero, IntPtr.Zero);
+            });
+            await Task.Delay(300);
         }
 
         public async Task<string> EvaluateJsAsync(string js)
         {
             if (_webView == null) return "null";
             var tcs = new TaskCompletionSource<string>();
-            _hostForm.Invoke(new Action(async () =>
+            PostCallback(async () =>
             {
                 try   { tcs.SetResult(await _webView.ExecuteScriptAsync(js)); }
                 catch { tcs.SetResult("null"); }
-            }));
+            });
             return await tcs.Task;
         }
 
         public void Dispose()
         {
-            try { _hostForm?.Invoke(new Action(() => _hostForm?.Close())); } catch { }
+            _running = false;
+            try { PostMessage(_nativeHwnd, 0x0012 /* WM_QUIT */, IntPtr.Zero, IntPtr.Zero); } catch { }
         }
 
         // ------------------------------------------------------------------ //
@@ -189,36 +190,96 @@ namespace uEmuera.Runtime.EraElectron
 
         void StaThreadProc()
         {
-            // WinForms message loop required for WebView2
-            System.Windows.Forms.Application.EnableVisualStyles();
-            System.Windows.Forms.Application.SetCompatibleTextRenderingDefault(false);
-
-            _hostForm = new System.Windows.Forms.Form
+            try
             {
-                Text        = "uEmuera WebView2",
-                ShowInTaskbar = false,
-                WindowState = System.Windows.Forms.FormWindowState.Normal,
-                FormBorderStyle = System.Windows.Forms.FormBorderStyle.None,
-                BackColor   = System.Drawing.Color.Black,
-            };
+                // Create a minimal hidden Win32 message window WITHOUT WinForms
+                // Application.Run() — that call conflicts with Unity Editor's own
+                // Win32 message pump.  We use CreateWindowEx + native GetMessage loop.
+                _nativeHwnd = CreateMessageWindow();
+                if (_nativeHwnd == IntPtr.Zero)
+                {
+                    _initTcs.TrySetException(new Exception(
+                        "[WebView2Host] CreateWindowEx failed: " +
+                        Marshal.GetLastWin32Error()));
+                    return;
+                }
 
-            _hostForm.Load += async (s, e) =>
+                // Create WebView2 environment.  This is async-over-native: it starts
+                // the Edge process and completes via PostMessage to our HWND.
+                // We pump messages until the task completes.
+                var envTask = CoreWebView2Environment.CreateAsync(null, _dataDirPath);
+                RunMessageLoopUntil(() => envTask.IsCompleted);
+
+                if (envTask.IsFaulted)
+                {
+                    _initTcs.TrySetException(envTask.Exception?.GetBaseException()
+                        ?? new Exception("[WebView2Host] CreateAsync failed"));
+                    return;
+                }
+
+                _env = envTask.Result;
+                UnityEngine.Debug.Log("[WebView2Host] CoreWebView2Environment ready.");
+                _initTcs.TrySetResult(true);
+
+                // Keep pumping messages until we are told to stop.
+                RunMessageLoopUntil(() => !_running);
+            }
+            catch (Exception ex)
             {
-                try
+                _initTcs?.TrySetException(ex);
+                _loadTcs?.TrySetException(ex);
+                UnityEngine.Debug.LogError("[WebView2Host] STA thread error: " + ex);
+            }
+            finally
+            {
+                if (_nativeHwnd != IntPtr.Zero)
                 {
-                    System.IO.Directory.CreateDirectory(_dataDirPath);
-                    _env = await CoreWebView2Environment.CreateAsync(null, _dataDirPath);
-                    _initTcs.TrySetResult(true);
-                    UnityEngine.Debug.Log("[WebView2Host] CoreWebView2Environment ready.");
+                    try { DestroyWindow(_nativeHwnd); } catch { }
+                    _nativeHwnd = IntPtr.Zero;
                 }
-                catch (Exception ex)
-                {
-                    _initTcs.TrySetException(ex);
-                    _hostForm.Close();
-                }
-            };
+            }
+        }
 
-            System.Windows.Forms.Application.Run(_hostForm);
+        volatile bool _running = true;
+        IntPtr        _nativeHwnd;
+
+        const string WC_CLASS = "uEmueraWV2Host";
+
+        IntPtr CreateMessageWindow()
+        {
+            // Register a minimal window class.
+            WNDCLASSEX wc = new WNDCLASSEX
+            {
+                cbSize        = Marshal.SizeOf<WNDCLASSEX>(),
+                lpfnWndProc   = Marshal.GetFunctionPointerForDelegate(
+                                    (WndProcDelegate)DefWindowProcWrapper),
+                lpszClassName = WC_CLASS,
+                hInstance     = GetModuleHandle(null),
+            };
+            RegisterClassEx(ref wc); // ok to fail if already registered
+
+            return CreateWindowEx(
+                0, WC_CLASS, "uEmuera WebView2 Host",
+                0x00800000 /* WS_POPUP */, 0, 0, 800, 600,
+                IntPtr.Zero, IntPtr.Zero, GetModuleHandle(null), IntPtr.Zero);
+        }
+
+        static IntPtr DefWindowProcWrapper(IntPtr hwnd, uint msg, IntPtr wParam, IntPtr lParam)
+            => DefWindowProc(hwnd, msg, wParam, lParam);
+
+        static void RunMessageLoopUntil(Func<bool> done)
+        {
+            while (!done())
+            {
+                MSG msg;
+                while (PeekMessage(out msg, IntPtr.Zero, 0, 0, 1 /* PM_REMOVE */))
+                {
+                    if (msg.message == 0x0012 /* WM_QUIT */) return;
+                    TranslateMessage(ref msg);
+                    DispatchMessage(ref msg);
+                }
+                Thread.Sleep(1);
+            }
         }
 
         // ------------------------------------------------------------------ //
@@ -229,57 +290,61 @@ namespace uEmuera.Runtime.EraElectron
         {
             try
             {
-                // Get Unity main window HWND
-                IntPtr parentHwnd = GetUnityWindowHwnd();
-
-                if (parentHwnd == IntPtr.Zero)
-                {
-                    // Fallback: use the host form as parent
-                    _hostForm.Show();
-                    _hostForm.BringToFront();
-                    parentHwnd = _hostForm.Handle;
-                }
-                else
-                {
-                    // Position our form over the Unity window
-                    PositionOverUnityWindow();
-                    _hostForm.Show();
-                }
-
-                _controller = await _env.CreateCoreWebView2ControllerAsync(
-                    _hostForm.Handle);
-
-                _webView = _controller.CoreWebView2;
+                // Parent is our native message window (stable HWND).
+                _controller = await _env.CreateCoreWebView2ControllerAsync(_nativeHwnd);
+                _webView    = _controller.CoreWebView2;
 
                 // Configure
                 _webView.Settings.AreDefaultContextMenusEnabled = false;
-                _webView.Settings.IsStatusBarEnabled = false;
-                _webView.Settings.AreDevToolsEnabled = true; // useful for development
-                _webView.Settings.IsZoomControlEnabled = false;
+                _webView.Settings.IsStatusBarEnabled            = false;
+                _webView.Settings.AreDevToolsEnabled            = true;
+                _webView.Settings.IsZoomControlEnabled          = false;
 
                 // Bridge: JS → C# via postMessage
                 _webView.WebMessageReceived += OnWebMessageReceived;
 
-                // Navigation guard: only allow the game origin
+                // Navigation guard
                 _webView.NavigationStarting += OnNavigationStarting;
 
-                // DOM content loaded: inject bridge
+                // DOM loaded → resolve LoadGameAsync
                 _webView.DOMContentLoaded += OnDomContentLoaded;
 
-                // Set bounds to fill the host form
-                _controller.Bounds = new System.Drawing.Rectangle(
-                    0, 0, _hostForm.ClientSize.Width, _hostForm.ClientSize.Height);
+                // Resize to Unity window area
+                ResizeToCoverUnityWindow();
                 _controller.IsVisible = true;
 
-                // Navigate to the file server
+                // Navigate to the loopback file server
                 _webView.Navigate(_startUrl ?? "about:blank");
 
                 _webViewReady = true;
-                UnityEngine.Debug.Log($"[WebView2Host] Controller created, navigating to {_startUrl}");
+                UnityEngine.Debug.Log($"[WebView2Host] Controller created → {_startUrl}");
             }
             catch (Exception ex)
             {
-                _loadTcs.TrySetException(ex);
+                UnityEngine.Debug.LogError("[WebView2Host] CreateController error: " + ex);
+                _loadTcs?.TrySetException(ex);
+            }
+        }
+
+        void ResizeToCoverUnityWindow()
+        {
+            try
+            {
+                IntPtr unityHwnd = GetUnityWindowHwnd();
+                if (unityHwnd == IntPtr.Zero) return;
+
+                RECT r;
+                if (GetClientRect(unityHwnd, out r))
+                {
+                    // Reparent the WebView2 controller's bounds window under the Unity HWND
+                    _controller.ParentWindow = unityHwnd;
+                    _controller.Bounds = new System.Drawing.Rectangle(
+                        0, 0, r.Right - r.Left, r.Bottom - r.Top);
+                }
+            }
+            catch (Exception ex)
+            {
+                UnityEngine.Debug.LogWarning("[WebView2Host] ResizeToCoverUnityWindow: " + ex.Message);
             }
         }
 
@@ -360,46 +425,75 @@ namespace uEmuera.Runtime.EraElectron
         void ResolveJs(int callId, string resultJson)
         {
             string js = $"window._eraResolve({callId}, {resultJson ?? "null"});";
-            _webView?.PostWebMessageAsString(js); // use ExecuteScript for reliability
-            _hostForm?.BeginInvoke(new Action(async () =>
+            PostCallback(async () =>
             {
                 try { await _webView?.ExecuteScriptAsync(js); } catch { }
-            }));
+            });
         }
 
         void RejectJs(int callId, string errorMsg)
         {
             string escaped = errorMsg?.Replace("\"", "\\\"").Replace("\n", "\\n") ?? "";
             string js = $"window._eraReject({callId}, \"{escaped}\");";
-            _hostForm?.BeginInvoke(new Action(async () =>
+            PostCallback(async () =>
             {
                 try { await _webView?.ExecuteScriptAsync(js); } catch { }
-            }));
+            });
         }
+
+        // ------------------------------------------------------------------ //
+        //  Cross-thread callback via PostMessage custom WM                     //
+        // ------------------------------------------------------------------ //
+
+        const uint WM_APP_CALLBACK = 0x8001;
+        readonly ConcurrentQueue<Action> _callbacks = new ConcurrentQueue<Action>();
+
+        /// <summary>Posts an action to run on the STA thread's message loop.</summary>
+        void PostCallback(Action a)
+        {
+            if (_nativeHwnd == IntPtr.Zero) return;
+            _callbacks.Enqueue(a);
+            PostMessage(_nativeHwnd, WM_APP_CALLBACK, IntPtr.Zero, IntPtr.Zero);
+        }
+
+        // Our message loop should handle WM_APP_CALLBACK.
+        // RunMessageLoopUntil pumps messages generically, so we need the WNDPROC to dispatch.
+        // Override DefWindowProc to drain the callback queue on WM_APP_CALLBACK.
+        static IntPtr DefWindowProcWrapper(IntPtr hwnd, uint msg, IntPtr wParam, IntPtr lParam)
+        {
+            // Drain pending callbacks; safe because this is the STA thread.
+            if (msg == WM_APP_CALLBACK)
+            {
+                // Walk the global list — static, so cast is via host lookup
+                // (simple approach: iterate the queue via the singleton pattern)
+                foreach (var host in _allHosts)
+                {
+                    if (host._nativeHwnd == hwnd)
+                    {
+                        Action a;
+                        while (host._callbacks.TryDequeue(out a))
+                            try { a(); } catch (Exception ex) {
+                                UnityEngine.Debug.LogWarning("[WebView2Host] Callback error: " + ex.Message);
+                            }
+                        return IntPtr.Zero;
+                    }
+                }
+            }
+            return DefWindowProc(hwnd, msg, wParam, lParam);
+        }
+
+        // Track all hosts so the static WndProc can find them
+        static readonly System.Collections.Concurrent.ConcurrentBag<WebView2Host> _allHosts
+            = new System.Collections.Concurrent.ConcurrentBag<WebView2Host>();
 
         // ------------------------------------------------------------------ //
         //  Helpers                                                             //
         // ------------------------------------------------------------------ //
 
-        void PositionOverUnityWindow()
-        {
-            IntPtr unityHwnd = GetUnityWindowHwnd();
-            if (unityHwnd == IntPtr.Zero) return;
-
-            RECT rect;
-            if (GetClientRect(unityHwnd, out rect))
-            {
-                POINT topLeft = new POINT { X = 0, Y = 0 };
-                ClientToScreen(unityHwnd, ref topLeft);
-                _hostForm.Location = new System.Drawing.Point(topLeft.X, topLeft.Y);
-                _hostForm.Size = new System.Drawing.Size(rect.Right - rect.Left, rect.Bottom - rect.Top);
-            }
-        }
-
         static IntPtr GetUnityWindowHwnd()
         {
-            var proc = System.Diagnostics.Process.GetCurrentProcess();
-            return proc.MainWindowHandle;
+            try { return System.Diagnostics.Process.GetCurrentProcess().MainWindowHandle; }
+            catch { return IntPtr.Zero; }
         }
 
         // Very simple JSON field extractors (no dependency on proper JSON parser)
@@ -438,13 +532,46 @@ namespace uEmuera.Runtime.EraElectron
         // ------------------------------------------------------------------ //
 
         [StructLayout(LayoutKind.Sequential)]
+        struct MSG
+        {
+            public IntPtr hwnd; public uint message;
+            public IntPtr wParam; public IntPtr lParam;
+            public uint time; public POINT pt;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
         struct RECT { public int Left, Top, Right, Bottom; }
 
         [StructLayout(LayoutKind.Sequential)]
         struct POINT { public int X, Y; }
 
+        [StructLayout(LayoutKind.Sequential, CharSet=CharSet.Unicode)]
+        struct WNDCLASSEX
+        {
+            public int cbSize; public uint style;
+            public IntPtr lpfnWndProc; public int cbClsExtra; public int cbWndExtra;
+            public IntPtr hInstance; public IntPtr hIcon; public IntPtr hCursor;
+            public IntPtr hbrBackground; public string lpszMenuName;
+            public string lpszClassName; public IntPtr hIconSm;
+        }
+
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        delegate IntPtr WndProcDelegate(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam);
+
+        [DllImport("user32.dll", CharSet=CharSet.Unicode)]
+        static extern short RegisterClassEx(ref WNDCLASSEX lpwcx);
+        [DllImport("user32.dll", CharSet=CharSet.Unicode)]
+        static extern IntPtr CreateWindowEx(uint dwExStyle, string lpClassName, string lpWindowName,
+            uint dwStyle, int x, int y, int nWidth, int nHeight,
+            IntPtr hWndParent, IntPtr hMenu, IntPtr hInstance, IntPtr lpParam);
+        [DllImport("user32.dll")] static extern bool DestroyWindow(IntPtr hWnd);
+        [DllImport("user32.dll")] static extern bool PostMessage(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
+        [DllImport("user32.dll")] static extern bool PeekMessage(out MSG lpMsg, IntPtr hWnd, uint min, uint max, uint remove);
+        [DllImport("user32.dll")] static extern bool TranslateMessage(ref MSG lpMsg);
+        [DllImport("user32.dll")] static extern IntPtr DispatchMessage(ref MSG lpMsg);
+        [DllImport("user32.dll")] static extern IntPtr DefWindowProc(IntPtr hWnd, uint uMsg, IntPtr wParam, IntPtr lParam);
+        [DllImport("kernel32.dll", CharSet=CharSet.Unicode)] static extern IntPtr GetModuleHandle(string lpModuleName);
         [DllImport("user32.dll")] static extern bool GetClientRect(IntPtr hWnd, out RECT lpRect);
-        [DllImport("user32.dll")] static extern bool ClientToScreen(IntPtr hWnd, ref POINT lpPoint);
     }
 }
 
