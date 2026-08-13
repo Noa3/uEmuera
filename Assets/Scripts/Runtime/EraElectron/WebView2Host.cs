@@ -59,6 +59,7 @@ namespace uEmuera.Runtime.EraElectron
         CoreWebView2               _webView;
 
         Thread  _staThread;
+        string  _dataDirPath;          // captured on Unity main thread before STA start
         System.Windows.Forms.Form _hostForm;
         volatile bool _webViewReady;
         TaskCompletionSource<bool> _initTcs;
@@ -92,6 +93,10 @@ namespace uEmuera.Runtime.EraElectron
             _initTcs   = new TaskCompletionSource<bool>();
 
             cancellationToken.ThrowIfCancellationRequested();
+
+            // Capture Unity main-thread-only path BEFORE starting the STA thread.
+            _dataDirPath = System.IO.Path.Combine(
+                UnityEngine.Application.temporaryCachePath, "WebView2Data");
 
             // Start STA thread that owns WebView2
             _staThread = new Thread(StaThreadProc) { IsBackground = true, Name = "WebView2STA" };
@@ -201,11 +206,8 @@ namespace uEmuera.Runtime.EraElectron
             {
                 try
                 {
-                    string dataDir = System.IO.Path.Combine(
-                        UnityEngine.Application.temporaryCachePath, "WebView2Data");
-                    System.IO.Directory.CreateDirectory(dataDir);
-
-                    _env = await CoreWebView2Environment.CreateAsync(null, dataDir);
+                    System.IO.Directory.CreateDirectory(_dataDirPath);
+                    _env = await CoreWebView2Environment.CreateAsync(null, _dataDirPath);
                     _initTcs.TrySetResult(true);
                     UnityEngine.Debug.Log("[WebView2Host] CoreWebView2Environment ready.");
                 }
