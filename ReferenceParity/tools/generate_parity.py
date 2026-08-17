@@ -210,7 +210,16 @@ def build_features(registry: dict, inv: dict[str, object], upstream: dict) -> li
                 argument_hits = evidence_for(tokens, {ROOT / "Creator.Method.cs": next((t for p, t in texts.items() if p.name == "Creator.Method.cs"), "")})
         # Source text can show that argument code exists, but only the
         # extracted reference/local signature comparison can produce FULL.
-        argument = signature if signature != "N/A" else ("FULL" if argument_hits else "MISSING")
+        # When upstream inventory is incomplete (missing_reference tokens), fall back to
+        # argument_hits instead of declaring MISSING — the feature may still be implemented.
+        if signature == "MISSING" and signature_missing_reference:
+            # Upstream doesn't have these tokens — check if we have local evidence
+            if argument_hits:
+                argument = "PARTIAL"
+            else:
+                argument = "MISSING"
+        else:
+            argument = signature if signature != "N/A" else ("FULL" if argument_hits else "MISSING")
 
         runtime_hits = evidence_for(feature.get("runtime_patterns", []), texts)
         runtime = "FULL" if runtime_hits else ("PARTIAL" if parser != "MISSING" else "MISSING")

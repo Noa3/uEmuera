@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "generated_at": "2025-11-14T20:59:19+09:00",
-  "uemuera_revision": "ed32e69246398e0f36b4d36c43649524a8a38f90",
+  "uemuera_revision": "15782fec13cb5ab71fadb72fdc829bac8a128efe",
   "reference": {
     "schema_version": 1,
     "repository": "https://gitlab.com/EvilMask/emuera.em",
