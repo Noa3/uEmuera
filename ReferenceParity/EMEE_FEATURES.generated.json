@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "generated_at": "2025-11-14T20:59:19+09:00",
-  "uemuera_revision": "1b4ee5399a4df475e90f3a53f38ad7417c0f736f",
+  "uemuera_revision": "495e701cfc32aadcba3129e1caabbac5f5736bcd",
   "reference": {
     "schema_version": 1,
     "repository": "https://gitlab.com/EvilMask/emuera.em",
@@ -683,7 +683,7 @@
       "WHILE"
     ],
     "command_inventory_count": 519,
-    "regression_fixture_count": 4
+    "regression_fixture_count": 6
   },
   "upstream_inventory": {
     "command_count": 567,
@@ -698,7 +698,7 @@
         "registered": true,
         "implemented": true,
         "signature_match": false,
-        "local_tests": "MISSING",
+        "local_tests": "REGISTERED",
         "reference_tests": "MISSING",
         "reference_version": "55"
       },
@@ -710,7 +710,7 @@
         "input": "N/A",
         "persistence": "N/A",
         "platform": "FULL",
-        "tests": "MISSING"
+        "tests": "IMPLEMENTED_UNVERIFIED"
       },
       "evidence": {
         "parser": [
@@ -739,7 +739,9 @@
         "persistence": [],
         "runtime_registry": "registered",
         "renderer_registry": "missing",
-        "tests": []
+        "tests": [
+          "html.div.layout"
+        ]
       },
       "reference": {
         "name": "Emuera.EM+EE",
@@ -759,7 +761,7 @@
         "registered": true,
         "implemented": true,
         "signature_match": false,
-        "local_tests": "MISSING",
+        "local_tests": "REGISTERED",
         "reference_tests": "MISSING",
         "reference_version": "55"
       },
@@ -771,7 +773,7 @@
         "input": "N/A",
         "persistence": "N/A",
         "platform": "FULL",
-        "tests": "MISSING"
+        "tests": "IMPLEMENTED_UNVERIFIED"
       },
       "evidence": {
         "parser": [
@@ -797,7 +799,9 @@
         "persistence": [],
         "runtime_registry": "registered",
         "renderer_registry": "missing",
-        "tests": []
+        "tests": [
+          "html.clearbutton.basic"
+        ]
       },
       "reference": {
         "name": "Emuera.EM+EE",

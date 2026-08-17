@@ -3,7 +3,7 @@
 > Generated from source registries and regression metadata. This file is not hand-maintained.
 > `FULL` requires a verified reference fixture; registration alone never produces `FULL`.
 
-- uEmuera revision: `1b4ee5399a4df475e90f3a53f38ad7417c0f736f`
+- uEmuera revision: `495e701cfc32aadcba3129e1caabbac5f5736bcd`
 - Reference: `EMv18 / EEv55`
 - Reference Emuera.EM revision: `cde11d69048f87d4a70d1452da79ae6e56462386`
 - Reference tag: `Emuera.NET1824+v22+EMv18+EEv55`
@@ -11,8 +11,8 @@
 
 | Feature | Parser | Arguments | Runtime | Rendering | Input | Persistence | Platform | Tests | Overall |
 |---|---|---|---|---|---|---|---|---|---|
-| html.div | FULL | PARTIAL | FULL | FULL | N/A | N/A | FULL | MISSING | PARTIAL |
-| html.clearbutton | FULL | PARTIAL | FULL | FULL | N/A | N/A | FULL | MISSING | PARTIAL |
+| html.div | FULL | PARTIAL | FULL | FULL | N/A | N/A | FULL | IMPLEMENTED_UNVERIFIED | PARTIAL |
+| html.clearbutton | FULL | PARTIAL | FULL | FULL | N/A | N/A | FULL | IMPLEMENTED_UNVERIFIED | PARTIAL |
 | html.img.srcb | FULL | MISSING | FULL | FULL | N/A | N/A | FULL | MISSING | PARTIAL |
 | html.img.srcm | FULL | MISSING | FULL | FULL | N/A | N/A | FULL | MISSING | PARTIAL |
 | html.print_island | FULL | PARTIAL | FULL | FULL | N/A | N/A | FULL | MISSING | PARTIAL |

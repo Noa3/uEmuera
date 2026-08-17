@@ -8,6 +8,8 @@
 | `dt.row.stable_id` | `dt.row` | `LOGIC` | `pending` | `Fixtures/dt_row_stable_id.erb` |
 | `dt.select.filter_sort` | `dt.select` | `LOGIC` | `pending` | `Fixtures/dt_select_filter_sort.erb` |
 | `dt.serialization.roundtrip` | `dt.serialization` | `SAVE` | `pending` | `Fixtures/dt_serialization_roundtrip.erb` |
+| `html.div.layout` | `html.div` | `HTML` | `pending` | `fixtures/html_div_layout.erb` |
+| `html.clearbutton.basic` | `html.clearbutton` | `HTML` | `pending` | `fixtures/html_clearbutton_basic.erb` |
 
 ## Required capture fields
 
