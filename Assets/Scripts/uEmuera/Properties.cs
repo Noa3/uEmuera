@@ -6,23 +6,23 @@ namespace Properties
     {
         static Dictionary<string, string> dict = new Dictionary<string, string>
         {
-            { "RuntimeErrMesMethodCIMGCreateOutOfRange0","{0}関数:画像の範囲外が指定されています"},
-            { "RuntimeErrMesMethodColorARGB0","{0}関数:ColorARGBargumentに不適切な値(0x{1:X8})が指定されました"},
-            { "RuntimeErrMesMethodDefaultArgumentOutOfRange0","{0}関数:第{2}argumentに不適切な値({1})が指定されました"},
-            { "RuntimeErrMesMethodGColorMatrix0","{0}関数:ColorMatrixの指定された要素({1}, {2})が不適切であるか5x5に足りていません"},
-            { "RuntimeErrMesMethodGDIPLUSOnly","{0}関数:描画オプションがWINAPIの時には使用できません"},
-            { "RuntimeErrMesMethodGHeight0","{0}関数:GraphicsのHeightに0以下の値({1})が指定されました"},
-            { "RuntimeErrMesMethodGHeight1","{0}関数:GraphicsのHeightに{2}以上の値({1})が指定されました"},
-            { "RuntimeErrMesMethodGraphicsID0","{0}関数:GraphicsIDに負の値({1})が指定されました"},
-            { "RuntimeErrMesMethodGraphicsID1","{0}関数:GraphicsIDの値({1})が大きすぎます"},
-            { "RuntimeErrMesMethodGWidth0","{0}関数:GraphicsのWidthに0以下の値({1})が指定されました"},
-            { "RuntimeErrMesMethodGWidth1","{0}関数:GraphicsのWidthに{2}以上の値({1})が指定されました"},
-            { "SyntaxErrMesMethodDefaultArgumentNotNullable0","{0}関数:第{1}argumentは省略できません"},
-            { "SyntaxErrMesMethodDefaultArgumentNum0","{0}関数:argumentの数が間違っています"},
-            { "SyntaxErrMesMethodDefaultArgumentNum1","{0}関数:少なくとも{1}個のargumentが必要です"},
-            { "SyntaxErrMesMethodDefaultArgumentNum2","{0}関数:argumentの数が多すぎます"},
-            { "SyntaxErrMesMethodDefaultArgumentType0","{0}関数:第{1}argumentの型が間違っています"},
-            { "SyntaxErrMesMethodGraphicsColorMatrix0","{0}関数:ColorMatrixに5x5以上の二次元数値型配列変数でないargumentが指定されました"},
+            { "RuntimeErrMesMethodCIMGCreateOutOfRange0",GameMessages.T("{0} function: the specified image range is out of bounds")},
+            { "RuntimeErrMesMethodColorARGB0",GameMessages.T("{0} function: an invalid value (0x{1:X8}) was specified for the ColorARGB argument")},
+            { "RuntimeErrMesMethodDefaultArgumentOutOfRange0",GameMessages.T("{0} function: an invalid value ({1}) was specified for argument #{2}")},
+            { "RuntimeErrMesMethodGColorMatrix0",GameMessages.T("{0} function: the specified ColorMatrix element ({1}, {2}) is invalid or is not 5x5")},
+            { "RuntimeErrMesMethodGDIPLUSOnly",GameMessages.T("{0} function: cannot be used when the drawing option is WINAPI")},
+            { "RuntimeErrMesMethodGHeight0",GameMessages.T("{0} function: a value of 0 or less ({1}) was specified for the Graphics Height")},
+            { "RuntimeErrMesMethodGHeight1",GameMessages.T("{0} function: a value of {2} or more ({1}) was specified for the Graphics Height")},
+            { "RuntimeErrMesMethodGraphicsID0",GameMessages.T("{0} function: a negative value ({1}) was specified for the GraphicsID")},
+            { "RuntimeErrMesMethodGraphicsID1",GameMessages.T("{0} function: the GraphicsID value ({1}) is too large")},
+            { "RuntimeErrMesMethodGWidth0",GameMessages.T("{0} function: a value of 0 or less ({1}) was specified for the Graphics Width")},
+            { "RuntimeErrMesMethodGWidth1",GameMessages.T("{0} function: a value of {2} or more ({1}) was specified for the Graphics Width")},
+            { "SyntaxErrMesMethodDefaultArgumentNotNullable0",GameMessages.T("{0} function: argument #{1} cannot be omitted")},
+            { "SyntaxErrMesMethodDefaultArgumentNum0",GameMessages.T("{0} function: the number of arguments is incorrect")},
+            { "SyntaxErrMesMethodDefaultArgumentNum1",GameMessages.T("{0} function: at least {1} arguments are required")},
+            { "SyntaxErrMesMethodDefaultArgumentNum2",GameMessages.T("{0} function: too many arguments")},
+            { "SyntaxErrMesMethodDefaultArgumentType0",GameMessages.T("{0} function: the type of argument #{1} is incorrect")},
+            { "SyntaxErrMesMethodGraphicsColorMatrix0",GameMessages.T("{0} function: the ColorMatrix argument is not a 2D numeric array variable of 5x5 or larger")},
         };
 
         public static string GetString(string key, object culture)
@@ -38,7 +38,7 @@ namespace Properties
         private static global::System.Globalization.CultureInfo resourceCulture;
 
         /// <summary>
-        ///   Looks up a localized string similar to "{0}関数:画像の範囲外が指定されています".
+        ///   Looks up a localized string similar to "{0} function: the specified image range is out of bounds".
         /// </summary>
         public static string RuntimeErrMesMethodCIMGCreateOutOfRange0
         {
@@ -49,7 +49,7 @@ namespace Properties
         }
 
         /// <summary>
-        ///   Looks up a localized string similar to "{0}関数:ColorARGBargumentに不適切な値(0x{1:X8})が指定されました".
+        ///   Looks up a localized string similar to "{0} function: an invalid value (0x{1:X8}) was specified for the ColorARGB argument".
         /// </summary>
         public static string RuntimeErrMesMethodColorARGB0
         {
@@ -60,7 +60,7 @@ namespace Properties
         }
 
         /// <summary>
-        ///   Looks up a localized string similar to "{0}関数:第{2}argumentに不適切な値({1})が指定されました".
+        ///   Looks up a localized string similar to "{0} function: an invalid value ({1}) was specified for argument #{2}".
         /// </summary>
         public static string RuntimeErrMesMethodDefaultArgumentOutOfRange0
         {
@@ -71,7 +71,7 @@ namespace Properties
         }
 
         /// <summary>
-        ///   Looks up a localized string similar to "{0}関数:ColorMatrixの指定された要素({1}, {2})が不適切であるか5x5に足りていません".
+        ///   Looks up a localized string similar to "{0} function: the specified ColorMatrix element ({1}, {2}) is invalid or is not 5x5".
         /// </summary>
         public static string RuntimeErrMesMethodGColorMatrix0
         {
@@ -82,7 +82,7 @@ namespace Properties
         }
 
         /// <summary>
-        ///   Looks up a localized string similar to "{0}関数:描画オプションがWINAPIの時には使用できません".
+        ///   Looks up a localized string similar to "{0} function: cannot be used when the drawing option is WINAPI".
         /// </summary>
         public static string RuntimeErrMesMethodGDIPLUSOnly
         {
@@ -93,7 +93,7 @@ namespace Properties
         }
 
         /// <summary>
-        ///   Looks up a localized string similar to "{0}関数:GraphicsのHeightに0以下の値({1})が指定されました".
+        ///   Looks up a localized string similar to "{0} function: a value of 0 or less ({1}) was specified for the Graphics Height".
         /// </summary>
         public static string RuntimeErrMesMethodGHeight0
         {
@@ -104,7 +104,7 @@ namespace Properties
         }
 
         /// <summary>
-        ///   Looks up a localized string similar to "{0}関数:GraphicsのHeightに{2}以上の値({1})が指定されました".
+        ///   Looks up a localized string similar to "{0} function: a value of {2} or more ({1}) was specified for the Graphics Height".
         /// </summary>
         public static string RuntimeErrMesMethodGHeight1
         {
@@ -115,7 +115,7 @@ namespace Properties
         }
 
         /// <summary>
-        ///   Looks up a localized string similar to "{0}関数:GraphicsIDに負の値({1})が指定されました".
+        ///   Looks up a localized string similar to "{0} function: a negative value ({1}) was specified for the GraphicsID".
         /// </summary>
         public static string RuntimeErrMesMethodGraphicsID0
         {
@@ -126,7 +126,7 @@ namespace Properties
         }
 
         /// <summary>
-        ///   Looks up a localized string similar to "{0}関数:GraphicsIDの値({1})が大きすぎます".
+        ///   Looks up a localized string similar to "{0} function: the GraphicsID value ({1}) is too large".
         /// </summary>
         public static string RuntimeErrMesMethodGraphicsID1
         {
@@ -137,7 +137,7 @@ namespace Properties
         }
 
         /// <summary>
-        ///   Looks up a localized string similar to "{0}関数:GraphicsのWidthに0以下の値({1})が指定されました".
+        ///   Looks up a localized string similar to "{0} function: a value of 0 or less ({1}) was specified for the Graphics Width".
         /// </summary>
         public static string RuntimeErrMesMethodGWidth0
         {
@@ -148,7 +148,7 @@ namespace Properties
         }
 
         /// <summary>
-        ///   Looks up a localized string similar to "{0}関数:GraphicsのWidthに{2}以上の値({1})が指定されました".
+        ///   Looks up a localized string similar to "{0} function: a value of {2} or more ({1}) was specified for the Graphics Width".
         /// </summary>
         public static string RuntimeErrMesMethodGWidth1
         {
@@ -159,7 +159,7 @@ namespace Properties
         }
 
         /// <summary>
-        ///   Looks up a localized string similar to "{0}関数:第{1}argumentは省略できません".
+        ///   Looks up a localized string similar to "{0} function: argument #{1} cannot be omitted".
         /// </summary>
         public static string SyntaxErrMesMethodDefaultArgumentNotNullable0
         {
@@ -170,7 +170,7 @@ namespace Properties
         }
 
         /// <summary>
-        ///   Looks up a localized string similar to "{0}関数:argumentの数が間違っています".
+        ///   Looks up a localized string similar to "{0} function: the number of arguments is incorrect".
         /// </summary>
         public static string SyntaxErrMesMethodDefaultArgumentNum0
         {
@@ -181,7 +181,7 @@ namespace Properties
         }
 
         /// <summary>
-        ///   Looks up a localized string similar to "{0}関数:少なくとも{1}個のargumentが必要です".
+        ///   Looks up a localized string similar to "{0} function: at least {1} arguments are required".
         /// </summary>
         public static string SyntaxErrMesMethodDefaultArgumentNum1
         {
@@ -192,7 +192,7 @@ namespace Properties
         }
 
         /// <summary>
-        ///   Looks up a localized string similar to "{0}関数:argumentの数が多すぎます".
+        ///   Looks up a localized string similar to "{0} function: too many arguments".
         /// </summary>
         public static string SyntaxErrMesMethodDefaultArgumentNum2
         {
@@ -203,7 +203,7 @@ namespace Properties
         }
 
         /// <summary>
-        ///   Looks up a localized string similar to "{0}関数:第{1}argumentの型が間違っています".
+        ///   Looks up a localized string similar to "{0} function: the type of argument #{1} is incorrect".
         /// </summary>
         public static string SyntaxErrMesMethodDefaultArgumentType0
         {
@@ -214,7 +214,7 @@ namespace Properties
         }
 
         /// <summary>
-        ///   Looks up a localized string similar to "{0}関数:ColorMatrixに5x5以上の二次元数値型配列変数でないargumentが指定されました".
+        ///   Looks up a localized string similar to "{0} function: the ColorMatrix argument is not a 2D numeric array variable of 5x5 or larger".
         /// </summary>
         public static string SyntaxErrMesMethodGraphicsColorMatrix0
         {

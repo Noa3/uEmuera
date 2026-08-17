@@ -278,8 +278,8 @@ namespace uEmuera.Tests.EditMode
             Assert.AreEqual(0, dt.RowCount);
             Assert.IsTrue(dt.AddCol("Name", EraDataTable.ColType.Str));
             Assert.IsTrue(dt.AddCol("Value", EraDataTable.ColType.Int));
-            int row = dt.AddRow();
-            Assert.AreEqual(0, row);
+            long rowId = dt.AddRow();
+            Assert.Greater(rowId, 0L);
             dt.SetStr(0, "Name", "Alice");
             dt.SetInt(0, "Value", 42);
             Assert.AreEqual("Alice", dt.GetStr(0, "Name"));

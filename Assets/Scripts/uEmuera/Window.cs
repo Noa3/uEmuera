@@ -189,6 +189,13 @@ namespace uEmuera.Window
             last_process_tic = 0;
         }
 
+        internal void UpdatePointer(uEmuera.Drawing.Point point)
+        {
+            if (console_ == null)
+                return;
+            console_.UpdateMouse(point);
+        }
+
         private EmueraConsole console_ = null;
         private bool dirty_ = false;
 

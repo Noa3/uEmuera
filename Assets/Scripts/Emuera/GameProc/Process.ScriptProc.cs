@@ -27,7 +27,7 @@ namespace MinorShift.Emuera.GameProc
 				InstructionLine func = line as InstructionLine;
 				//there should be no processing that makes this NULL currently
 				//if (line == null)
-				//	throw new ExeEE("Emuera.exeは次に実行する行を見失いました");
+				//	throw new ExeEE("Emuera.exe lost track of the next line to execute");
 				if (line.IsError)
 					throw new CodeEE(line.ErrMes);
 				else if (func != null)
@@ -46,9 +46,9 @@ namespace MinorShift.Emuera.GameProc
 					{
 						if ((userDefinedSkip) && (func.Function.IsInput()))
 						{
-							console.PrintError("表示スキップ中にデフォルト値を持たないINPUTに遭遇しました");
-							console.PrintError("INPUTに必要な処理をNOSKIP～ENDNOSKIPで囲むか、SKIPDISP 0～SKIPDISP 1で囲ってください");
-							throw new CodeEE("無限ループに入る可能性が高いため実行を終了します");
+							console.PrintError(GameMessages.T("Encountered an INPUT that has no default value while display is skipped."));
+							console.PrintError(GameMessages.T("Enclose the required INPUT handling in NOSKIP~ENDNOSKIP, or use SKIPDISP 0~SKIPDISP 1."));
+							throw new CodeEE(GameMessages.T("Ending execution because there is a high probability of an infinite loop."));
 						}
 						continue;
 					}
@@ -76,13 +76,13 @@ namespace MinorShift.Emuera.GameProc
 				else if (line is InvalidLine)
 				{
 					if (string.IsNullOrEmpty(line.ErrMes))
-						throw new CodeEE("読込に失敗した行が実行されました。Errorの詳細は読込時の警告を参照してください。");
+						throw new CodeEE(GameMessages.T("A line that failed to load was executed. See the warnings at load time for details of the error."));
 					else
 						throw new CodeEE(line.ErrMes);
 				}
 				//there is none of that currently
 				//else
-				//	throw new ExeEE("定義されていない種類の行です");
+				//	throw new ExeEE("Line of an undefined type");
 				if (!console.IsRunning || state.ScriptEnd)
 					return;
 			}
@@ -270,7 +270,7 @@ namespace MinorShift.Emuera.GameProc
 							NoList[i] = term_i.GetIntValue(exm);
 							if (!(term_i is VariableTerm) || ((((VariableTerm)term_i).Identifier.Code != VariableCode.MASTER) && (((VariableTerm)term_i).Identifier.Code != VariableCode.ASSI) && (((VariableTerm)term_i).Identifier.Code != VariableCode.TARGET)))
 								if (NoList[i] < 0 || NoList[i] >= charaNum)
-									throw new CodeEE("命令PICKUPCHARAの第" + (i + 1).ToString() + "argumentにキャラリストの範囲外の値(" + NoList[i].ToString() + ")が与えられました");
+									throw new CodeEE(GameMessages.T("PICKUPCHARA: argument #") + (i + 1).ToString() + GameMessages.T(" was given a value outside the character list (") + NoList[i].ToString() + GameMessages.T(")"));
 						}
 						vEvaluator.PickUpChara(NoList);
 					}
@@ -279,7 +279,7 @@ namespace MinorShift.Emuera.GameProc
 					{
 						//pass if it is a debug command
 						if ((func.ParentLabelLine != null) && (func.ParentLabelLine.LabelName != "SYSTEM_TITLE"))
-							throw new CodeEE("@SYSTEM_TITLE以外でこの命令を使うことはできません");
+							throw new CodeEE(GameMessages.T("This command cannot be used outside @SYSTEM_TITLE."));
 						vEvaluator.AddCharacterFromCsvNo(0);
 						if (GlobalStatic.GameBaseData.DefaultCharacter > 0)
 							vEvaluator.AddCharacterFromCsvNo(GlobalStatic.GameBaseData.DefaultCharacter);
@@ -311,15 +311,15 @@ namespace MinorShift.Emuera.GameProc
 						SpSaveDataArgument spSavedataArg = (SpSaveDataArgument)func.Argument;
 						Int64 target = spSavedataArg.Target.GetIntValue(exm);
 						if (target < 0)
-							throw new CodeEE("SAVEDATAのargumentに負の値(" + target.ToString() + ")が指定されました");
-						else if (target > int.MaxValue)
-							throw new CodeEE("SAVEDATAのargument(" + target.ToString() + ")が大きすぎます");
-						string savemes = spSavedataArg.StrExpression.GetStrValue(exm);
-						if (savemes.Contains("\n"))
-							throw new CodeEE("SAVEDATAのセーブテキストに改行文字が与えられました（セーブデータが破損するため改行文字は使えません）");
-						if (!vEvaluator.SaveTo((int)target, savemes))
-						{
-							console.PrintError("SAVEDATA命令によるセーブ中に予期しないErrorが発生しました");
+							throw new CodeEE(GameMessages.T("SAVEDATA was given a negative value (") + target.ToString() + GameMessages.T(")"));
+					else if (target > int.MaxValue)
+						throw new CodeEE(GameMessages.T("SAVEDATA argument (") + target.ToString() + GameMessages.T(") is too large"));
+					string savemes = spSavedataArg.StrExpression.GetStrValue(exm);
+					if (savemes.Contains("\n"))
+						throw new CodeEE(GameMessages.T("SAVEDATA save text was given a newline character (newlines cannot be used as they would corrupt the save data)"));
+					if (!vEvaluator.SaveTo((int)target, savemes))
+					{
+						console.PrintError(GameMessages.T("An unexpected error occurred while saving via the SAVEDATA command"));
 						}
 					}
 					break;
@@ -330,12 +330,12 @@ namespace MinorShift.Emuera.GameProc
 						double x = powerArg.X.GetIntValue(exm);
 						double y = powerArg.Y.GetIntValue(exm);
 						double pow = Math.Pow(x, y);
-						if (double.IsNaN(pow))
-							throw new CodeEE("累乗結果が非数値です");
-						else if (double.IsInfinity(pow))
-							throw new CodeEE("累乗結果が無限大です");
-						else if ((pow >= Int64.MaxValue) || (pow <= Int64.MinValue))
-							throw new CodeEE("累乗結果(" + pow.ToString() + ")が64ビット符号付き整数の範囲外です");
+					if (double.IsNaN(pow))
+						throw new CodeEE(GameMessages.T("The exponentiation result is not a number"));
+					else if (double.IsInfinity(pow))
+						throw new CodeEE(GameMessages.T("The exponentiation result is infinite"));
+					else if ((pow >= Int64.MaxValue) || (pow <= Int64.MinValue))
+						throw new CodeEE(GameMessages.T("The exponentiation result (") + pow.ToString() + GameMessages.T(") is outside the range of a 64-bit signed integer"));
 						powerArg.VariableDest.SetValue((long)pow, exm);
 						break;
 					}
@@ -346,8 +346,8 @@ namespace MinorShift.Emuera.GameProc
 						//until the index is pinned down before reading the value, RAND in the index cannot be handled correctly
 						FixedVariableTerm vTerm1 = arg.var1.GetFixedVariableTerm(exm);
 						FixedVariableTerm vTerm2 = arg.var2.GetFixedVariableTerm(exm);
-						if (vTerm1.GetOperandType() != vTerm2.GetOperandType())
-							throw new CodeEE("入れ替える変数の型が異なります");
+					if (vTerm1.GetOperandType() != vTerm2.GetOperandType())
+						throw new CodeEE(GameMessages.T("The types of the variables to swap are different"));
 						if (vTerm1.GetOperandType() == typeof(Int64))
 						{
 							Int64 temp = vTerm1.GetIntValue(exm);
@@ -360,10 +360,10 @@ namespace MinorShift.Emuera.GameProc
 							vTerm1.SetValue(vTerm2.GetStrValue(exm), exm);
 							vTerm2.SetValue(temps, exm);
 						}
-						else
-						{
-							throw new CodeEE("不明な変数型です");
-						}
+					else
+					{
+						throw new CodeEE(GameMessages.T("Unknown variable type"));
+					}
 						break;
 					}
 				case FunctionCode.GETTIME:
@@ -398,9 +398,9 @@ namespace MinorShift.Emuera.GameProc
 							colorG = colorArg.G.GetIntValue(exm);
 							colorB = colorArg.B.GetIntValue(exm);
 							if ((colorR < 0) || (colorG < 0) || (colorB < 0))
-								throw new CodeEE("SETCOLORのargumentに0未満の値が指定されました");
+								throw new CodeEE(GameMessages.T("SETCOLOR argument was given a value less than 0"));
 							if ((colorR > 255) || (colorG > 255) || (colorB > 255))
-								throw new CodeEE("SETCOLORのargumentに255を超える値が指定されました");
+								throw new CodeEE(GameMessages.T("SETCOLOR argument was given a value greater than 255"));
 						}
 						Color c = Color.FromArgb((Int32)colorR, (Int32)colorG, (Int32)colorB);
 						exm.Console.SetStringStyle(c);
@@ -413,8 +413,8 @@ namespace MinorShift.Emuera.GameProc
 						if (c.A == 0)
 						{
 							if (str.Equals("transparent", StringComparison.OrdinalIgnoreCase))
-								throw new CodeEE("無色透明(Transparent)は色として指定できません");
-							throw new CodeEE("指定された色名\"" + colorName + "\"は無効な色名です");
+								throw new CodeEE(GameMessages.T("Transparent (colorless) cannot be specified as a color"));
+							throw new CodeEE(GameMessages.T("The specified color name \"") + colorName + GameMessages.T("\" is not a valid color name"));
 						}
 						exm.Console.SetStringStyle(c);
 					}
@@ -445,9 +445,9 @@ namespace MinorShift.Emuera.GameProc
 							colorG = colorArg.G.GetIntValue(exm);
 							colorB = colorArg.B.GetIntValue(exm);
 							if ((colorR < 0) || (colorG < 0) || (colorB < 0))
-								throw new CodeEE("SETCOLORのargumentに0未満の値が指定されました");
+								throw new CodeEE(GameMessages.T("SETCOLOR argument was given a value less than 0"));
 							if ((colorR > 255) || (colorG > 255) || (colorB > 255))
-								throw new CodeEE("SETCOLORのargumentに255を超える値が指定されました");
+								throw new CodeEE(GameMessages.T("SETCOLOR argument was given a value greater than 255"));
 						}
 						Color c = Color.FromArgb((Int32)colorR, (Int32)colorG, (Int32)colorB);
 						exm.Console.SetBgColor(c);
@@ -460,8 +460,8 @@ namespace MinorShift.Emuera.GameProc
 						if (c.A == 0)
 						{
 							if (str.Equals("transparent", StringComparison.OrdinalIgnoreCase))
-								throw new CodeEE("無色透明(Transparent)は色として指定できません");
-							throw new CodeEE("指定された色名\"" + colorName + "\"は無効な色名です");
+								throw new CodeEE(GameMessages.T("Transparent (colorless) cannot be specified as a color"));
+							throw new CodeEE(GameMessages.T("The specified color name \"") + colorName + GameMessages.T("\" is not a valid color name"));
 						}
 						exm.Console.SetBgColor(c);
 					}
@@ -500,7 +500,7 @@ namespace MinorShift.Emuera.GameProc
 					else if (str.Equals("RIGHT", Config.SCVariable))
 						exm.Console.Alignment = DisplayLineAlignment.RIGHT;
 					else
-						throw new CodeEE("ALIGNMENTのキーワード\"" + str + "\"は未定義です");
+						throw new CodeEE(GameMessages.T("ALIGNMENT keyword \"") + str + GameMessages.T("\" is undefined"));
 					break;
 
 				case FunctionCode.REDRAW:
@@ -532,7 +532,7 @@ namespace MinorShift.Emuera.GameProc
 							string[] temp = retStr;
 							retStr = new string[spSplitArg.Var.GetLength(0)];
 							Array.Copy(temp, retStr, retStr.Length);
-							//throw new CodeEE("SPLITによる分割後の文字列の数が配列変数の要素数を超えています");
+							//throw new CodeEE("The number of strings after splitting by SPLIT exceeds the number of array variable elements");
 						}
 						spSplitArg.Var.SetValue(retStr, new long[] { 0, 0, 0 });
 					}
@@ -566,8 +566,8 @@ namespace MinorShift.Emuera.GameProc
 					break;
 				case FunctionCode.NOSKIP:
 					{
-						if (func.JumpTo == null)
-							throw new CodeEE("対応するENDNOSKIPのないNOSKIPです");
+					if (func.JumpTo == null)
+						throw new CodeEE(GameMessages.T("NOSKIP has no matching ENDNOSKIP"));
 						saveSkip = skipPrint;
 						if (skipPrint)
 							skipPrint = false;
@@ -575,8 +575,8 @@ namespace MinorShift.Emuera.GameProc
 					break;
 				case FunctionCode.ENDNOSKIP:
 					{
-						if (func.JumpTo == null)
-							throw new CodeEE("対応するNOSKIPのないENDNOSKIPです");
+					if (func.JumpTo == null)
+						throw new CodeEE(GameMessages.T("ENDNOSKIP has no matching NOSKIP"));
 						if (saveSkip)
 							skipPrint = true;
 					}
@@ -587,21 +587,21 @@ namespace MinorShift.Emuera.GameProc
 				case FunctionCode.ARRAYSHIFT: //shift array elements
 					{
 						SpArrayShiftArgument arrayArg = (SpArrayShiftArgument)func.Argument;
-						if (!arrayArg.VarToken.Identifier.IsArray1D)
-							throw new CodeEE("ARRAYSHIFTは1次元配列および配列型キャラクタ変数のみに対応しています");
-						FixedVariableTerm dest = arrayArg.VarToken.GetFixedVariableTerm(exm);
-						int shift = (int)arrayArg.Num1.GetIntValue(exm);
-						if (shift == 0)
-							break;
-						int start = (int)arrayArg.Num3.GetIntValue(exm);
-						if (start < 0)
-							throw new CodeEE("ARRAYSHIFTの第４argumentが負の値(" + start.ToString() + ")です");
+					if (!arrayArg.VarToken.Identifier.IsArray1D)
+						throw new CodeEE(GameMessages.T("ARRAYSHIFT only supports 1-dimensional arrays and array-type character variables"));
+					FixedVariableTerm dest = arrayArg.VarToken.GetFixedVariableTerm(exm);
+					int shift = (int)arrayArg.Num1.GetIntValue(exm);
+					if (shift == 0)
+						break;
+					int start = (int)arrayArg.Num3.GetIntValue(exm);
+					if (start < 0)
+						throw new CodeEE(GameMessages.T("The 4th argument of ARRAYSHIFT is a negative value (") + start.ToString() + GameMessages.T(")"));
 						int num;
 						if (arrayArg.Num4 != null)
 						{
 							num = (int)arrayArg.Num4.GetIntValue(exm);
-							if (num < 0)
-								throw new CodeEE("ARRAYSHIFTの第５argumentが負の値(" + num.ToString() + ")です");
+						if (num < 0)
+							throw new CodeEE(GameMessages.T("The 5th argument of ARRAYSHIFT is a negative value (") + num.ToString() + GameMessages.T(")"));
 							if (num == 0)
 								break;
 						}
@@ -622,15 +622,15 @@ namespace MinorShift.Emuera.GameProc
 				case FunctionCode.ARRAYREMOVE:
 					{
 						SpArrayControlArgument arrayArg = (SpArrayControlArgument)func.Argument;
-						if (!arrayArg.VarToken.Identifier.IsArray1D)
-							throw new CodeEE("ARRAYREMOVEは1次元配列および配列型キャラクタ変数のみに対応しています");
-						FixedVariableTerm p = arrayArg.VarToken.GetFixedVariableTerm(exm);
-						int start = (int)arrayArg.Num1.GetIntValue(exm);
-						int num = (int)arrayArg.Num2.GetIntValue(exm);
-						if (start < 0)
-							throw new CodeEE("ARRAYREMOVEの第２argumentが負の値(" + start.ToString() + ")です");
-						if (num < 0)
-							throw new CodeEE("ARRAYREMOVEの第３argumentが負の値(" + start.ToString() + ")です");
+					if (!arrayArg.VarToken.Identifier.IsArray1D)
+						throw new CodeEE(GameMessages.T("ARRAYREMOVE only supports 1-dimensional arrays and array-type character variables"));
+					FixedVariableTerm p = arrayArg.VarToken.GetFixedVariableTerm(exm);
+					int start = (int)arrayArg.Num1.GetIntValue(exm);
+					int num = (int)arrayArg.Num2.GetIntValue(exm);
+					if (start < 0)
+						throw new CodeEE(GameMessages.T("The 2nd argument of ARRAYREMOVE is a negative value (") + start.ToString() + GameMessages.T(")"));
+					if (num < 0)
+						throw new CodeEE(GameMessages.T("The 3rd argument of ARRAYREMOVE is a negative value (") + start.ToString() + GameMessages.T(")"));
 						if (num == 0)
 							break;
 						vEvaluator.RemoveArray(p, start, num);
@@ -639,18 +639,18 @@ namespace MinorShift.Emuera.GameProc
 				case FunctionCode.ARRAYSORT:
 					{
 						SpArraySortArgument arrayArg = (SpArraySortArgument)func.Argument;
-						if (!arrayArg.VarToken.Identifier.IsArray1D)
-							throw new CodeEE("ARRAYRESORTは1次元配列および配列型キャラクタ変数のみに対応しています");
-						FixedVariableTerm p = arrayArg.VarToken.GetFixedVariableTerm(exm);
-						int start = (int)arrayArg.Num1.GetIntValue(exm);
-						if (start < 0)
-							throw new CodeEE("ARRAYSORTの第３argumentが負の値(" + start.ToString() + ")です");
+					if (!arrayArg.VarToken.Identifier.IsArray1D)
+						throw new CodeEE(GameMessages.T("ARRAYSORT only supports 1-dimensional arrays and array-type character variables"));
+					FixedVariableTerm p = arrayArg.VarToken.GetFixedVariableTerm(exm);
+					int start = (int)arrayArg.Num1.GetIntValue(exm);
+					if (start < 0)
+						throw new CodeEE(GameMessages.T("The 3rd argument of ARRAYSORT is a negative value (") + start.ToString() + GameMessages.T(")"));
 						int num = 0;
 						if (arrayArg.Num2 != null)
 						{
 							num = (int)arrayArg.Num2.GetIntValue(exm);
-							if (num < 0)
-								throw new CodeEE("ARRAYSORTの第４argumentが負の値(" + start.ToString() + ")です");
+						if (num < 0)
+							throw new CodeEE(GameMessages.T("The 4th argument of ARRAYSORT is a negative value (") + start.ToString() + GameMessages.T(")"));
 							if (num == 0)
 								break;
 						}
@@ -670,32 +670,32 @@ namespace MinorShift.Emuera.GameProc
 							string[] names = new string[2] { null, null };
 							names[0] = varName1.GetStrValue(exm);
 							names[1] = varName2.GetStrValue(exm);
-							if ((vars[0] = GlobalStatic.IdentifierDictionary.GetVariableToken(names[0], null, true)) == null)
-								throw new CodeEE("ARRAYCOPY命令の第１argument(" + names[0] + ")が有効な変数名ではありません");
-							if (!vars[0].IsArray1D && !vars[0].IsArray2D && !vars[0].IsArray3D)
-								throw new CodeEE("ARRAYCOPY命令の第１argument\"" + names[0] + "\"は配列変数ではありません");
-							if (vars[0].IsCharacterData)
-								throw new CodeEE("ARRAYCOPY命令の第１argument\"" + names[0] + "\"はキャラクタ変数です（対応していません）");
-							if ((vars[1] = GlobalStatic.IdentifierDictionary.GetVariableToken(names[1], null, true)) == null)
-								throw new CodeEE("ARRAYCOPY命令の第２argument(" + names[0] + ")が有効な変数名ではありません");
-							if (!vars[1].IsArray1D && !vars[1].IsArray2D && !vars[1].IsArray3D)
-								throw new CodeEE("ARRAYCOPY命令の第２argument\"" + names[1] + "\"は配列変数ではありません");
-							if (vars[1].IsCharacterData)
-								throw new CodeEE("ARRAYCOPY命令の第２argument\"" + names[1] + "\"はキャラクタ変数です（対応していません）");
-							if (vars[1].IsConst)
-								throw new CodeEE("ARRAYCOPY命令の第２argument\"" + names[1] + "\"は値を変更できない変数です");
-							if ((vars[0].IsArray1D && !vars[1].IsArray1D) || (vars[0].IsArray2D && !vars[1].IsArray2D) || (vars[0].IsArray3D && !vars[1].IsArray3D))
-								throw new CodeEE("ARRAYCOPY命令の２つの配列変数の次元数が一致していません");
-							if ((vars[0].IsInteger && vars[1].IsString) || (vars[0].IsString && vars[1].IsInteger))
-								throw new CodeEE("ARRAYCOPY命令の２つの配列変数の型が一致していません");
+						if ((vars[0] = GlobalStatic.IdentifierDictionary.GetVariableToken(names[0], null, true)) == null)
+							throw new CodeEE(GameMessages.T("The 1st argument of ARRAYCOPY (") + names[0] + GameMessages.T(") is not a valid variable name"));
+						if (!vars[0].IsArray1D && !vars[0].IsArray2D && !vars[0].IsArray3D)
+							throw new CodeEE(GameMessages.T("The 1st argument \"") + names[0] + GameMessages.T("\" of ARRAYCOPY is not an array variable"));
+						if (vars[0].IsCharacterData)
+							throw new CodeEE(GameMessages.T("The 1st argument \"") + names[0] + GameMessages.T("\" of ARRAYCOPY is a character variable (not supported)"));
+						if ((vars[1] = GlobalStatic.IdentifierDictionary.GetVariableToken(names[1], null, true)) == null)
+							throw new CodeEE(GameMessages.T("The 2nd argument of ARRAYCOPY (") + names[0] + GameMessages.T(") is not a valid variable name"));
+						if (!vars[1].IsArray1D && !vars[1].IsArray2D && !vars[1].IsArray3D)
+							throw new CodeEE(GameMessages.T("The 2nd argument \"") + names[1] + GameMessages.T("\" of ARRAYCOPY is not an array variable"));
+						if (vars[1].IsCharacterData)
+							throw new CodeEE(GameMessages.T("The 2nd argument \"") + names[1] + GameMessages.T("\" of ARRAYCOPY is a character variable (not supported)"));
+						if (vars[1].IsConst)
+							throw new CodeEE(GameMessages.T("The 2nd argument \"") + names[1] + GameMessages.T("\" of ARRAYCOPY is a read-only variable"));
+						if ((vars[0].IsArray1D && !vars[1].IsArray1D) || (vars[0].IsArray2D && !vars[1].IsArray2D) || (vars[0].IsArray3D && !vars[1].IsArray3D))
+							throw new CodeEE(GameMessages.T("The two array variables of ARRAYCOPY do not have the same number of dimensions"));
+						if ((vars[0].IsInteger && vars[1].IsString) || (vars[0].IsString && vars[1].IsInteger))
+							throw new CodeEE(GameMessages.T("The two array variables of ARRAYCOPY are not of the same type"));
 						}
 						else
 						{
 							vars[0] = GlobalStatic.IdentifierDictionary.GetVariableToken(((SingleTerm)varName1).Str, null, true);
 							vars[1] = GlobalStatic.IdentifierDictionary.GetVariableToken(((SingleTerm)varName2).Str, null, true);
-							if ((vars[0].IsInteger && vars[1].IsString) || (vars[0].IsString && vars[1].IsInteger))
-								throw new CodeEE("ARRAYCOPY命令の２つの配列変数の型が一致していません");
-						}
+						if ((vars[0].IsInteger && vars[1].IsString) || (vars[0].IsString && vars[1].IsInteger))
+							throw new CodeEE(GameMessages.T("The two array variables of ARRAYCOPY are not of the same type"));
+					}
 						vEvaluator.CopyArray(vars[0], vars[1]);
 					}
 					break;
@@ -711,7 +711,7 @@ namespace MinorShift.Emuera.GameProc
 						int length = vEvaluator.RESULT_ARRAY.Length;
 						// result:0 holds the length, so -1 accordingly
 						if (target.Length > length - 1)
-							throw new CodeEE(String.Format("ENCODETOUNIのargumentが長すぎます（現在{0}文字。最大{1}文字まで）", target.Length, length - 1));
+							throw new CodeEE(String.Format(GameMessages.T("The argument for ENCODETOUNI is too long (current: {0} characters; maximum: {1} characters)"), target.Length, length - 1));
 
 						int[] ary = new int[target.Length];
 						for (int i = 0; i < target.Length; i++)
@@ -720,8 +720,8 @@ namespace MinorShift.Emuera.GameProc
 					}
 					break;
 				case FunctionCode.ASSERT:
-					if (((ExpressionArgument)func.Argument).Term.GetIntValue(exm) == 0)
-						throw new CodeEE("ASSERT文のargumentが0です");
+				if (((ExpressionArgument)func.Argument).Term.GetIntValue(exm) == 0)
+					throw new CodeEE(GameMessages.T("The ASSERT statement argument is 0"));
 					break;
 				case FunctionCode.THROW:
 					throw new CodeEE(((ExpressionArgument)func.Argument).Term.GetStrValue(exm));
@@ -756,8 +756,8 @@ namespace MinorShift.Emuera.GameProc
 						break;
 					}
 #if UEMUERA_DEBUG
-				default:
-					throw new ExeEE("未定義の関数");
+			default:
+				throw new ExeEE(GameMessages.T("Undefined function"));
 #endif
 			}
 			return;
@@ -778,17 +778,17 @@ namespace MinorShift.Emuera.GameProc
 					{
 						ExpressionArgument intExpArg = (ExpressionArgument)func.Argument;
 						Int64 target = intExpArg.Term.GetIntValue(exm);
-						if (target < 0)
-							throw new CodeEE("LOADDATAのargumentに負の値(" + target.ToString() + ")が指定されました");
-						else if (target > int.MaxValue)
-							throw new CodeEE("LOADDATAのargument(" + target.ToString() + ")が大きすぎます");
+					if (target < 0)
+						throw new CodeEE(GameMessages.T("LOADDATA argument was given a negative value (") + target.ToString() + GameMessages.T(")"));
+					else if (target > int.MaxValue)
+						throw new CodeEE(GameMessages.T("LOADDATA argument (") + target.ToString() + GameMessages.T(") is too large"));
 						//EraDataResult result = vEvaluator.checkData((int)target);
 						EraDataResult result = vEvaluator.CheckData((int)target, EraSaveFileType.Normal);
-						if (result.State != EraDataState.OK)
-							throw new CodeEE("Invalid データをロードしようとしました");
+					if (result.State != EraDataState.OK)
+						throw new CodeEE(GameMessages.T("Attempted to load invalid data"));
 
-						if (!vEvaluator.LoadFrom((int)target))
-							throw new ExeEE("ファイルのロード中に予期しないErrorが発生しました");
+					if (!vEvaluator.LoadFrom((int)target))
+						throw new ExeEE(GameMessages.T("An unexpected error occurred while loading the file"));
 						state.ClearFunctionList();
 						state.SystemState = SystemStateCode.LoadData_DataLoaded;
 						return false;
@@ -879,29 +879,29 @@ namespace MinorShift.Emuera.GameProc
 							case SystemStateCode.Train_CallEventComEnd://while @EVENTCOMEND is being called. skippable. returns to Train_CallEventTrain. also here while @USERCOM is being called
 								break;
 							default:
-								exm.Console.PrintSystemLine(state.SystemState.ToString());
-								throw new CodeEE("DOTRAIN命令をこの位置で実行することはできません");
+							exm.Console.PrintSystemLine(state.SystemState.ToString());
+							throw new CodeEE(GameMessages.T("The DOTRAIN command cannot be executed at this point"));
 						}
 						coms.Clear();
 						isCTrain = false;
 						this.count = 0;
 
 						Int64 train = ((ExpressionArgument)func.Argument).Term.GetIntValue(exm);
-						if (train < 0)
-							throw new CodeEE("DOTRAIN命令に0未満の値が渡されました");
-						if (train >= TrainName.Length)
-							throw new CodeEE("DOTRAIN命令にTRAINNAMEの配列数以上の値が渡されました");
+					if (train < 0)
+						throw new CodeEE(GameMessages.T("A value less than 0 was passed to the DOTRAIN command"));
+					if (train >= TrainName.Length)
+						throw new CodeEE(GameMessages.T("A value greater than or equal to the TRAINNAME array size was passed to the DOTRAIN command"));
 						doTrainSelectCom = train;
 						state.SystemState = SystemStateCode.Train_DoTrain;
 						return false;
 					}
 #if UEMUERA_DEBUG
-				default:
-					throw new ExeEE("未定義の関数です");
+			default:
+				throw new ExeEE(GameMessages.T("Undefined function"));
 #endif
-			}
-			return true;
 		}
+		return true;
+	}
 
 
 
@@ -911,7 +911,7 @@ namespace MinorShift.Emuera.GameProc
 		{
 			//scary territory, but this phenomenon doesn't occur currently so try deleting it for now
 			//if (single && (prevStateList.Count > 0))
-			//	throw new ExeEE("記憶している状態があるのに再度記憶しようとした");
+			//	throw new ExeEE("Attempted to save state again while a saved state already exists");
 			if (state != null)
 			{
 				prevStateList.Add(state);
@@ -923,7 +923,7 @@ namespace MinorShift.Emuera.GameProc
 		{
 			//scary territory, but this phenomenon doesn't occur today so try deleting it for now
 			//if (prevStateList.Count == 0)
-			//	throw new ExeEE("記憶している状態がないのに呼び戻しされた");
+			//	throw new ExeEE("Attempted to restore state but no saved state exists");
 			if (state != null)
 			{
 				state.ClearFunctionList();

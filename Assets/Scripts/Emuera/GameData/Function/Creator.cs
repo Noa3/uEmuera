@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using MinorShift.Emuera.GameData.Expression;
@@ -14,7 +14,7 @@ namespace MinorShift.Emuera.GameData.Function
 		{
             methodList = new Dictionary<string, FunctionMethod>
             {
-                //キャラクタデータ系
+                //Character data
                 ["GETCHARA"] = new GetcharaMethod(),
                 ["GETSPCHARA"] = new GetspcharaMethod(),
                 ["CSVNAME"] = new CsvStrDataMethod(CharacterStrData.NAME),
@@ -35,7 +35,7 @@ namespace MinorShift.Emuera.GameData.Function
                 ["FINDLASTCHARA"] = new FindcharaMethod(true),
                 ["EXISTCSV"] = new ExistCsvMethod(),
 
-                //汎用処理系
+                //General-purpose
                 ["VARSIZE"] = new VarsizeMethod(),
                 ["CHKFONT"] = new CheckfontMethod(),
                 ["CHKDATA"] = new CheckdataMethod(EraSaveFileType.Normal),
@@ -62,7 +62,7 @@ namespace MinorShift.Emuera.GameData.Function
                 //methodList["FIND_VARDATA"] = new FindFilesMethod(EraSaveFileType.Var);
                 ["FIND_CHARADATA"] = new FindFilesMethod(EraSaveFileType.CharVar),
 
-                //定数取得
+                //Constant retrieval
                 ["MONEYSTR"] = new MoneyStrMethod(),
                 ["PRINTCPERLINE"] = new GetPrintCPerLineMethod(),
                 ["PRINTCLENGTH"] = new PrintCLengthMethod(),
@@ -72,7 +72,7 @@ namespace MinorShift.Emuera.GameData.Function
                 ["GETMILLISECOND"] = new GetmsMethod(),
                 ["GETSECOND"] = new GetSecondMethod(),
 
-                //数学関数
+                //Math functions
                 ["RAND"] = new RandMethod(),
                 ["MIN"] = new MaxMethod(false),
                 ["MAX"] = new MaxMethod(true),
@@ -86,7 +86,7 @@ namespace MinorShift.Emuera.GameData.Function
                 ["SIGN"] = new SignMethod(),
                 ["LIMIT"] = new GetLimitMethod(),
 
-                //変数操作系
+                //Variable operations
                 ["SUMARRAY"] = new SumArrayMethod(),
                 ["SUMCARRAY"] = new SumArrayMethod(true),
                 ["MATCH"] = new MatchMethod(),
@@ -111,7 +111,7 @@ namespace MinorShift.Emuera.GameData.Function
 
                 ["ARRAYMSORT"] = new ArrayMultiSortMethod(),
 
-                //文字列操作系
+                //String operations
                 ["STRLENS"] = new StrlenMethod(),
                 ["STRLENSU"] = new StrlenuMethod(),
                 ["SUBSTRING"] = new SubstringMethod(),
@@ -141,7 +141,7 @@ namespace MinorShift.Emuera.GameData.Function
                 ["GETCONFIG"] = new GetConfigMethod(true),
                 ["GETCONFIGS"] = new GetConfigMethod(false),
 
-                //html系
+                //HTML
                 ["HTML_GETPRINTEDSTR"] = new HtmlGetPrintedStrMethod(),
                 ["HTML_POPPRINTINGSTR"] = new HtmlPopPrintingStrMethod(),
                 ["HTML_TOPLAINTEXT"] = new HtmlToPlainTextMethod(),
@@ -150,7 +150,7 @@ namespace MinorShift.Emuera.GameData.Function
                 ["ERDNAME"] = new ErdNameMethod(),
 
 
-                //画像処理系
+                //Image processing
                 ["SPRITECREATED"] = new SpriteStateMethod(),
                 ["SPRITEWIDTH"] = new SpriteStateMethod(),
                 ["SPRITEHEIGHT"] = new SpriteStateMethod(),
@@ -167,6 +167,7 @@ namespace MinorShift.Emuera.GameData.Function
                 ["GETKEYTRIGGERED"] = new GetKeyStateMethod(),
                 ["MOUSEX"] = new MousePosMethod(),
                 ["MOUSEY"] = new MousePosMethod(),
+                ["MOUSEB"] = new MouseButtonMethod(),
                 ["ISACTIVE"] = new IsActiveMethod(),
                 ["SAVETEXT"] = new SaveTextMethod(),
                 ["LOADTEXT"] = new LoadTextMethod(),
@@ -262,12 +263,15 @@ namespace MinorShift.Emuera.GameData.Function
                 ["DT_NOCASE"] = new DtManageMethod(DtManageMethod.Op.Case),
                 ["DT_CLEAR"] = new DtManageMethod(DtManageMethod.Op.Clear),
                 ["DT_ROW_COUNT"] = new DtManageMethod(DtManageMethod.Op.RowCount),
-                ["DT_ROW_ADD"] = new DtManageMethod(DtManageMethod.Op.RowAdd),
-                ["DT_COLUMN_ADD"] = new DtColMethod(DtColMethod.Op.Add),
-                ["DT_COLUMN_NAMES"] = new DtColMethod(DtColMethod.Op.Names),
-                ["DT_COLUMN_EXIST"] = new DtColMethod(DtColMethod.Op.Check),
-                ["DT_COLUMN_REMOVE"] = new DtColMethod(DtColMethod.Op.Remove),
-                ["DT_ROW_REMOVE"] = new DtRowOpMethod(DtRowOpMethod.Op.Remove),
+                ["DT_ROW_ADD"] = new DtSemanticRowSetMethod(false),
+                ["DT_ROW_SET"] = new DtSemanticRowSetMethod(true),
+                ["DT_COLUMN_ADD"] = new DtSemanticColumnMethod(DtSemanticColumnMethod.Operation.Add),
+                ["DT_COLUMN_NAMES"] = new DtSemanticColumnMethod(DtSemanticColumnMethod.Operation.Names),
+                ["DT_COLUMN_EXIST"] = new DtSemanticColumnMethod(DtSemanticColumnMethod.Operation.Check),
+                ["DT_COLUMN_REMOVE"] = new DtSemanticColumnMethod(DtSemanticColumnMethod.Operation.Remove),
+                ["DT_COLUMN_OPTIONS"] = new DtSemanticColumnOptionsMethod(),
+                ["DEFAULT"] = new DtDefaultKeywordMethod(),
+                ["DT_ROW_REMOVE"] = new DtSemanticRowRemoveMethod(),
                 ["DT_GET"] = new DtRowOpMethod(DtRowOpMethod.Op.GetStr),
                 ["DT_GETINT"] = new DtRowOpMethod(DtRowOpMethod.Op.GetInt),
                 ["DT_SET"] = new DtRowOpMethod(DtRowOpMethod.Op.SetStr),
@@ -275,18 +279,21 @@ namespace MinorShift.Emuera.GameData.Function
                 ["DT_FIND"] = new DtRowOpMethod(DtRowOpMethod.Op.Find),
                 ["DT_SORT"] = new DtRowOpMethod(DtRowOpMethod.Op.Sort),
                 ["DT_TOCSV"] = new DtRowOpMethod(DtRowOpMethod.Op.ToCsv),
-                ["DT_TOXML"] = new DtRowOpMethod(DtRowOpMethod.Op.ToXml),
+                ["DT_TOXML"] = new DtSemanticToXmlMethod(),
+                ["DT_FROMXML"] = new DtSemanticFromXmlMethod(),
 
                 // New built-in commands
                 ["CLEARMEMORY"] = new ClearMemoryMethod(),
                 ["EXISTFILE"] = new ExistFileMethod(),
                 ["EXISTVAR"] = new ExistVarMethod(),
                 ["ENUMFILES"] = new EnumFilesMethod(),
-                ["DT_ROW_LENGTH"] = new DtRowLengthMethod(),
-                ["DT_CELL_GET"] = new DtCellGetMethod(DtCellGetMethod.Op.GetInt),
-                ["DT_CELL_GETS"] = new DtCellGetMethod(DtCellGetMethod.Op.GetStr),
-                ["DT_CELL_ISNULL"] = new DtCellGetMethod(DtCellGetMethod.Op.IsNull),
-                 ["DT_SELECT"] = new DtSelectMethod(),
+                ["DT_ROW_LENGTH"] = new DtSemanticLengthMethod(false),
+                ["DT_CELL_GET"] = new DtSemanticCellGetMethod(DtSemanticCellGetMethod.Operation.Int),
+                ["DT_CELL_GETS"] = new DtSemanticCellGetMethod(DtSemanticCellGetMethod.Operation.String),
+                ["DT_CELL_ISNULL"] = new DtSemanticCellGetMethod(DtSemanticCellGetMethod.Operation.IsNull),
+                 ["DT_SELECT"] = new DtSemanticSelectMethod(),
+                ["DT_CELL_SET"] = new DtSemanticCellSetMethod(),
+                ["DT_COLUMN_LENGTH"] = new DtSemanticLengthMethod(true),
 
                  // ERA standard built-ins
                  ["GETDOINGFUNCTION"] = new GetDoingFunctionMethod(),
@@ -296,7 +303,7 @@ namespace MinorShift.Emuera.GameData.Function
              };
 
 
-            //1823 自分の関数名を知っていた方が何かと便利なので覚えさせることにした
+            //1823 Storing each method's own name is convenient for various purposes.
             foreach (var pair in methodList)
 				pair.Value.SetMethodName(pair.Key);
         }

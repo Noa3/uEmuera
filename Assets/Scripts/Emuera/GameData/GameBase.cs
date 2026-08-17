@@ -10,18 +10,18 @@ namespace MinorShift.Emuera.GameData
 	internal sealed class GameBase
 	{
 		public string ScriptAutherName = "";
-		public string ScriptDetail = "";//詳細な説明
+		public string ScriptDetail = "";//Detailed description
 		public string ScriptYear = "";
 		public string ScriptTitle = "";
 		public Int64 ScriptUniqueCode = 0;
-		//1.713 訂正。eramakerのバージョンの初期値は1000ではなく0だった
+		//1.713 Correction. eramaker's version default value was 0, not 1000
 		public Int64 ScriptVersion = 0;//1000;
-		//1.713 上の変更とあわせて。セーブデータのバージョンが1000であり、現在のバージョンが未定義である場合、セーブデータのバージョンを同じとみなす
+		//1.713 Along with the change above. If the save data version is 1000 and the current version is undefined, treat the save data version as the same
 		public bool ScriptVersionDefined = false;
 		public Int64 ScriptCompatibleMinVersion = -1;
         public string Compatible_EmueraVer = "0.000.0.0";
 
-		//1.727 追加。Form.Text
+		//1.727 Added. Form.Text
 		public string ScriptWindowTitle = null;
 		public string ScriptVersionText
 		{
@@ -39,7 +39,7 @@ namespace MinorShift.Emuera.GameData
 		}
 		public bool UniqueCodeEqualTo(Int64 target)
 		{
-			//1804 UniqueCode Int64への拡張に伴い修正
+			//1804 Modified in conjunction with the expansion of UniqueCode to Int64
 			if (target == 0L)
 				return true;
 			return target == ScriptUniqueCode;
@@ -79,10 +79,10 @@ namespace MinorShift.Emuera.GameData
 		}
 
 		/// <summary>
-		/// GAMEBASE読み込み。GAMEBASE.csvの存在は必須ではないので読み込み失敗したらなかったことにする。
+		/// Loads GAMEBASE. GAMEBASE.csv does not have to exist, so treat a load failure as if the file did not exist.
 		/// </summary>
 		/// <param name="basePath"></param>
-		/// <returns>読み込み続行するなら真、Error終了なら偽</returns>
+		/// <returns>True to continue loading, false to end with an error</returns>
 		public bool LoadGameBaseCsv(string basePath)
 		{
 			// Use case-insensitive file resolution for non-Windows systems
@@ -93,7 +93,7 @@ namespace MinorShift.Emuera.GameData
 			EraStreamReader eReader = new EraStreamReader(false);
 			if (!eReader.Open(resolvedPath))
 			{
-				//output.PrintLine(eReader.Filename + "のオープンに失敗しました");
+				//output.PrintLine(eReader.Filename + "Failed to open");
 				return true;
 			}
 			try
@@ -112,7 +112,7 @@ namespace MinorShift.Emuera.GameData
 							if (tryatoi(tokens[1], out ScriptUniqueCode))
 							{
 								if (ScriptUniqueCode == 0L)
-									ParserMediator.Warn("コード:0のセーブデータはいかなるコードのスクリプトからも読めるデータとして扱われます", pos, 0);
+									ParserMediator.Warn(GameMessages.T("Save data with code 0 is treated as data readable from scripts with any code"), pos, 0);
 							}							
 							break;
 						case "バージョン":
@@ -147,14 +147,14 @@ namespace MinorShift.Emuera.GameData
                             Compatible_EmueraVer = tokens[1];
                             if (!Regex.IsMatch(Compatible_EmueraVer, @"^\d+\.\d+\.\d+\.\d+$"))
                             {
-                                ParserMediator.Warn("バージョン指定を読み取れなかったので処理を省略します", pos, 0);
+                                ParserMediator.Warn(GameMessages.T("The version specification could not be read, so this process is skipped"), pos, 0);
                                 break;
                             }
                             Version curerntVersion = new Version(GlobalStatic.MainWindow.InternalEmueraVer);
                             Version targetVersoin = new Version(Compatible_EmueraVer);
                             if (curerntVersion < targetVersoin)
                             {
-                                ParserMediator.Warn("このバリアント動作させるにはVer. " + GlobalStatic.MainWindow.EmueraVerText + "以降のバージョンのEmueraが必要です", pos, 2);
+                                ParserMediator.Warn(GameMessages.T("To run this variant, Emuera version ") + GlobalStatic.MainWindow.EmueraVerText + GameMessages.T(" or later is required"), pos, 2);
                                 return false;
                             }
                             break;
@@ -163,7 +163,7 @@ namespace MinorShift.Emuera.GameData
 			}
 			catch
 			{
-                ParserMediator.Warn("GAMEBASE.CSVの読み込み中にErrorが発生したため、読みこみを中断します", pos, 1);
+                ParserMediator.Warn(GameMessages.T("An error occurred while loading GAMEBASE.CSV, so loading was interrupted"), pos, 1);
 				return true;
 			}
 			finally

@@ -56,6 +56,13 @@ namespace MinorShift.Emuera
 			LabelDictionary = null;
 			IdentifierDictionary = null;
 			tempDic.Clear();
+			// Clear the function catalog so stale metadata from the old game cannot
+			// be consulted by a new session's EXISTFUNCTION / PendingMethodTerm.
+			// (Phase 6 — FunctionCatalog lifecycle)
+			GameProc.FunctionCatalog.Clear();
+			// Drop any on-demand compile session so a stale compiler cannot act on the
+			// new game's labels/functions. (Phase 6 — OnDemandErbCompiler lifecycle)
+			GameProc.OnDemandErbCompiler.Clear();
 		}
 	}
 }

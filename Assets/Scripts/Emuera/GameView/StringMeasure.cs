@@ -68,7 +68,7 @@ namespace MinorShift.Emuera.GameView
             //}
             ////Will never be reached
             ////else
-            ////    throw new ExeEE("描画モード不明");
+            ////    throw new ExeEE("Unknown drawing mode");
 
             return uEmuera.Utils.GetDisplayLength(s, font);
 		}

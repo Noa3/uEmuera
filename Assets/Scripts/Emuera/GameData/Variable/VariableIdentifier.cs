@@ -156,35 +156,35 @@ namespace MinorShift.Emuera.GameData.Variable
 				if ((code & VariableCode.__ARRAY_2D__) == VariableCode.__ARRAY_2D__)
 				{
 					if ((code & VariableCode.__ARRAY_1D__) == VariableCode.__ARRAY_1D__)
-						throw new ExeEE("ARRAY2DとARRAY1Dは排他");
+						throw new ExeEE(GameMessages.T("ARRAY2D and ARRAY1D are mutually exclusive"));
 				}
 				if (((code & VariableCode.__INTEGER__) != VariableCode.__INTEGER__)
 					&& ((code & VariableCode.__STRING__) != VariableCode.__STRING__))
-						throw new ExeEE("INTEGERとSTRINGのどちらかは必須");
+						throw new ExeEE(GameMessages.T("Either INTEGER or STRING is required"));
 				if (((code & VariableCode.__INTEGER__) == VariableCode.__INTEGER__)
 					&& ((code & VariableCode.__STRING__) == VariableCode.__STRING__))
-						throw new ExeEE("INTEGERとSTRINGは排他");
+						throw new ExeEE(GameMessages.T("INTEGER and STRING are mutually exclusive"));
 				if((code & VariableCode.__EXTENDED__) != VariableCode.__EXTENDED__)
 				{
 					if ((code & VariableCode.__SAVE_EXTENDED__) == VariableCode.__SAVE_EXTENDED__)
-							throw new ExeEE("SAVE_EXTENDEDにはEXTENDEDフラグ必須");
+							throw new ExeEE(GameMessages.T("SAVE_EXTENDED requires the EXTENDED flag"));
 					if ((code & VariableCode.__LOCAL__) == VariableCode.__LOCAL__)
-							throw new ExeEE("LOCALにはEXTENDEDフラグ必須");
+							throw new ExeEE(GameMessages.T("LOCAL requires the EXTENDED flag"));
 					if ((code & VariableCode.__GLOBAL__) == VariableCode.__GLOBAL__)
-							throw new ExeEE("GLOBALにはEXTENDEDフラグ必須");
+							throw new ExeEE(GameMessages.T("GLOBAL requires the EXTENDED flag"));
 					if ((code & VariableCode.__ARRAY_2D__) == VariableCode.__ARRAY_2D__)
-							throw new ExeEE("ARRAY2DにはEXTENDEDフラグ必須");
+							throw new ExeEE(GameMessages.T("ARRAY2D requires the EXTENDED flag"));
 				}
 				if (((code & VariableCode.__SAVE_EXTENDED__) == VariableCode.__SAVE_EXTENDED__)
 					&& ((code & VariableCode.__UNCHANGEABLE__) == VariableCode.__UNCHANGEABLE__))
-						throw new ExeEE("CALCとSAVE_EXTENDEDは排他");
+						throw new ExeEE(GameMessages.T("CALC and SAVE_EXTENDED are mutually exclusive"));
 				if (((code & VariableCode.__SAVE_EXTENDED__) == VariableCode.__SAVE_EXTENDED__)
 					&& ((code & VariableCode.__CALC__) == VariableCode.__CALC__))
-						throw new ExeEE("UNCHANGEABLEとSAVE_EXTENDEDは排他");
+						throw new ExeEE(GameMessages.T("UNCHANGEABLE and SAVE_EXTENDED are mutually exclusive"));
 				if (((code & VariableCode.__SAVE_EXTENDED__) == VariableCode.__SAVE_EXTENDED__)
 					&& ((code & VariableCode.__ARRAY_2D__) == VariableCode.__ARRAY_2D__)
 					&& ((code & VariableCode.__STRING__) == VariableCode.__STRING__))
-						throw new ExeEE("STRINGかつARRAY2DのSAVE_EXTENDEDは未実装");
+						throw new ExeEE(GameMessages.T("SAVE_EXTENDED with STRING and ARRAY2D is not implemented"));
 #endif
 				nameDic.Add(key, code);
 				////Creation of the list of variables that need saving
@@ -293,8 +293,8 @@ namespace MinorShift.Emuera.GameData.Variable
 				if (localvarNameDic.TryGetValue(key, out ret))
 					return new VariableIdentifier(ret, subStr);
 				if (nameDic.ContainsKey(key))
-					throw new CodeEE("ローカル変数でない変数" + key + "に対して@が使われました");
-				throw new CodeEE("@の使い方が不正です");
+					throw new CodeEE(GameMessages.T("@ was used for non-local variable ") + key);
+				throw new CodeEE(GameMessages.T("Invalid use of @"));
 			}
 			if (nameDic.TryGetValue(key, out ret))
 				return new VariableIdentifier(ret);

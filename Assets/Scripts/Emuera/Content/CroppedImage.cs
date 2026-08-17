@@ -83,10 +83,11 @@ namespace MinorShift.Emuera.Content
 		public override Color SpriteGetColor(int x, int y)
 		{
 			Bitmap bmp = this.Bitmap;
-			if (bmp == null)
+			if (bmp == null || x < 0 || y < 0 || x >= DestBaseSize.Width || y >= DestBaseSize.Height)
 				return Color.Transparent;
-			int bmpX = x + SrcRectangle.X;
-			int bmpY = y + SrcRectangle.Y;
+
+			int bmpX = SrcRectangle.Width < 0 ? SrcRectangle.X - x : SrcRectangle.X + x;
+			int bmpY = SrcRectangle.Height < 0 ? SrcRectangle.Y - y : SrcRectangle.Y + y;
 			if (bmpX < 0 || bmpX >= bmp.Width || bmpY < 0 || bmpY >= bmp.Height)
 				return Color.Transparent;
 
@@ -268,7 +269,10 @@ namespace MinorShift.Emuera.Content
         {
             get
             {
-                return GetCurrentFrame().BaseImage.Bitmap;
+                AnimeFrame frame = GetCurrentFrame();
+                if (frame == null || frame.BaseImage == null || !frame.BaseImage.IsCreated)
+                    return null;
+                return frame.BaseImage.Bitmap;
             }
         }
 
@@ -286,16 +290,22 @@ namespace MinorShift.Emuera.Content
 
 		public override Color SpriteGetColor(int x, int y)
 		{
-			throw new NotSupportedException();
-			//Bitmap bmp = this.Bitmap;
-			//if (bmp == null)
-			//	return Color.Transparent;
-			//int bmpX = x + SrcRectangle.X;
-			//int bmpY = y + SrcRectangle.Y;
-			//if (bmpX < 0 || bmpX >= bmp.Width || bmpY < 0 || bmpY >= bmp.Height)
-			//	return Color.Transparent;
+			AnimeFrame frame = GetCurrentFrame();
+			if (frame == null || frame.BaseImage == null || !frame.BaseImage.IsCreated || frame.BaseImage.Bitmap == null)
+				return Color.Transparent;
+			if (x < frame.Offset.X || y < frame.Offset.Y ||
+				x >= frame.Offset.X + Math.Abs(frame.SrcRectangle.Width) ||
+				y >= frame.Offset.Y + Math.Abs(frame.SrcRectangle.Height))
+				return Color.Transparent;
 
-			//return bmp.GetPixel(bmpX, bmpY);
+			int localX = x - frame.Offset.X;
+			int localY = y - frame.Offset.Y;
+			int bmpX = frame.SrcRectangle.Width < 0 ? frame.SrcRectangle.X - localX : frame.SrcRectangle.X + localX;
+			int bmpY = frame.SrcRectangle.Height < 0 ? frame.SrcRectangle.Y - localY : frame.SrcRectangle.Y + localY;
+			Bitmap bmp = frame.BaseImage.Bitmap;
+			if (bmpX < 0 || bmpX >= bmp.Width || bmpY < 0 || bmpY >= bmp.Height)
+				return Color.Transparent;
+			return bmp.GetPixel(bmpX, bmpY);
 		}
 
 

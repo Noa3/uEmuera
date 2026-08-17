@@ -46,8 +46,11 @@ public static class ResolutionHelper
     static float aspect {
         get
         {
-            if(_aspect < 0.0f)
+            // Recalculate if screen size changed (handles foldable phones, window resize).
+            if(_aspect < 0.0f || Screen.width != _aspect_screen_w || Screen.height != _aspect_screen_h)
             {
+                _aspect_screen_w = Screen.width;
+                _aspect_screen_h = Screen.height;
                 _aspect = Screen.width * 1.0f / Screen.height;
                 if(_aspect < 1)
                     _aspect = 1 / _aspect;
@@ -56,6 +59,8 @@ public static class ResolutionHelper
         }
     }
     static float _aspect = -1.0f;
+    static int _aspect_screen_w = 0;
+    static int _aspect_screen_h = 0;
 
     public static int resolution_index
     {

@@ -192,7 +192,7 @@ namespace MinorShift.Emuera.Compatibility
         static void CollectUserFunctionsFromFile(string path, HashSet<string> into)
         {
             string src;
-            try { src = File.ReadAllText(path, DetectEncoding(path)); }
+            try { src = EraEncoding.ReadText(path); }
             catch { return; }
             string currentLabel = null;
             foreach (string raw in src.Split('\n'))
@@ -271,12 +271,11 @@ namespace MinorShift.Emuera.Compatibility
 
         static void CollectErbFiles(string dir, List<string> into)
         {
-            foreach (string sub in SafeDirectories(dir))
-                CollectErbFiles(sub, into);
-            foreach (string f in SafeFiles(dir))
-                if (f.EndsWith(".ERB", StringComparison.OrdinalIgnoreCase) ||
-                    f.EndsWith(".ERH", StringComparison.OrdinalIgnoreCase))
-                    into.Add(f);
+            GameVirtualFileSystem vfs;
+            try { vfs = new GameVirtualFileSystem(dir); }
+            catch { return; }
+            into.AddRange(vfs.EnumerateFiles(string.Empty, "*.ERB", true));
+            into.AddRange(vfs.EnumerateFiles(string.Empty, "*.ERH", true));
         }
 
         static IEnumerable<string> SafeDirectories(string dir)
@@ -294,7 +293,7 @@ namespace MinorShift.Emuera.Compatibility
         static void ScanFile(string path, CompatibilityReport report, HashSet<string> userFunctions)
         {
             string src;
-            try { src = File.ReadAllText(path, DetectEncoding(path)); }
+            try { src = EraEncoding.ReadText(path); }
             catch { return; }
             string[] lines = src.Split('\n');
             foreach (string raw in lines)
@@ -373,7 +372,7 @@ namespace MinorShift.Emuera.Compatibility
                 t == "ONEINPUT" || t == "ONEINPUTS" || t == "TONEINPUT" || t == "TONEINPUTS" ||
                 t == "WAIT" || t == "TWAIT" || t == "WAITANYKEY" || t == "FORCEWAIT" ||
                 t == "BINPUT" || t == "BINPUTS" || t == "INPUTMOUSEKEY" || t == "AWAIT" ||
-                t == "GETKEY" || t == "GETKEYTRIGGERED" || t == "MOUSEX" || t == "MOUSEY" ||
+                t == "GETKEY" || t == "GETKEYTRIGGERED" || t == "MOUSEX" || t == "MOUSEY" || t == "MOUSEB" ||
                 t == "ISACTIVE")
                 return "Input";
             if (t == "PRINT" || t == "PRINTL" || t == "PRINTW" || t == "PRINTFORM" ||
@@ -401,49 +400,7 @@ namespace MinorShift.Emuera.Compatibility
         /// </summary>
         public static Encoding DetectEncoding(string path)
         {
-            byte[] head = new byte[4];
-            int got;
-            try
-            {
-                using (var fs = new FileStream(path, FileMode.Open, FileAccess.Read))
-                    got = fs.Read(head, 0, 4);
-            }
-            catch { return Encoding.UTF8; }
-
-            // UTF-8 BOM (EF BB BF)
-            if (got >= 3 && head[0] == 0xEF && head[1] == 0xBB && head[2] == 0xBF)
-                return new UTF8Encoding(true);
-            // UTF-16 LE BOM (FF FE)
-            if (got >= 2 && head[0] == 0xFF && head[1] == 0xFE)
-                return Encoding.Unicode;
-            // UTF-16 BE BOM (FE FF)
-            if (got >= 2 && head[0] == 0xFE && head[1] == 0xFF)
-                return Encoding.BigEndianUnicode;
-
-            // No BOM — probe up to 1 KB to decide UTF-8 vs CP932
-            try
-            {
-                using (var fs = new FileStream(path, FileMode.Open, FileAccess.Read))
-                {
-                    byte[] sample = new byte[1024];
-                    int sampleLen = fs.Read(sample, 0, sample.Length);
-                    if (sampleLen > 0)
-                    {
-                        // throwOnInvalidBytes=true so GetChars throws on bad UTF-8 sequences
-                        var decoder = new UTF8Encoding(false, true).GetDecoder();
-                        char[] chars = new char[sampleLen];
-                        decoder.GetChars(sample, 0, sampleLen, chars, 0);
-                    }
-                }
-                return new UTF8Encoding(false); // valid UTF-8, no BOM
-            }
-            catch (DecoderFallbackException)
-            {
-                // Not valid UTF-8 — assume CP932 / Shift-JIS (legacy era game)
-                try { return Encoding.GetEncoding(932); }
-                catch { return Encoding.UTF8; }
-            }
-            catch { return Encoding.UTF8; }
+            return EraEncoding.Detect(path);
         }
     }
 

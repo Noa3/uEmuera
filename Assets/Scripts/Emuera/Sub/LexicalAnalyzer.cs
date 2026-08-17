@@ -17,9 +17,9 @@ namespace MinorShift.Emuera.Sub
 		None = 0,
 		EoL,//Always analyze to the very end
 		Operator,//Ends when an operator is found. Left side of an assignment expression
-		Question,//Ends at the ternary operator ?. \@～～?～～#～～\@
-		Percent,//Ends at %. %～～%
-		RightCurlyBrace,//Ends at }. {～～}
+		Question,//Ends at the ternary operator ?. \@~~?~~#~~\@
+		Percent,//Ends at %. %~~%
+		RightCurlyBrace,//Ends at }. {~~}
 		Comma,//Ends at ,. TIMES first argument
 		//Single,//Ends at a single Identifier//1807 Single removed
 		GreaterThan,//Ends at '>'. HTML tag parsing
@@ -30,9 +30,9 @@ namespace MinorShift.Emuera.Sub
 		//Forced termination at EoL in any case
 		None = 0,
 		EoL,//Always analyze to the very end
-		DoubleQuotation,//Ends at ". @"～～"
-		Sharp,//Ends at #. The first part of \@～～?～～#～～\@
-		YenAt,//Ends at \@. The second part of \@～～?～～#～～\@
+		DoubleQuotation,//Ends at ". @"~~"
+		Sharp,//Ends at #. The first part of \@~~?~~#~~\@
+		YenAt,//Ends at \@. The second part of \@~~?~~#~~\@
 		Comma,//Ends at ,. ANY_FORM argument
 		LeftParenthesis_Bracket_Comma_Semicolon,//Ends at [ or ( or , or ;. Function name part of the CALLFORM family.
 	}
@@ -42,9 +42,9 @@ namespace MinorShift.Emuera.Sub
 		//Forced termination at EoL in any case
 		None = 0,
 		EoL,//Always analyze to the very end
-		SingleQuotation,//Ends at '. '～～'
-		DoubleQuotation,//Ends at ". "～～"
-		Comma,//Ends at ,. PRINTV'～～,
+		SingleQuotation,//Ends at '. '~~'
+		DoubleQuotation,//Ends at ". "~~"
+		Comma,//Ends at ,. PRINTV'~~,
 		LeftParenthesis_Bracket_Comma_Semicolon,//Ends at [ or ( or , or ;. Function name part.
 	}
 
@@ -126,7 +126,7 @@ namespace MinorShift.Emuera.Sub
 		//		}
 		//		return ((Int64)(d + 0.49));
 		//	}
-		//	throw new CodeEE("数字で始まるトークンが適切でありません");
+		//	throw new CodeEE("A token starting with a digit is invalid.");
 		//}
 
 
@@ -186,7 +186,7 @@ namespace MinorShift.Emuera.Sub
 
 				double d = significand * Math.Pow(expBase, exponent);
 				if ((double.IsNaN(d)) || (double.IsInfinity(d)) || (d > Int64.MaxValue) || (d < Int64.MinValue))
-					throw new CodeEE("\"" + st.Substring(stStartPos, stEndPos) + "\"は64ビット符号付整数の範囲を超えています");
+					throw new CodeEE("\"" + st.Substring(stStartPos, stEndPos) + GameMessages.T("\" exceeds the range of a 64-bit signed integer."));
 				significand = (Int64)d;
 			}
 			return significand;
@@ -238,7 +238,7 @@ namespace MinorShift.Emuera.Sub
 					if (char.IsDigit(c))
 					{
 						if ((c != '0') && (c != '1'))
-							throw new CodeEE("二進法表記の中で使用できない文字が使われています");
+							throw new CodeEE(GameMessages.T("A character that cannot be used in binary notation was used."));
 						st.ShiftNext();
 						continue;
 					}
@@ -252,17 +252,17 @@ namespace MinorShift.Emuera.Sub
 			}
 			catch (FormatException)
 			{
-				throw new CodeEE("\"" + strInt + "\"は整数値に変換できません");
+				throw new CodeEE("\"" + strInt + GameMessages.T("\" cannot be converted to an integer."));
 			}
 			catch (OverflowException)
 			{
-				throw new CodeEE("\"" + strInt + "\"は64ビット符号付き整数の範囲を超えています");
+				throw new CodeEE("\"" + strInt + GameMessages.T("\" exceeds the range of a 64-bit signed integer."));
 			}
 			catch (ArgumentOutOfRangeException)
 			{
 				if (string.IsNullOrEmpty(strInt))
-					throw new CodeEE("数値として認識できる文字が必要です");
-				throw new CodeEE("文字列\"" + strInt + "\"は数値として認識できません");
+					throw new CodeEE(GameMessages.T("A character recognizable as a number is required."));
+				throw new CodeEE(GameMessages.T("String \"") + strInt + GameMessages.T("\" cannot be recognized as a number."));
 			}
 		}
 
@@ -323,7 +323,7 @@ namespace MinorShift.Emuera.Sub
 			//int startpos = st.CurrentPosition;
 			string str = ReadSingleIdentifier(st);
 			if (string.IsNullOrEmpty(str))
-				throw new CodeEE("Invalid 文字で行が始まっています");
+				throw new CodeEE(GameMessages.T("The line starts with an invalid character."));
 			//1808a3 Stop expanding the leading single word. Prohibit the replacement of commands.
 			//if (UseMacro)
 			//{
@@ -333,7 +333,7 @@ namespace MinorShift.Emuera.Sub
 			//        DefineMacro macro = GlobalStatic.IdentifierDictionary.GetMacro(str);
 			//        i++;
 			//        if (i > MAX_EXPAND_MACRO)
-			//            throw new CodeEE("マクロの展開数が1文あたりの上限を超えました(自己参照・循環参照のおそれ)");
+			//            throw new CodeEE("The number of macro expansions exceeded the limit per statement (possible self-reference or circular reference).");
 			//        if (macro == null)
 			//            break;
 			//        //If a macro that is not a word (a single identifier) appears, it is not handled here
@@ -366,11 +366,11 @@ namespace MinorShift.Emuera.Sub
 					DefineMacro macro = GlobalStatic.IdentifierDictionary.GetMacro(str);
 					i++;
 					if (i > MAX_EXPAND_MACRO)
-						throw new CodeEE("マクロの展開数が1文あたりの上限値" + MAX_EXPAND_MACRO.ToString() + "を超えました(自己参照・循環参照のおそれ)");
+						throw new CodeEE(GameMessages.T("The number of macro expansions exceeded the limit of ") + MAX_EXPAND_MACRO.ToString() + GameMessages.T(" per statement (possible self-reference or circular reference)."));
 					if (macro == null)
 						break;
 					if (macro.IDWord != null)
-						throw new CodeEE("マクロ" + macro.Keyword + "はこの文脈では使用できません(1単語に置き換えるマクロのみが使用できます)");
+						throw new CodeEE(GameMessages.T("Macro ") + macro.Keyword + GameMessages.T(" cannot be used in this context (only macros that expand to a single word can be used)."));
 					str = macro.IDWord.Code;
 				}
 			}
@@ -464,7 +464,7 @@ namespace MinorShift.Emuera.Sub
                 //		goto end;
                 //	case '　':
                 //		if (!Config.SystemAllowFullSpace)
-                //			throw new CodeEE("予期しない全角スペースを発見しました(この警告はシステムオプション「" + Config.GetConfigName(ConfigCode.SystemAllowFullSpace) + "」により無視できます)");
+                //			throw new CodeEE("Unexpected full-width space found (this warning can be ignored with the system option " + Config.GetConfigName(ConfigCode.SystemAllowFullSpace) + ")");
                 //		goto end;
                 //}
 
@@ -474,7 +474,7 @@ namespace MinorShift.Emuera.Sub
                 else if(c == '　')
                 {
                     if(!Config.SystemAllowFullSpace)
-                	    throw new CodeEE("予期しない全角スペースを発見しました(この警告はシステムオプション「" + Config.GetConfigName(ConfigCode.SystemAllowFullSpace) + "」により無視できます)");
+                	    throw new CodeEE(GameMessages.T("Unexpected full-width space found (this warning can be ignored via the system option \"") + Config.GetConfigName(ConfigCode.SystemAllowFullSpace) + GameMessages.T("\")."));
                     goto end;
                 }
                 st.ShiftNext();
@@ -521,7 +521,7 @@ namespace MinorShift.Emuera.Sub
 						switch (st.Current)
 						{
 							case StringStream.EndOfString:
-								throw new CodeEE("エスケープ文字\\の後に文字がありません");
+								throw new CodeEE(GameMessages.T("No character follows the escape character \\."));
 							case '\n': break;
 							case 's': buffer.Append(' '); break;
 							case 'S': buffer.Append('　'); break;
@@ -580,7 +580,7 @@ namespace MinorShift.Emuera.Sub
 					}
 					if (allowAssignment)
 						return OperatorCode.Assignment;
-					throw new CodeEE("予期しない代入演算子'='を発見しました(等価比較には'=='を使用してください)");
+					throw new CodeEE(GameMessages.T("Unexpected assignment operator '=' found (use '==' for equality comparison)."));
 				case '!':
 					if (next == '=')
 					{
@@ -651,7 +651,7 @@ namespace MinorShift.Emuera.Sub
 					return OperatorCode.Ternary_b;
 
 			}
-			throw new CodeEE("'" + cur + "'は演算子として認識できません");
+			throw new CodeEE("'" + cur + GameMessages.T("' cannot be recognized as an operator."));
 		}
 
 		/// <summary>
@@ -705,7 +705,7 @@ namespace MinorShift.Emuera.Sub
 						ret = OperatorCode.AssignmentStr;
 						break;
 					}
-					throw new CodeEE("\"\'\"は代入演算子として認識できません");
+					throw new CodeEE(GameMessages.T("\"\'\" cannot be recognized as an assignment operator."));
 				case '<':
 					if (next == '<')
 					{
@@ -715,7 +715,7 @@ namespace MinorShift.Emuera.Sub
 							ret = OperatorCode.LeftShift;
 							break;
 						}
-						throw new CodeEE("'<'は代入演算子として認識できません");
+						throw new CodeEE(GameMessages.T("'<' cannot be recognized as an assignment operator."));
 					}
 					break;
 				case '>':
@@ -727,7 +727,7 @@ namespace MinorShift.Emuera.Sub
 							ret = OperatorCode.RightShift;
 							break;
 						}
-						throw new CodeEE("'>'は代入演算子として認識できません");
+						throw new CodeEE(GameMessages.T("'>' cannot be recognized as an assignment operator."));
 					}
 					break;
 				case '|':
@@ -744,7 +744,7 @@ namespace MinorShift.Emuera.Sub
 					break;
 			}
 			if (ret == OperatorCode.NULL)
-				throw new CodeEE("'" + cur + "'は代入演算子として認識できません");
+				throw new CodeEE("'" + cur + GameMessages.T("' cannot be recognized as an assignment operator."));
 			st.ShiftNext();
 			return ret;
 		}
@@ -855,7 +855,7 @@ namespace MinorShift.Emuera.Sub
 						continue;
 					case '　':
 						if (!Config.SystemAllowFullSpace)
-							throw new CodeEE("字句解析中に予期しない全角スペースを発見しました(この警告はシステムオプション「" + Config.GetConfigName(ConfigCode.SystemAllowFullSpace) + "」により無視できます)");
+							throw new CodeEE(GameMessages.T("Unexpected full-width space found during lexical analysis (this warning can be ignored via the system option \"") + Config.GetConfigName(ConfigCode.SystemAllowFullSpace) + GameMessages.T("\")."));
 						st.ShiftNext();
 						continue;
 					case '0':
@@ -905,28 +905,28 @@ namespace MinorShift.Emuera.Sub
 					case '[':
 						if (st.Next == '[')
 						{
-							//throw new CodeEE("字句解析中に予期しない文字'[['を発見しました");
+							//throw new CodeEE("Unexpected character '[[' found during lexical analysis.");
 							////1808alpha006 rename handling change
 							//1808beta009 Restore only this one
 							//Because with the current handling, by the time we reach here the rename has already failed, but to restore the warning content
 							if (ParserMediator.RenameDic == null)
-								throw new CodeEE("字句解析中に予期しない文字\"[[\"を発見しました");
+								throw new CodeEE(GameMessages.T("Unexpected character \"[[\" found during lexical analysis."));
 							int start = st.CurrentPosition;
 							int find = st.Find("]]");
 							if (find <= 2)
 							{
 								if (find == 2)
-									throw new CodeEE("空の[[]]です");
+									throw new CodeEE(GameMessages.T("An empty [[]] was found."));
 								else
-									throw new CodeEE("対応する\"]]\"のない\"[[\"です");
+									throw new CodeEE(GameMessages.T("A \"[[\" without a matching \"]]\" was found."));
 							}
 							string key = st.Substring(start, find + 2);
 							//1810 Anything that could not be replaced up to this point is forced to Error
 							//Because even ones that were unreplaceable before line concatenation but became replaceable by it had been replaced
-							throw new CodeEE("字句解析中に置換(rename)できない符号" + key + "を発見しました");
+							throw new CodeEE(GameMessages.T("A token that cannot be replaced (rename) was found during lexical analysis: ") + key + GameMessages.T("."));
 							//string value = null;
 							//if (!ParserMediator.RenameDic.TryGetValue(key, out value))
-							//    throw new CodeEE("字句解析中に置換(rename)できない符号" + key + "を発見しました");
+							//    throw new CodeEE("A token that cannot be replaced (rename) was found during lexical analysis: " + key + ".");
 							//st.Replace(start, find + 2, value);
 							//continue;//Restart analysis from that spot
 						}
@@ -944,7 +944,7 @@ namespace MinorShift.Emuera.Sub
 							st.ShiftNext();
 							ret.Add(new LiteralStringWord(ReadString(st, StrEndWith.SingleQuotation)));
 							if (st.Current != '\'')
-								throw new CodeEE("\'が閉じられていません");
+								throw new CodeEE(GameMessages.T("\' is not closed."));
 							st.ShiftNext();
 							break;
 						}
@@ -953,7 +953,7 @@ namespace MinorShift.Emuera.Sub
 							//AssignmentStr special handling. Only when '=' is found while searching for the assignment operator in an assignment statement
 							if ((endWith == LexEndWith.Operator) && (nestBracketS == 0) && (nestBracketL == 0) && st.Next == '=' )
 								goto end;
-							throw new CodeEE("字句解析中に予期しない文字'" + st.Current + "'を発見しました");
+							throw new CodeEE(GameMessages.T("Unexpected character '") + st.Current + GameMessages.T("' found during lexical analysis."));
 						}
 						st.ShiftNext();
 						ret.Add(new LiteralStringWord(ReadString(st, StrEndWith.Comma)));
@@ -963,12 +963,12 @@ namespace MinorShift.Emuera.Sub
 					case '}':
 						if (endWith == LexEndWith.RightCurlyBrace)
 							goto end;
-						throw new CodeEE("字句解析中に予期しない文字'" + st.Current + "'を発見しました");
+						throw new CodeEE(GameMessages.T("Unexpected character '") + st.Current + GameMessages.T("' found during lexical analysis."));
 					case '\"':
 						st.ShiftNext();
 						ret.Add(new LiteralStringWord(ReadString(st, StrEndWith.DoubleQuotation)));
 						if (st.Current != '\"')
-							throw new CodeEE("\"が閉じられていません");
+							throw new CodeEE(GameMessages.T("\" is not closed."));
 						st.ShiftNext();
 						break;
 					case '@':
@@ -982,7 +982,7 @@ namespace MinorShift.Emuera.Sub
 						st.ShiftNext();
 						ret.Add(AnalyseFormattedString(st, FormStrEndWith.DoubleQuotation, false));
 						if (st.Current != '\"')
-							throw new CodeEE("\"が閉じられていません");
+							throw new CodeEE(GameMessages.T("\" is not closed."));
 						st.ShiftNext();
 						break;
 					case '.':
@@ -992,7 +992,7 @@ namespace MinorShift.Emuera.Sub
 
 					case '\\':
 						if (st.Next != '@')
-							throw new CodeEE("字句解析中に予期しない文字'" + st.Current + "'を発見しました");
+							throw new CodeEE(GameMessages.T("Unexpected character '") + st.Current + GameMessages.T("' found during lexical analysis."));
 						{
 							st.Jump(2);
 							ret.Add(new StrFormWord(new string[] { "", "" }, new SubWord[] { AnalyseYenAt(st) }));
@@ -1000,7 +1000,7 @@ namespace MinorShift.Emuera.Sub
 						break;
 					case '{':
 					case '$':
-						throw new CodeEE("字句解析中に予期しない文字'" + st.Current + "'を発見しました");
+						throw new CodeEE(GameMessages.T("Unexpected character '") + st.Current + GameMessages.T("' found during lexical analysis."));
 					case ';'://1807 Semicolon comment sections in a line
 						if (st.CurrentEqualTo(";#;") && Program.DebugMode)
 						{
@@ -1025,13 +1025,13 @@ namespace MinorShift.Emuera.Sub
 			if ((nestBracketS != 0) || (nestBracketL != 0))
 			{
 				if (nestBracketS < 0)
-					throw new CodeEE("字句解析中に対応する'('のない')'を発見しました");
+					throw new CodeEE(GameMessages.T("A ')' without a matching '(' was found during lexical analysis."));
 				else if (nestBracketS > 0)
-					throw new CodeEE("字句解析中に対応する')'のない'('を発見しました");
+					throw new CodeEE(GameMessages.T("A '(' without a matching ')' was found during lexical analysis."));
 				if (nestBracketL < 0)
-					throw new CodeEE("字句解析中に対応する'['のない']'を発見しました");
+					throw new CodeEE(GameMessages.T("A ']' without a matching '[' was found during lexical analysis."));
 				else if (nestBracketL > 0)
-					throw new CodeEE("字句解析中に対応する']'のない'['を発見しました");
+					throw new CodeEE(GameMessages.T("A '[' without a matching ']' was found during lexical analysis."));
 			}
 			if (UseMacro)
 				return expandMacro(ret);
@@ -1074,7 +1074,7 @@ namespace MinorShift.Emuera.Sub
 				}
 				count++;
 				if (count > MAX_EXPAND_MACRO)
-					throw new CodeEE("マクロの展開数が1文あたりの上限" + MAX_EXPAND_MACRO.ToString() + "を超えました(自己参照・循環参照のおそれ)");
+					throw new CodeEE(GameMessages.T("The number of macro expansions exceeded the limit of ") + MAX_EXPAND_MACRO.ToString() + GameMessages.T(" per statement (possible self-reference or circular reference)."));
 				if (!macro.HasArguments)
 				{
 					wc.Remove();
@@ -1094,7 +1094,7 @@ namespace MinorShift.Emuera.Sub
 			wc.ShiftNext();
 			SymbolWord symbol = wc.Current as SymbolWord;
 			if (symbol == null || symbol.Type != '(')
-				throw new CodeEE("関数形式のマクロ" + macro.Keyword + "にargumentがありません");
+				throw new CodeEE(GameMessages.T("Function-type macro ") + macro.Keyword + GameMessages.T(" has no argument."));
 			WordCollection macroWC = macro.Statement.Clone();
 			WordCollection[] args = new WordCollection[macro.ArgCount];
 			//argument part reading loop
@@ -1106,7 +1106,7 @@ namespace MinorShift.Emuera.Sub
 				{
 					wc.ShiftNext();
 					if (wc.EOL)
-						throw new CodeEE("関数形式のマクロ" + macro.Keyword + "の用法が正しくありません");
+						throw new CodeEE(GameMessages.T("Function-type macro ") + macro.Keyword + GameMessages.T(" is used incorrectly."));
 					symbol = wc.Current as SymbolWord;
 					if (symbol == null)
 					{
@@ -1123,7 +1123,7 @@ namespace MinorShift.Emuera.Sub
 								break;
 							}
 							if (i != macro.ArgCount - 1)
-								throw new CodeEE("関数形式のマクロ" + macro.Keyword + "のargumentの数が正しくありません");
+								throw new CodeEE(GameMessages.T("Function-type macro ") + macro.Keyword + GameMessages.T(" has an incorrect number of arguments."));
 							goto exitfor;
 						case ',':
 							if (macroNestBracketS == 0)
@@ -1134,14 +1134,14 @@ namespace MinorShift.Emuera.Sub
 				}
 			exitwhile:
 				if (args[i].Collection.Count == 0)
-					throw new CodeEE("関数形式のマクロ" + macro.Keyword + "のargumentを省略することはできません");
+					throw new CodeEE(GameMessages.T("Function-type macro ") + macro.Keyword + GameMessages.T(" cannot omit arguments."));
 				continue;
 			}
 		//argument part reading loop end
 		exitfor:
 			symbol = wc.Current as SymbolWord;
 			if (symbol == null || symbol.Type != ')')
-				throw new CodeEE("関数形式のマクロ" + macro.Keyword + "の用法が正しくありません");
+				throw new CodeEE(GameMessages.T("Function-type macro ") + macro.Keyword + GameMessages.T(" is used incorrectly."));
 			int macroLength = wc.Pointer - macroStart + 1;
 			wc.Pointer = macroStart;
 			for (int j = 0; j < macroLength; j++)
@@ -1209,7 +1209,7 @@ namespace MinorShift.Emuera.Sub
 						st.ShiftNext();
 						SWTs.Add(new PercentSubWord(Analyse(st, LexEndWith.Percent, LexAnalyzeFlag.None)));
 						if (st.Current != '%')
-							throw new CodeEE("\'%\'が使われましたが対応する\'%\'が見つかりません");
+							throw new CodeEE(GameMessages.T("\'%\' was used but a matching \'%\' was not found."));
 						break;
 					case '{':
 						strs.Add(buffer.ToString());
@@ -1217,7 +1217,7 @@ namespace MinorShift.Emuera.Sub
 						st.ShiftNext();
 						SWTs.Add(new CurlyBraceSubWord(Analyse(st, LexEndWith.RightCurlyBrace, LexAnalyzeFlag.None)));
 						if (st.Current != '}')
-							throw new CodeEE("\'{\'が使われましたが対応する\'}\'が見つかりません");
+							throw new CodeEE(GameMessages.T("\'{\' was used but a matching \'}\' was not found."));
 						break;
 					case '*':
 					case '+':
@@ -1242,13 +1242,13 @@ namespace MinorShift.Emuera.Sub
 						switch (cur)
 						{
 							case '\0':
-								throw new CodeEE("エスケープ文字\\の後に文字がありません");
+								throw new CodeEE(GameMessages.T("No character follows the escape character \\."));
 							case '\n': break;
 							case 's': buffer.Append(' '); break;
 							case 'S': buffer.Append('　'); break;
 							case 't': buffer.Append('\t'); break;
 							case 'n': buffer.Append('\n'); break;
-							case '@'://\@～～?～～#～～\@
+							case '@'://\@~~?~~#~~\@
 								{
 									if ((endWith == FormStrEndWith.YenAt) || (endWith == FormStrEndWith.Sharp))
 										goto end;
@@ -1296,21 +1296,21 @@ namespace MinorShift.Emuera.Sub
 		{
 			WordCollection w = Analyse(st, LexEndWith.Question, LexAnalyzeFlag.None);
 			if (st.Current != '?')
-				throw new CodeEE("\'\\@\'が使われましたが対応する\'?\'が見つかりません");
+				throw new CodeEE(GameMessages.T("\'\\@\' was used but a matching \'?\' was not found."));
 			st.ShiftNext();
 			StrFormWord left = AnalyseFormattedString(st, FormStrEndWith.Sharp, true);
 			if (st.Current != '#')
 			{
 				if (st.Current != '@')
-					throw new CodeEE("\'\\@\',\'?\'が使われましたが対応する\'#\'が見つかりません");
+					throw new CodeEE(GameMessages.T("\'\\@\',\'?\' was used but a matching \'#\' was not found."));
 				st.ShiftNext();
-				ParserMediator.Warn("\'\\@\',\'?\'が使われましたが対応する\'#\'が見つかりません", GlobalStatic.Process.GetScaningLine(), 1, false, false);
+				ParserMediator.Warn(GameMessages.T("\'\\@\',\'?\' was used but a matching \'#\' was not found."), GlobalStatic.Process.GetScaningLine(), 1, false, false);
 				return new YenAtSubWord(w, left, null);
 			}
 			st.ShiftNext();
 			StrFormWord right = AnalyseFormattedString(st, FormStrEndWith.YenAt, true);
 			if (st.Current != '@')
-				throw new CodeEE("\'\\@\',\'?\',\'#\'が使われましたが対応する\'\\@\'が見つかりません");
+				throw new CodeEE(GameMessages.T("\'\\@\',\'?\',\'#\' was used but a matching \'\\@\' was not found."));
 			st.ShiftNext();
 			return new YenAtSubWord(w, left, right);
 		}

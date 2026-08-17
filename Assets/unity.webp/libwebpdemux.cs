@@ -61,6 +61,8 @@ namespace WebP.Extern
         const string DLL_NAME = "webpdemux";
 #elif UNITY_ANDROID
 		const string DLL_NAME = "webpdemux";
+#elif UNITY_STANDALONE_LINUX
+		const string DLL_NAME = "webpdemux";
 #elif UNITY_IOS
 		const string DLL_NAME = "__Internal";
 #endif

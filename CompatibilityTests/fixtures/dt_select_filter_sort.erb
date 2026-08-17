@@ -1,0 +1,10 @@
+; Reference capture: EvilMask/Emuera.EM+EE @ 2175f8a629257efb08214e093704b3a3d3d06d05
+@SYSTEM_TITLE
+DT_CREATE "test"
+DT_COLUMN_ADD "test", "name", "string"
+DT_COLUMN_ADD "test", "age", "int16"
+DT_ROW_ADD "test", "name", "A", "age", 21
+DT_ROW_ADD "test", "name", "B", "age", 18
+DT_ROW_ADD "test", "name", "C", "age", 33
+#DIM ids, 10
+PRINTVL DT_SELECT("test", "age >= 18", "age ASC", ids)

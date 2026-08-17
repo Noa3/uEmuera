@@ -114,17 +114,17 @@ namespace MinorShift.Emuera
             //Forbid and forbid double startup
 			//if ((!Config.AllowMultipleInstances) && (Sys.PrevInstance()))
 			//{
-			//	MessageBox.Show("多重起動を許可する場合、emuera.configを書き換えて下さい", "既に起動しています");
+			//	MessageBox.Show("To allow multiple instances, edit emuera.config", "Already running");
 			//	return;
 			//}
 			if (!Directory.Exists(CsvDir))
 			{
-				MessageBox.Show("\"" + CsvDir + "\" csvフォルダが見つかりません", "フォルダなし");
+				MessageBox.Show("\"" + CsvDir + GameMessages.T("\" csv folder not found"), GameMessages.T("Folder not found"));
 				return;
 			}
 			if (!Directory.Exists(ErbDir))
 			{
-				MessageBox.Show("\"" + ErbDir + "\" erbフォルダが見つかりません", "フォルダなし");
+				MessageBox.Show("\"" + ErbDir + GameMessages.T("\" erb folder not found"), GameMessages.T("Folder not found"));
 				return;
 			}
             int argsStart = 0;
@@ -144,7 +144,7 @@ namespace MinorShift.Emuera
 					}
 					catch
 					{
-						MessageBox.Show("debugフォルダの作成に失敗しました", "フォルダなし");
+						MessageBox.Show(GameMessages.T("Failed to create debug folder"), GameMessages.T("Folder not found"));
 						return;
 					}
 				}
@@ -156,7 +156,7 @@ namespace MinorShift.Emuera
                 {
                     if (!File.Exists(args[i]) && !Directory.Exists(args[i]))
                     {
-                        MessageBox.Show("与えられたファイル・フォルダは存在しません");
+                        MessageBox.Show(GameMessages.T("The specified file or folder does not exist"));
                         return;
                     }
                     if ((File.GetAttributes(args[i]) & FileAttributes.Directory) == FileAttributes.Directory)
@@ -174,7 +174,7 @@ namespace MinorShift.Emuera
                     {
                         if (Path.GetExtension(args[i]).ToUpper() != ".ERB")
                         {
-                            MessageBox.Show("ドロップ可能なファイルはERBファイルのみです");
+                            MessageBox.Show(GameMessages.T("Only ERB files can be dropped"));
                             return;
                         }
                         AnalysisFiles.Add(args[i]);

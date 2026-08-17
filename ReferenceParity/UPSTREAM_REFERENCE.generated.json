@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "repository": "https://gitlab.com/EvilMask/emuera.em",
+  "revision": "cde11d69048f87d4a70d1452da79ae6e56462386",
+  "commit_date": "2025-11-14T20:59:19+09:00",
+  "tag": "Emuera.NET1824+v22+EMv18+EEv55",
+  "version_source": "current_release_tag",
+  "em_version": "18",
+  "ee_version": "55",
+  "documentation_version": "Emuera.NET1824+v22+EMv18+EEv55",
+  "capture_date": "2025-11-14T20:59:19+09:00",
+  "source_path_recorded": false,
+  "configured_revision": "cde11d69048f87d4a70d1452da79ae6e56462386",
+  "stale": false,
+  "uemuera_revision": "c5ff6c7cdcf960a6abef01b8ef4b8d08963e82f3",
+  "remote_discovery": {
+    "repository": "https://gitlab.com/EvilMask/emuera.em",
+    "resolved_from": "git ls-remote --heads --tags",
+    "current_release": {
+      "commit": "cde11d69048f87d4a70d1452da79ae6e56462386",
+      "tag": "Emuera.NET1824+v22+EMv18+EEv55",
+      "emuera_version": "1824",
+      "base_version": "22",
+      "em_version": "18",
+      "ee_version": "55"
+    },
+    "release_tags_seen": 20
+  }
+}

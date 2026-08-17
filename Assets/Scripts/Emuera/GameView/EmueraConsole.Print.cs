@@ -136,7 +136,7 @@ namespace MinorShift.Emuera.GameView
 			}
 			if (errorStr != null)
 			{
-				MessageBox.Show("Emueraの表示処理中に不適正なフォントを検出しました\n描画処理を続行できないため強制終了します", "フォント不適正");
+				MessageBox.Show(GameMessages.T("An invalid font was detected during Emuera display processing\nRendering cannot continue, forcing termination"), GameMessages.T("Invalid Font"));
 				this.Quit();
 				return;
 			}
@@ -566,7 +566,7 @@ namespace MinorShift.Emuera.GameView
 		public void printCustomBar(string barStr)
 		{
 			if (string.IsNullOrEmpty(barStr))
-				throw new CodeEE("空文字列によるDRAWLINEが行われました");
+				throw new CodeEE(GameMessages.T("DRAWLINE was called with an empty string"));
 			StringStyle ss = userStyle;
 			userStyle.FontStyle = FontStyle.Regular;
 			Print(getStBar(barStr));
@@ -617,7 +617,7 @@ namespace MinorShift.Emuera.GameView
 			}
 			catch (Exception)
 			{
-				MessageBox.Show("ログの出力に失敗しました", "ログ出力失敗");
+				MessageBox.Show(GameMessages.T("Failed to output log"), GameMessages.T("Log Output Failed"));
 				return false;
 			}
 			finally

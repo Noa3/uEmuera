@@ -30,6 +30,11 @@ namespace MinorShift.Emuera.GameProc
 		int currentFileCount = 0;
 		int totalFileCount = 0;
 
+		// Labels registered while loading the most recent file. Used by the
+		// background loader to run per-file syntax checks (checkFunctionWithCatch).
+		readonly List<FunctionLabelLine> latestFileLabels = new List<FunctionLabelLine>();
+		public List<FunctionLabelLine> LatestFileLabels { get { return latestFileLabels; } }
+
 		public int Count { get { return count; } }
 
 /// <summary>
@@ -40,15 +45,18 @@ namespace MinorShift.Emuera.GameProc
 		#region For use before Initialized
 		public FunctionLabelLine GetSameNameLabel(FunctionLabelLine point)
 		{
-			string id = point.LabelName;
-			if (!labelAtDic.ContainsKey(id))
-				return null;
-			if (point.IsError)
-				return null;
-			List<FunctionLabelLine> labelList = labelAtDic[id];
-			if (labelList.Count <= 1)
-				return null;
-			return labelList[0];
+            return BackgroundErbLoader.AcquireReadLock(() =>
+            {
+                string id = point.LabelName;
+                if (!labelAtDic.ContainsKey(id))
+                    return null;
+                if (point.IsError)
+                    return null;
+                List<FunctionLabelLine> labelList = labelAtDic[id];
+                if (labelList.Count <= 1)
+                    return null;
+                return labelList[0];
+            });
 		}
 
 
@@ -57,6 +65,12 @@ namespace MinorShift.Emuera.GameProc
 
 		public void SortLabels()
 		{
+            // Phase 6 #76: assert single-thread semantic mutation in debug builds.
+            InterpreterThreadGuard.AssertOwner("LabelDictionary.SortLabels");
+            // Wrap in the background lock so that GetNonEventLabel / GetEventLabels
+            // (which also acquire the lock) never observe a partially-rebuilt dict.
+            BackgroundErbLoader.AcquireWriteLock(() =>
+            {
 			foreach (KeyValuePair<string, List<FunctionLabelLine>[]> pair in eventLabelDic)
 				foreach (List<FunctionLabelLine> list in pair.Value)
 					list.Clear();
@@ -119,6 +133,7 @@ namespace MinorShift.Emuera.GameProc
                 }
                 eventLabelDic.Add(key, eventLabels);
 			}
+            }); // end BackgroundErbLoader.AcquireWriteLock
 		}
 
 		public void RemoveAll()
@@ -143,66 +158,79 @@ namespace MinorShift.Emuera.GameProc
 
 		public void RemoveLabelWithPath(string fname)
 		{
-			List<FunctionLabelLine> labelLines;
-			List<FunctionLabelLine> removeLine = new List<FunctionLabelLine>();
-			List<string> removeKey = new List<string>();
-			foreach (KeyValuePair<string, List<FunctionLabelLine>> pair in labelAtDic)
-			{
-				string key = pair.Key;
-				labelLines = pair.Value;
-				foreach (FunctionLabelLine labelLine in labelLines)
-				{
-					if (string.Equals(labelLine.Position.Filename, fname, Config.SCIgnoreCase))
-						removeLine.Add(labelLine);
-				}
-				foreach (FunctionLabelLine remove in removeLine)
-				{
-					labelLines.Remove(remove);
-					if (labelLines.Count == 0)
-						removeKey.Add(key);
-				}
-				removeLine.Clear();
-			}
-			foreach (string rKey in removeKey)
-			{
-				labelAtDic.Remove(rKey);
-			}
-			for (int i = 0; i < invalidList.Count; i++)
-			{
-				if (string.Equals(invalidList[i].Position.Filename, fname, Config.SCIgnoreCase))
-				{
-					invalidList.RemoveAt(i);
-					i--;
-				}
-			}
+            BackgroundErbLoader.AcquireWriteLock(() =>
+            {
+                List<FunctionLabelLine> labelLines;
+                List<FunctionLabelLine> removeLine = new List<FunctionLabelLine>();
+                List<string> removeKey = new List<string>();
+                foreach (KeyValuePair<string, List<FunctionLabelLine>> pair in labelAtDic)
+                {
+                    string key = pair.Key;
+                    labelLines = pair.Value;
+                    foreach (FunctionLabelLine labelLine in labelLines)
+                    {
+                        if (string.Equals(labelLine.Position.Filename, fname, Config.SCIgnoreCase))
+                            removeLine.Add(labelLine);
+                    }
+                    foreach (FunctionLabelLine remove in removeLine)
+                    {
+                        labelLines.Remove(remove);
+                        if (labelLines.Count == 0)
+                            removeKey.Add(key);
+                    }
+                    removeLine.Clear();
+                }
+                foreach (string rKey in removeKey)
+                {
+                    labelAtDic.Remove(rKey);
+                }
+                for (int i = 0; i < invalidList.Count; i++)
+                {
+                    if (string.Equals(invalidList[i].Position.Filename, fname, Config.SCIgnoreCase))
+                    {
+                        invalidList.RemoveAt(i);
+                        i--;
+                    }
+                }
+            });
 		}
 
 
 		public void AddFilename(string filename)
 		{
-            if (loadedFileDic.TryGetValue(filename, out int curCount))
+            InterpreterThreadGuard.AssertOwner("LabelDictionary.AddFilename");
+            BackgroundErbLoader.AcquireWriteLock(() =>
             {
-                currentFileCount = curCount;
-                RemoveLabelWithPath(filename);
-                return;
-            }
-            totalFileCount++;
-			currentFileCount = totalFileCount;
-			loadedFileDic.Add(filename, totalFileCount);
+                latestFileLabels.Clear();
+                if (loadedFileDic.TryGetValue(filename, out int curCount))
+                {
+                    currentFileCount = curCount;
+                    RemoveLabelWithPath(filename);
+                    return;
+                }
+                totalFileCount++;
+                currentFileCount = totalFileCount;
+                loadedFileDic.Add(filename, totalFileCount);
+            });
 		}
 		public void AddLabel(FunctionLabelLine point)
 		{
-			point.Index = count;
-			point.FileIndex = currentFileCount;
-			count++;
-			string id = point.LabelName;
-            List<FunctionLabelLine> function_label_line_list = null;
-			if(!labelAtDic.TryGetValue(id, out function_label_line_list))
-			{
-                function_label_line_list = new List<FunctionLabelLine>();
-				labelAtDic.Add(id, function_label_line_list);
-			}
-            function_label_line_list.Add(point);
+            InterpreterThreadGuard.AssertOwner("LabelDictionary.AddLabel");
+            BackgroundErbLoader.AcquireWriteLock(() =>
+            {
+                point.Index = count;
+                point.FileIndex = currentFileCount;
+                count++;
+                string id = point.LabelName;
+                List<FunctionLabelLine> function_label_line_list = null;
+                if (!labelAtDic.TryGetValue(id, out function_label_line_list))
+                {
+                    function_label_line_list = new List<FunctionLabelLine>();
+                    labelAtDic.Add(id, function_label_line_list);
+                }
+                function_label_line_list.Add(point);
+                latestFileLabels.Add(point);
+            });
         }
 
 		public bool AddLabelDollar(GotoLabelLine point)
@@ -221,44 +249,60 @@ namespace MinorShift.Emuera.GameProc
 
 		
 		public List<FunctionLabelLine>[] GetEventLabels(string key)
-		{
-            if (eventLabelDic.TryGetValue(key, out List<FunctionLabelLine>[] ret))
-                return ret;
-            else
+        {
+            return BackgroundErbLoader.AcquireReadLock(() =>
+            {
+                if (eventLabelDic.TryGetValue(key, out List<FunctionLabelLine>[] ret))
+                    return ret;
                 return null;
+            });
         }
 
 		public FunctionLabelLine GetNonEventLabel(string key)
-		{
-            if (noneventLabelDic.TryGetValue(key, out FunctionLabelLine ret))
-                return ret;
-            else
+        {
+            // During background loading, the dictionaries may be updated by another
+            // thread.  Delegate through BackgroundErbLoader's lock when active.
+            return BackgroundErbLoader.AcquireReadLock(() =>
+            {
+                if (noneventLabelDic.TryGetValue(key, out FunctionLabelLine ret))
+                    return ret;
                 return null;
+            });
         }
 
 		public List<FunctionLabelLine> GetAllLabels(bool getInvalidList)
 		{
-			List<FunctionLabelLine> ret = new List<FunctionLabelLine>();
-			foreach (List<FunctionLabelLine> list in labelAtDic.Values)
-				ret.AddRange(list);
-			if(getInvalidList)
-				ret.AddRange(invalidList);
-			return ret;
+            return BackgroundErbLoader.AcquireReadLock(() =>
+            {
+                List<FunctionLabelLine> ret = new List<FunctionLabelLine>();
+                foreach (List<FunctionLabelLine> list in labelAtDic.Values)
+                    ret.AddRange(list);
+                if (getInvalidList)
+                    ret.AddRange(invalidList);
+                return ret;
+            });
 		}
 
 		public GotoLabelLine GetLabelDollar(string key, FunctionLabelLine labelAtLine)
 		{
-			foreach (GotoLabelLine label in labelDollarList)
-			{
-				if ((label.LabelName == key) && (label.ParentLabelLine == labelAtLine))
-					return label;
-			}
-			return null;
+            return BackgroundErbLoader.AcquireReadLock(() =>
+            {
+                foreach (GotoLabelLine label in labelDollarList)
+                {
+                    if ((label.LabelName == key) && (label.ParentLabelLine == labelAtLine))
+                        return label;
+                }
+                return null;
+            });
 		}
 		
 		internal void AddInvalidLabel(FunctionLabelLine invalidLabelLine)
 		{
-			invalidList.Add(invalidLabelLine);
-		}
+            BackgroundErbLoader.AcquireWriteLock(() =>
+            {
+                invalidList.Add(invalidLabelLine);
+                latestFileLabels.Add(invalidLabelLine);
+            });
+        }
     }
 }

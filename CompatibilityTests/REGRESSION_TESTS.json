@@ -1,0 +1,59 @@
+{
+  "schema_version": 2,
+  "reference": {
+    "name": "Emuera.EM+EE",
+    "revision": "cde11d69048f87d4a70d1452da79ae6e56462386",
+    "em_version": "EMv18",
+    "ee_version": "EEv55"
+  },
+  "fixtures": [
+    {
+      "id": "dt.create.basic",
+      "feature_id": "dt.create",
+      "category": "LOGIC",
+      "commands": ["DT_CREATE", "DT_EXIST"],
+      "fixture": "Fixtures/dt_create_basic.erb",
+      "reference_status": "pending",
+      "local_status": "pending",
+      "reference_version": "EMv18/EEv55",
+      "reference_commit": "cde11d69048f87d4a70d1452da79ae6e56462386",
+      "expected": {"console": [], "result": null, "results": [], "state": {}, "render_tree": null, "image": null}
+    },
+    {
+      "id": "dt.row.stable_id",
+      "feature_id": "dt.row",
+      "category": "LOGIC",
+      "commands": ["DT_ROW_ADD", "DT_ROW_REMOVE", "DT_ROW_LENGTH"],
+      "fixture": "Fixtures/dt_row_stable_id.erb",
+      "reference_status": "pending",
+      "local_status": "pending",
+      "reference_version": "EMv18/EEv55",
+      "reference_commit": "cde11d69048f87d4a70d1452da79ae6e56462386",
+      "expected": {"console": [], "result": null, "results": [], "state": {}, "render_tree": null, "image": null}
+    },
+    {
+      "id": "dt.select.filter_sort",
+      "feature_id": "dt.select",
+      "category": "LOGIC",
+      "commands": ["DT_SELECT"],
+      "fixture": "Fixtures/dt_select_filter_sort.erb",
+      "reference_status": "pending",
+      "local_status": "pending",
+      "reference_version": "EMv18/EEv55",
+      "reference_commit": "cde11d69048f87d4a70d1452da79ae6e56462386",
+      "expected": {"console": [], "result": null, "results": [], "state": {}, "render_tree": null, "image": null}
+    },
+    {
+      "id": "dt.serialization.roundtrip",
+      "feature_id": "dt.serialization",
+      "category": "SAVE",
+      "commands": ["DT_TOXML", "DT_FROMXML"],
+      "fixture": "Fixtures/dt_serialization_roundtrip.erb",
+      "reference_status": "pending",
+      "local_status": "pending",
+      "reference_version": "EMv18/EEv55",
+      "reference_commit": "cde11d69048f87d4a70d1452da79ae6e56462386",
+      "expected": {"console": [], "result": null, "results": [], "state": {}, "render_tree": null, "image": null}
+    }
+  ]
+}

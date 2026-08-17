@@ -11,13 +11,13 @@ using System.Text.RegularExpressions;
 
 namespace MinorShift.Emuera
 {
-	//1756 新設。ParserやLexicalAnalyzerなどが知りたい情報をまとめる
-	//本当はargumentとして渡すべきなのかもしれないが全てのParserのargumentを書きなおすのが面倒なのでstatic
+	//1756 Newly created. Collects information that Parser, LexicalAnalyzer, etc. need to know.
+	//Ideally this should be passed as an argument, but rewriting all Parser arguments is tedious, so it is static.
 	internal static class ParserMediator
 	{
 		/// <summary>
-		/// emuera.config等で発生した警告
-		/// Initializeより前に発生する
+		/// Warnings generated from emuera.config etc.
+		/// Occurs before Initialize.
 		/// </summary>
 		/// <param name="str"></param>
 		/// <param name="?"></param>
@@ -25,7 +25,8 @@ namespace MinorShift.Emuera
 		{
 			if (level < Config.DisplayWarningLevel && !Program.AnalysisMode)
 				return;
-			warningList.Add(new ParserWarning(str, pos, level, stack));
+			lock (warningList)
+				warningList.Add(new ParserWarning(str, pos, level, stack));
 		}
 
 		static EmueraConsole console;
@@ -36,12 +37,12 @@ namespace MinorShift.Emuera
 
 		#region Rename
 		public static Dictionary<string, string> RenameDic { get; private set; }
-		//1756 Process.Load.csより移動
+		//1756 Moved from Process.Load.cs
 		public static void LoadEraExRenameFile(string filepath)
 		{
 			if (RenameDic != null)
 				RenameDic.Clear();
-			//とにかく辞書を作る。辞書がnullのときは UseRenameFileがNOの時のみ
+			//Always create the dictionary. It is null only when UseRenameFile is NO.
 			RenameDic = new Dictionary<string, string>();
 			
 			// Use case-insensitive file resolution for non-Windows systems
@@ -72,7 +73,7 @@ namespace MinorShift.Emuera
 					tokens[0] = string.Join(",", baseTokens);
 					tokens[1] = last[1];
 					pos = new ScriptPosition(eReader.Filename, eReader.LineNo);
-					//右がERB中の表記、左が変換先になる。
+					//The right side is the notation in ERB; the left side is the replacement.
 					string value = tokens[0].Trim();
 					string key = string.Format("[[{0}]]", tokens[1].Trim());
 					RenameDic[key] = value;
@@ -105,15 +106,16 @@ namespace MinorShift.Emuera
 			if (level < Config.DisplayWarningLevel && !Program.AnalysisMode)
 				return;
 			if (console != null && !console.RunERBFromMemory)
-				warningList.Add(new ParserWarning(str, pos, level, stack));
+				lock (warningList)
+					warningList.Add(new ParserWarning(str, pos, level, stack));
 		}
 
 		/// <summary>
-		/// Parser中での警告出力
+		/// Warning output during parsing
 		/// </summary>
 		/// <param name="str"></param>
 		/// <param name="line"></param>
-		/// <param name="level">警告レベル.0:軽微なミス.1:無視できる行.2:行が実行されなければ無害.3:致命的</param>
+		/// <param name="level">Warning level. 0: minor mistake. 1: ignorable line. 2: harmless if the line is not executed. 3: fatal.</param>
 		public static void Warn(string str, LogicalLine line, int level, bool isError, bool isBackComp)
 		{
             Warn(str, line, level, isError, isBackComp, null);
@@ -131,23 +133,32 @@ namespace MinorShift.Emuera
             if (isBackComp && !Config.WarnBackCompatibility)
                 return;
             if (console != null && !console.RunERBFromMemory)
-                warningList.Add(new ParserWarning(str, line.Position, level, stack));
+                lock (warningList)
+                    warningList.Add(new ParserWarning(str, line.Position, level, stack));
             //				console.PrintWarning(str, line.Position, level);
         }
         
         private static List<ParserWarning> warningList = new List<ParserWarning>();
 
-		public static bool HasWarning{get {return warningList.Count > 0;}}
+		public static bool HasWarning{get {lock (warningList) return warningList.Count > 0;}}
 		public static void ClearWarningList()
 		{
-			warningList.Clear();
+			lock (warningList)
+				warningList.Clear();
 		}
 
 		public static void FlushWarningList()
 		{
-			for (int i = 0; i < warningList.Count; i++)
+			List<ParserWarning> local;
+			lock (warningList)
 			{
-				ParserWarning warning = warningList[i];
+				if (warningList.Count == 0) return;
+				local = warningList;
+				warningList = new List<ParserWarning>();
+			}
+			for (int i = 0; i < local.Count; i++)
+			{
+				ParserWarning warning = local[i];
 				console.PrintWarning(warning.WarningMes, warning.WarningPos, warning.WarningLevel);
                 if (warning.StackTrace != null)
                 {
@@ -158,7 +169,6 @@ namespace MinorShift.Emuera
                     }
                 }
             }
-			warningList.Clear();
 		}
 
 		private class ParserWarning

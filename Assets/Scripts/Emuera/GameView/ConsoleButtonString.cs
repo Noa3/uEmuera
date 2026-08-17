@@ -126,7 +126,7 @@ namespace MinorShift.Emuera.GameView
 				{
 					ConsoleStyledString oldcss = strArray[cssIndex] as ConsoleStyledString;
 					if (oldcss == null || !oldcss.CanDivide)
-						throw new ExeEE("文字列分割異常");
+						throw new ExeEE(GameMessages.T("String split error"));
 					ConsoleStyledString newCss = oldcss.DivideAt(divIndex - index, sm);
 					cssListA.Add(oldcss);
 					if (newCss != null)

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using MinorShift.Emuera.Sub;
+using MinorShift.Emuera.GameProc;
 using MinorShift.Emuera.GameData.Variable;
 using MinorShift.Emuera.GameData.Function;
 
@@ -55,7 +56,7 @@ namespace MinorShift.Emuera.GameData.Expression
         public static IOperandTerm[] ReduceArguments(WordCollection wc, ArgsEndWith endWith, bool isDefine)
         {
             if(wc == null)
-                throw new ExeEE("空のストリームを渡された");
+                throw new ExeEE(GameMessages.T("An empty stream was passed"));
             List<IOperandTerm> terms = new List<IOperandTerm>();
             TermEndWith termEndWith = TermEndWith.EoL;
             switch (endWith)
@@ -78,9 +79,9 @@ namespace MinorShift.Emuera.GameData.Expression
                 {
                     case '\0':
                         if (endWith == ArgsEndWith.RightBracket)
-                            throw new CodeEE("'['に対応する']'が見つかりません");
+                            throw new CodeEE(GameMessages.T("No closing ']' found for '['"));
                         if (endWith == ArgsEndWith.RightParenthesis)
-                            throw new CodeEE("'('に対応する')'が見つかりません");
+                            throw new CodeEE(GameMessages.T("No closing ')' found for '('"));
                         goto end;
                     case ')':
                         if (endWith == ArgsEndWith.RightParenthesis)
@@ -88,14 +89,14 @@ namespace MinorShift.Emuera.GameData.Expression
                             wc.ShiftNext();
                             goto end;
                         }
-                        throw new CodeEE("構文解析中に予期しない')'を発見しました");
+                        throw new CodeEE(GameMessages.T("Unexpected ')' found during parsing"));
                     case ']':
                         if (endWith == ArgsEndWith.RightBracket)
                         {
                             wc.ShiftNext();
                             goto end;
                         }
-                        throw new CodeEE("構文解析中に予期しない']'を発見しました");
+                        throw new CodeEE(GameMessages.T("Unexpected ']' found during parsing"));
                 }
                 if(!isDefine)
                     terms.Add(ReduceExpressionTerm(wc, termEndWith));
@@ -103,15 +104,15 @@ namespace MinorShift.Emuera.GameData.Expression
                 {
                     terms.Add(ReduceExpressionTerm(wc, termEndWith_Assignment));
                     if (terms[terms.Count - 1] == null)
-                        throw new CodeEE("関数定義のargumentは省略できません");
+                        throw new CodeEE(GameMessages.T("The argument of a function definition cannot be omitted"));
                     if (wc.Current is OperatorWord)
                     {//there is '='
                         wc.ShiftNext();
                         IOperandTerm term = reduceTerm(wc, false, termEndWith, VariableCode.__NULL__);
                         if (term == null)
-                            throw new CodeEE("'='の後に式がありません");
+                            throw new CodeEE(GameMessages.T("No expression after '='"));
                         if (term.GetOperandType() != terms[terms.Count - 1].GetOperandType())
-                            throw new CodeEE("'='の前後で型が一致しません");
+                            throw new CodeEE(GameMessages.T("The types before and after '=' do not match"));
                         terms.Add(term);
                     }
                     else
@@ -153,9 +154,9 @@ namespace MinorShift.Emuera.GameData.Expression
         {
             IOperandTerm term = reduceTerm(wc, false, endwith, VariableCode.__NULL__);
             if (term == null)
-                throw new CodeEE("構文を式として解釈できません");
+                throw new CodeEE(GameMessages.T("The syntax cannot be interpreted as an expression"));
             if (term.GetOperandType() != typeof(Int64))
-                throw new CodeEE("式の結果が数値ではありません");
+                throw new CodeEE(GameMessages.T("The expression result is not a number"));
             return term;
         }
 
@@ -200,7 +201,7 @@ namespace MinorShift.Emuera.GameData.Expression
         {
             IOperandTerm ret = reduceTerm(wc, false, TermEndWith.EoL, varCode);
             if(ret == null)
-                throw new CodeEE("変数の:の後にargumentがありません");
+                throw new CodeEE(GameMessages.T("No argument after the variable's ':'"));
             return ret;
         }
 
@@ -218,7 +219,7 @@ namespace MinorShift.Emuera.GameData.Expression
                 wc.ShiftNext();
                 IdentifierWord subidWT = wc.Current as IdentifierWord;
                 if (subidWT == null)
-                    throw new CodeEE("@の使い方が不正です");
+                    throw new CodeEE(GameMessages.T("Invalid use of '@'"));
                 wc.ShiftNext();
                 subId = subidWT.Code;
             }
@@ -244,12 +245,19 @@ namespace MinorShift.Emuera.GameData.Expression
             {//function
                 wc.ShiftNext();
                 if (symbol.Type == '[')//1810 Probably never implemented
-                    throw new CodeEE("[]を使った機能はまだ実装されていません");
+                    throw new CodeEE(GameMessages.T("Functionality using '[]' is not implemented yet"));
                 //Process the arguments
                 IOperandTerm[] args = ReduceArguments(wc, ArgsEndWith.RightParenthesis, false);
                 IOperandTerm mToken = GlobalStatic.IdentifierDictionary.GetFunctionMethod(GlobalStatic.LabelDictionary, idStr, args, false);
                 if (mToken == null)
                 {
+                    // Progressive/lazy loading: the function may be defined in a file
+                    // that has not been compiled yet (Fast boot) or is still loading in
+                    // the background (legacy progressive). Turn it into a lazily-resolved
+                    // term instead of warning + NullTerm(0), which would silently break
+                    // game logic (the call would evaluate to 0/false in every expression).
+                    if (FunctionResolver.IsKnownMethod(idStr))
+                        return new PendingUserDefinedMethodTerm(idStr, args);
                     // Warn and track unknown function identifier
                     ScriptPosition pos = GlobalStatic.Process.GetScaningLine()?.Position ?? new ScriptPosition();
                     ParserMediator.Warn(string.Format(GameMessages.UnrecognizedIdentifier, idStr), pos, 1);
@@ -288,7 +296,7 @@ namespace MinorShift.Emuera.GameData.Expression
                     GlobalStatic.tempDic.Add(idStr, 1);
                 return new NullTerm(0);
             }
-            throw new ExeEE("Error投げ損ねた");//By this point either a throw or a return should have been made.
+            throw new ExeEE(GameMessages.T("Failed to throw an error"));//By this point either a throw or a return should have been made.
         }
 
         #endregion
@@ -304,35 +312,35 @@ namespace MinorShift.Emuera.GameData.Expression
 				ret.CaseType = CaseExpressionType.Is;
 				OperatorWord opWT = wc.Current as OperatorWord;
 				if (opWT == null)
-					throw new CodeEE("ISキーワードの後に演算子がありません");
+					throw new CodeEE(GameMessages.T("No operator after the IS keyword"));
 
 				OperatorCode op = opWT.Code;
 				if (!OperatorManager.IsBinary(op))
-					throw new CodeEE("ISキーワードの後の演算子が2項演算子ではありません");
+					throw new CodeEE(GameMessages.T("The operator after the IS keyword is not a binary operator"));
 				wc.ShiftNext();
 				ret.Operator = op;
 				ret.LeftTerm = reduceTerm(wc, false, TermEndWith.Comma, VariableCode.__NULL__);
 				if (ret.LeftTerm == null)
-					throw new CodeEE("ISキーワードの後に式がありません");
+					throw new CodeEE(GameMessages.T("No expression after the IS keyword"));
 				//Type type = ret.LeftTerm.GetOperandType();
 				return ret;
 			}
 			ret.LeftTerm = reduceTerm(wc, true, TermEndWith.Comma, VariableCode.__NULL__);
-			if (ret.LeftTerm == null)
-				throw new CodeEE("CASEのargumentは省略できません");
+		if (ret.LeftTerm == null)
+			throw new CodeEE(GameMessages.T("The argument of CASE cannot be omitted"));
 			id = wc.Current as IdentifierWord;
 			if ((id != null) && (id.Code.Equals("TO", Config.SCVariable)))
 			{
 				ret.CaseType = CaseExpressionType.To;
 				wc.ShiftNext();
 				ret.RightTerm = reduceTerm(wc, true, TermEndWith.Comma, VariableCode.__NULL__);
-				if (ret.RightTerm == null)
-					throw new CodeEE("TOキーワードの後に式がありません");
-				id = wc.Current as IdentifierWord;
-				if ((id != null) && (id.Code.Equals("TO", Config.SCVariable)))
-					throw new CodeEE("TOキーワードが2度使われています");
-				if (ret.LeftTerm.GetOperandType() != ret.RightTerm.GetOperandType())
-					throw new CodeEE("TOキーワードの前後の型が一致していません");
+		if (ret.RightTerm == null)
+				throw new CodeEE(GameMessages.T("No expression after the TO keyword"));
+			id = wc.Current as IdentifierWord;
+			if ((id != null) && (id.Code.Equals("TO", Config.SCVariable)))
+				throw new CodeEE(GameMessages.T("The TO keyword is used twice"));
+			if (ret.LeftTerm.GetOperandType() != ret.RightTerm.GetOperandType())
+				throw new CodeEE(GameMessages.T("The types before and after the TO keyword do not match"));
 				return ret;
 			}
 			ret.CaseType = CaseExpressionType.Normal;
@@ -379,10 +387,10 @@ namespace MinorShift.Emuera.GameData.Expression
 								if (allowKeywordTo)
 									goto end;
 								else
-									throw new CodeEE("TOキーワードはここでは使用できません");
+									throw new CodeEE(GameMessages.T("The TO keyword cannot be used here"));
 							}
 							else if (idStr.Equals("IS", Config.SCVariable))
-								throw new CodeEE("ISキーワードはここでは使用できません");
+								throw new CodeEE(GameMessages.T("The IS keyword cannot be used here"));
 							stack.Add(reduceIdentifier(wc, idStr, varCode));
 							continue;
 						}
@@ -390,13 +398,13 @@ namespace MinorShift.Emuera.GameData.Expression
 					case '='://OperatorWT
 						{
 							if (varArg)
-								throw new CodeEE("変数のargumentの読み取り中に予期しない演算子を発見しました");
+								throw new CodeEE(GameMessages.T("An unexpected operator was found while reading the variable argument"));
 							OperatorCode op = ((OperatorWord)token).Code;
 							if (op == OperatorCode.Assignment)
 							{
 								if ((endWith & TermEndWith.Assignment) == TermEndWith.Assignment)
 									goto end;
-								throw new CodeEE("式中で代入演算子'='が使われています(等価比較には'=='を使用してください)");
+								throw new CodeEE(GameMessages.T("Assignment operator '=' was used in an expression (use '==' for equality comparison)"));
 							}
 
 							if (formerOp == OperatorCode.Equal || formerOp == OperatorCode.Greater || formerOp == OperatorCode.Less
@@ -405,7 +413,7 @@ namespace MinorShift.Emuera.GameData.Expression
 								if (op == OperatorCode.Equal || op == OperatorCode.Greater || op == OperatorCode.Less
 								|| op == OperatorCode.GreaterEqual || op == OperatorCode.LessEqual || op == OperatorCode.NotEqual)
 								{
-									ParserMediator.Warn("（構文上の注意）比較演算子が連続しています。", GlobalStatic.Process.GetScaningLine(), 0, false, false);
+									ParserMediator.Warn(GameMessages.T("(Syntax note) Comparison operators are consecutive."), GlobalStatic.Process.GetScaningLine(), 0, false, false);
 								}
 							}
 							stack.Add(op);
@@ -417,7 +425,7 @@ namespace MinorShift.Emuera.GameData.Expression
 								if (ternaryCount > 0)
 									ternaryCount--;
 								else
-									throw new CodeEE("対応する'?'のない'#'です");
+									throw new CodeEE(GameMessages.T("'#' without a matching '?'"));
 							}
 							break;
 						}
@@ -425,36 +433,36 @@ namespace MinorShift.Emuera.GameData.Expression
 						wc.ShiftNext();
                         IOperandTerm inTerm = reduceTerm(wc, false, TermEndWith.RightParenthesis, VariableCode.__NULL__);
                         if (inTerm == null)
-                            throw new CodeEE("かっこ\"(\"～\")\"の中に式が含まれていません");
+                            throw new CodeEE(GameMessages.T("No expression inside parentheses '(' ~ ')'"));
 						stack.Add(inTerm);
-						if (wc.Current.Type != ')')
-							throw new CodeEE("対応する')'のない'('です");
+					if (wc.Current.Type != ')')
+						throw new CodeEE(GameMessages.T("'(' without a matching ')'"));
 						//termCount++;
 						wc.ShiftNext();
 						continue;
 					case ')':
 						if ((endWith & TermEndWith.RightParenthesis) == TermEndWith.RightParenthesis)
 							goto end;
-						throw new CodeEE("構文解釈中に予期しない記号'" + token.Type + "'を発見しました");
+						throw new CodeEE(GameMessages.T("Unexpected symbol '") + token.Type + GameMessages.T("' found during parsing"));
 					case ']':
 						if ((endWith & TermEndWith.RightBracket) == TermEndWith.RightBracket)
 							goto end;
-						throw new CodeEE("構文解釈中に予期しない記号'" + token.Type + "'を発見しました");
+						throw new CodeEE(GameMessages.T("Unexpected symbol '") + token.Type + GameMessages.T("' found during parsing"));
 					case ',':
 						if ((endWith & TermEndWith.Comma) == TermEndWith.Comma)
 							goto end;
-						throw new CodeEE("構文解釈中に予期しない記号'" + token.Type + "'を発見しました");
-					case 'M':
-						throw new ExeEE("マクロ解決失敗");
+						throw new CodeEE(GameMessages.T("Unexpected symbol '") + token.Type + GameMessages.T("' found during parsing"));
+				case 'M':
+					throw new ExeEE(GameMessages.T("Macro expansion failed"));
 					default:
-						throw new CodeEE("構文解釈中に予期しない記号'" + token.Type + "'を発見しました");
+						throw new CodeEE(GameMessages.T("Unexpected symbol '") + token.Type + GameMessages.T("' found during parsing"));
 				}
 				//termCount++;
 				wc.ShiftNext();
 			} while (!varArg);
 		end:
             if (ternaryCount > 0)
-                throw new CodeEE("'?'と'#'の数が正しく対応していません");
+                throw new CodeEE(GameMessages.T("The number of '?' and '#' do not match"));
             return stack.ReduceAll();
         }
         
@@ -476,11 +484,11 @@ namespace MinorShift.Emuera.GameData.Expression
             public void Add(OperatorCode op)
             {
                 if (state == 2 || state == 3)
-                    throw new CodeEE("式が異常です");
+                    throw new CodeEE(GameMessages.T("The expression is invalid"));
                 if (state == 0)
                 {
                     if (!OperatorManager.IsUnary(op))
-                        throw new CodeEE("式が異常です");
+                        throw new CodeEE(GameMessages.T("The expression is invalid"));
                     stack.Push(op);
                     if (op == OperatorCode.Plus || op == OperatorCode.Minus || op == OperatorCode.BitNot)
                         state = 2;
@@ -496,12 +504,12 @@ namespace MinorShift.Emuera.GameData.Expression
                         if (hasAfter)
                         {
                             hasAfter = false;
-                            throw new CodeEE("後置の単項演算子が複数存在しています");
+                            throw new CodeEE(GameMessages.T("Multiple postfix unary operators exist"));
                         }
                         if (hasBefore)
                         {
                             hasBefore = false;
-                            throw new CodeEE("インクリメント・デクリメントを前置・後置両方同時に使うことはできません");
+                            throw new CodeEE(GameMessages.T("Increment/decrement cannot be used as both prefix and postfix simultaneously"));
                         }
                         stack.Push(op);
                         reduceUnaryAfter();
@@ -514,7 +522,7 @@ namespace MinorShift.Emuera.GameData.Expression
                         return;
                     }
                     if (!OperatorManager.IsBinary(op) && !OperatorManager.IsTernary(op))
-                        throw new CodeEE("式が異常です");
+                        throw new CodeEE(GameMessages.T("The expression is invalid"));
                     //Resolve unresolved prefix operators first
                     if (waitAfter)
                         reduceUnary();
@@ -531,7 +539,7 @@ namespace MinorShift.Emuera.GameData.Expression
                     hasAfter = false;
                     return;
                 }
-                throw new CodeEE("式が異常です");
+                throw new CodeEE(GameMessages.T("The expression is invalid"));
             }
             public void Add(Int64 i) { Add(new SingleTerm(i)); }
             public void Add(string s) { Add(new SingleTerm(s)); }
@@ -539,7 +547,7 @@ namespace MinorShift.Emuera.GameData.Expression
             {
                 stack.Push(term);
                 if (state == 1)
-                    throw new CodeEE("式が異常です");
+                    throw new CodeEE(GameMessages.T("The expression is invalid"));
                 if (state == 2)
                     waitAfter = true;
                 if (state == 3)
@@ -568,7 +576,7 @@ namespace MinorShift.Emuera.GameData.Expression
                 if (stack.Count == 0)
                     return null;
                 if (state != 1)
-                    throw new CodeEE("式が異常です");
+                    throw new CodeEE(GameMessages.T("The expression is invalid"));
                 //If a unary operator is pending unresolved, resolve it here
                 if (waitAfter)
                     reduceUnary();
@@ -586,7 +594,7 @@ namespace MinorShift.Emuera.GameData.Expression
             private void reduceUnary()
             {
                 //if (stack.Count < 2)
-                //    throw new ExeEE("Invalid 時期の呼び出し");
+                //    throw new ExeEE("Invalid call timing");
                 IOperandTerm operand = (IOperandTerm)stack.Pop();
                 OperatorCode op = (OperatorCode)stack.Pop();
                 IOperandTerm newTerm = OperatorMethodManager.ReduceUnaryTerm(op, operand);
@@ -596,7 +604,7 @@ namespace MinorShift.Emuera.GameData.Expression
             private void reduceUnaryAfter()
             {
                 //if (stack.Count < 2)
-                //    throw new ExeEE("Invalid 時期の呼び出し");
+                //    throw new ExeEE("Invalid call timing");
                 OperatorCode op = (OperatorCode)stack.Pop();
                 IOperandTerm operand = (IOperandTerm)stack.Pop();
                 
@@ -607,7 +615,7 @@ namespace MinorShift.Emuera.GameData.Expression
             private void reduceLastThree()
             {
                 //if (stack.Count < 2)
-                //    throw new ExeEE("Invalid 時期の呼び出し");
+                //    throw new ExeEE("Invalid call timing");
                 IOperandTerm right = (IOperandTerm)stack.Pop();//The one pushed later is on the right side
                 OperatorCode op = (OperatorCode)stack.Pop();
                 IOperandTerm left = (IOperandTerm)stack.Pop();
@@ -618,7 +626,7 @@ namespace MinorShift.Emuera.GameData.Expression
                         reduceTernary(left, right);
                         return;
                     }
-                    throw new CodeEE("式の数が不足しています");
+                    throw new CodeEE(GameMessages.T("Insufficient number of expressions"));
                 }
                 
                 IOperandTerm newTerm = OperatorMethodManager.ReduceBinaryTerm(op, left, right);

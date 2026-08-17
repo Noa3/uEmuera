@@ -43,6 +43,10 @@ public class EmueraMain : MonoBehaviour
         while(EmueraThread.instance.Running())
             yield return null;
 
+        // Bump session first so any in-flight SpriteManager / BackgroundErbLoader
+        // callbacks from this session are silently discarded. (Phase 6 #21–#22)
+        MinorShift.Emuera.GameProc.GameSession.Bump();
+
         GenericUtils.ShowIsInProcess(true);
 
         var console = MinorShift.Emuera.GlobalStatic.Console;
@@ -56,7 +60,9 @@ public class EmueraMain : MonoBehaviour
         ConfigData.Instance.Clear();
         SpriteManager.ForceClear();
 
-        System.GC.Collect();
+        // NOTE (Phase 6): GC.Collect() removed from the post-game teardown hot
+        // path — SpriteManager.ForceClear already released texture objects; the
+        // GC will collect on its own schedule. See Docs/STARTUP_REGRESSIONS.md.
 
         var async = Resources.UnloadUnusedAssets();
         while(!async.isDone)
@@ -81,6 +87,10 @@ public class EmueraMain : MonoBehaviour
         while(EmueraThread.instance.Running())
             yield return null;
 
+        // Bump session before tearing down state so stale callbacks are discarded.
+        // (Phase 6 #21/#22)
+        MinorShift.Emuera.GameProc.GameSession.Bump();
+
         GenericUtils.ShowIsInProcess(true);
 
         var console = MinorShift.Emuera.GlobalStatic.Console;
@@ -92,7 +102,8 @@ public class EmueraMain : MonoBehaviour
 
         MinorShift.Emuera.Content.AppContents.UnloadContents();
         ConfigData.Instance.Clear();
-        System.GC.Collect();
+        // NOTE (Phase 6): GC.Collect() removed from restart hot path.
+        // See Docs/STARTUP_REGRESSIONS.md.
 
         yield return null;
         // Always use background thread for framerate-independent execution
@@ -150,7 +161,11 @@ public class EmueraMain : MonoBehaviour
             console_lines = MinorShift.Emuera.GlobalStatic.Console.GetDisplayLinesCount();
 #endif
         if(GlobalStatic.MainWindow != null)
+        {
+            var pointer = EmueraCoordinateMapper.UpdateFromUnity();
+            GlobalStatic.MainWindow.UpdatePointer(pointer);
             GlobalStatic.MainWindow.Update();
+        }
 
         UpdateOrientation();
         ApplyScale();
@@ -253,6 +268,18 @@ public class EmueraMain : MonoBehaviour
             last_scale_value_ = 1;
 
         canvas_scaler_.referenceResolution = default_resolution_ / last_scale_value_;
+
+        // Dynamically adjust matchWidthOrHeight so bottom buttons are always reachable.
+        // On screens wider than the reference aspect (landscape / ultra-wide):
+        //   match HEIGHT — keeps canvas height intact, horizontal black bars are acceptable.
+        // On screens taller than the reference aspect (portrait):
+        //   match WIDTH — keeps canvas width intact, vertical space is fine.
+        float refAspect = (default_resolution_.x > 0 && default_resolution_.y > 0)
+            ? default_resolution_.x / default_resolution_.y : 16f / 9f;
+        float screenAspect = (Screen.height > 0)
+            ? (float)Screen.width / Screen.height : refAspect;
+        canvas_scaler_.matchWidthOrHeight = screenAspect > refAspect ? 1f : 0f;
+
         dirty_flag_ = true;
 
         // Persist applied scale
@@ -270,17 +297,38 @@ public class EmueraMain : MonoBehaviour
 
     void UpdateOrientation()
     {
+        bool changed = false;
+
         if(last_orientation_ != Input.deviceOrientation)
         {
             if(Input.deviceOrientation == DeviceOrientation.FaceDown ||
                 Input.deviceOrientation == DeviceOrientation.FaceUp ||
                 Input.deviceOrientation == DeviceOrientation.Unknown)
-                return;
-            last_orientation_ = Input.deviceOrientation;
-            dirty_flag_ = true;
+            {
+                // Ignore these orientations but don't bail out — still check screen size below
+            }
+            else
+            {
+                last_orientation_ = Input.deviceOrientation;
+                changed = true;
+            }
         }
+
+        // Detect screen size changes: handles foldable phones, desktop window resize,
+        // and any runtime resolution changes that deviceOrientation won't catch.
+        if (Screen.width != last_screen_width_ || Screen.height != last_screen_height_)
+        {
+            last_screen_width_  = Screen.width;
+            last_screen_height_ = Screen.height;
+            changed = true;
+        }
+
+        if (changed)
+            dirty_flag_ = true;
     }
     DeviceOrientation last_orientation_ = DeviceOrientation.Unknown;
+    int last_screen_width_  = 0;
+    int last_screen_height_ = 0;
 
     // Preference key for saving scale value
     const string PREF_SCALE_VALUE = "ScalePad_Value";

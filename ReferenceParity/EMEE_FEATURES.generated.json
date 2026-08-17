@@ -1,0 +1,2202 @@
+{
+  "schema_version": 2,
+  "generated_at": "2025-11-14T20:59:19+09:00",
+  "uemuera_revision": "c5ff6c7cdcf960a6abef01b8ef4b8d08963e82f3",
+  "reference": {
+    "schema_version": 1,
+    "repository": "https://gitlab.com/EvilMask/emuera.em",
+    "revision": "cde11d69048f87d4a70d1452da79ae6e56462386",
+    "commit_date": "2025-11-14T20:59:19+09:00",
+    "tag": "Emuera.NET1824+v22+EMv18+EEv55",
+    "version_source": "current_release_tag",
+    "em_version": "18",
+    "ee_version": "55",
+    "documentation_version": "Emuera.NET1824+v22+EMv18+EEv55",
+    "capture_date": "2025-11-14T20:59:19+09:00",
+    "source_path_recorded": false,
+    "configured_revision": "cde11d69048f87d4a70d1452da79ae6e56462386",
+    "stale": false,
+    "uemuera_revision": "c5ff6c7cdcf960a6abef01b8ef4b8d08963e82f3",
+    "remote_discovery": {
+      "repository": "https://gitlab.com/EvilMask/emuera.em",
+      "resolved_from": "git ls-remote --heads --tags",
+      "current_release": {
+        "commit": "cde11d69048f87d4a70d1452da79ae6e56462386",
+        "tag": "Emuera.NET1824+v22+EMv18+EEv55",
+        "emuera_version": "1824",
+        "base_version": "22",
+        "em_version": "18",
+        "ee_version": "55"
+      },
+      "release_tags_seen": 20
+    }
+  },
+  "source_inventory": {
+    "function_method_creator_keys": [
+      "ABS",
+      "ALLSAMES",
+      "ARRAYMSORT",
+      "BARSTR",
+      "CBGCLEAR",
+      "CBGCLEARBUTTON",
+      "CBGREMOVEBMAP",
+      "CBGREMOVERANGE",
+      "CBGSETBMAPG",
+      "CBGSETBUTTONSPRITE",
+      "CBGSETG",
+      "CBGSETSPRITE",
+      "CBRT",
+      "CEILING",
+      "CHARATU",
+      "CHKCHARADATA",
+      "CHKDATA",
+      "CHKFONT",
+      "CHKGLOBALDATA",
+      "CHKVARDATA",
+      "CLEARMEMORY",
+      "CLIENTHEIGHT",
+      "CLIENTWIDTH",
+      "CMATCH",
+      "COLOR_FROMNAME",
+      "COLOR_FROMRGB",
+      "CONVERT",
+      "CSVABL",
+      "CSVBASE",
+      "CSVCALLNAME",
+      "CSVCFLAG",
+      "CSVCSTR",
+      "CSVEQUIP",
+      "CSVEXP",
+      "CSVJUEL",
+      "CSVMARK",
+      "CSVMASTERNAME",
+      "CSVNAME",
+      "CSVNICKNAME",
+      "CSVRELATION",
+      "CSVTALENT",
+      "CURRENTALIGN",
+      "CURRENTREDRAW",
+      "DEFAULT",
+      "DT_CELL_GET",
+      "DT_CELL_GETS",
+      "DT_CELL_ISNULL",
+      "DT_CELL_SET",
+      "DT_CLEAR",
+      "DT_COLUMN_ADD",
+      "DT_COLUMN_EXIST",
+      "DT_COLUMN_LENGTH",
+      "DT_COLUMN_NAMES",
+      "DT_COLUMN_OPTIONS",
+      "DT_COLUMN_REMOVE",
+      "DT_CREATE",
+      "DT_EXIST",
+      "DT_FIND",
+      "DT_FROMXML",
+      "DT_GET",
+      "DT_GETINT",
+      "DT_NOCASE",
+      "DT_RELEASE",
+      "DT_ROW_ADD",
+      "DT_ROW_COUNT",
+      "DT_ROW_LENGTH",
+      "DT_ROW_REMOVE",
+      "DT_ROW_SET",
+      "DT_SELECT",
+      "DT_SET",
+      "DT_SETINT",
+      "DT_SORT",
+      "DT_TOCSV",
+      "DT_TOXML",
+      "ENCODETOUNI",
+      "ENUMFILES",
+      "ERDNAME",
+      "ESCAPE",
+      "EXISTCSV",
+      "EXISTFILE",
+      "EXISTFUNCTION",
+      "EXISTSOUND",
+      "EXISTVAR",
+      "EXPONENT",
+      "FINDCHARA",
+      "FINDELEMENT",
+      "FINDLASTCHARA",
+      "FINDLASTELEMENT",
+      "FIND_CHARADATA",
+      "FIND_VARDATA",
+      "FLOOR",
+      "FLOWINPUT",
+      "FLOWINPUTS",
+      "GCLEAR",
+      "GCREATE",
+      "GCREATED",
+      "GCREATEFROMFILE",
+      "GDISPOSE",
+      "GDRAWG",
+      "GDRAWGWITHMASK",
+      "GDRAWLINE",
+      "GDRAWSPRITE",
+      "GETBGCOLOR",
+      "GETBIT",
+      "GETCHARA",
+      "GETCOLOR",
+      "GETCONFIG",
+      "GETCONFIGS",
+      "GETDEFBGCOLOR",
+      "GETDEFCOLOR",
+      "GETDOINGFUNCTION",
+      "GETEXPLV",
+      "GETFOCUSCOLOR",
+      "GETFONT",
+      "GETKEY",
+      "GETKEYTRIGGERED",
+      "GETLINESTR",
+      "GETMILLISECOND",
+      "GETNUM",
+      "GETNUMB",
+      "GETPALAMLV",
+      "GETSECOND",
+      "GETSPCHARA",
+      "GETSTYLE",
+      "GETTIME",
+      "GETTIMES",
+      "GETVAR",
+      "GETVARS",
+      "GFILLRECTANGLE",
+      "GGETCOLOR",
+      "GHEIGHT",
+      "GLOAD",
+      "GROUPMATCH",
+      "GSAVE",
+      "GSETBRUSH",
+      "GSETCOLOR",
+      "GSETFONT",
+      "GSETPEN",
+      "GWIDTH",
+      "HTML_ESCAPE",
+      "HTML_GETPRINTEDSTR",
+      "HTML_POPPRINTINGSTR",
+      "HTML_STRINGLEN",
+      "HTML_STRINGLINES",
+      "HTML_TOPLAINTEXT",
+      "INRANGE",
+      "INRANGEARRAY",
+      "INRANGECARRAY",
+      "ISACTIVE",
+      "ISNUMERIC",
+      "ISSKIP",
+      "LIMIT",
+      "LINEISEMPTY",
+      "LOADTEXT",
+      "LOG",
+      "LOG10",
+      "MAP_CLEAR",
+      "MAP_CREATE",
+      "MAP_EXIST",
+      "MAP_FROMXML",
+      "MAP_GET",
+      "MAP_GETKEYS",
+      "MAP_HAS",
+      "MAP_RELEASE",
+      "MAP_REMOVE",
+      "MAP_SET",
+      "MAP_SIZE",
+      "MAP_TOXML",
+      "MATCH",
+      "MAX",
+      "MAXARRAY",
+      "MAXCARRAY",
+      "MESSKIP",
+      "MIN",
+      "MINARRAY",
+      "MINCARRAY",
+      "MONEYSTR",
+      "MOUSEB",
+      "MOUSESKIP",
+      "MOUSEX",
+      "MOUSEY",
+      "NOSAMES",
+      "POWER",
+      "PRINTCLENGTH",
+      "PRINTCPERLINE",
+      "RAND",
+      "REPLACE",
+      "ROUND",
+      "SAVENOS",
+      "SAVETEXT",
+      "SETANIMETIMER",
+      "SIGN",
+      "SPRITEANIMEADDFRAME",
+      "SPRITEANIMECREATE",
+      "SPRITECREATE",
+      "SPRITECREATED",
+      "SPRITEDISPOSE",
+      "SPRITEDISPOSEALL",
+      "SPRITEEXIST",
+      "SPRITEGETCOLOR",
+      "SPRITEHEIGHT",
+      "SPRITEMOVE",
+      "SPRITEPOSX",
+      "SPRITEPOSY",
+      "SPRITESETPOS",
+      "SPRITEWIDTH",
+      "SQRT",
+      "STRCOUNT",
+      "STRFIND",
+      "STRFINDU",
+      "STRFORM",
+      "STRJOIN",
+      "STRLENS",
+      "STRLENSU",
+      "SUBSTRING",
+      "SUBSTRINGU",
+      "SUMARRAY",
+      "SUMCARRAY",
+      "TOFULL",
+      "TOHALF",
+      "TOINT",
+      "TOLOWER",
+      "TOSTR",
+      "TOUPPER",
+      "UNICODE",
+      "UNICODEBYTE",
+      "VARSIZE",
+      "XML_ADDATTRIBUTE",
+      "XML_ADDATTRIBUTE_BYNAME",
+      "XML_ADDNODE",
+      "XML_ADDNODE_BYNAME",
+      "XML_DOCUMENT",
+      "XML_EXIST",
+      "XML_GET",
+      "XML_GET_BYNAME",
+      "XML_RELEASE",
+      "XML_REMOVEATTRIBUTE",
+      "XML_REMOVEATTRIBUTE_BYNAME",
+      "XML_REMOVENODE",
+      "XML_REMOVENODE_BYNAME",
+      "XML_REPLACE",
+      "XML_REPLACE_BYNAME",
+      "XML_SET",
+      "XML_SET_BYNAME",
+      "XML_TOSTR"
+    ],
+    "function_identifier_entries": [
+      "ADDCHARA",
+      "ADDCOPYCHARA",
+      "ADDDEFCHARA",
+      "ADDSPCHARA",
+      "ADDVOIDCHARA",
+      "ALIGNMENT",
+      "ARRAYCOPY",
+      "ARRAYREMOVE",
+      "ARRAYSHIFT",
+      "ARRAYSORT",
+      "ASSERT",
+      "AWAIT",
+      "BAR",
+      "BARL",
+      "BEGIN",
+      "BINPUT",
+      "BINPUTS",
+      "BREAK",
+      "CALL",
+      "CALLEVENT",
+      "CALLF",
+      "CALLFORM",
+      "CALLFORMF",
+      "CALLTRAIN",
+      "CASE",
+      "CASEELSE",
+      "CATCH",
+      "CLEARBIT",
+      "CLEARLINE",
+      "CLEARTEXTBOX",
+      "CONTINUE",
+      "COPYCHARA",
+      "CUPCHECK",
+      "CUSTOMDRAWLINE",
+      "CVARSET",
+      "DATA",
+      "DATAFORM",
+      "DATALIST",
+      "DEBUGCLEAR",
+      "DEBUGPRINT",
+      "DEBUGPRINTFORM",
+      "DEBUGPRINTFORML",
+      "DEBUGPRINTL",
+      "DELALLCHARA",
+      "DELCHARA",
+      "DELDATA",
+      "DO",
+      "DOTRAIN",
+      "DRAWLINE",
+      "DRAWLINEFORM",
+      "DUMPRAND",
+      "ELSE",
+      "ELSEIF",
+      "ENCODETOUNI",
+      "ENDCATCH",
+      "ENDDATA",
+      "ENDFUNC",
+      "ENDIF",
+      "ENDLIST",
+      "ENDNOSKIP",
+      "ENDSELECT",
+      "FONTBOLD",
+      "FONTITALIC",
+      "FONTREGULAR",
+      "FONTSTYLE",
+      "FOR",
+      "FORCEKANA",
+      "FORCEWAIT",
+      "FUNC",
+      "GETTIME",
+      "GOTO",
+      "GOTOFORM",
+      "HTML_PRINT",
+      "HTML_PRINT_ISLAND",
+      "HTML_PRINT_ISLAND_CLEAR",
+      "HTML_TAGSPLIT",
+      "IF",
+      "INITRAND",
+      "INPUT",
+      "INPUTMOUSEKEY",
+      "INPUTS",
+      "INVERTBIT",
+      "JUMP",
+      "JUMPFORM",
+      "LOADCHARA",
+      "LOADDATA",
+      "LOADGAME",
+      "LOADGLOBAL",
+      "LOADVAR",
+      "LOOP",
+      "NEXT",
+      "NOSKIP",
+      "ONEINPUT",
+      "ONEINPUTS",
+      "OUTPUTLOG",
+      "PICKUPCHARA",
+      "PLAYBGM",
+      "PLAYSOUND",
+      "POWER",
+      "PRINTBUTTON",
+      "PRINTBUTTONC",
+      "PRINTBUTTONLC",
+      "PRINTCPERLINE",
+      "PRINTPLAIN",
+      "PRINTPLAINFORM",
+      "PRINT_ABL",
+      "PRINT_EXP",
+      "PRINT_IMG",
+      "PRINT_ITEM",
+      "PRINT_MARK",
+      "PRINT_PALAM",
+      "PRINT_RECT",
+      "PRINT_SHOPITEM",
+      "PRINT_SPACE",
+      "PRINT_TALENT",
+      "PUTFORM",
+      "QUIT",
+      "RANDOMIZE",
+      "REDRAW",
+      "REF",
+      "REFBYNAME",
+      "REND",
+      "REPEAT",
+      "RESETBGCOLOR",
+      "RESETCOLOR",
+      "RESETDATA",
+      "RESETGLOBAL",
+      "RESET_STAIN",
+      "RESTART",
+      "RETURN",
+      "RETURNF",
+      "RETURNFORM",
+      "REUSELASTLINE",
+      "SAVECHARA",
+      "SAVEDATA",
+      "SAVEGAME",
+      "SAVEGLOBAL",
+      "SAVENOS",
+      "SAVEVAR",
+      "SELECTCASE",
+      "SETBGCOLOR",
+      "SETBGCOLORBYNAME",
+      "SETBGMVOLUME",
+      "SETBIT",
+      "SETCOLOR",
+      "SETCOLORBYNAME",
+      "SETFONT",
+      "SETSOUNDVOLUME",
+      "SIF",
+      "SKIPDISP",
+      "SORTCHARA",
+      "SPLIT",
+      "STOPBGM",
+      "STOPCALLTRAIN",
+      "STOPSOUND",
+      "STRDATA",
+      "STRLEN",
+      "STRLENFORM",
+      "STRLENFORMU",
+      "STRLENU",
+      "SWAP",
+      "SWAPCHARA",
+      "THROW",
+      "TIMES",
+      "TINPUT",
+      "TINPUTS",
+      "TONEINPUT",
+      "TONEINPUTS",
+      "TOOLTIP_SETCOLOR",
+      "TOOLTIP_SETDELAY",
+      "TOOLTIP_SETDURATION",
+      "TRYCALL",
+      "TRYCALLF",
+      "TRYCALLFORM",
+      "TRYCALLFORMF",
+      "TRYCALLLIST",
+      "TRYCCALL",
+      "TRYCCALLFORM",
+      "TRYCGOTO",
+      "TRYCGOTOFORM",
+      "TRYCJUMP",
+      "TRYCJUMPFORM",
+      "TRYGOTO",
+      "TRYGOTOFORM",
+      "TRYGOTOLIST",
+      "TRYJUMP",
+      "TRYJUMPFORM",
+      "TRYJUMPLIST",
+      "TWAIT",
+      "UPCHECK",
+      "VARSET",
+      "VARSIZE",
+      "WAIT",
+      "WAITANYKEY",
+      "WEND",
+      "WHILE"
+    ],
+    "built_in_function_codes": [
+      "ADDCOPYCHARA",
+      "ADDDEFCHARA",
+      "ALIGNMENT",
+      "ARRAYCOPY",
+      "ARRAYREMOVE",
+      "ARRAYSHIFT",
+      "ARRAYSORT",
+      "ASSERT",
+      "CALLEVENT",
+      "CALLF",
+      "CALLFORM",
+      "CALLFORMF",
+      "CALLTRAIN",
+      "CASE",
+      "CASEELSE",
+      "CATCH",
+      "CLEARBIT",
+      "CLEARLINE",
+      "CLEARTEXTBOX",
+      "COPYCHARA",
+      "CUPCHECK",
+      "CUSTOMDRAWLINE",
+      "CVARSET",
+      "DATA",
+      "DATAFORM",
+      "DATALIST",
+      "DEBUGCLEAR",
+      "DEBUGPRINT",
+      "DEBUGPRINTFORM",
+      "DEBUGPRINTFORML",
+      "DEBUGPRINTL",
+      "DELALLCHARA",
+      "DELDATA",
+      "DO",
+      "DOTRAIN",
+      "DRAWLINEFORM",
+      "DUMPRAND",
+      "ELSE",
+      "ELSEIF",
+      "ENCODETOUNI",
+      "ENDCATCH",
+      "ENDDATA",
+      "ENDFUNC",
+      "ENDIF",
+      "ENDLIST",
+      "ENDNOSKIP",
+      "ENDSELECT",
+      "FONTBOLD",
+      "FONTITALIC",
+      "FONTREGULAR",
+      "FONTSTYLE",
+      "FOR",
+      "FORCEKANA",
+      "FUNC",
+      "GOTOFORM",
+      "HTML_PRINT",
+      "HTML_TAGSPLIT",
+      "IF",
+      "INITRAND",
+      "INPUTMOUSEKEY",
+      "INVERTBIT",
+      "JUMPFORM",
+      "LOADCHARA",
+      "LOADDATA",
+      "LOADGLOBAL",
+      "LOADVAR",
+      "LOOP",
+      "NEXT",
+      "NOSKIP",
+      "ONEINPUT",
+      "ONEINPUTS",
+      "OUTPUTLOG",
+      "PICKUPCHARA",
+      "PRINTBUTTON",
+      "PRINTBUTTONC",
+      "PRINTBUTTONLC",
+      "PRINTDATA",
+      "PRINTDATAD",
+      "PRINTDATADL",
+      "PRINTDATADW",
+      "PRINTDATAK",
+      "PRINTDATAKL",
+      "PRINTDATAKW",
+      "PRINTDATAL",
+      "PRINTDATAW",
+      "PRINTFORMC",
+      "PRINTFORMCD",
+      "PRINTFORMCK",
+      "PRINTFORMDL",
+      "PRINTFORMDW",
+      "PRINTFORMKL",
+      "PRINTFORMKW",
+      "PRINTFORML",
+      "PRINTFORMLC",
+      "PRINTFORMLCD",
+      "PRINTFORMLCK",
+      "PRINTFORMSDL",
+      "PRINTFORMSDW",
+      "PRINTFORMSKL",
+      "PRINTFORMSKW",
+      "PRINTFORMSL",
+      "PRINTFORMSW",
+      "PRINTFORMW",
+      "PRINTK",
+      "PRINTKL",
+      "PRINTKW",
+      "PRINTLC",
+      "PRINTLCD",
+      "PRINTLCK",
+      "PRINTPLAIN",
+      "PRINTPLAINFORM",
+      "PRINTSDL",
+      "PRINTSDW",
+      "PRINTSINGLE",
+      "PRINTSINGLED",
+      "PRINTSINGLEFORM",
+      "PRINTSINGLEFORMD",
+      "PRINTSINGLEFORMK",
+      "PRINTSINGLEFORMS",
+      "PRINTSINGLEFORMSD",
+      "PRINTSINGLEFORMSK",
+      "PRINTSINGLEK",
+      "PRINTSINGLES",
+      "PRINTSINGLESD",
+      "PRINTSINGLESK",
+      "PRINTSINGLEV",
+      "PRINTSINGLEVD",
+      "PRINTSINGLEVK",
+      "PRINTSKL",
+      "PRINTSKW",
+      "PRINTSL",
+      "PRINTSW",
+      "PRINTVDL",
+      "PRINTVDW",
+      "PRINTVKL",
+      "PRINTVKW",
+      "PRINTVL",
+      "PRINTVW",
+      "PRINT_IMG",
+      "PRINT_RECT",
+      "PRINT_SPACE",
+      "RANDOMIZE",
+      "REDRAW",
+      "REF",
+      "REFBYNAME",
+      "REND",
+      "RESETBGCOLOR",
+      "RESETCOLOR",
+      "RESETDATA",
+      "RESETGLOBAL",
+      "RESET_STAIN",
+      "RETURNF",
+      "REUSELASTLINE",
+      "SAVECHARA",
+      "SAVEDATA",
+      "SAVEGLOBAL",
+      "SAVEVAR",
+      "SELECTCASE",
+      "SETBGCOLOR",
+      "SETBGCOLORBYNAME",
+      "SETBIT",
+      "SETCOLOR",
+      "SETCOLORBYNAME",
+      "SETFONT",
+      "SKIPDISP",
+      "SORTCHARA",
+      "SPLIT",
+      "STOPCALLTRAIN",
+      "STRDATA",
+      "STRLEN",
+      "STRLENFORM",
+      "STRLENFORMU",
+      "STRLENU",
+      "SWAP",
+      "SWAPCHARA",
+      "THROW",
+      "TINPUT",
+      "TINPUTS",
+      "TONEINPUT",
+      "TONEINPUTS",
+      "TOOLTIP_SETCOLOR",
+      "TOOLTIP_SETDELAY",
+      "TOOLTIP_SETDURATION",
+      "TRYCALL",
+      "TRYCALLFORM",
+      "TRYCALLLIST",
+      "TRYCCALL",
+      "TRYCCALLFORM",
+      "TRYCGOTO",
+      "TRYCGOTOFORM",
+      "TRYCJUMP",
+      "TRYCJUMPFORM",
+      "TRYGOTO",
+      "TRYGOTOFORM",
+      "TRYGOTOLIST",
+      "TRYJUMP",
+      "TRYJUMPFORM",
+      "TRYJUMPLIST",
+      "TWAIT",
+      "VARSET",
+      "WAITANYKEY",
+      "WEND",
+      "WHILE"
+    ],
+    "command_inventory_count": 519,
+    "regression_fixture_count": 4
+  },
+  "upstream_inventory": {
+    "command_count": 567,
+    "extraction": "source_checkout"
+  },
+  "features": [
+    {
+      "id": "html.div",
+      "name": "HTML div layout",
+      "status": "IMPLEMENTED_UNVERIFIED",
+      "verification": {
+        "registered": true,
+        "implemented": true,
+        "signature_match": true,
+        "local_tests": "MISSING",
+        "reference_tests": "MISSING",
+        "reference_version": "55"
+      },
+      "dimensions": {
+        "parser": "PARTIAL",
+        "argument_parity": "FULL",
+        "runtime": "FULL",
+        "rendering": "FULL",
+        "input": "N/A",
+        "persistence": "N/A",
+        "platform": "FULL",
+        "tests": "MISSING"
+      },
+      "evidence": {
+        "parser": [
+          "div"
+        ],
+        "argument_parity": [
+          "div: ArgumentBuilder.cs"
+        ],
+        "signature_missing_reference": [],
+        "signature_missing_local": [],
+        "runtime": [
+          "Html2DisplayLine: Assets/Scripts/Emuera/GameView/EmueraConsole.Print.cs",
+          "PrintHtml: Assets/Scripts/Emuera/GameView/EmueraConsole.Print.cs"
+        ],
+        "rendering": [
+          "HtmlManager: Assets/Scripts/Emuera/GameView/ConsoleShapePart.cs",
+          "Div: Assets/Scripts/Emuera/Compatibility/FeatureCapabilityIds.cs"
+        ],
+        "input": [],
+        "persistence": [],
+        "runtime_registry": "registered",
+        "renderer_registry": "missing",
+        "tests": []
+      },
+      "reference": {
+        "name": "Emuera.EM+EE",
+        "source": "https://gitlab.com/EvilMask/emuera.em",
+        "revision": "cde11d69048f87d4a70d1452da79ae6e56462386",
+        "tag": "Emuera.NET1824+v22+EMv18+EEv55",
+        "em_version": "EMv18",
+        "ee_version": "EEv55",
+        "documentation": "https://evilmask.gitlab.io/emuera.em.doc/en/"
+      }
+    },
+    {
+      "id": "html.clearbutton",
+      "name": "HTML clearbutton",
+      "status": "PARTIAL",
+      "verification": {
+        "registered": true,
+        "implemented": true,
+        "signature_match": false,
+        "local_tests": "MISSING",
+        "reference_tests": "MISSING",
+        "reference_version": "55"
+      },
+      "dimensions": {
+        "parser": "FULL",
+        "argument_parity": "MISSING",
+        "runtime": "FULL",
+        "rendering": "FULL",
+        "input": "N/A",
+        "persistence": "N/A",
+        "platform": "FULL",
+        "tests": "MISSING"
+      },
+      "evidence": {
+        "parser": [
+          "clearbutton"
+        ],
+        "argument_parity": [],
+        "signature_missing_reference": [],
+        "signature_missing_local": [],
+        "runtime": [
+          "clearbutton: Assets/Scripts/Emuera/Compatibility/FeatureCapabilityIds.cs",
+          "ClearButton: Assets/Scripts/Emuera/Compatibility/FeatureCapabilityIds.cs"
+        ],
+        "rendering": [
+          "clearbutton: Assets/Scripts/Emuera/Compatibility/FeatureCapabilityIds.cs",
+          "ClearButton: Assets/Scripts/Emuera/Compatibility/FeatureCapabilityIds.cs"
+        ],
+        "input": [],
+        "persistence": [],
+        "runtime_registry": "registered",
+        "renderer_registry": "missing",
+        "tests": []
+      },
+      "reference": {
+        "name": "Emuera.EM+EE",
+        "source": "https://gitlab.com/EvilMask/emuera.em",
+        "revision": "cde11d69048f87d4a70d1452da79ae6e56462386",
+        "tag": "Emuera.NET1824+v22+EMv18+EEv55",
+        "em_version": "EMv18",
+        "ee_version": "EEv55",
+        "documentation": "https://evilmask.gitlab.io/emuera.em.doc/en/"
+      }
+    },
+    {
+      "id": "html.img.srcb",
+      "name": "HTML image srcb",
+      "status": "PARTIAL",
+      "verification": {
+        "registered": true,
+        "implemented": true,
+        "signature_match": false,
+        "local_tests": "MISSING",
+        "reference_tests": "MISSING",
+        "reference_version": "55"
+      },
+      "dimensions": {
+        "parser": "FULL",
+        "argument_parity": "MISSING",
+        "runtime": "FULL",
+        "rendering": "FULL",
+        "input": "N/A",
+        "persistence": "N/A",
+        "platform": "FULL",
+        "tests": "MISSING"
+      },
+      "evidence": {
+        "parser": [
+          "srcb"
+        ],
+        "argument_parity": [],
+        "signature_missing_reference": [],
+        "signature_missing_local": [],
+        "runtime": [
+          "srcb: Assets/Scripts/EmueraImage.cs"
+        ],
+        "rendering": [
+          "srcb: Assets/Scripts/EmueraImage.cs"
+        ],
+        "input": [],
+        "persistence": [],
+        "runtime_registry": "registered",
+        "renderer_registry": "missing",
+        "tests": []
+      },
+      "reference": {
+        "name": "Emuera.EM+EE",
+        "source": "https://gitlab.com/EvilMask/emuera.em",
+        "revision": "cde11d69048f87d4a70d1452da79ae6e56462386",
+        "tag": "Emuera.NET1824+v22+EMv18+EEv55",
+        "em_version": "EMv18",
+        "ee_version": "EEv55",
+        "documentation": "https://evilmask.gitlab.io/emuera.em.doc/en/"
+      }
+    },
+    {
+      "id": "html.img.srcm",
+      "name": "HTML image srcm",
+      "status": "PARTIAL",
+      "verification": {
+        "registered": true,
+        "implemented": true,
+        "signature_match": false,
+        "local_tests": "MISSING",
+        "reference_tests": "MISSING",
+        "reference_version": "55"
+      },
+      "dimensions": {
+        "parser": "FULL",
+        "argument_parity": "MISSING",
+        "runtime": "FULL",
+        "rendering": "FULL",
+        "input": "N/A",
+        "persistence": "N/A",
+        "platform": "FULL",
+        "tests": "MISSING"
+      },
+      "evidence": {
+        "parser": [
+          "srcm"
+        ],
+        "argument_parity": [],
+        "signature_missing_reference": [],
+        "signature_missing_local": [],
+        "runtime": [
+          "srcm: Assets/Scripts/Emuera/Compatibility/FeatureCapabilityIds.cs"
+        ],
+        "rendering": [
+          "srcm: Assets/Scripts/Emuera/Compatibility/FeatureCapabilityIds.cs"
+        ],
+        "input": [],
+        "persistence": [],
+        "runtime_registry": "registered",
+        "renderer_registry": "missing",
+        "tests": []
+      },
+      "reference": {
+        "name": "Emuera.EM+EE",
+        "source": "https://gitlab.com/EvilMask/emuera.em",
+        "revision": "cde11d69048f87d4a70d1452da79ae6e56462386",
+        "tag": "Emuera.NET1824+v22+EMv18+EEv55",
+        "em_version": "EMv18",
+        "ee_version": "EEv55",
+        "documentation": "https://evilmask.gitlab.io/emuera.em.doc/en/"
+      }
+    },
+    {
+      "id": "html.print_island",
+      "name": "HTML print island",
+      "status": "PARTIAL",
+      "verification": {
+        "registered": true,
+        "implemented": true,
+        "signature_match": false,
+        "local_tests": "MISSING",
+        "reference_tests": "MISSING",
+        "reference_version": "55"
+      },
+      "dimensions": {
+        "parser": "FULL",
+        "argument_parity": "PARTIAL",
+        "runtime": "FULL",
+        "rendering": "FULL",
+        "input": "N/A",
+        "persistence": "N/A",
+        "platform": "FULL",
+        "tests": "MISSING"
+      },
+      "evidence": {
+        "parser": [
+          "HTML_PRINT_ISLAND",
+          "HTML_PRINT_ISLAND_CLEAR"
+        ],
+        "argument_parity": [],
+        "signature_missing_reference": [],
+        "signature_missing_local": [],
+        "runtime": [
+          "HtmlPrintIsland: Assets/Scripts/Emuera/Compatibility/FeatureCapabilityIds.cs"
+        ],
+        "rendering": [
+          "HtmlPrintIsland: Assets/Scripts/Emuera/Compatibility/FeatureCapabilityIds.cs"
+        ],
+        "input": [],
+        "persistence": [],
+        "runtime_registry": "registered",
+        "renderer_registry": "missing",
+        "tests": []
+      },
+      "reference": {
+        "name": "Emuera.EM+EE",
+        "source": "https://gitlab.com/EvilMask/emuera.em",
+        "revision": "cde11d69048f87d4a70d1452da79ae6e56462386",
+        "tag": "Emuera.NET1824+v22+EMv18+EEv55",
+        "em_version": "EMv18",
+        "ee_version": "EEv55",
+        "documentation": "https://evilmask.gitlab.io/emuera.em.doc/en/"
+      }
+    },
+    {
+      "id": "cbg.sprite",
+      "name": "CBG sprite rendering",
+      "status": "IMPLEMENTED_UNVERIFIED",
+      "verification": {
+        "registered": true,
+        "implemented": true,
+        "signature_match": true,
+        "local_tests": "MISSING",
+        "reference_tests": "MISSING",
+        "reference_version": "55"
+      },
+      "dimensions": {
+        "parser": "FULL",
+        "argument_parity": "FULL",
+        "runtime": "FULL",
+        "rendering": "FULL",
+        "input": "N/A",
+        "persistence": "N/A",
+        "platform": "FULL",
+        "tests": "MISSING"
+      },
+      "evidence": {
+        "parser": [
+          "CBGSETG",
+          "CBGSETSPRITE"
+        ],
+        "argument_parity": [
+          "CBGSETG: Creator.Method.cs"
+        ],
+        "signature_missing_reference": [],
+        "signature_missing_local": [],
+        "runtime": [
+          "CBG_SetGraphics: Assets/Scripts/Emuera/GameView/EmueraConsole.cs",
+          "CBG_SetImage: Assets/Scripts/Emuera/GameView/EmueraConsole.cs",
+          "CBGSetGraphicsMethod: Assets/Scripts/Emuera/GameData/Function/Creator.cs"
+        ],
+        "rendering": [
+          "EmuleraCbgRenderer: Assets/Scripts/EmueraContent.cs",
+          "CbgEntry: Assets/Scripts/EmuleraCbgRenderer.cs"
+        ],
+        "input": [],
+        "persistence": [],
+        "runtime_registry": "registered",
+        "renderer_registry": "missing",
+        "tests": []
+      },
+      "reference": {
+        "name": "Emuera.EM+EE",
+        "source": "https://gitlab.com/EvilMask/emuera.em",
+        "revision": "cde11d69048f87d4a70d1452da79ae6e56462386",
+        "tag": "Emuera.NET1824+v22+EMv18+EEv55",
+        "em_version": "EMv18",
+        "ee_version": "EEv55",
+        "documentation": "https://evilmask.gitlab.io/emuera.em.doc/en/"
+      }
+    },
+    {
+      "id": "cbg.buttonmap",
+      "name": "CBG button map",
+      "status": "PARTIAL",
+      "verification": {
+        "registered": true,
+        "implemented": true,
+        "signature_match": false,
+        "local_tests": "MISSING",
+        "reference_tests": "MISSING",
+        "reference_version": "55"
+      },
+      "dimensions": {
+        "parser": "FULL",
+        "argument_parity": "PARTIAL",
+        "runtime": "FULL",
+        "rendering": "FULL",
+        "input": "FULL",
+        "persistence": "N/A",
+        "platform": "FULL",
+        "tests": "MISSING"
+      },
+      "evidence": {
+        "parser": [
+          "CBGSETBMAPG",
+          "CBGSETBUTTONSPRITE"
+        ],
+        "argument_parity": [
+          "CBGSETBMAPG: Creator.Method.cs"
+        ],
+        "signature_missing_reference": [],
+        "signature_missing_local": [],
+        "runtime": [
+          "CBG_SetButtonMap: Assets/Scripts/Emuera/GameView/EmueraConsole.cs",
+          "CBG_SetButtonImage: Assets/Scripts/Emuera/GameView/EmueraConsole.cs",
+          "CBGSETButtonSpriteMethod: Assets/Scripts/Emuera/GameData/Function/Creator.cs"
+        ],
+        "rendering": [
+          "CBG: Assets/Scripts/EmueraContent.cs",
+          "ButtonMap: Assets/Scripts/Emuera/Compatibility/FeatureCapabilityIds.cs"
+        ],
+        "input": [
+          "OnCBGButtonClick: Assets/Scripts/EmuleraCbgRenderer.cs",
+          "CBG: Assets/Scripts/EmueraContent.cs"
+        ],
+        "persistence": [],
+        "runtime_registry": "registered",
+        "renderer_registry": "missing",
+        "tests": []
+      },
+      "reference": {
+        "name": "Emuera.EM+EE",
+        "source": "https://gitlab.com/EvilMask/emuera.em",
+        "revision": "cde11d69048f87d4a70d1452da79ae6e56462386",
+        "tag": "Emuera.NET1824+v22+EMv18+EEv55",
+        "em_version": "EMv18",
+        "ee_version": "EEv55",
+        "documentation": "https://evilmask.gitlab.io/emuera.em.doc/en/"
+      }
+    },
+    {
+      "id": "cbg.ordering",
+      "name": "CBG deterministic ordering",
+      "status": "IMPLEMENTED_UNVERIFIED",
+      "verification": {
+        "registered": true,
+        "implemented": true,
+        "signature_match": true,
+        "local_tests": "MISSING",
+        "reference_tests": "MISSING",
+        "reference_version": "55"
+      },
+      "dimensions": {
+        "parser": "FULL",
+        "argument_parity": "FULL",
+        "runtime": "FULL",
+        "rendering": "FULL",
+        "input": "N/A",
+        "persistence": "N/A",
+        "platform": "FULL",
+        "tests": "MISSING"
+      },
+      "evidence": {
+        "parser": [
+          "CBGSETG",
+          "CBGSETSPRITE"
+        ],
+        "argument_parity": [
+          "CBGSETG: Creator.Method.cs"
+        ],
+        "signature_missing_reference": [],
+        "signature_missing_local": [],
+        "runtime": [
+          "cbgList: Assets/Scripts/Emuera/GameView/EmueraConsole.cs",
+          "CbgEntry: Assets/Scripts/EmuleraCbgRenderer.cs"
+        ],
+        "rendering": [
+          "zdepth: Assets/Scripts/EmuleraCbgRenderer.cs"
+        ],
+        "input": [],
+        "persistence": [],
+        "runtime_registry": "registered",
+        "renderer_registry": "missing",
+        "tests": []
+      },
+      "reference": {
+        "name": "Emuera.EM+EE",
+        "source": "https://gitlab.com/EvilMask/emuera.em",
+        "revision": "cde11d69048f87d4a70d1452da79ae6e56462386",
+        "tag": "Emuera.NET1824+v22+EMv18+EEv55",
+        "em_version": "EMv18",
+        "ee_version": "EEv55",
+        "documentation": "https://evilmask.gitlab.io/emuera.em.doc/en/"
+      }
+    },
+    {
+      "id": "dt.create",
+      "name": "DataTable create/exist/release",
+      "status": "PARTIAL",
+      "verification": {
+        "registered": true,
+        "implemented": true,
+        "signature_match": false,
+        "local_tests": "REGISTERED",
+        "reference_tests": "MISSING",
+        "reference_version": "55"
+      },
+      "dimensions": {
+        "parser": "FULL",
+        "argument_parity": "PARTIAL",
+        "runtime": "FULL",
+        "rendering": "N/A",
+        "input": "N/A",
+        "persistence": "N/A",
+        "platform": "FULL",
+        "tests": "IMPLEMENTED_UNVERIFIED"
+      },
+      "evidence": {
+        "parser": [
+          "DT_CREATE",
+          "DT_EXIST",
+          "DT_RELEASE"
+        ],
+        "argument_parity": [
+          "DT_CREATE: Creator.Method.cs",
+          "DT_EXIST: Creator.Method.cs",
+          "DT_RELEASE: Creator.Method.cs"
+        ],
+        "signature_missing_reference": [],
+        "signature_missing_local": [],
+        "runtime": [
+          "DtManageMethod: Assets/Scripts/Emuera/GameData/Function/Creator.cs",
+          "DataDataTables: Assets/Scripts/Emuera/GameData/Function/Creator.Method.cs",
+          "EraDataTable: Assets/Scripts/Emuera/GameData/DataTableExpressionParser.cs"
+        ],
+        "rendering": [],
+        "input": [],
+        "persistence": [],
+        "runtime_registry": "registered",
+        "renderer_registry": "missing",
+        "tests": [
+          "dt.create.basic"
+        ]
+      },
+      "reference": {
+        "name": "Emuera.EM+EE",
+        "source": "https://gitlab.com/EvilMask/emuera.em",
+        "revision": "cde11d69048f87d4a70d1452da79ae6e56462386",
+        "tag": "Emuera.NET1824+v22+EMv18+EEv55",
+        "em_version": "EMv18",
+        "ee_version": "EEv55",
+        "documentation": "https://evilmask.gitlab.io/emuera.em.doc/en/"
+      }
+    },
+    {
+      "id": "dt.column",
+      "name": "DataTable columns/types/defaults",
+      "status": "PARTIAL",
+      "verification": {
+        "registered": true,
+        "implemented": true,
+        "signature_match": false,
+        "local_tests": "MISSING",
+        "reference_tests": "MISSING",
+        "reference_version": "55"
+      },
+      "dimensions": {
+        "parser": "FULL",
+        "argument_parity": "PARTIAL",
+        "runtime": "FULL",
+        "rendering": "N/A",
+        "input": "N/A",
+        "persistence": "N/A",
+        "platform": "FULL",
+        "tests": "MISSING"
+      },
+      "evidence": {
+        "parser": [
+          "DT_COLUMN_ADD",
+          "DT_COLUMN_OPTIONS",
+          "DT_COLUMN_REMOVE",
+          "DT_COLUMN_NAMES",
+          "DT_COLUMN_EXIST"
+        ],
+        "argument_parity": [
+          "DT_COLUMN_ADD: Creator.Method.cs",
+          "DT_COLUMN_REMOVE: Creator.Method.cs",
+          "DT_COLUMN_NAMES: Creator.Method.cs",
+          "DT_COLUMN_EXIST: Creator.Method.cs"
+        ],
+        "signature_missing_reference": [],
+        "signature_missing_local": [],
+        "runtime": [
+          "DtColMethod: Assets/Scripts/Emuera/GameData/Function/Creator.Method.cs",
+          "DT_COLUMN_OPTIONS: Assets/Scripts/Emuera/GameData/Function/Creator.cs",
+          "ColType: Assets/Scripts/Emuera/GameData/EraDataTable.cs",
+          "DefaultValue: Assets/Scripts/Emuera/GameData/EraDataTable.cs"
+        ],
+        "rendering": [],
+        "input": [],
+        "persistence": [],
+        "runtime_registry": "registered",
+        "renderer_registry": "missing",
+        "tests": []
+      },
+      "reference": {
+        "name": "Emuera.EM+EE",
+        "source": "https://gitlab.com/EvilMask/emuera.em",
+        "revision": "cde11d69048f87d4a70d1452da79ae6e56462386",
+        "tag": "Emuera.NET1824+v22+EMv18+EEv55",
+        "em_version": "EMv18",
+        "ee_version": "EEv55",
+        "documentation": "https://evilmask.gitlab.io/emuera.em.doc/en/"
+      }
+    },
+    {
+      "id": "dt.row",
+      "name": "DataTable rows and stable IDs",
+      "status": "PARTIAL",
+      "verification": {
+        "registered": true,
+        "implemented": true,
+        "signature_match": false,
+        "local_tests": "REGISTERED",
+        "reference_tests": "MISSING",
+        "reference_version": "55"
+      },
+      "dimensions": {
+        "parser": "FULL",
+        "argument_parity": "PARTIAL",
+        "runtime": "FULL",
+        "rendering": "N/A",
+        "input": "N/A",
+        "persistence": "N/A",
+        "platform": "FULL",
+        "tests": "IMPLEMENTED_UNVERIFIED"
+      },
+      "evidence": {
+        "parser": [
+          "DT_ROW_ADD",
+          "DT_ROW_SET",
+          "DT_ROW_REMOVE",
+          "DT_ROW_LENGTH"
+        ],
+        "argument_parity": [
+          "DT_ROW_ADD: Creator.Method.cs",
+          "DT_ROW_REMOVE: Creator.Method.cs"
+        ],
+        "signature_missing_reference": [],
+        "signature_missing_local": [],
+        "runtime": [
+          "DtRowOpMethod: Assets/Scripts/Emuera/GameData/Function/Creator.cs",
+          "AddRow: Assets/Scripts/Emuera/GameData/EraDataTable.cs",
+          "RowId: Assets/Scripts/Emuera/GameData/EraDataTable.cs"
+        ],
+        "rendering": [],
+        "input": [],
+        "persistence": [],
+        "runtime_registry": "registered",
+        "renderer_registry": "missing",
+        "tests": [
+          "dt.row.stable_id"
+        ]
+      },
+      "reference": {
+        "name": "Emuera.EM+EE",
+        "source": "https://gitlab.com/EvilMask/emuera.em",
+        "revision": "cde11d69048f87d4a70d1452da79ae6e56462386",
+        "tag": "Emuera.NET1824+v22+EMv18+EEv55",
+        "em_version": "EMv18",
+        "ee_version": "EEv55",
+        "documentation": "https://evilmask.gitlab.io/emuera.em.doc/en/"
+      }
+    },
+    {
+      "id": "dt.cell",
+      "name": "DataTable cell/null semantics",
+      "status": "PARTIAL",
+      "verification": {
+        "registered": true,
+        "implemented": true,
+        "signature_match": false,
+        "local_tests": "MISSING",
+        "reference_tests": "MISSING",
+        "reference_version": "55"
+      },
+      "dimensions": {
+        "parser": "FULL",
+        "argument_parity": "PARTIAL",
+        "runtime": "FULL",
+        "rendering": "N/A",
+        "input": "N/A",
+        "persistence": "N/A",
+        "platform": "FULL",
+        "tests": "MISSING"
+      },
+      "evidence": {
+        "parser": [
+          "DT_CELL_GET",
+          "DT_CELL_GETS",
+          "DT_CELL_ISNULL",
+          "DT_CELL_SET"
+        ],
+        "argument_parity": [],
+        "signature_missing_reference": [],
+        "signature_missing_local": [],
+        "runtime": [
+          "DtCellGetMethod: Assets/Scripts/Emuera/GameData/Function/Creator.Method.cs",
+          "IsNull: Assets/Scripts/EmueraBehaviour.cs",
+          "IsNull: Assets/Scripts/EmueraBehaviour.cs"
+        ],
+        "rendering": [],
+        "input": [],
+        "persistence": [],
+        "runtime_registry": "registered",
+        "renderer_registry": "missing",
+        "tests": []
+      },
+      "reference": {
+        "name": "Emuera.EM+EE",
+        "source": "https://gitlab.com/EvilMask/emuera.em",
+        "revision": "cde11d69048f87d4a70d1452da79ae6e56462386",
+        "tag": "Emuera.NET1824+v22+EMv18+EEv55",
+        "em_version": "EMv18",
+        "ee_version": "EEv55",
+        "documentation": "https://evilmask.gitlab.io/emuera.em.doc/en/"
+      }
+    },
+    {
+      "id": "dt.select",
+      "name": "DataTable filter/sort selection",
+      "status": "PARTIAL",
+      "verification": {
+        "registered": true,
+        "implemented": true,
+        "signature_match": false,
+        "local_tests": "REGISTERED",
+        "reference_tests": "MISSING",
+        "reference_version": "55"
+      },
+      "dimensions": {
+        "parser": "FULL",
+        "argument_parity": "PARTIAL",
+        "runtime": "FULL",
+        "rendering": "N/A",
+        "input": "N/A",
+        "persistence": "N/A",
+        "platform": "FULL",
+        "tests": "IMPLEMENTED_UNVERIFIED"
+      },
+      "evidence": {
+        "parser": [
+          "DT_SELECT"
+        ],
+        "argument_parity": [],
+        "signature_missing_reference": [],
+        "signature_missing_local": [],
+        "runtime": [
+          "DtSelectMethod: Assets/Scripts/Emuera/GameData/Function/Creator.Method.cs",
+          "DataTableExpressionParser: Assets/Scripts/Emuera/GameData/DataTableExpressionParser.cs",
+          "Select: Assets/Scripts/LocalizationHelper.cs"
+        ],
+        "rendering": [],
+        "input": [],
+        "persistence": [],
+        "runtime_registry": "registered",
+        "renderer_registry": "missing",
+        "tests": [
+          "dt.select.filter_sort"
+        ]
+      },
+      "reference": {
+        "name": "Emuera.EM+EE",
+        "source": "https://gitlab.com/EvilMask/emuera.em",
+        "revision": "cde11d69048f87d4a70d1452da79ae6e56462386",
+        "tag": "Emuera.NET1824+v22+EMv18+EEv55",
+        "em_version": "EMv18",
+        "ee_version": "EEv55",
+        "documentation": "https://evilmask.gitlab.io/emuera.em.doc/en/"
+      }
+    },
+    {
+      "id": "dt.serialization",
+      "name": "DataTable schema/data XML",
+      "status": "PARTIAL",
+      "verification": {
+        "registered": true,
+        "implemented": true,
+        "signature_match": false,
+        "local_tests": "REGISTERED",
+        "reference_tests": "MISSING",
+        "reference_version": "55"
+      },
+      "dimensions": {
+        "parser": "FULL",
+        "argument_parity": "PARTIAL",
+        "runtime": "FULL",
+        "rendering": "N/A",
+        "input": "N/A",
+        "persistence": "FULL",
+        "platform": "FULL",
+        "tests": "IMPLEMENTED_UNVERIFIED"
+      },
+      "evidence": {
+        "parser": [
+          "DT_TOXML",
+          "DT_FROMXML"
+        ],
+        "argument_parity": [
+          "DT_TOXML: Creator.Method.cs"
+        ],
+        "signature_missing_reference": [],
+        "signature_missing_local": [],
+        "runtime": [
+          "ToXmlSchema: Assets/Scripts/Emuera/GameData/EraDataTable.cs",
+          "FromXml: Assets/Scripts/Emuera/GameData/EraDataTable.cs"
+        ],
+        "rendering": [],
+        "input": [],
+        "persistence": [
+          "DataDataTables: Assets/Scripts/Emuera/GameData/Function/Creator.Method.cs"
+        ],
+        "runtime_registry": "registered",
+        "renderer_registry": "missing",
+        "tests": [
+          "dt.serialization.roundtrip"
+        ]
+      },
+      "reference": {
+        "name": "Emuera.EM+EE",
+        "source": "https://gitlab.com/EvilMask/emuera.em",
+        "revision": "cde11d69048f87d4a70d1452da79ae6e56462386",
+        "tag": "Emuera.NET1824+v22+EMv18+EEv55",
+        "em_version": "EMv18",
+        "ee_version": "EEv55",
+        "documentation": "https://evilmask.gitlab.io/emuera.em.doc/en/"
+      }
+    },
+    {
+      "id": "map.create",
+      "name": "MAP create/exist/release",
+      "status": "IMPLEMENTED_UNVERIFIED",
+      "verification": {
+        "registered": true,
+        "implemented": true,
+        "signature_match": true,
+        "local_tests": "MISSING",
+        "reference_tests": "MISSING",
+        "reference_version": "55"
+      },
+      "dimensions": {
+        "parser": "FULL",
+        "argument_parity": "FULL",
+        "runtime": "FULL",
+        "rendering": "N/A",
+        "input": "N/A",
+        "persistence": "N/A",
+        "platform": "FULL",
+        "tests": "MISSING"
+      },
+      "evidence": {
+        "parser": [
+          "MAP_CREATE",
+          "MAP_EXIST",
+          "MAP_RELEASE"
+        ],
+        "argument_parity": [],
+        "signature_missing_reference": [],
+        "signature_missing_local": [],
+        "runtime": [
+          "MapCreateMethod: Assets/Scripts/Emuera/GameData/Function/Creator.cs",
+          "MapExistMethod: Assets/Scripts/Emuera/GameData/Function/Creator.cs",
+          "MapReleaseMethod: Assets/Scripts/Emuera/GameData/Function/Creator.cs"
+        ],
+        "rendering": [],
+        "input": [],
+        "persistence": [],
+        "runtime_registry": "registered",
+        "renderer_registry": "missing",
+        "tests": []
+      },
+      "reference": {
+        "name": "Emuera.EM+EE",
+        "source": "https://gitlab.com/EvilMask/emuera.em",
+        "revision": "cde11d69048f87d4a70d1452da79ae6e56462386",
+        "tag": "Emuera.NET1824+v22+EMv18+EEv55",
+        "em_version": "EMv18",
+        "ee_version": "EEv55",
+        "documentation": "https://evilmask.gitlab.io/emuera.em.doc/en/"
+      }
+    },
+    {
+      "id": "map.operations",
+      "name": "MAP operations",
+      "status": "PARTIAL",
+      "verification": {
+        "registered": true,
+        "implemented": true,
+        "signature_match": false,
+        "local_tests": "MISSING",
+        "reference_tests": "MISSING",
+        "reference_version": "55"
+      },
+      "dimensions": {
+        "parser": "FULL",
+        "argument_parity": "PARTIAL",
+        "runtime": "FULL",
+        "rendering": "N/A",
+        "input": "N/A",
+        "persistence": "N/A",
+        "platform": "FULL",
+        "tests": "MISSING"
+      },
+      "evidence": {
+        "parser": [
+          "MAP_SET",
+          "MAP_GET",
+          "MAP_REMOVE",
+          "MAP_CLEAR",
+          "MAP_SIZE"
+        ],
+        "argument_parity": [
+          "MAP_GET: Creator.Method.cs"
+        ],
+        "signature_missing_reference": [],
+        "signature_missing_local": [],
+        "runtime": [
+          "MapSetMethod: Assets/Scripts/Emuera/GameData/Function/Creator.cs",
+          "MapGetMethod: Assets/Scripts/Emuera/GameData/Function/Creator.cs",
+          "MapRemoveMethod: Assets/Scripts/Emuera/GameData/Function/Creator.cs",
+          "MapClearMethod: Assets/Scripts/Emuera/GameData/Function/Creator.cs",
+          "MapSizeMethod: Assets/Scripts/Emuera/GameData/Function/Creator.cs"
+        ],
+        "rendering": [],
+        "input": [],
+        "persistence": [],
+        "runtime_registry": "registered",
+        "renderer_registry": "missing",
+        "tests": []
+      },
+      "reference": {
+        "name": "Emuera.EM+EE",
+        "source": "https://gitlab.com/EvilMask/emuera.em",
+        "revision": "cde11d69048f87d4a70d1452da79ae6e56462386",
+        "tag": "Emuera.NET1824+v22+EMv18+EEv55",
+        "em_version": "EMv18",
+        "ee_version": "EEv55",
+        "documentation": "https://evilmask.gitlab.io/emuera.em.doc/en/"
+      }
+    },
+    {
+      "id": "map.serialization",
+      "name": "MAP XML serialization",
+      "status": "PARTIAL",
+      "verification": {
+        "registered": true,
+        "implemented": true,
+        "signature_match": false,
+        "local_tests": "MISSING",
+        "reference_tests": "MISSING",
+        "reference_version": "55"
+      },
+      "dimensions": {
+        "parser": "FULL",
+        "argument_parity": "PARTIAL",
+        "runtime": "FULL",
+        "rendering": "N/A",
+        "input": "N/A",
+        "persistence": "FULL",
+        "platform": "FULL",
+        "tests": "MISSING"
+      },
+      "evidence": {
+        "parser": [
+          "MAP_TOXML",
+          "MAP_FROMXML"
+        ],
+        "argument_parity": [
+          "MAP_FROMXML: Creator.Method.cs"
+        ],
+        "signature_missing_reference": [],
+        "signature_missing_local": [],
+        "runtime": [
+          "MapToXmlMethod: Assets/Scripts/Emuera/GameData/Function/Creator.cs",
+          "MapFromXmlMethod: Assets/Scripts/Emuera/GameData/Function/Creator.cs"
+        ],
+        "rendering": [],
+        "input": [],
+        "persistence": [
+          "DataMaps: Assets/Scripts/Emuera/GameData/Function/Creator.Method.cs",
+          "MAP_TOXML: Assets/Scripts/Emuera/GameData/Function/Creator.cs",
+          "MAP_FROMXML: Assets/Scripts/Emuera/GameData/Function/Creator.cs"
+        ],
+        "runtime_registry": "registered",
+        "renderer_registry": "missing",
+        "tests": []
+      },
+      "reference": {
+        "name": "Emuera.EM+EE",
+        "source": "https://gitlab.com/EvilMask/emuera.em",
+        "revision": "cde11d69048f87d4a70d1452da79ae6e56462386",
+        "tag": "Emuera.NET1824+v22+EMv18+EEv55",
+        "em_version": "EMv18",
+        "ee_version": "EEv55",
+        "documentation": "https://evilmask.gitlab.io/emuera.em.doc/en/"
+      }
+    },
+    {
+      "id": "xml.get",
+      "name": "XML_GET overloads",
+      "status": "PARTIAL",
+      "verification": {
+        "registered": true,
+        "implemented": true,
+        "signature_match": false,
+        "local_tests": "MISSING",
+        "reference_tests": "MISSING",
+        "reference_version": "55"
+      },
+      "dimensions": {
+        "parser": "FULL",
+        "argument_parity": "PARTIAL",
+        "runtime": "FULL",
+        "rendering": "N/A",
+        "input": "N/A",
+        "persistence": "N/A",
+        "platform": "FULL",
+        "tests": "MISSING"
+      },
+      "evidence": {
+        "parser": [
+          "XML_GET",
+          "XML_GET_BYNAME"
+        ],
+        "argument_parity": [
+          "XML_GET: Creator.Method.cs"
+        ],
+        "signature_missing_reference": [],
+        "signature_missing_local": [],
+        "runtime": [
+          "XmlGetMethod: Assets/Scripts/Emuera/GameData/Function/Creator.cs",
+          "XML_GET: Assets/Scripts/Emuera/GameData/Function/Creator.cs",
+          "SelectNodes: Assets/Scripts/Emuera/GameData/EraDataTable.cs",
+          "SelectSingleNode: Assets/Scripts/Emuera/GameData/Function/Creator.Method.cs"
+        ],
+        "rendering": [],
+        "input": [],
+        "persistence": [],
+        "runtime_registry": "registered",
+        "renderer_registry": "missing",
+        "tests": []
+      },
+      "reference": {
+        "name": "Emuera.EM+EE",
+        "source": "https://gitlab.com/EvilMask/emuera.em",
+        "revision": "cde11d69048f87d4a70d1452da79ae6e56462386",
+        "tag": "Emuera.NET1824+v22+EMv18+EEv55",
+        "em_version": "EMv18",
+        "ee_version": "EEv55",
+        "documentation": "https://evilmask.gitlab.io/emuera.em.doc/en/"
+      }
+    },
+    {
+      "id": "xml.set",
+      "name": "XML_SET overloads",
+      "status": "PARTIAL",
+      "verification": {
+        "registered": true,
+        "implemented": true,
+        "signature_match": false,
+        "local_tests": "MISSING",
+        "reference_tests": "MISSING",
+        "reference_version": "55"
+      },
+      "dimensions": {
+        "parser": "FULL",
+        "argument_parity": "PARTIAL",
+        "runtime": "FULL",
+        "rendering": "N/A",
+        "input": "N/A",
+        "persistence": "N/A",
+        "platform": "FULL",
+        "tests": "MISSING"
+      },
+      "evidence": {
+        "parser": [
+          "XML_SET",
+          "XML_SET_BYNAME"
+        ],
+        "argument_parity": [
+          "XML_SET: Creator.Method.cs"
+        ],
+        "signature_missing_reference": [],
+        "signature_missing_local": [],
+        "runtime": [
+          "XmlSetMethod: Assets/Scripts/Emuera/GameData/Function/Creator.cs",
+          "XML_SET: Assets/Scripts/Emuera/GameData/Function/Creator.cs",
+          "SelectNodes: Assets/Scripts/Emuera/GameData/EraDataTable.cs"
+        ],
+        "rendering": [],
+        "input": [],
+        "persistence": [],
+        "runtime_registry": "registered",
+        "renderer_registry": "missing",
+        "tests": []
+      },
+      "reference": {
+        "name": "Emuera.EM+EE",
+        "source": "https://gitlab.com/EvilMask/emuera.em",
+        "revision": "cde11d69048f87d4a70d1452da79ae6e56462386",
+        "tag": "Emuera.NET1824+v22+EMv18+EEv55",
+        "em_version": "EMv18",
+        "ee_version": "EEv55",
+        "documentation": "https://evilmask.gitlab.io/emuera.em.doc/en/"
+      }
+    },
+    {
+      "id": "xml.mutation",
+      "name": "XML mutation API",
+      "status": "PARTIAL",
+      "verification": {
+        "registered": true,
+        "implemented": true,
+        "signature_match": false,
+        "local_tests": "MISSING",
+        "reference_tests": "MISSING",
+        "reference_version": "55"
+      },
+      "dimensions": {
+        "parser": "FULL",
+        "argument_parity": "PARTIAL",
+        "runtime": "FULL",
+        "rendering": "N/A",
+        "input": "N/A",
+        "persistence": "N/A",
+        "platform": "FULL",
+        "tests": "MISSING"
+      },
+      "evidence": {
+        "parser": [
+          "XML_ADDNODE",
+          "XML_REMOVENODE",
+          "XML_REPLACE",
+          "XML_ADDATTRIBUTE",
+          "XML_REMOVEATTRIBUTE"
+        ],
+        "argument_parity": [
+          "XML_ADDNODE: Creator.Method.cs",
+          "XML_REMOVENODE: Creator.Method.cs",
+          "XML_REPLACE: Creator.Method.cs",
+          "XML_ADDATTRIBUTE: Creator.Method.cs",
+          "XML_REMOVEATTRIBUTE: Creator.Method.cs"
+        ],
+        "signature_missing_reference": [],
+        "signature_missing_local": [],
+        "runtime": [
+          "XmlAddNodeMethod: Assets/Scripts/Emuera/GameData/Function/Creator.cs",
+          "XmlRemoveNodeMethod: Assets/Scripts/Emuera/GameData/Function/Creator.cs",
+          "XmlReplaceMethod: Assets/Scripts/Emuera/GameData/Function/Creator.cs",
+          "XmlResolver: Assets/Scripts/Emuera/GameData/EraDataTable.cs"
+        ],
+        "rendering": [],
+        "input": [],
+        "persistence": [],
+        "runtime_registry": "registered",
+        "renderer_registry": "missing",
+        "tests": []
+      },
+      "reference": {
+        "name": "Emuera.EM+EE",
+        "source": "https://gitlab.com/EvilMask/emuera.em",
+        "revision": "cde11d69048f87d4a70d1452da79ae6e56462386",
+        "tag": "Emuera.NET1824+v22+EMv18+EEv55",
+        "em_version": "EMv18",
+        "ee_version": "EEv55",
+        "documentation": "https://evilmask.gitlab.io/emuera.em.doc/en/"
+      }
+    },
+    {
+      "id": "erd.named_indices",
+      "name": "ERD named indices",
+      "status": "PARTIAL",
+      "verification": {
+        "registered": true,
+        "implemented": true,
+        "signature_match": false,
+        "local_tests": "MISSING",
+        "reference_tests": "MISSING",
+        "reference_version": "55"
+      },
+      "dimensions": {
+        "parser": "FULL",
+        "argument_parity": "PARTIAL",
+        "runtime": "FULL",
+        "rendering": "N/A",
+        "input": "N/A",
+        "persistence": "N/A",
+        "platform": "FULL",
+        "tests": "MISSING"
+      },
+      "evidence": {
+        "parser": [
+          "ERDNAME"
+        ],
+        "argument_parity": [
+          "ERDNAME: Creator.Method.cs"
+        ],
+        "signature_missing_reference": [],
+        "signature_missing_local": [],
+        "runtime": [
+          "ErdNameMethod: Assets/Scripts/Emuera/GameData/Function/Creator.cs",
+          "TryIntegerToKeyword: Assets/Scripts/Emuera/GameData/ConstantData.cs"
+        ],
+        "rendering": [],
+        "input": [],
+        "persistence": [],
+        "runtime_registry": "registered",
+        "renderer_registry": "missing",
+        "tests": []
+      },
+      "reference": {
+        "name": "Emuera.EM+EE",
+        "source": "https://gitlab.com/EvilMask/emuera.em",
+        "revision": "cde11d69048f87d4a70d1452da79ae6e56462386",
+        "tag": "Emuera.NET1824+v22+EMv18+EEv55",
+        "em_version": "EMv18",
+        "ee_version": "EEv55",
+        "documentation": "https://evilmask.gitlab.io/emuera.em.doc/en/"
+      }
+    },
+    {
+      "id": "input.mouseb",
+      "name": "MOUSEB state",
+      "status": "PARTIAL",
+      "verification": {
+        "registered": true,
+        "implemented": true,
+        "signature_match": false,
+        "local_tests": "MISSING",
+        "reference_tests": "MISSING",
+        "reference_version": "55"
+      },
+      "dimensions": {
+        "parser": "FULL",
+        "argument_parity": "PARTIAL",
+        "runtime": "FULL",
+        "rendering": "N/A",
+        "input": "FULL",
+        "persistence": "N/A",
+        "platform": "FULL",
+        "tests": "MISSING"
+      },
+      "evidence": {
+        "parser": [
+          "MOUSEB"
+        ],
+        "argument_parity": [],
+        "signature_missing_reference": [],
+        "signature_missing_local": [],
+        "runtime": [
+          "MOUSEB: Assets/Scripts/EmueraCoordinateMapper.cs",
+          "GetMouseButton: Assets/Scripts/OnDemandRenderManager.cs",
+          "MouseB: Assets/Scripts/OnDemandRenderManager.cs"
+        ],
+        "rendering": [],
+        "input": [
+          "Mouse: Assets/Scripts/EmueraCoordinateMapper.cs",
+          "Pointer: Assets/Scripts/EmueraBehaviour.cs",
+          "MOUSEB: Assets/Scripts/EmueraCoordinateMapper.cs"
+        ],
+        "persistence": [],
+        "runtime_registry": "registered",
+        "renderer_registry": "missing",
+        "tests": []
+      },
+      "reference": {
+        "name": "Emuera.EM+EE",
+        "source": "https://gitlab.com/EvilMask/emuera.em",
+        "revision": "cde11d69048f87d4a70d1452da79ae6e56462386",
+        "tag": "Emuera.NET1824+v22+EMv18+EEv55",
+        "em_version": "EMv18",
+        "ee_version": "EEv55",
+        "documentation": "https://evilmask.gitlab.io/emuera.em.doc/en/"
+      }
+    },
+    {
+      "id": "input.coordinates",
+      "name": "MOUSEX/MOUSEY coordinates",
+      "status": "PARTIAL",
+      "verification": {
+        "registered": true,
+        "implemented": true,
+        "signature_match": false,
+        "local_tests": "MISSING",
+        "reference_tests": "MISSING",
+        "reference_version": "55"
+      },
+      "dimensions": {
+        "parser": "FULL",
+        "argument_parity": "PARTIAL",
+        "runtime": "FULL",
+        "rendering": "N/A",
+        "input": "FULL",
+        "persistence": "N/A",
+        "platform": "FULL",
+        "tests": "MISSING"
+      },
+      "evidence": {
+        "parser": [
+          "MOUSEX",
+          "MOUSEY"
+        ],
+        "argument_parity": [
+          "MOUSEX: Creator.Method.cs",
+          "MOUSEY: Creator.Method.cs"
+        ],
+        "signature_missing_reference": [],
+        "signature_missing_local": [],
+        "runtime": [
+          "MOUSEX: Assets/Scripts/EmueraCoordinateMapper.cs",
+          "MOUSEY: Assets/Scripts/EmueraCoordinateMapper.cs",
+          "CoordinateMapper: Assets/Scripts/EmueraContent.cs"
+        ],
+        "rendering": [],
+        "input": [
+          "Coordinate: Assets/Scripts/EmueraBehaviour.cs",
+          "MousePosition: Assets/Scripts/EmueraCoordinateMapper.cs",
+          "PointToClient: Assets/Scripts/uEmuera/Forms.cs"
+        ],
+        "persistence": [],
+        "runtime_registry": "registered",
+        "renderer_registry": "missing",
+        "tests": []
+      },
+      "reference": {
+        "name": "Emuera.EM+EE",
+        "source": "https://gitlab.com/EvilMask/emuera.em",
+        "revision": "cde11d69048f87d4a70d1452da79ae6e56462386",
+        "tag": "Emuera.NET1824+v22+EMv18+EEv55",
+        "em_version": "EMv18",
+        "ee_version": "EEv55",
+        "documentation": "https://evilmask.gitlab.io/emuera.em.doc/en/"
+      }
+    },
+    {
+      "id": "save.extended_data",
+      "name": "MAP/XML/DataTable persistence",
+      "status": "PARTIAL",
+      "verification": {
+        "registered": true,
+        "implemented": true,
+        "signature_match": false,
+        "local_tests": "MISSING",
+        "reference_tests": "MISSING",
+        "reference_version": "55"
+      },
+      "dimensions": {
+        "parser": "FULL",
+        "argument_parity": "PARTIAL",
+        "runtime": "FULL",
+        "rendering": "N/A",
+        "input": "N/A",
+        "persistence": "FULL",
+        "platform": "FULL",
+        "tests": "MISSING"
+      },
+      "evidence": {
+        "parser": [
+          "RESETDATA",
+          "RESETGLOBAL"
+        ],
+        "argument_parity": [],
+        "signature_missing_reference": [],
+        "signature_missing_local": [],
+        "runtime": [
+          "DataDataTables: Assets/Scripts/Emuera/GameData/Function/Creator.Method.cs",
+          "DataXmlDocuments: Assets/Scripts/Emuera/GameData/Function/Creator.Method.cs",
+          "DataMaps: Assets/Scripts/Emuera/GameData/Function/Creator.Method.cs"
+        ],
+        "rendering": [],
+        "input": [],
+        "persistence": [
+          "Save: Assets/Scripts/EmueraMain.cs",
+          "Load: Assets/Scripts/EmueraImage.cs"
+        ],
+        "runtime_registry": "registered",
+        "renderer_registry": "missing",
+        "tests": []
+      },
+      "reference": {
+        "name": "Emuera.EM+EE",
+        "source": "https://gitlab.com/EvilMask/emuera.em",
+        "revision": "cde11d69048f87d4a70d1452da79ae6e56462386",
+        "tag": "Emuera.NET1824+v22+EMv18+EEv55",
+        "em_version": "EMv18",
+        "ee_version": "EEv55",
+        "documentation": "https://evilmask.gitlab.io/emuera.em.doc/en/"
+      }
+    },
+    {
+      "id": "save.multidimensional_strings",
+      "name": "Multidimensional string save",
+      "status": "MISSING",
+      "verification": {
+        "registered": false,
+        "implemented": true,
+        "signature_match": false,
+        "local_tests": "MISSING",
+        "reference_tests": "MISSING",
+        "reference_version": "55"
+      },
+      "dimensions": {
+        "parser": "MISSING",
+        "argument_parity": "MISSING",
+        "runtime": "FULL",
+        "rendering": "N/A",
+        "input": "N/A",
+        "persistence": "FULL",
+        "platform": "FULL",
+        "tests": "MISSING"
+      },
+      "evidence": {
+        "parser": [],
+        "argument_parity": [],
+        "signature_missing_reference": [],
+        "signature_missing_local": [],
+        "runtime": [
+          "dataStringArray2D: Assets/Scripts/Emuera/GameData/Variable/CharacterData.cs",
+          "dataStringArray3D: Assets/Scripts/Emuera/GameData/Variable/CharacterData.cs"
+        ],
+        "rendering": [],
+        "input": [],
+        "persistence": [
+          "Save: Assets/Scripts/EmueraMain.cs",
+          "Load: Assets/Scripts/EmueraImage.cs",
+          "StringArray2D: Assets/Scripts/Emuera/Sub/EraDataStream.cs",
+          "StringArray3D: Assets/Scripts/Emuera/Sub/EraDataStream.cs"
+        ],
+        "runtime_registry": "registered",
+        "renderer_registry": "missing",
+        "tests": []
+      },
+      "reference": {
+        "name": "Emuera.EM+EE",
+        "source": "https://gitlab.com/EvilMask/emuera.em",
+        "revision": "cde11d69048f87d4a70d1452da79ae6e56462386",
+        "tag": "Emuera.NET1824+v22+EMv18+EEv55",
+        "em_version": "EMv18",
+        "ee_version": "EEv55",
+        "documentation": "https://evilmask.gitlab.io/emuera.em.doc/en/"
+      }
+    },
+    {
+      "id": "filesystem.virtual",
+      "name": "Game virtual filesystem",
+      "status": "PARTIAL",
+      "verification": {
+        "registered": true,
+        "implemented": true,
+        "signature_match": false,
+        "local_tests": "MISSING",
+        "reference_tests": "MISSING",
+        "reference_version": "55"
+      },
+      "dimensions": {
+        "parser": "FULL",
+        "argument_parity": "PARTIAL",
+        "runtime": "FULL",
+        "rendering": "N/A",
+        "input": "N/A",
+        "persistence": "FULL",
+        "platform": "FULL",
+        "tests": "MISSING"
+      },
+      "evidence": {
+        "parser": [
+          "EXISTFILE",
+          "ENUMFILES"
+        ],
+        "argument_parity": [
+          "EXISTFILE: Creator.Method.cs",
+          "ENUMFILES: Creator.Method.cs"
+        ],
+        "signature_missing_reference": [],
+        "signature_missing_local": [],
+        "runtime": [
+          "GameVirtualFileSystem: Assets/Scripts/Emuera/Compatibility/CompatibilityScanner.cs",
+          "ResolveExistingFilePath: Assets/Scripts/uEmuera/Utils.cs"
+        ],
+        "rendering": [],
+        "input": [],
+        "persistence": [
+          "EXISTFILE: Assets/Scripts/Emuera/GameData/Function/Creator.cs",
+          "ENUMFILES: Assets/Scripts/Emuera/GameData/Function/Creator.cs"
+        ],
+        "runtime_registry": "registered",
+        "renderer_registry": "missing",
+        "tests": []
+      },
+      "reference": {
+        "name": "Emuera.EM+EE",
+        "source": "https://gitlab.com/EvilMask/emuera.em",
+        "revision": "cde11d69048f87d4a70d1452da79ae6e56462386",
+        "tag": "Emuera.NET1824+v22+EMv18+EEv55",
+        "em_version": "EMv18",
+        "ee_version": "EEv55",
+        "documentation": "https://evilmask.gitlab.io/emuera.em.doc/en/"
+      }
+    },
+    {
+      "id": "filesystem.encoding",
+      "name": "Per-file text encoding",
+      "status": "PARTIAL",
+      "verification": {
+        "registered": true,
+        "implemented": true,
+        "signature_match": false,
+        "local_tests": "MISSING",
+        "reference_tests": "MISSING",
+        "reference_version": "55"
+      },
+      "dimensions": {
+        "parser": "PARTIAL",
+        "argument_parity": "MISSING",
+        "runtime": "FULL",
+        "rendering": "N/A",
+        "input": "N/A",
+        "persistence": "N/A",
+        "platform": "FULL",
+        "tests": "MISSING"
+      },
+      "evidence": {
+        "parser": [
+          "Shift-JIS",
+          "UTF-8"
+        ],
+        "argument_parity": [
+          "UTF-8: Creator.Method.cs"
+        ],
+        "signature_missing_reference": [
+          "CP932"
+        ],
+        "signature_missing_local": [
+          "CP932"
+        ],
+        "runtime": [
+          "CodePagesEncodingProvider: Assets/Scripts/Emuera/Program.cs"
+        ],
+        "rendering": [],
+        "input": [],
+        "persistence": [],
+        "runtime_registry": "registered",
+        "renderer_registry": "missing",
+        "tests": []
+      },
+      "reference": {
+        "name": "Emuera.EM+EE",
+        "source": "https://gitlab.com/EvilMask/emuera.em",
+        "revision": "cde11d69048f87d4a70d1452da79ae6e56462386",
+        "tag": "Emuera.NET1824+v22+EMv18+EEv55",
+        "em_version": "EMv18",
+        "ee_version": "EEv55",
+        "documentation": "https://evilmask.gitlab.io/emuera.em.doc/en/"
+      }
+    }
+  ],
+  "stub_audit": {
+    "count": 42,
+    "player_reachable": 9
+  }
+}

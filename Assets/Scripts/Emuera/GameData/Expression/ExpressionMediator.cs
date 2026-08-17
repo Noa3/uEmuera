@@ -37,7 +37,7 @@ namespace MinorShift.Emuera.GameData.Expression
 		public void ForceKana(Int64 flag)
 		{
 			if (flag < 0 || flag > 3)
-				throw new CodeEE("命令FORCEKANAのargumentが指定可能な範囲(0～3)を超えています");
+				throw new CodeEE(GameMessages.T("FORCEKANA argument exceeds the allowable range (0 to 3)"));
 			forceKatakana = (flag == 1) ? true : false;
 			forceHiragana = (flag > 1) ? true : false;
 			halftoFull = (flag == 3) ? true : false;
@@ -122,11 +122,11 @@ namespace MinorShift.Emuera.GameData.Expression
 		public string CreateBar(Int64 var, Int64 max, Int64 length)
 		{
 			if (max <= 0)
-				throw new CodeEE("BARの最大値が正の値ではありません");
+				throw new CodeEE(GameMessages.T("BAR maximum value is not a positive number"));
 			if (length <= 0)
-				throw new CodeEE("BARの長さが正の値ではありません");
+				throw new CodeEE(GameMessages.T("BAR length is not a positive number"));
 			if (length >= 100)//To prevent an out-of-control runaway.
-				throw new CodeEE("BARが長すぎます");
+				throw new CodeEE(GameMessages.T("BAR is too long"));
 			StringBuilder builder = new StringBuilder();
 			builder.Append('[');
 			int count;

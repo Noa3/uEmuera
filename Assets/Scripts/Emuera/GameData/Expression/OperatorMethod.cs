@@ -9,7 +9,7 @@ using MinorShift.Emuera.GameData.Variable;
 namespace MinorShift.Emuera.GameData.Expression
 {
 	/// <summary>
-	/// argumentのチェック、戻り値の型チェック等は全て呼び出し元が責任を負うこと。
+	/// All argument checks and return value type checks are the responsibility of the caller.
 	/// </summary>
 	internal abstract class OperatorMethod : FunctionMethod
 	{
@@ -17,7 +17,7 @@ namespace MinorShift.Emuera.GameData.Expression
 		{
 			argumentTypeArray = null;
 		}
-		public override string CheckArgumentType(string name, IOperandTerm[] arguments) { throw new ExeEE("型チェックは呼び出し元が行うこと"); }
+		public override string CheckArgumentType(string name, IOperandTerm[] arguments) { throw new ExeEE(GameMessages.T("Type checking is the responsibility of the caller")); }
 	}
 
 	internal static class OperatorMethodManager
@@ -86,9 +86,9 @@ namespace MinorShift.Emuera.GameData.Expression
 			{
 				VariableTerm var = o1 as VariableTerm;
 				if (var == null)
-					throw new CodeEE("変数以外をインクリメントすることはできません");
+					throw new CodeEE(GameMessages.T("Only variables can be incremented"));
 				if (var.Identifier.IsConst)
-					throw new CodeEE("変更できない変数をインクリメントすることはできません");
+					throw new CodeEE(GameMessages.T("Cannot increment a variable that cannot be modified"));
 			}
 			if (o1.GetOperandType() == typeof(Int64))
 			{
@@ -102,12 +102,12 @@ namespace MinorShift.Emuera.GameData.Expression
 				return new FunctionMethodTerm(method, new IOperandTerm[] { o1 });
             string errMes = "";
             if (o1.GetOperandType() == typeof(Int64))
-                errMes += "数値型";
+                errMes += GameMessages.T("Number type");
             else if (o1.GetOperandType() == typeof(string))
-                errMes += "文字列型";
+                errMes += GameMessages.T("String type");
             else
-                errMes += "不定型";
-            errMes += "に単項演算子\'" + OperatorManager.ToOperatorString(op) + "\'は適用できません";
+                errMes += GameMessages.T("Unknown type");
+            errMes += GameMessages.T(" cannot be used with the unary operator \'") + OperatorManager.ToOperatorString(op) + GameMessages.T("\'");
             throw new CodeEE(errMes);
 		}
 		
@@ -118,9 +118,9 @@ namespace MinorShift.Emuera.GameData.Expression
 			{
 				VariableTerm var = o1 as VariableTerm;
 				if (var == null)
-					throw new CodeEE("変数以外をインクリメントすることはできません");
+					throw new CodeEE(GameMessages.T("Only variables can be incremented"));
 				if (var.Identifier.IsConst)
-					throw new CodeEE("変更できない変数をインクリメントすることはできません");
+					throw new CodeEE(GameMessages.T("Cannot increment a variable that cannot be modified"));
 			}
 			if (o1.GetOperandType() == typeof(Int64))
 			{
@@ -132,12 +132,12 @@ namespace MinorShift.Emuera.GameData.Expression
 				return new FunctionMethodTerm(method, new IOperandTerm[] { o1 });
             string errMes = "";
             if (o1.GetOperandType() == typeof(Int64))
-                errMes += "数値型";
+                errMes += GameMessages.T("Number type");
             else if (o1.GetOperandType() == typeof(string))
-                errMes += "文字列型";
+                errMes += GameMessages.T("String type");
             else
-                errMes += "不定型";
-            errMes += "に後置単項演算子\'" + OperatorManager.ToOperatorString(op) + "\'は適用できません";
+                errMes += GameMessages.T("Unknown type");
+            errMes += GameMessages.T(" cannot be used with the postfix unary operator \'") + OperatorManager.ToOperatorString(op) + GameMessages.T("\'");
             throw new CodeEE(errMes);
 		}
 		
@@ -166,18 +166,18 @@ namespace MinorShift.Emuera.GameData.Expression
 				return new FunctionMethodTerm(method, new IOperandTerm[] { left, right });
 			string errMes = "";
                 if (left.GetOperandType() == typeof(Int64))
-                    errMes += "数値型と";
+                    errMes += GameMessages.T("Number type");
                 else if (left.GetOperandType() == typeof(string))
-                    errMes += "文字列型と";
+                    errMes += GameMessages.T("String type");
                 else
-                    errMes += "不定型と";
+                    errMes += GameMessages.T("Unknown type");
                 if (right.GetOperandType() == typeof(Int64))
-                    errMes += "数値型の";
+                    errMes += GameMessages.T(" and number type");
                 else if (right.GetOperandType() == typeof(string))
-                    errMes += "文字列型の";
+                    errMes += GameMessages.T(" and string type");
                 else
-                    errMes += "不定型の";
-                errMes += "演算に二項演算子\'" + OperatorManager.ToOperatorString(op) + "\'は適用できません";
+                    errMes += GameMessages.T(" and unknown type");
+                errMes += GameMessages.T(" cannot be used with the binary operator \'") + OperatorManager.ToOperatorString(op) + GameMessages.T("\'");
                 throw new CodeEE(errMes);
 		}
 		
@@ -190,7 +190,7 @@ namespace MinorShift.Emuera.GameData.Expression
 				method = ternaryIntStrStr;
 			if (method != null)
 				return new FunctionMethodTerm(method, new IOperandTerm[] { o1, o2, o3 });
-			throw new CodeEE("三項演算子の使用法が不正です");
+			throw new CodeEE(GameMessages.T("Invalid use of the ternary operator"));
 			
 		}
 
@@ -284,9 +284,9 @@ namespace MinorShift.Emuera.GameData.Expression
 					value = arguments[1].GetIntValue(exm);
 				}
 				if (value < 0)
-					throw new CodeEE("文字列に負の値(" + value.ToString() + ")を乗算しようとしました");
+					throw new CodeEE(GameMessages.T("Attempted to multiply a string by a negative value (") + value.ToString() + GameMessages.T(")"));
 				if (value >= 10000)
-					throw new CodeEE("文字列に10000以上の値(" + value.ToString() + ")を乗算しようとしました");
+					throw new CodeEE(GameMessages.T("Attempted to multiply a string by a value of 10000 or more (") + value.ToString() + GameMessages.T(")"));
 				if ((str == "") || (value == 0))
 					return "";
                 StringBuilder builder = new StringBuilder
@@ -313,7 +313,7 @@ namespace MinorShift.Emuera.GameData.Expression
 	        {
 				Int64 right = arguments[1].GetIntValue(exm);
 				if (right == 0)
-					throw new CodeEE("0による除算が行なわれました");
+					throw new CodeEE(GameMessages.T("Division by zero was performed"));
 				return arguments[0].GetIntValue(exm) / right;
 			}
 		}
@@ -330,7 +330,7 @@ namespace MinorShift.Emuera.GameData.Expression
 	        {
 				Int64 right = arguments[1].GetIntValue(exm);
 				if (right == 0)
-					throw new CodeEE("0による除算が行なわれました");
+					throw new CodeEE(GameMessages.T("Division by zero was performed"));
 				return arguments[0].GetIntValue(exm) % right;
 			}
 		}

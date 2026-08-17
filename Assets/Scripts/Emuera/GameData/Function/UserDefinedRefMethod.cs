@@ -26,10 +26,10 @@ namespace MinorShift.Emuera.GameData.Function
 		}
 
 		/// <summary>
-		/// 戻り値とargumentの数・型の完全一致が必要
+		/// Requires exact match of return type, argument count, and argument types.
 		/// </summary>
 		/// <param name="call"></param>
-		/// <returns>一致ならtrue</returns>
+		/// <returns>true if they match</returns>
 		internal bool MatchType(CalledFunction call)
 		{
 			FunctionLabelLine label = call.TopLabel;
@@ -65,10 +65,10 @@ namespace MinorShift.Emuera.GameData.Function
 		}
 
 		/// <summary>
-		/// 戻り値とargumentの数・型の完全一致が必要
+		/// Requires exact match of return type, argument count, and argument types.
 		/// </summary>
 		/// <param name="rother"></param>
-		/// <returns>一致ならtrue</returns>
+		/// <returns>true if they match</returns>
 		internal bool MatchType(UserDefinedRefMethod rother)
 		{
 			if (RetType != rother.RetType)

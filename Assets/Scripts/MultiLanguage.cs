@@ -78,10 +78,7 @@ public static class MultiLanguage
             var value = kv.Value;
             if(key[0] == '<')
                 continue;
-            else if(key[0] == '[')
-            {
-                language_map[key] = value;
-            }
+            language_map[key] = value;
             var obj = GenericUtils.Get(key);
             if(obj == null)
                 continue;

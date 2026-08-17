@@ -85,7 +85,7 @@ namespace MinorShift.Emuera.GameProc
 		Int64 systemResult = 0;
 		int lastCalledComable = -1;
 		int lastAddCom = -1;
-		//(value in Train.csv・-1 if not defined) == comAble[(displayed value)];
+		//(value in Train.csv, or -1 if not defined) == comAble[(displayed value)];
 		int[] comAble;//
 
 
@@ -93,13 +93,13 @@ namespace MinorShift.Emuera.GameProc
 		{
 			//should not reach here during script execution
 			//if (!state.ScriptEnd)
-			//    throw new ExeEE("Invalid 呼び出し");
+			//    throw new ExeEE("Invalid call");
 
 			//there is currently no processing that passes something that doesn't exist
 			//if (systemProcessDictionary.ContainsKey(state.SystemState))
 			systemProcessDictionary[state.SystemState]();
 			//else
-			//    throw new ExeEE("未定義の状態");//undefined state
+			//    throw new ExeEE("Undefined state");
 
 		}
 
@@ -128,10 +128,10 @@ namespace MinorShift.Emuera.GameProc
 				if (!force)
 					return false;
 				else
-					throw new CodeEE("関数\"@" + functionName + "\"が見つかりません");
+					throw new CodeEE(GameMessages.T("Function \"@") + functionName + GameMessages.T("\" not found"));
 			//since even a non-event function only provides a single function's worth, the condition cannot possibly be met
-			//if ((!isEvent) && (call.Count > 1))
-			//    throw new ExeEE("イベント関数でない関数\"@" + functionName + "\"の候補が複数ある");
+		//if ((!isEvent) && (call.Count > 1))
+		//    throw new ExeEE("Multiple candidates for non-event function \"@" + functionName + "\"");
 			state.IntoFunction(call, null, null);
 			return true;
 		}
@@ -160,7 +160,7 @@ namespace MinorShift.Emuera.GameProc
 			if ((!noError) && (!Config.CompatiErrorLine))
 			{
 				console.PrintSystemLine(GameMessages.ErbCodeError);
-				console.PrintSystemLine(GameMessages.CompatibilityOptionHint + "「" + Config.GetConfigName(ConfigCode.CompatiErrorLine) + "」");
+				console.PrintSystemLine(GameMessages.CompatibilityOptionHint + GameMessages.T(" \"") + Config.GetConfigName(ConfigCode.CompatiErrorLine) + GameMessages.T("\""));
 				console.PrintSystemLine(GameMessages.OutputLogToFile);
 				console.OutputLog(Program.ExeDir + "emuera.log");
 				console.noOutputLog = true;
@@ -712,7 +712,7 @@ namespace MinorShift.Emuera.GameProc
 					}
 					else
 					{
-						//console.Print("お金が足りません。");
+						//console.Print("Not enough money.");
 						//console.NewLine();
 						console.deleteLine(1);
 						console.PrintTemporaryLine(GameMessages.NotEnoughMoney);
@@ -720,7 +720,7 @@ namespace MinorShift.Emuera.GameProc
 				}
 				else
 				{
-					//console.Print("売っていません。");
+					//console.Print("Not for sale.");
 					//console.NewLine();
 					console.deleteLine(1);
 					console.PrintTemporaryLine(GameMessages.NotForSale);
@@ -864,7 +864,7 @@ namespace MinorShift.Emuera.GameProc
 				state.SystemState = SystemStateCode.LoadGameOpenning_WaitInput;
 			//properly processed so never reach here
 			//else
-			//    throw new ExeEE("異常な状態");
+			//    throw new ExeEE("Abnormal state");
 		}
 
 		int saveTarget = -1;
@@ -991,8 +991,8 @@ namespace MinorShift.Emuera.GameProc
 				return;
 			}
 
-			if (!vEvaluator.LoadFrom((int)systemResult))
-				throw new ExeEE("ファイルのロード中に予期しないErrorが発生しました");
+		if (!vEvaluator.LoadFrom((int)systemResult))
+			throw new ExeEE(GameMessages.T("An unexpected error occurred while loading the file"));
 			deletePrevState();
 			beginDataLoaded();
 		}
@@ -1000,7 +1000,7 @@ namespace MinorShift.Emuera.GameProc
 
 		void endNormal()
 		{
-			throw new CodeEE("予期しないスクリプト終端です");
+			throw new CodeEE(GameMessages.T("Unexpected end of script"));
 		}
 
 		void endReloaderb()

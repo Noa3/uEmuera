@@ -159,7 +159,7 @@ namespace uEmuera.Forms
     {
         public static DialogResult Show(string text)
         {
-            return Show(text, "提示");
+            return Show(text, GameMessages.T("Notice"));
         }
         public static DialogResult Show(string text, string caption)
         {
@@ -190,8 +190,10 @@ namespace uEmuera.Forms
     {
         public Point PointToClient(object mousePosition)
         {
-            //throw new NotImplementedException();
-            return Point.Empty;
+            // EmueraCoordinateMapper publishes client coordinates through
+            // Control.MousePosition. Keep this adapter total for legacy callers
+            // that still pass the value as object.
+            return mousePosition is Point point ? point : Point.Empty;
         }
         public Rectangle ClientRectangle;
         public int Width { get { return ClientRectangle.Width; } }
@@ -202,14 +204,24 @@ namespace uEmuera.Forms
     {
         internal void RemoveAll()
         {
-            throw new NotImplementedException();
+            Target = null;
+            Text = null;
+            Visible = false;
+            Changed?.Invoke(this, EventArgs.Empty);
         }
 
         internal void SetToolTip(PictureBox mainPicBox, string title)
         {
-            throw new NotImplementedException();
+            Target = mainPicBox;
+            Text = title;
+            Visible = !string.IsNullOrEmpty(title);
+            Changed?.Invoke(this, EventArgs.Empty);
         }
 
+        public event EventHandler Changed;
+        public PictureBox Target { get; private set; }
+        public string Text { get; private set; }
+        public bool Visible { get; private set; }
         public uEmuera.Drawing.Color ForeColor;
         public uEmuera.Drawing.Color BackColor;
         public int InitialDelay = 0;

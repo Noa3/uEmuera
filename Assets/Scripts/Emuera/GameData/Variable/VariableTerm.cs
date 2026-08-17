@@ -126,7 +126,7 @@ namespace MinorShift.Emuera.GameData.Variable
 				if ((e is IndexOutOfRangeException) || (e is ArgumentOutOfRangeException) || (e is OverflowException))
 				{
 					Identifier.CheckElement(transporter);
-					throw new CodeEE("配列変数" + Identifier.Name + "の要素数を超えて代入しようとしました");
+					throw new CodeEE(GameMessages.T("Attempted to assign a value beyond the element count of array variable ") + Identifier.Name);
 				}
 				throw;
 			}
@@ -145,7 +145,7 @@ namespace MinorShift.Emuera.GameData.Variable
 				if ((e is IndexOutOfRangeException) || (e is ArgumentOutOfRangeException) || (e is OverflowException))
 				{
 					Identifier.CheckElement(transporter);
-					throw new CodeEE("配列変数" + Identifier.Name + "の要素数を超えて代入しようとしました");
+					throw new CodeEE(GameMessages.T("Attempted to assign a value beyond the element count of array variable ") + Identifier.Name);
 				}
 				throw;
 			}
@@ -412,27 +412,27 @@ namespace MinorShift.Emuera.GameData.Variable
 			this.allArgIsConst = true;
 		}
 		public override Int64 GetIntValue(ExpressionMediator exm)
-		{ throw new CodeEE("変数" + Identifier.Name + "に必要なargumentが不足しています"); }
+		{ throw new CodeEE(GameMessages.T("Variable ") + Identifier.Name + GameMessages.T(" is missing the required argument")); }
 		public override string GetStrValue(ExpressionMediator exm)
-		{ throw new CodeEE("変数" + Identifier.Name + "に必要なargumentが不足しています"); }
+		{ throw new CodeEE(GameMessages.T("Variable ") + Identifier.Name + GameMessages.T(" is missing the required argument")); }
 		public override void SetValue(Int64 value, ExpressionMediator exm)
-		{ throw new CodeEE("変数" + Identifier.Name + "に必要なargumentが不足しています"); }
+		{ throw new CodeEE(GameMessages.T("Variable ") + Identifier.Name + GameMessages.T(" is missing the required argument")); }
 		public override void SetValue(string value, ExpressionMediator exm)
-		{ throw new CodeEE("変数" + Identifier.Name + "に必要なargumentが不足しています"); }
+		{ throw new CodeEE(GameMessages.T("Variable ") + Identifier.Name + GameMessages.T(" is missing the required argument")); }
 		public override void SetValue(Int64[] array, ExpressionMediator exm)
-		{ throw new CodeEE("変数" + Identifier.Name + "に必要なargumentが不足しています"); }
+		{ throw new CodeEE(GameMessages.T("Variable ") + Identifier.Name + GameMessages.T(" is missing the required argument")); }
 		public override void SetValue(string[] array, ExpressionMediator exm)
-		{ throw new CodeEE("変数" + Identifier.Name + "に必要なargumentが不足しています"); }
+		{ throw new CodeEE(GameMessages.T("Variable ") + Identifier.Name + GameMessages.T(" is missing the required argument")); }
 		public override Int64 PlusValue(Int64 value, ExpressionMediator exm)
-		{ throw new CodeEE("変数" + Identifier.Name + "に必要なargumentが不足しています"); }
+		{ throw new CodeEE(GameMessages.T("Variable ") + Identifier.Name + GameMessages.T(" is missing the required argument")); }
 		public override SingleTerm GetValue(ExpressionMediator exm)
-		{ throw new CodeEE("変数" + Identifier.Name + "に必要なargumentが不足しています"); }
+		{ throw new CodeEE(GameMessages.T("Variable ") + Identifier.Name + GameMessages.T(" is missing the required argument")); }
 		public override void SetValue(SingleTerm value, ExpressionMediator exm)
-		{ throw new CodeEE("変数" + Identifier.Name + "に必要なargumentが不足しています"); }
+		{ throw new CodeEE(GameMessages.T("Variable ") + Identifier.Name + GameMessages.T(" is missing the required argument")); }
 		public override void SetValue(IOperandTerm value, ExpressionMediator exm)
-		{ throw new CodeEE("変数" + Identifier.Name + "に必要なargumentが不足しています"); }
+		{ throw new CodeEE(GameMessages.T("Variable ") + Identifier.Name + GameMessages.T(" is missing the required argument")); }
 		public override FixedVariableTerm GetFixedVariableTerm(ExpressionMediator exm)
-		{ throw new CodeEE("変数" + Identifier.Name + "に必要なargumentが不足しています"); }
+		{ throw new CodeEE(GameMessages.T("Variable ") + Identifier.Name + GameMessages.T(" is missing the required argument")); }
 
 		public override IOperandTerm Restructure(ExpressionMediator exm)
 		{

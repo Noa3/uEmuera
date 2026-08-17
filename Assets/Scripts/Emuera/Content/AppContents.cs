@@ -161,7 +161,10 @@ namespace MinorShift.Emuera.Content
 				return true;
 			try
 			{
-				// Pre-index all image files for fast case-insensitive lookups
+				// Single authoritative resource scan: builds GameResourceCatalog first,
+				// then SpriteManager.InitializeFileIndex delegates to it (one directory
+				// walk instead of separate walks — Phase 6 #26).
+				uEmuera.GameResourceCatalog.Scan(Program.ContentDir);
 				SpriteManager.InitializeFileIndex(Program.ContentDir);
 				
 				//Search all csv files in the resources folder (recursive, matching reference Emuera behavior)
@@ -193,7 +196,7 @@ namespace MinorShift.Emuera.Content
 					string directory = Path.GetDirectoryName(filepath) + "/";
 					string filename = Path.GetFileName(filepath);
                     //string[] lines = File.ReadAllLines(filepath, Config.Encode);
-                    string[] lines = uEmuera.Utils.GetResourceCSVLines(filepath, Config.Encode);
+                    string[] lines = uEmuera.Utils.GetResourceCSVLines(filepath, EraEncoding.Detect(filepath));
 					int lineNo = 0;
                     var linecount = lines.Length;
                     for (var l=0; l<linecount; ++l)

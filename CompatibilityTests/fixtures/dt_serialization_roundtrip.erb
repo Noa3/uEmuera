@@ -1,0 +1,13 @@
+; Reference capture: EvilMask/Emuera.EM+EE @ 2175f8a629257efb08214e093704b3a3d3d06d05
+@SYSTEM_TITLE
+DT_CREATE "test"
+DT_COLUMN_ADD "test", "name", "string"
+DT_COLUMN_ADD "test", "count", "int16"
+DT_COLUMN_OPTIONS "test", "name", DEFAULT, "unset"
+DT_COLUMN_OPTIONS "test", "count", DEFAULT, 7
+DT_ROW_ADD "test"
+#DIM schema
+#DIM data
+PRINTVL DT_TOXML("test", schema, data)
+DT_RELEASE "test"
+PRINTVL DT_FROMXML("test", schema, data)

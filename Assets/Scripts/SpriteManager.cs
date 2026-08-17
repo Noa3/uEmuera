@@ -3,6 +3,7 @@ using System.IO;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using UnityEngine;
 using MinorShift.Emuera.Content;
 using uEmuera.Drawing;
@@ -30,62 +31,102 @@ internal static class SpriteManager
     static readonly HashSet<string> missing_files_cache_ = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
     static readonly object missing_files_lock = new object();
     
+    // ---- Shared transparent placeholder (Phase 6 #35/#36) -------------------
+    // One 4×4 fully-transparent Texture2D shared for the lifetime of the process.
+    // Never put in texture_dict, never evicted. Its refcount starts at 1 and is
+    // never decremented to 0, so the TextureInfo is never freed.
+    static Texture2D shared_placeholder_tex_ = null;
+    static TextureInfo shared_placeholder_ti_ = null;
+    static Sprite shared_placeholder_sprite_ = null;
+    static readonly object shared_placeholder_lock_ = new object();
+
     /// <summary>
-    /// Creates a placeholder transparent texture for missing images.
+    /// Returns (lazily creating once) the shared transparent placeholder texture.
+    /// Must be called on the Unity main thread.
     /// </summary>
-    static Texture2D CreatePlaceholderTexture(int width = 64, int height = 64)
+    static Texture2D GetOrCreateSharedPlaceholderTex()
+    {
+        if (shared_placeholder_tex_ != null)
+            return shared_placeholder_tex_;
+        lock (shared_placeholder_lock_)
+        {
+            if (shared_placeholder_tex_ != null)
+                return shared_placeholder_tex_;
+            var tex = new Texture2D(4, 4, TextureFormat.RGBA32, false);
+            var px = new UnityEngine.Color[16];
+            tex.SetPixels(px);
+            tex.Apply();
+            shared_placeholder_tex_ = tex;
+            shared_placeholder_ti_ = new TextureInfo("__shared_placeholder__", tex);
+            // Anchor refcount at 1 so the TextureInfo is never freed.
+            shared_placeholder_ti_.refcount = 1;
+            shared_placeholder_sprite_ = Sprite.Create(tex, new Rect(0, 0, 4, 4), Vector2.zero);
+            return tex;
+        }
+    }
+
+    /// <summary>
+    /// Creates a placeholder transparent texture (legacy; used only where a fresh
+    /// Texture2D is genuinely required, e.g. an existing TextureInfo already in cache).
+    /// Prefer <see cref="GetOrCreateSharedPlaceholderTex"/> for standalone placeholders.
+    /// </summary>
+    static Texture2D CreatePlaceholderTexture(int width = 4, int height = 4)
     {
         var tex = new Texture2D(width, height, TextureFormat.RGBA32, false);
-        var transparentColor = new UnityEngine.Color(0f, 0f, 0f, 0f);
         var pixels = new UnityEngine.Color[width * height];
-        for (int i = 0; i < pixels.Length; i++)
-            pixels[i] = transparentColor;
         tex.SetPixels(pixels);
         tex.Apply();
         return tex;
     }
 
     /// <summary>
-    /// Creates and stores a placeholder TextureInfo.
+    /// Creates and stores a placeholder TextureInfo for <paramref name="name"/>,
+    /// reusing the shared placeholder Texture2D so no extra allocation occurs.
     /// </summary>
     static TextureInfo CreateAndStorePlaceholder(string name, Bitmap baseimage = null)
     {
-        var placeholderTex = CreatePlaceholderTexture();
-        var ti = new TextureInfo(name, placeholderTex);
+        GetOrCreateSharedPlaceholderTex();
+        // The placeholder TextureInfo stored in texture_dict wraps the shared texture
+        // so Sprite.Create uses the same pixels, but lives as an independent dict entry.
+        var ti = new TextureInfo(name, shared_placeholder_tex_);
         lock(texture_dict_lock)
         {
             if (!texture_dict.ContainsKey(name))
                 texture_dict.Add(name, ti);
+            else
+                ti = texture_dict[name]; // another thread raced; discard ours
         }
         if (baseimage != null)
         {
-            baseimage.size.Width = placeholderTex.width;
-            baseimage.size.Height = placeholderTex.height;
+            // Do NOT use placeholder dimensions as logical image dimensions.
+            // (Phase 6 #35 — placeholder size must not alter layout)
+            // Leave baseimage.size unchanged if it was already set.
         }
         return ti;
     }
 
     /// <summary>
-    /// Creates a placeholder SpriteInfo.
+    /// Returns a placeholder SpriteInfo backed by the shared transparent placeholder.
+    /// No new Texture2D is allocated.
     /// </summary>
     static SpriteInfo CreatePlaceholderSpriteInfo(string name)
     {
-        var placeholderTex = CreatePlaceholderTexture();
-        var ti = new TextureInfo($"_placeholder_{name}", placeholderTex);
-        return CreateSpriteInfoFromTexture(ti, placeholderTex);
+        GetOrCreateSharedPlaceholderTex();
+        return new SpriteInfo(shared_placeholder_ti_, shared_placeholder_sprite_);
     }
     
     /// <summary>
-    /// Creates a placeholder SpriteInfo for an existing TextureInfo.
+    /// Creates a placeholder SpriteInfo for an existing TextureInfo using the shared
+    /// placeholder texture (no new Texture2D allocated).
     /// </summary>
     static SpriteInfo CreatePlaceholderSpriteInfoForTexture(TextureInfo parentTexture)
     {
-        var placeholderTex = CreatePlaceholderTexture();
-        return CreateSpriteInfoFromTexture(parentTexture, placeholderTex);
+        GetOrCreateSharedPlaceholderTex();
+        return new SpriteInfo(parentTexture, shared_placeholder_sprite_);
     }
     
     /// <summary>
-    /// Creates a SpriteInfo from a texture.
+    /// Creates a SpriteInfo from a specific texture.
     /// </summary>
     static SpriteInfo CreateSpriteInfoFromTexture(TextureInfo textureInfo, Texture2D texture)
     {
@@ -123,6 +164,23 @@ internal static class SpriteManager
         if (!Directory.Exists(resourcesDirectory))
         {
             Debug.LogWarning($"SpriteManager: Resources directory not found: {resourcesDirectory}");
+            return;
+        }
+
+        // Prefer the GameResourceCatalog when it has already scanned this directory.
+        // This avoids a second full directory walk (Phase 6 #26 — one scan per game).
+        var cat = uEmuera.GameResourceCatalog.Instance;
+        if (cat != null && cat.IsReady &&
+            string.Equals(cat.RootDir, resourcesDirectory, StringComparison.OrdinalIgnoreCase))
+        {
+            var sw = System.Diagnostics.Stopwatch.StartNew();
+            lock (file_index_lock)
+            {
+                cat.ExportFileIndex(file_index_);
+                file_index_initialized_ = true;
+            }
+            sw.Stop();
+            Debug.Log($"SpriteManager: File index built from GameResourceCatalog ({file_index_.Count} entries) in {sw.ElapsedMilliseconds}ms");
             return;
         }
         
@@ -406,9 +464,20 @@ internal static class SpriteManager
             this.obj = obj;
             this.callback = callback;
             this.target_alive = obj != null ? true : false;
+            // Capture the session ID so we can discard results from old sessions.
+            // (Phase 6 #38 / GameSession)
+            this.sessionId = MinorShift.Emuera.GameProc.GameSession.Current;
         }
         public void DoCallback(SpriteInfo info)
         {
+            // Stale-callback guard: discard if the game session changed since this
+            // request was created (e.g. restart, game-switch, screen transition).
+            // This prevents old-session images from landing on new GameObjects.
+            if (!MinorShift.Emuera.GameProc.GameSession.IsValid(sessionId))
+            {
+                GivebackSpriteInfo(info);
+                return;
+            }
             // Validate that the target object is still alive (not destroyed)
             // This prevents callbacks from executing on deleted GameObjects
             if (obj != null && target_alive)
@@ -433,34 +502,33 @@ internal static class SpriteManager
         internal object obj;
         Action<object, SpriteInfo> callback;
         bool target_alive;
+        readonly int sessionId;
     }
+
+    static bool services_started_ = false;
 
     public static void Init()
     {
-#if UNITY_EDITOR
-        kPastTime = 300.0f;
-        GenericUtils.StartCoroutine(Update());
-        GenericUtils.StartCoroutine(UpdateRenderOP());
-        GenericUtils.StartCoroutine(UpdateGraphicsSurface());
-#else
+        // Memory size influences CACHE POLICY only (how long unused textures are
+        // retained before eviction), never whether essential engine services run.
+        // (Phase 6 #41/#42: G*/CBG and render-op processing cannot depend on RAM.)
         var memorysize = SystemInfo.systemMemorySize;
         if(memorysize <= 4096)
-        {
             kPastTime = 300.0f;
-            GenericUtils.StartCoroutine(Update());
-
-        }
         else if(memorysize <= 8192)
-        {
             kPastTime = 600.0f;
-            GenericUtils.StartCoroutine(Update());
-            GenericUtils.StartCoroutine(UpdateRenderOP());
-        }
-        //else
-        //{
-            //
-        //}
-#endif
+        else
+            kPastTime = 900.0f;
+
+        // Essential services must run on every platform and RAM size. The coroutine
+        // host (CoroutineHelper) is persistent and never stopped, and Init() is called
+        // on every game start, so start the infinite-loop services exactly once.
+        if(services_started_)
+            return;
+        services_started_ = true;
+        GenericUtils.StartCoroutine(UpdateGraphicsSurface()); // G*/CBG pending main-thread ops
+        GenericUtils.StartCoroutine(UpdateRenderOP());        // texture / render-texture creation
+        GenericUtils.StartCoroutine(Update());                // unused-texture cache eviction
     }
     public static void GetSprite(ASprite src, 
                                 object obj, Action<object, SpriteInfo> callback)
@@ -531,6 +599,7 @@ internal static class SpriteManager
                 {
                     list = new List<CallbackInfo> { item };
                     loading_set.Add(basename, list);
+                    // High priority (default): user-facing sprite load.
                     GenericUtils.StartCoroutine(Loading(src.Bitmap));
                 }
             }
@@ -576,6 +645,7 @@ internal static class SpriteManager
             try
             {
                 var content = File.ReadAllBytes(pathToLoad);
+                LoadedFileTracker.Track(pathToLoad);
                 if (content == null || content.Length == 0)
                 {
                     return CreateAndStorePlaceholder(name);
@@ -805,9 +875,9 @@ internal static class SpriteManager
 
                     if (!alreadyLoaded)
                     {
-                        // Start loading in background via coroutine
-                        // The Loading coroutine already handles yielding appropriately
-                        yield return Loading(sprite.Bitmap);
+                        // Start loading in background via coroutine (low priority:
+                        // preloads must never delay user-facing loads in the I/O gate).
+                        yield return Loading(sprite.Bitmap, lowPriority: true);
                     }
                 }
             }
@@ -850,7 +920,11 @@ internal static class SpriteManager
         {
             stats.PreloadQueueCount = preload_queue_.Count;
         }
-        
+
+        stats.ActiveIoReads    = AsyncIoGate.ActiveReads;
+        stats.PendingIoReads   = AsyncIoGate.PendingHigh;
+        stats.LowPriorityIoReads = AsyncIoGate.PendingLow;
+
         return stats;
     }
 
@@ -865,16 +939,20 @@ internal static class SpriteManager
         public int MissingFilesCachedCount;
         public int LoadingInProgressCount;
         public int PreloadQueueCount;
+        public int ActiveIoReads;
+        public int PendingIoReads;
+        public int LowPriorityIoReads;
 
         public override string ToString()
         {
             return $"SpriteManager Stats: Loaded={LoadedTexturesCount}, " +
                    $"Indexed={IndexedFilesCount}, Missing={MissingFilesCachedCount}, " +
-                   $"Loading={LoadingInProgressCount}, Preload={PreloadQueueCount}";
+                   $"Loading={LoadingInProgressCount}, Preload={PreloadQueueCount}, " +
+                   $"IoActive={ActiveIoReads}, IoPending={PendingIoReads}, IoLow={LowPriorityIoReads}";
         }
     }
 
-    static IEnumerator Loading(Bitmap baseimage)
+    static IEnumerator Loading(Bitmap baseimage, bool lowPriority = false)
     {
         TextureInfo ti = null;
         string pathToLoad = NormalizePathSeparators(baseimage.path);
@@ -898,71 +976,111 @@ internal static class SpriteManager
             // Try Unicode normalized search for Japanese filenames
             var unicodeResolved = TryUnicodeNormalizedSearch(pathToLoad);
             if (!string.IsNullOrEmpty(unicodeResolved))
-                    {
-                        pathToLoad = unicodeResolved;
-                    }
-                }
+                pathToLoad = unicodeResolved;
+        }
         
-                if(File.Exists(pathToLoad))
-                {
-                    byte[] content = null;
-                    try
-                    {
-                        content = File.ReadAllBytes(pathToLoad);
-                    }
-                    catch (Exception ex)
-                    {
-                        Debug.LogError($"SpriteManager: Failed to read '{pathToLoad}': {ex.Message}");
-                    }
+        if (!File.Exists(pathToLoad))
+        {
+            MarkAsMissing(baseimage.path);
+            ti = CreateAndStorePlaceholder(baseimage.filename, baseimage);
+            ProcessLoadingCallbacks(baseimage.filename, ti);
+            yield break;
+        }
 
-                    if (content != null && content.Length > 0)
-                    {
-                        TextureFormat format = TextureFormat.RGBA32;
-                        var extname = uEmuera.Utils.GetSuffix(pathToLoad).ToLower();
+        // ---- Read bytes through the bounded async I/O gate (Phase 6 #32–#34) ----
+        // Unbounded Task.Run per image let a screen switch spawn hundreds of reads;
+        // AsyncIoGate caps concurrency (MaxConcurrentReads) and gives user-facing
+        // loads (high priority) precedence over preloads (low priority).
+        byte[] content = null;
+        Exception readEx = null;
+        bool readDone = false;
+        var sessionAtRequest = MinorShift.Emuera.GameProc.GameSession.Current;
 
-                        if (extname == "webp")
-                        {
-                            var tex = Texture2DExt.CreateTexture2DFromWebP(content, false, false, out Error err);
-                            if (err == Error.Success)
-                            {
-                                ti = new TextureInfo(baseimage.filename, tex);
-                                lock(texture_dict_lock)
-                                {
-                                    if (!texture_dict.ContainsKey(baseimage.filename))
-                                        texture_dict.Add(baseimage.filename, ti);
-                                    baseimage.size.Width = tex.width;
-                                    baseimage.size.Height = tex.height;
-                                }
-                            }
-                        }
-                        else
-                        {
-                            var tex = new Texture2D(2, 2, format, false);
-                            if (tex.LoadImage(content))
-                            {
-                                ti = new TextureInfo(baseimage.filename, tex);
-                                lock(texture_dict_lock)
-                                {
-                                    if (!texture_dict.ContainsKey(baseimage.filename))
-                                        texture_dict.Add(baseimage.filename, ti);
-                                    baseimage.size.Width = tex.width;
-                                    baseimage.size.Height = tex.height;
-                                }
-                            }
-                        }
-                    }
-                }
-        
-                // If loading failed, create placeholder and mark as missing
-                if (ti == null)
-                {
-                    MarkAsMissing(baseimage.path);
-                    ti = CreateAndStorePlaceholder(baseimage.filename, baseimage);
-                }
-        
-                ProcessLoadingCallbacks(baseimage.filename, ti);
-                yield break;
+        Task<byte[]> readTask = AsyncIoGate.ReadAllBytesAsync(pathToLoad, lowPriority);
+        readTask.ContinueWith(t =>
+        {
+            try
+            {
+                if (t.IsFaulted)
+                    readEx = (t.Exception != null && t.Exception.InnerExceptions.Count > 0)
+                        ? t.Exception.InnerExceptions[0]
+                        : new Exception("Unknown file read failure");
+                else
+                    content = t.Result;
             }
+            finally
+            {
+                readDone = true;
+            }
+        }, TaskScheduler.Default);
+
+        // Yield frames until the read completes (main thread remains responsive).
+        while (!readDone)
+            yield return null;
+
+        if (content != null)
+            LoadedFileTracker.Track(pathToLoad);
+
+        // If the game session changed while we were waiting, discard stale content.
+        if (!MinorShift.Emuera.GameProc.GameSession.IsValid(sessionAtRequest))
+        {
+            ProcessLoadingCallbacks(baseimage.filename, null);
+            yield break;
+        }
+
+        if (readEx != null)
+        {
+            Debug.LogError($"SpriteManager: Failed to read '{pathToLoad}': {readEx.Message}");
+        }
+
+        // ---- Texture creation: must happen on the Unity main thread ----------
+        if (content != null && content.Length > 0)
+        {
+            TextureFormat format = TextureFormat.RGBA32;
+            var extname = uEmuera.Utils.GetSuffix(pathToLoad).ToLower();
+
+            if (extname == "webp")
+            {
+                var tex = Texture2DExt.CreateTexture2DFromWebP(content, false, false, out Error err);
+                if (err == Error.Success)
+                {
+                    ti = new TextureInfo(baseimage.filename, tex);
+                    lock(texture_dict_lock)
+                    {
+                        if (!texture_dict.ContainsKey(baseimage.filename))
+                            texture_dict.Add(baseimage.filename, ti);
+                        baseimage.size.Width = tex.width;
+                        baseimage.size.Height = tex.height;
+                    }
+                }
+            }
+            else
+            {
+                var tex = new Texture2D(2, 2, format, false);
+                if (tex.LoadImage(content))
+                {
+                    ti = new TextureInfo(baseimage.filename, tex);
+                    lock(texture_dict_lock)
+                    {
+                        if (!texture_dict.ContainsKey(baseimage.filename))
+                            texture_dict.Add(baseimage.filename, ti);
+                        baseimage.size.Width = tex.width;
+                        baseimage.size.Height = tex.height;
+                    }
+                }
+            }
+        }
+        
+        // If loading failed, create placeholder and mark as missing
+        if (ti == null)
+        {
+            MarkAsMissing(baseimage.path);
+            ti = CreateAndStorePlaceholder(baseimage.filename, baseimage);
+        }
+        
+        ProcessLoadingCallbacks(baseimage.filename, ti);
+        yield break;
+    }
     
     /// <summary>
     /// Processes callbacks for loaded textures.
@@ -1049,13 +1167,16 @@ internal static class SpriteManager
     }
     /// <summary>
     /// Runs pending Graphics (G) main-thread blit operations on the Unity main thread
-    /// once per frame. CPU-only operations never enter this queue.
+    /// once per frame. CPU-only operations never enter this queue. Also pumps the
+    /// thread-safe loading-status channel so interpreter/background threads never touch
+    /// Unity UI directly (Phase 6 #44).
     /// </summary>
     static IEnumerator UpdateGraphicsSurface()
     {
         while(true)
         {
             AppContents.ExecutePendingGraphicsOps();
+            GenericUtils.PumpLoadingStatus();
             yield return null;
         }
     }
@@ -1064,11 +1185,15 @@ internal static class SpriteManager
     {
         while(true)
         {
-            do
+            // Drain ready render operations on the next frame rather than after a
+            // multi-second poll interval (Phase 6 #43). When nothing is queued we
+            // simply wait for the next frame.
+            if(texture_other_threads.Count == 0
+                && render_texture_other_threads.Count == 0)
             {
-                yield return new WaitForSeconds(15);
-            } while(texture_other_threads.Count == 0
-                && render_texture_other_threads.Count == 0);
+                yield return null;
+                continue;
+            }
 
             TextureInfo ti = null;
             if(texture_other_threads.Count > 0)
@@ -1101,6 +1226,7 @@ internal static class SpriteManager
                 }
                 render_texture_other_threads.Clear();
             }
+            yield return null;
         }
     }
     internal static void ForceClear()
@@ -1132,6 +1258,9 @@ internal static class SpriteManager
             preload_queue_.Clear();
             preload_in_progress_ = false;
         }
+        // Clear the GameResourceCatalog so the next game starts with a fresh scan.
+        // (Phase 6 — GameResourceCatalog lifecycle)
+        uEmuera.GameResourceCatalog.Clear();
         GC.Collect();
     }
     internal static void SetResourceCSVLine(string filename, string[] lines)

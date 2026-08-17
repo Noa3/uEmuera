@@ -146,7 +146,7 @@ namespace MinorShift.Emuera.GameProc
 			{
 				//a state with no executing function only exists for some system INPUT, so in relation to reaching here only via GOTO-type processing, the precondition cannot be met
 				//if (functionList.Count == 0)
-				//    throw new ExeEE("実行中関数がない");//no executing function
+				//    throw new ExeEE("No executing function");//no executing function
 				return functionList[functionList.Count - 1];
 			}
 		}
@@ -197,7 +197,7 @@ namespace MinorShift.Emuera.GameProc
 				case "TITLE":
 					SetBegin(BeginType.TITLE); return;
 			}
-			throw new CodeEE("BEGINのキーワード\"" + keyword + "\"は未定義です");
+			throw new CodeEE(GameMessages.T("BEGIN keyword \"") + keyword + GameMessages.T("\" is undefined"));
 		}
 
 		public void SetBegin(BeginType type)
@@ -222,14 +222,14 @@ namespace MinorShift.Emuera.GameProc
 					break;
 				//already checked during BEGIN processing
 				//default:
-				//    throw new ExeEE("不適当なBEGIN呼び出し");
+				//    throw new ExeEE("Inappropriate BEGIN call");
 			}
 			begintype = type;
 			return;
 		err:
 			CalledFunction func = functionList[0];
 			string funcName = func.FunctionName;
-			throw new CodeEE("@" + funcName + "中で" + errmes + "命令を実行することはできません");
+			throw new CodeEE("@" + funcName + GameMessages.T(": the ") + errmes + GameMessages.T(" command cannot be executed"));
 		}
 
 		public void SaveLoadData(bool saveData)
@@ -295,7 +295,7 @@ namespace MinorShift.Emuera.GameProc
 					break;
 				//judged at set time, so should never reach here
 				//default:
-				//    throw new ExeEE("不適当なBEGIN呼び出し");
+				//    throw new ExeEE("Inappropriate BEGIN call");
 			}
 			if (Program.DebugMode)
 			{
@@ -345,7 +345,7 @@ namespace MinorShift.Emuera.GameProc
 				//only called from script execution processing, so should not be case here... probably
 				//if (functionList.Count == 0)
 				//{
-				//    throw new ExeEE("実行中の関数が存在しません");
+				//    throw new ExeEE("No executing function exists");
 				//}
 				if (functionList.Count == 0)
 					return null;//1756 now called from debug commands
@@ -364,7 +364,7 @@ namespace MinorShift.Emuera.GameProc
 			//all callers are script processing
 			//if (functionList.Count == 0)
 			//{
-			//    throw new ExeEE("実行中の関数が存在しません");
+			//    throw new ExeEE("No executing function exists");
 			//}
 			CalledFunction called = functionList[functionList.Count - 1];
 			if (called.IsJump)
@@ -428,7 +428,7 @@ namespace MinorShift.Emuera.GameProc
 			else if (Program.DebugMode)
 			{
 				FunctionLabelLine label = called.CurrentLabel;
-				console.DebugAddTraceLog("CALL :@" + label.LabelName + ":" + label.Position.ToString() + "行目");
+				console.DebugAddTraceLog("CALL :@" + label.LabelName + ":" + label.Position.ToString() + GameMessages.T(" line"));
 			}
             lineCount++;
             //ShfitNextLine();
@@ -443,16 +443,16 @@ namespace MinorShift.Emuera.GameProc
 				foreach (CalledFunction called in functionList)
 				{
 					if (called.IsEvent)
-						throw new CodeEE("EVENT関数の解決前にCALLEVENT命令が行われました");
+						throw new CodeEE(GameMessages.T("CALLEVENT instruction executed before EVENT function resolution"));
 				}
 			}
 			if (Program.DebugMode)
 			{
 				FunctionLabelLine label = call.CurrentLabel;
 				if (call.IsJump)
-					console.DebugAddTraceLog("JUMP :@" + label.LabelName + ":" + label.Position.ToString() + "行目");
+					console.DebugAddTraceLog("JUMP :@" + label.LabelName + ":" + label.Position.ToString() + GameMessages.T(" line"));
 				else
-					console.DebugAddTraceLog("CALL :@" + label.LabelName + ":" + label.Position.ToString() + "行目");
+					console.DebugAddTraceLog("CALL :@" + label.LabelName + ":" + label.Position.ToString() + GameMessages.T(" line"));
 			}
             if (srcArgs != null)
             {
@@ -503,14 +503,14 @@ namespace MinorShift.Emuera.GameProc
 		{
 			//should already be checked at load time
 			//if (!IsFunctionMethod)
-			//    throw new ExeEE("ReturnFと#FUNCTIONのチェックがおかしい");
+			//    throw new ExeEE("The ReturnF/#FUNCTION check is wrong");
 			//sequential = false;//not sequential either way anyway
 			//callers are only the RETURNF command or function end
 			//if (functionList.Count == 0)
-			//    throw new ExeEE("実行中の関数が存在しません");
+			//    throw new ExeEE("No executing function exists");
 			//since this is a non-event call, this cannot happen
 			//else if (functionList.Count != 1)
-			//    throw new ExeEE("関数が複数ある");
+			//    throw new ExeEE("There are multiple functions");
 			if (Program.DebugMode)
 			{
 				console.DebugRemoveTraceLog();

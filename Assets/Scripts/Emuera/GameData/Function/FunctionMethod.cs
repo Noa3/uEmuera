@@ -36,8 +36,8 @@ namespace MinorShift.Emuera.GameData.Function
 		public bool HasUniqueRestructure { get; protected set; }
 
 		//actual calculation.
-		public virtual Int64 GetIntValue(ExpressionMediator exm, IOperandTerm[] arguments) { throw new ExeEE("戻り値の型が違う or 未実装"); }
-		public virtual string GetStrValue(ExpressionMediator exm, IOperandTerm[] arguments) { throw new ExeEE("戻り値の型が違う or 未実装"); }
+		public virtual Int64 GetIntValue(ExpressionMediator exm, IOperandTerm[] arguments) { throw new ExeEE(GameMessages.T("Return type mismatch or not implemented")); }
+		public virtual string GetStrValue(ExpressionMediator exm, IOperandTerm[] arguments) { throw new ExeEE(GameMessages.T("Return type mismatch or not implemented")); }
 		public virtual SingleTerm GetReturnValue(ExpressionMediator exm, IOperandTerm[] arguments)
 		{
 			if (ReturnType == typeof(Int64))
@@ -53,7 +53,7 @@ namespace MinorShift.Emuera.GameData.Function
 		/// <param name="arguments"></param>
 		/// <returns></returns>
 		public virtual bool UniqueRestructure(ExpressionMediator exm, IOperandTerm[] arguments)
-		{ throw new ExeEE("未実装？"); }
+		{ throw new ExeEE(GameMessages.T("Not implemented?")); }
 
 
 		internal void SetMethodName(string name)

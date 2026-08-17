@@ -582,6 +582,7 @@ namespace MinorShift.Emuera.GameView
 		/// ToolTip???????????????
 		/// </summary>
 		ConsoleButtonString pointingString = null;
+		internal ConsoleButtonString PointingString { get { return pointingString; } }
 #pragma warning disable CS0414 // Field is assigned but its value is never used
 		ConsoleButtonString lastPointingString = null;
 #pragma warning restore CS0414
@@ -1719,151 +1720,135 @@ namespace MinorShift.Emuera.GameView
 
 		#region Window.Form?
 
-		internal Point GetMousePosition()
-		{
-            //if (window == null || !window.Created)
-            //	return new Point();
-            ////???????????????
-            //Point pos = window.MainPicBox.PointToClient(Cursor.Position);
-            ////??????????????????
-            //pos.Y = pos.Y - ClientHeight;
-            //return pos;
-            return Point.Empty;
-		}
+        internal Point GetMousePosition()
+        {
+            if (window == null || !window.Created)
+                return Point.Empty;
+            UpdateClientRectangle();
+            return window.MainPicBox.PointToClient(Control.MousePosition);
+        }
 
-		/// <summary>
-		/// ????????????????????
-		/// </summary>
-		/// <param name="point"></param>
-		/// <returns>????RefreshStrings???????</returns>
-		public bool MoveMouse(Point point)
-		{
-            return false;
-		//	if (cbgButtonMap != null && cbgButtonMap.IsCreated)
-		//	{
-		//		//point???????????????
-		//		//clientPoint???????????????????
-		//		Point clientPoint = point;
-		//		clientPoint.Y = point.Y - ClientHeight;
-		//		int buttonNum = -1;
-		//		//??????????????????
-		//		Point mapPoint = clientPoint;
-		//		mapPoint.Y = mapPoint.Y + cbgButtonMap.Height;
-		//		if (mapPoint.X >= 0 && mapPoint.Y >= 0 && mapPoint.X < cbgButtonMap.Width && mapPoint.Y < cbgButtonMap.Height)
-		//		{
-		//			Color c = cbgButtonMap.Bitmap.GetPixel(mapPoint.X, mapPoint.Y);
-		//			if (c.A == 255)
-		//			{
-		//				buttonNum = c.ToArgb() & 0xFFFFFF;
-		//			}
-		//		}
-		//		if (buttonNum >= 0)
-		//		{
-		//			bool ret = (pointingString != null || selectingButton != null || buttonNum != selectingCBGButtonInt);
-		//			selectingCBGButtonInt = buttonNum;
-		//			pointingString = null;
-		//			selectingButton = null;
-		//			return ret;
-		//		}
-		//		else if (selectingCBGButtonInt >= 0)
-		//		{
-		//			selectingCBGButtonInt = -1;
-		//			pointingString = null;
-		//			selectingButton = null;
-		//			return true;
-		//		}
-		//	}
-		//	selectingCBGButtonInt = -1;
-		//	ConsoleButtonString select = null;
-		//	ConsoleButtonString pointing = null;
-		//	bool canSelect = false;
-		//	//???????????????????????????
-		//	if (state == ConsoleState.Error)
-		//		canSelect = true;
-		//	else if (state == ConsoleState.WaitInput && inputReq.NeedValue)
-		//		canSelect = true;
-		//	//???????????//??�?????????
-		//	if(this.IsInProcess)
-		//		goto end;
-		//	//????????
-		//	//if (window.ScrollBar.Value != window.ScrollBar.Maximum)
-		//	//	goto end;
-		//	int pointX = point.X;
-		//	int pointY = point.Y;
-		//	ConsoleDisplayLine curLine = null;
+        private void UpdateClientRectangle()
+        {
+            if (window == null)
+                return;
+            if (window.MainPicBox.ClientRectangle.Width != ClientWidth ||
+                window.MainPicBox.ClientRectangle.Height != ClientHeight)
+            {
+                window.MainPicBox.ClientRectangle = new Rectangle(0, 0, ClientWidth, ClientHeight);
+            }
+        }
 
-		//	int bottomLineNo = window.ScrollBar.Value - 1;
-		//	if (displayLineList.Count - 1 < bottomLineNo)
-		//		bottomLineNo = displayLineList.Count - 1;//1820 ?????????????Error????????????
-		//	int topLineNo = bottomLineNo - (window.MainPicBox.Height/ Config.LineHeight);
-		//	if (topLineNo < 0)
-		//		topLineNo = 0;
-		//	int relPointY = pointY - window.MainPicBox.Height;
-		//	//????????????????
-		//	for (int i = bottomLineNo; i >= topLineNo; i--)
-		//	{
-		//		relPointY += Config.LineHeight;
-		//		curLine = displayLineList[i];
-				
-		//		for (int b = 0; b < curLine.Buttons.Length; b++)
-		//		{
-		//			ConsoleButtonString button = curLine.Buttons[curLine.Buttons.Length - b - 1];
-		//			if(button == null || button.StrArray == null)
-		//				continue;
-		//			if ((button.PointX <= pointX) && (button.PointX + button.Width >= pointX))
-		//			{
-		//				//if (relPointY >= 0 && relPointY <= Config.FontSize)
-		//				//{
-		//				//	pointing = button;
-		//				//	if(pointing.IsButton)
-		//				//		goto breakfor;
-		//				//}
-		//				foreach(AConsoleDisplayPart part in button.StrArray)
-		//				{
-		//					if(part == null)
-		//						continue;
-		//					if ((part.PointX <= pointX) && (part.PointX + part.Width >= pointX)
-		//						&& (relPointY >= part.Top) && (relPointY <= part.Bottom))
-		//					{
-		//						pointing = button;
-		//						if (pointing.IsButton)
-		//							goto breakfor;
-		//					}
-		//				}
-		//			}
-		//		}
-		//	}
+        internal void UpdateMouse(Point point)
+        {
+            UpdateClientRectangle();
+            if (window.MainPicBox.ClientRectangle.Contains(point))
+            {
+                if (MoveMouse(point))
+                    RefreshStrings(true);
+            }
+            else
+            {
+                LeaveMouse();
+            }
+        }
 
+        /// <summary>
+        /// Applies a client-space pointer position to CBG and console buttons.
+        /// The host is responsible only for coordinate conversion; all hit
+        /// testing remains in the Emuera view layer.
+        /// </summary>
+        public bool MoveMouse(Point point)
+        {
+            UpdateClientRectangle();
+            if (cbgButtonMap != null && cbgButtonMap.IsCreated && cbgButtonMap.Bitmap != null)
+            {
+                Point clientPoint = point;
+                clientPoint.Y -= ClientHeight;
+                Point mapPoint = clientPoint;
+                mapPoint.Y += cbgButtonMap.Height;
+                int buttonNum = -1;
+                if (mapPoint.X >= 0 && mapPoint.Y >= 0 &&
+                    mapPoint.X < cbgButtonMap.Width && mapPoint.Y < cbgButtonMap.Height)
+                {
+                    Color color = cbgButtonMap.Bitmap.GetPixel(mapPoint.X, mapPoint.Y);
+                    if (color.A == 255)
+                        buttonNum = color.ToArgb() & 0xFFFFFF;
+                }
+                if (buttonNum >= 0)
+                {
+                    bool changed = pointingString != null || selectingButton != null ||
+                                   buttonNum != selectingCBGButtonInt;
+                    selectingCBGButtonInt = buttonNum;
+                    pointingString = null;
+                    selectingButton = null;
+                    return changed;
+                }
+                if (selectingCBGButtonInt >= 0)
+                {
+                    selectingCBGButtonInt = -1;
+                    pointingString = null;
+                    selectingButton = null;
+                    return true;
+                }
+            }
 
-		//	//int posy_bottom2up = window.MainPicBox.Height - pointY;
-		//	//int logNum = window.ScrollBar.Maximum - window.ScrollBar.Value;
-		//	////???????????
-		//	//int curBottomLineNo = displayLineList.Count - logNum;
-		//	//int curPointingLineNo = curBottomLineNo - (posy_bottom2up / Config.LineHeight + 1);
-		//	//if ((curPointingLineNo < 0) || (curPointingLineNo >= displayLineList.Count))
-		//	//	curLine = null;
-		//	//else
-		//	//	curLine =  displayLineList[curPointingLineNo];
-		//	//if (curLine == null)
-		//	//	goto end;
-			
-		//	//pointing = curLine.GetPointingButton(pointX);
-		//breakfor:
-		//	if ((pointing == null) || (pointing.Generation != lastButtonGeneration))
-		//		canSelect = false;
-		//	else if (!pointing.IsButton)
-		//		canSelect = false;
-		//	else if ((state == ConsoleState.WaitInput && inputReq.InputType == InputType.IntValue) && (!pointing.IsInteger))
-		//		canSelect = false;
-		//end:
-		//	if (canSelect)
-		//		select = pointing;
-		//	bool needRefresh = select != selectingButton || pointing != pointingString;
-		//	pointingString = pointing;
-		//	selectingButton = select;
-		//	return needRefresh;
-		}
+            selectingCBGButtonInt = -1;
+            ConsoleButtonString pointing = null;
+            bool canSelect = state == ConsoleState.Error ||
+                (state == ConsoleState.WaitInput && inputReq.NeedValue);
+            int bottomLineNo = window.ScrollBar.Value - 1;
+            if (bottomLineNo < 0 || bottomLineNo >= displayLineList.Count)
+                bottomLineNo = displayLineList.Count - 1;
+            int topLineNo = bottomLineNo - (window.MainPicBox.Height / Math.Max(1, Config.LineHeight));
+            if (topLineNo < 0)
+                topLineNo = 0;
 
+            int relativeY = point.Y - window.MainPicBox.Height;
+            for (int lineIndex = bottomLineNo; lineIndex >= topLineNo; lineIndex--)
+            {
+                relativeY += Config.LineHeight;
+                ConsoleDisplayLine line = displayLineList[lineIndex];
+                if (line == null || line.Buttons == null)
+                    continue;
+                for (int buttonIndex = line.Buttons.Length - 1; buttonIndex >= 0; buttonIndex--)
+                {
+                    ConsoleButtonString button = line.Buttons[buttonIndex];
+                    if (button == null || button.StrArray == null ||
+                        point.X < button.PointX || point.X > button.PointX + button.Width)
+                        continue;
+                    foreach (AConsoleDisplayPart part in button.StrArray)
+                    {
+                        if (part == null || point.X < part.PointX || point.X > part.PointX + part.Width ||
+                            relativeY < part.Top || relativeY > part.Bottom)
+                            continue;
+                        if (pointing == null || button.Generation >= pointing.Generation)
+                            pointing = button;
+                        break;
+                    }
+                    if (pointing != null && pointing.IsButton)
+                        break;
+                }
+                if (pointing != null && pointing.IsButton)
+                    break;
+            }
+
+            if (pointing != null &&
+                (pointing.Generation != lastButtonGeneration || !pointing.IsButton))
+                pointing = null;
+            ConsoleButtonString selected = null;
+            if (canSelect && pointing != null)
+            {
+                if (state != ConsoleState.WaitInput || inputReq.InputType == InputType.StrValue ||
+                    inputReq.InputType == InputType.BStrValue || pointing.IsInteger)
+                    selected = pointing;
+            }
+
+            bool needRefresh = selected != selectingButton || pointing != pointingString;
+            pointingString = pointing;
+            selectingButton = selected;
+            return needRefresh;
+        }
 
 		public void LeaveMouse()
 		{

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -22,7 +22,7 @@ namespace MinorShift.Emuera.GameData.Function
 
     internal static partial class FunctionMethodCreator
     {
-        #region CSVデータ関係
+        #region Character data
         private sealed class GetcharaMethod : FunctionMethod
         {
             public GetcharaMethod()
@@ -34,19 +34,19 @@ namespace MinorShift.Emuera.GameData.Function
             
             public override string CheckArgumentType(string name, IOperandTerm[] arguments)
             {
-                //通常２つ、１つ省略可能で１～２のargumentが必要。
+                //Usually 2, with 1 optional, so 1-2 arguments are required.
                 if (arguments.Length < 1)
-                    return name + "関数には少なくとも1つのargumentが必要です";
+                    return name + GameMessages.T(" function requires at least 1 argument");
                 if (arguments.Length > 2)
-                    return name + "関数のargumentが多すぎます";
+                    return name + GameMessages.T(" function: too many arguments");
 
                 if (arguments[0] == null)
-                    return name + "関数の1番目のargumentは省略できません";
+                    return name + GameMessages.T(" function: argument #1 cannot be omitted");
                 if (arguments[0].GetOperandType() != typeof(Int64))
-                    return name + "関数の1番目のargumentの型が正しくありません";
-                //2は省略可能
+                    return name + GameMessages.T(" function: argument #1 has an invalid type");
+                //2 is optional
                 if ((arguments.Length == 2) && (arguments[1] != null) && (arguments[1].GetOperandType() != typeof(Int64)))
-                    return name + "関数の2番目のargumentの型が正しくありません";
+                    return name + GameMessages.T(" function: argument #2 has an invalid type");
                 return null;
             }
 			public override Int64 GetIntValue(ExpressionMediator exm, IOperandTerm[] arguments)
@@ -57,7 +57,7 @@ namespace MinorShift.Emuera.GameData.Function
 					//if ((arguments.Length > 1) && (arguments[1] != null) && (arguments[1].GetIntValue(exm) != 0))
 					return exm.VEvaluator.GetChara(integer);
 				}
-				//以下互換性用の旧処理
+				//Legacy processing below for compatibility
                 bool CheckSp = false;
                 if ((arguments.Length > 1) && (arguments[1] != null) && (arguments[1].GetIntValue(exm) != 0))
                     CheckSp = true;
@@ -85,7 +85,7 @@ namespace MinorShift.Emuera.GameData.Function
 			public override Int64 GetIntValue(ExpressionMediator exm, IOperandTerm[] arguments)
             {
 				if(!Config.CompatiSPChara)
-					throw new CodeEE("SPキャラ関係の機能は標準では使用できません(互換性オプション「SPキャラを使用する」をONにしてください)");
+					throw new CodeEE(GameMessages.T("SP character-related functions are not available by default (enable the \"Use SP Characters\" compatibility option)"));
                 Int64 integer = arguments[0].GetIntValue(exm);
                 return exm.VEvaluator.GetChara_UseSp(integer, true);
             }
@@ -111,17 +111,17 @@ namespace MinorShift.Emuera.GameData.Function
             public override string CheckArgumentType(string name, IOperandTerm[] arguments)
             {
                 if (arguments.Length < 1)
-                    return name + "関数には少なくとも1つのargumentが必要です";
+                    return name + GameMessages.T(" function requires at least 1 argument");
                 if (arguments.Length > 2)
-                    return name + "関数のargumentが多すぎます";
+                    return name + GameMessages.T(" function: too many arguments");
                 if (arguments[0] == null)
-                    return name + "関数の1番目のargumentは省略できません";
+                    return name + GameMessages.T(" function: argument #1 cannot be omitted");
                 if (!arguments[0].IsInteger)
-                    return name + "関数の1番目のargumentが数値ではありません";
+                    return name + GameMessages.T(" function: argument #1 is not a number");
                 if (arguments.Length == 1)
                     return null;
                 if ((arguments[1] != null) && (arguments[1].GetOperandType() != typeof(Int64)))
-                    return name + "関数の2番目の変数が数値ではありません";
+                    return name + GameMessages.T(" function: argument #2 is not a number");
                 return null;
             }
             public override string GetStrValue(ExpressionMediator exm, IOperandTerm[] arguments)
@@ -129,7 +129,7 @@ namespace MinorShift.Emuera.GameData.Function
                 long x = arguments[0].GetIntValue(exm);
 				long y = (arguments.Length > 1 && arguments[1] != null) ? arguments[1].GetIntValue(exm) : 0;
 				if (!Config.CompatiSPChara && y != 0)
-					throw new CodeEE("SPキャラ関係の機能は標準では使用できません(互換性オプション「SPキャラを使用する」をONにしてください)");
+					throw new CodeEE(GameMessages.T("SP character-related functions are not available by default (enable the \"Use SP Characters\" compatibility option)"));
                 return exm.VEvaluator.GetCharacterStrfromCSVData(x, charaStr, (y != 0), 0);
             }
         }
@@ -145,21 +145,21 @@ namespace MinorShift.Emuera.GameData.Function
             public override string CheckArgumentType(string name, IOperandTerm[] arguments)
             {
                 if (arguments.Length < 2)
-                    return name + "関数には少なくとも2つのargumentが必要です";
+                    return name + GameMessages.T(" function requires at least 2 arguments");
                 if (arguments.Length > 3)
-                    return name + "関数のargumentが多すぎます";
+                    return name + GameMessages.T(" function: too many arguments");
                 if (arguments[0] == null)
-                    return name + "関数の1番目のargumentは省略できません";
+                    return name + GameMessages.T(" function: argument #1 cannot be omitted");
                 if (!arguments[0].IsInteger)
-                    return name + "関数の1番目のargumentが数値ではありません";
+                    return name + GameMessages.T(" function: argument #1 is not a number");
                 if (arguments[1] == null)
-                    return name + "関数の2番目のargumentは省略できません";
+                    return name + GameMessages.T(" function: argument #2 cannot be omitted");
                 if (arguments[1].GetOperandType() != typeof(Int64))
-                    return name + "関数の2番目の変数が数値ではありません";
+                    return name + GameMessages.T(" function: argument #2 is not a number");
                 if (arguments.Length == 2)
                     return null;
                 if ((arguments[2] != null) && (arguments[2].GetOperandType() != typeof(Int64)))
-                    return name + "関数の3番目の変数が数値ではありません";
+                    return name + GameMessages.T(" function: argument #3 is not a number");
                 return null;
             }
             public override string GetStrValue(ExpressionMediator exm, IOperandTerm[] arguments)
@@ -168,7 +168,7 @@ namespace MinorShift.Emuera.GameData.Function
                 long y = arguments[1].GetIntValue(exm);
                 long z = (arguments.Length == 3 && arguments[2] != null) ? arguments[2].GetIntValue(exm) : 0;
 				if(!Config.CompatiSPChara && z != 0)
-					throw new CodeEE("SPキャラ関係の機能は標準では使用できません(互換性オプション「SPキャラを使用する」をONにしてください)");
+					throw new CodeEE(GameMessages.T("SP character-related functions are not available by default (enable the \"Use SP Characters\" compatibility option)"));
                 return exm.VEvaluator.GetCharacterStrfromCSVData(x, CharacterStrData.CSTR, (z != 0), y);
             }
         }
@@ -193,21 +193,21 @@ namespace MinorShift.Emuera.GameData.Function
             public override string CheckArgumentType(string name, IOperandTerm[] arguments)
             {
                 if (arguments.Length < 2)
-                    return name + "関数には少なくとも2つのargumentが必要です";
+                    return name + GameMessages.T(" function requires at least 2 arguments");
                 if (arguments.Length > 3)
-                    return name + "関数のargumentが多すぎます";
+                    return name + GameMessages.T(" function: too many arguments");
                 if (arguments[0] == null)
-                    return name + "関数の1番目のargumentは省略できません";
+                    return name + GameMessages.T(" function: argument #1 cannot be omitted");
                 if (!arguments[0].IsInteger)
-                    return name + "関数の1番目のargumentが数値ではありません";
+                    return name + GameMessages.T(" function: argument #1 is not a number");
                 if (arguments[1] == null)
-                    return name + "関数の2番目のargumentは省略できません";
+                    return name + GameMessages.T(" function: argument #2 cannot be omitted");
                 if (arguments[1].GetOperandType() != typeof(Int64))
-                    return name + "関数の2番目の変数が数値ではありません";
+                    return name + GameMessages.T(" function: argument #2 is not a number");
                 if (arguments.Length == 2)
                     return null;
                 if ((arguments[2] != null) && (arguments[2].GetOperandType() != typeof(Int64)))
-                    return name + "関数の3番目の変数が数値ではありません";
+                    return name + GameMessages.T(" function: argument #3 is not a number");
                 return null;
             }
             public override Int64 GetIntValue(ExpressionMediator exm, IOperandTerm[] arguments)
@@ -216,7 +216,7 @@ namespace MinorShift.Emuera.GameData.Function
                 long y = arguments[1].GetIntValue(exm);
                 long z = (arguments.Length == 3 && arguments[2] != null) ? arguments[2].GetIntValue(exm) : 0;
 				if(!Config.CompatiSPChara && z != 0)
-					throw new CodeEE("SPキャラ関係の機能は標準では使用できません(互換性オプション「SPキャラを使用する」をONにしてください)");
+					throw new CodeEE(GameMessages.T("SP character-related functions are not available by default (enable the \"Use SP Characters\" compatibility option)"));
                 return exm.VEvaluator.GetCharacterIntfromCSVData(x, charaInt, (z != 0), y);
             }
         }
@@ -234,28 +234,28 @@ namespace MinorShift.Emuera.GameData.Function
             readonly bool isLast;
             public override string CheckArgumentType(string name, IOperandTerm[] arguments)
             {
-                //通常3つ、1つ省略可能で2～3のargumentが必要。
+                //Usually 3, with 1 optional, so 2-3 arguments are required.
                 if (arguments.Length < 2)
-                    return name + "関数には少なくとも2つのargumentが必要です";
+                    return name + GameMessages.T(" function requires at least 2 arguments");
                 if (arguments.Length > 4)
-                    return name + "関数のargumentが多すぎます";
+                    return name + GameMessages.T(" function: too many arguments");
 
                 if (arguments[0] == null)
-                    return name + "関数の1番目のargumentは省略できません";
+                    return name + GameMessages.T(" function: argument #1 cannot be omitted");
                 if (!(arguments[0] is VariableTerm))
-                    return name + "関数の1番目のargumentの型が正しくありません";
+                    return name + GameMessages.T(" function: argument #1 has an invalid type");
                 if (!(((VariableTerm)arguments[0]).Identifier.IsCharacterData))
-                    return name + "関数の1番目のargumentの変数がキャラクタ変数ではありません";
+                    return name + GameMessages.T(" function: argument #1 is not a character variable");
                 if (arguments[1] == null)
-                    return name + "関数の2番目のargumentは省略できません";
+                    return name + GameMessages.T(" function: argument #2 cannot be omitted");
                 if (arguments[1].GetOperandType() != arguments[0].GetOperandType())
-                    return name + "関数の2番目のargumentの型が正しくありません";
-                //3番目は省略可能
+                    return name + GameMessages.T(" function: argument #2 has an invalid type");
+                //The 3rd is optional
                 if ((arguments.Length >= 3) && (arguments[2] != null) && (arguments[2].GetOperandType() != typeof(Int64)))
-                    return name + "関数の3番目のargumentの型が正しくありません";
-                //4番目は省略可能
+                    return name + GameMessages.T(" function: argument #3 has an invalid type");
+                //The 4th is optional
                 if ((arguments.Length >= 4) && (arguments[3] != null) && (arguments[3].GetOperandType() != typeof(Int64)))
-                    return name + "関数の4番目のargumentの型が正しくありません";
+                    return name + GameMessages.T(" function: argument #4 has an invalid type");
                 return null;
             }
             public override Int64 GetIntValue(ExpressionMediator exm, IOperandTerm[] arguments)
@@ -278,9 +278,9 @@ namespace MinorShift.Emuera.GameData.Function
                 if (arguments.Length >= 4 && arguments[3] != null)
                     lastindex = arguments[3].GetIntValue(exm);
                 if (startindex < 0 || startindex >= exm.VEvaluator.CHARANUM)
-                    throw new CodeEE((isLast ? "" : "") + "関数の第3argument(" + startindex.ToString() + ")はキャラクタ位置の範囲外です");
+                    throw new CodeEE((isLast ? "" : "") + GameMessages.T(" function: argument #3 (") + startindex.ToString() + GameMessages.T(") is outside the character position range"));
                 if (lastindex < 0 || lastindex > exm.VEvaluator.CHARANUM)
-                    throw new CodeEE((isLast ? "" : "") + "関数の第4argument(" + lastindex.ToString() + ")はキャラクタ位置の範囲外です");
+                    throw new CodeEE((isLast ? "" : "") + GameMessages.T(" function: argument #4 (") + lastindex.ToString() + GameMessages.T(") is outside the character position range"));
                 long ret;
                 if (varID.IsString)
                 {
@@ -307,17 +307,17 @@ namespace MinorShift.Emuera.GameData.Function
             public override string CheckArgumentType(string name, IOperandTerm[] arguments)
             {
                 if (arguments.Length < 1)
-                    return name + "関数には少なくとも1つのargumentが必要です";
+                    return name + GameMessages.T(" function requires at least 1 argument");
                 if (arguments.Length > 2)
-                    return name + "関数のargumentが多すぎます";
+                    return name + GameMessages.T(" function: too many arguments");
                 if (arguments[0] == null)
-                    return name + "関数の1番目のargumentは省略できません";
+                    return name + GameMessages.T(" function: argument #1 cannot be omitted");
                 if (!arguments[0].IsInteger)
-                    return name + "関数の1番目のargumentが数値ではありません";
+                    return name + GameMessages.T(" function: argument #1 is not a number");
                 if (arguments.Length == 1)
                     return null;
                 if ((arguments[1] != null) && (arguments[1].GetOperandType() != typeof(Int64)))
-                    return name + "関数の2番目の変数が数値ではありません";
+                    return name + GameMessages.T(" function: argument #2 is not a number");
                 return null;
             }
             public override Int64 GetIntValue(ExpressionMediator exm, IOperandTerm[] arguments)
@@ -325,14 +325,14 @@ namespace MinorShift.Emuera.GameData.Function
                 Int64 no = arguments[0].GetIntValue(exm);
                 bool isSp =(arguments.Length == 2 && arguments[1] != null) ? (arguments[1].GetIntValue(exm) != 0) : false;
 				if(!Config.CompatiSPChara && isSp)
-					throw new CodeEE("SPキャラ関係の機能は標準では使用できません(互換性オプション「SPキャラを使用する」をONにしてください)");
+					throw new CodeEE(GameMessages.T("SP character-related functions are not available by default (enable the \"Use SP Characters\" compatibility option)"));
 
                 return (exm.VEvaluator.ExistCsv(no, isSp));
             }
         }
         #endregion
 
-        #region 汎用処理系
+        #region General processing
         private sealed class VarsizeMethod : FunctionMethod
         {
             public VarsizeMethod()
@@ -340,29 +340,29 @@ namespace MinorShift.Emuera.GameData.Function
                 ReturnType = typeof(Int64);
                 argumentTypeArray = null;
                 CanRestructure = true;
-				//1808beta009 参照型変数の追加によりちょっと面倒になった
+				//1808beta009: got more troublesome with the addition of reference-type variables
 				HasUniqueRestructure = true;
             }
             public override string CheckArgumentType(string name, IOperandTerm[] arguments)
             {
                 if (arguments.Length < 1)
-                    return name + "関数には少なくとも1つのargumentが必要です";
+                    return name + GameMessages.T(" function requires at least 1 argument");
                 if (arguments.Length > 2)
-                    return name + "関数のargumentが多すぎます";
+                    return name + GameMessages.T(" function: too many arguments");
                 if (arguments[0] == null)
-                    return name + "関数の1番目のargumentは省略できません";
+                    return name + GameMessages.T(" function: argument #1 cannot be omitted");
                 if (!arguments[0].IsString)
-                    return name + "関数の1番目のargumentが文字列ではありません";
+                    return name + GameMessages.T(" function: argument #1 is not a string");
                 if (arguments[0] is SingleTerm)
                 {
                     string varName = ((SingleTerm)arguments[0]).Str;
                     if (GlobalStatic.IdentifierDictionary.GetVariableToken(varName, null, true) == null)
-                        return name + "関数の1番目のargumentが変数名ではありません";
+                        return name + GameMessages.T(" function: argument #1 is not a variable name");
                 }
                 if (arguments.Length == 1)
                     return null;
                 if ((arguments[1] != null) && (arguments[1].GetOperandType() != typeof(Int64)))
-                    return name + "関数の2番目の変数が数値ではありません";
+                    return name + GameMessages.T(" function: argument #2 is not a number");
                 if (arguments.Length == 2)
                     return null;
                 return null;
@@ -371,7 +371,7 @@ namespace MinorShift.Emuera.GameData.Function
             {
                 VariableToken var = GlobalStatic.IdentifierDictionary.GetVariableToken(arguments[0].GetStrValue(exm), null, true);
                 if (var == null)
-                    throw new CodeEE("VARSIZEの1番目のargument(\"" + arguments[0].GetStrValue(exm) + "\")が変数名ではありません");
+                    throw new CodeEE(GameMessages.T("VARSIZE function: argument #1 (\"") + arguments[0].GetStrValue(exm) + GameMessages.T("\") is not a variable name"));
                 int dim = 0;
                 if (arguments.Length == 2 && arguments[1] != null)
                     dim = (int)arguments[1].GetIntValue(exm);
@@ -385,7 +385,7 @@ namespace MinorShift.Emuera.GameData.Function
 				if (arguments[0] is SingleTerm && (arguments.Length == 1 || arguments[1] is SingleTerm))
 				{
 					VariableToken var = GlobalStatic.IdentifierDictionary.GetVariableToken(arguments[0].GetStrValue(exm), null, true);
-					if (var == null || var.IsReference)//可変長の場合は定数化できない
+					if (var == null || var.IsReference)//Cannot be const-ified if variable-length
 						return false;
 					return true;
 				}
@@ -399,7 +399,7 @@ namespace MinorShift.Emuera.GameData.Function
 			{
 				ReturnType = typeof(Int64);
 				argumentTypeArray = new Type[] { typeof(string) };
-				CanRestructure = true;//起動中に変わることもそうそうないはず……
+				CanRestructure = true;//Probably won't change during runtime...
 			}
             public override Int64 GetIntValue(ExpressionMediator exm, IOperandTerm[] arguments)
             {
@@ -436,9 +436,9 @@ namespace MinorShift.Emuera.GameData.Function
             {
                 Int64 target = arguments[0].GetIntValue(exm);
                 if (target < 0)
-                    throw new CodeEE(Name + "のargumentに負の値(" + target.ToString() + ")が指定されました");
+                    throw new CodeEE(Name + GameMessages.T(" function: a negative value (") + target.ToString() + GameMessages.T(") was specified"));
                 else if (target > int.MaxValue)
-                    throw new CodeEE(Name + "のargument(" + target.ToString() + ")が大きすぎます");
+                    throw new CodeEE(Name + GameMessages.T(" function: value (") + target.ToString() + GameMessages.T(") is too large"));
                 EraDataResult result = exm.VEvaluator.CheckData((int)target, type);
                 exm.VEvaluator.RESULTS = result.DataMes;
                 return ((long)result.State);
@@ -446,7 +446,7 @@ namespace MinorShift.Emuera.GameData.Function
         }
 
 		/// <summary>
-		/// ファイル名をstringで指定する版・CHKVARDATAとCHKCHARADATAはこっちに分類
+		/// Version that specifies the file name as a string; CHKVARDATA and CHKCHARADATA fall into this category
 		/// </summary>
 		private sealed class CheckdataStrMethod : FunctionMethod
 		{
@@ -469,7 +469,7 @@ namespace MinorShift.Emuera.GameData.Function
 		}
 
 		/// <summary>
-		/// ファイル探索関数
+		/// File search function
 		/// </summary>
 		private sealed class FindFilesMethod : FunctionMethod
 		{
@@ -486,11 +486,11 @@ namespace MinorShift.Emuera.GameData.Function
 			public override string CheckArgumentType(string name, IOperandTerm[] arguments)
 			{
 				if (arguments.Length > 1)
-					return name + "関数のargumentが多すぎます";
+					return name + GameMessages.T(" function: too many arguments");
 				if (arguments.Length == 0 || arguments[0] == null)
 					return null;
 				if (!arguments[0].IsString)
-					return name + "関数の1番目のargumentが文字列ではありません";
+					return name + GameMessages.T(" function: argument #1 is not a string");
 				return null;
 			}
 
@@ -538,9 +538,9 @@ namespace MinorShift.Emuera.GameData.Function
             public override string CheckArgumentType(string name, IOperandTerm[] arguments)
             {
                 if (arguments.Length > 0)
-					return name + "関数のargumentが多すぎます";
+					return name + GameMessages.T(" function: too many arguments");
 				if (warn)
-					ParserMediator.Warn("関数MOUSESKIP()は推奨されません。代わりに関数MESSKIP()を使用してください", GlobalStatic.Process.GetScaningLine(), 1, false, false, null);
+					ParserMediator.Warn(GameMessages.T("The function MOUSESKIP() is not recommended. Use the function MESSKIP() instead"), GlobalStatic.Process.GetScaningLine(), 1, false, false, null);
                 return null;
             }
 			public override long GetIntValue(ExpressionMediator exm, IOperandTerm[] arguments)
@@ -707,8 +707,8 @@ namespace MinorShift.Emuera.GameData.Function
 				else
 				{
 					if (colorName.Equals("transparent", StringComparison.OrdinalIgnoreCase))
-						throw new CodeEE("無色透明(Transparent)は色として指定できません");
-					//throw new CodeEE("指定された色名\"" + colorName + "\"は無効な色名です");
+						throw new CodeEE(GameMessages.T("A fully transparent (Transparent) color cannot be specified"));
+					//throw new CodeEE("The specified color name \"" + colorName + "\" is invalid");
 					i = -1;
 				}
 				return i;
@@ -727,18 +727,18 @@ namespace MinorShift.Emuera.GameData.Function
 			{
 				long r = arguments[0].GetIntValue(exm);
 				if(r < 0 || r > 255)
-					throw new CodeEE("第１argumentが0から255の範囲外です");
+					throw new CodeEE(GameMessages.T("argument #1 is out of range 0-255"));
 				long g = arguments[1].GetIntValue(exm);
 				if(g< 0 || g > 255)
-					throw new CodeEE("第２argumentが0から255の範囲外です");
+					throw new CodeEE(GameMessages.T("argument #2 is out of range 0-255"));
 				long b = arguments[2].GetIntValue(exm);
 				if(b < 0 || b > 255)
-					throw new CodeEE("第３argumentが0から255の範囲外です");
+					throw new CodeEE(GameMessages.T("argument #3 is out of range 0-255"));
 				return (r << 16) + (g << 8) + b;
 			}
 		}
 		/// <summary>
-		/// 1810 作ったけど保留
+		/// 1810: created but put on hold
 		/// </summary>
 		private sealed class GetRefMethod : FunctionMethod
 		{
@@ -751,13 +751,13 @@ namespace MinorShift.Emuera.GameData.Function
 			public override string CheckArgumentType(string name, IOperandTerm[] arguments)
 			{
 				if (arguments.Length < 1)
-					return name + "関数には少なくとも1つのargumentが必要です";
+					return name + GameMessages.T(" function requires at least 1 argument");
 				if (arguments.Length > 1)
-					return name + "関数のargumentが多すぎます";
+					return name + GameMessages.T(" function: too many arguments");
 				if (arguments[0] == null)
-					return name + "関数の1番目のargumentは省略できません";
+					return name + GameMessages.T(" function: argument #1 cannot be omitted");
 				if (!(arguments[0] is UserDefinedRefMethodNoArgTerm))
-					return name + "関数の1番目のargumentが関数参照ではありません";
+					return name + GameMessages.T(" function: argument #1 is not a function reference");
 				return null;
 			}
 			public override string GetStrValue(ExpressionMediator exm, IOperandTerm[] arguments)
@@ -767,7 +767,7 @@ namespace MinorShift.Emuera.GameData.Function
 		}
         #endregion
 
-        #region 定数取得
+        #region Constant retrieval
         private sealed class MoneyStrMethod : FunctionMethod
         {
             public MoneyStrMethod()
@@ -778,17 +778,17 @@ namespace MinorShift.Emuera.GameData.Function
             }
             public override string CheckArgumentType(string name, IOperandTerm[] arguments)
             {
-                //通常2つ、1つ省略可能で1～2のargumentが必要。
+                //Usually 2, with 1 optional, so 1-2 arguments are required.
                 if (arguments.Length < 1)
-                    return name + "関数には少なくとも1つのargumentが必要です";
+                    return name + GameMessages.T(" function requires at least 1 argument");
                 if (arguments.Length > 2)
-                    return name + "関数のargumentが多すぎます";
+                    return name + GameMessages.T(" function: too many arguments");
                 if (arguments[0] == null)
-                    return name + "関数の1番目のargumentは省略できません";
+                    return name + GameMessages.T(" function: argument #1 cannot be omitted");
                 if (arguments[0].GetOperandType() != typeof(Int64))
-                    return name + "関数の1番目のargumentの型が正しくありません";
+                    return name + GameMessages.T(" function: argument #1 has an invalid type");
                 if ((arguments.Length >= 2) && (arguments[1] != null) && (arguments[1].GetOperandType() != typeof(string)))
-                    return name + "関数の2番目のargumentの型が正しくありません";
+                    return name + GameMessages.T(" function: argument #2 has an invalid type");
                 return null;
             }
             public override string GetStrValue(ExpressionMediator exm, IOperandTerm[] arguments)
@@ -804,7 +804,7 @@ namespace MinorShift.Emuera.GameData.Function
                 }
                 catch (FormatException)
                 {
-                    throw new CodeEE("MONEYSTR関数の第2argumentの書式指定が間違っています");
+                    throw new CodeEE(GameMessages.T("MONEYSTR function: argument #2 format specifier is invalid"));
                 }
                 return (Config.MoneyFirst) ? Config.MoneyLabel + ret : ret + Config.MoneyLabel;
             }
@@ -869,7 +869,7 @@ namespace MinorShift.Emuera.GameData.Function
                 date = date * 100 + DateTime.Now.Minute;
                 date = date * 100 + DateTime.Now.Second;
                 date = date * 1000 + DateTime.Now.Millisecond;
-                return (date);//17桁。2京くらい。
+                return (date);//17 digits, around 20 quadrillion.
             }
         }
 
@@ -897,8 +897,8 @@ namespace MinorShift.Emuera.GameData.Function
             }
             public override Int64 GetIntValue(ExpressionMediator exm, IOperandTerm[] arguments)
             {
-                //西暦0001年1月1日からの経過時間をミリ秒で。
-                //Ticksは100ナノ秒単位であるが実際にはそんな精度はないので無駄。
+                //Elapsed time since January 1, 0001, in milliseconds.
+                //Ticks are in 100-nanosecond units, but in practice they lack such precision, so it's pointless.
                 return (DateTime.Now.Ticks / 10000);
             }
         }
@@ -913,14 +913,14 @@ namespace MinorShift.Emuera.GameData.Function
             }
             public override Int64 GetIntValue(ExpressionMediator exm, IOperandTerm[] arguments)
             {
-                //西暦0001年1月1日からの経過時間を秒で。
-                //Ticksは100ナノ秒単位であるが実際にはそんな精度はないので無駄。
+                //Elapsed time since January 1, 0001, in seconds.
+                //Ticks are in 100-nanosecond units, but in practice they lack such precision, so it's pointless.
                 return (DateTime.Now.Ticks / 10000000);
             }
         }
         #endregion
 
-        #region 数学関数
+        #region Math functions
         private sealed class RandMethod : FunctionMethod
         {
             public RandMethod()
@@ -932,24 +932,24 @@ namespace MinorShift.Emuera.GameData.Function
 
             public override string CheckArgumentType(string name, IOperandTerm[] arguments)
             {
-                //通常2つ、1つ省略可能で1～2のargumentが必要。
+                //Usually 2, with 1 optional, so 1-2 arguments are required.
                 if (arguments.Length < 1)
-                    return name + "関数には少なくとも1つのargumentが必要です";
+                    return name + GameMessages.T(" function requires at least 1 argument");
                 if (arguments.Length > 2)
-                    return name + "関数のargumentが多すぎます";
+                    return name + GameMessages.T(" function: too many arguments");
                 if (arguments.Length == 1)
                 {
                     if (arguments[0] == null)
-                        return name + "関数には少なくとも1つのargumentが必要です";
+                        return name + GameMessages.T(" function requires at least 1 argument");
                     if ((arguments[0].GetOperandType() != typeof(Int64)))
-                        return name + "関数の1番目のargumentの型が正しくありません";
+                        return name + GameMessages.T(" function: argument #1 has an invalid type");
                     return null;
                 }
-                //1番目は省略可能
+                //The 1st is optional
                 if ((arguments[0] != null) && (arguments[0].GetOperandType() != typeof(Int64)))
-                    return name + "関数の1番目のargumentの型が正しくありません";
+                    return name + GameMessages.T(" function: argument #1 has an invalid type");
                 if ((arguments[1] != null) && (arguments[1].GetOperandType() != typeof(Int64)))
-                    return name + "関数の2番目のargumentの型が正しくありません";
+                    return name + GameMessages.T(" function: argument #2 has an invalid type");
                 return null;
             }
             public override Int64 GetIntValue(ExpressionMediator exm, IOperandTerm[] arguments)
@@ -967,9 +967,9 @@ namespace MinorShift.Emuera.GameData.Function
                 if (max <= min)
                 {
                     if (min == 0)
-                        throw new CodeEE("RANDの最大値に0以下の値(" + max.ToString() + ")が指定されました");
+                        throw new CodeEE(GameMessages.T("RAND: a maximum value of 0 or less (") + max.ToString() + GameMessages.T(") was specified"));
                     else
-                        throw new CodeEE("RANDの最大値に最小値以下の値(" + max.ToString() + ")が指定されました");
+                        throw new CodeEE(GameMessages.T("RAND: a maximum value below the minimum (") + max.ToString() + GameMessages.T(") was specified"));
                 }
                 return (exm.VEvaluator.GetNextRand(max - min) + min);
             }
@@ -995,13 +995,13 @@ namespace MinorShift.Emuera.GameData.Function
             public override string CheckArgumentType(string name, IOperandTerm[] arguments)
             {
                 if (arguments.Length < 1)
-                    return name + "関数には少なくとも1つのargumentが必要です";
+                    return name + GameMessages.T(" function requires at least 1 argument");
                 for (int i = 0; i < arguments.Length; i++)
                 {
                     if (arguments[i] == null)
-                        return name + "関数の" + (i + 1).ToString() + "番目のargumentは省略できません";
+                        return name + GameMessages.T(" function: argument #") + (i + 1).ToString() + GameMessages.T(" cannot be omitted");
                     if (arguments[i].GetOperandType() != typeof(Int64))
-                        return name + "関数の" + (i + 1).ToString() + "番目のargumentの型が正しくありません";
+                        return name + GameMessages.T(" function: argument #") + (i + 1).ToString() + GameMessages.T(" has an invalid type");
                 }
                 return null;
             }
@@ -1056,11 +1056,11 @@ namespace MinorShift.Emuera.GameData.Function
                 Int64 y = arguments[1].GetIntValue(exm);
                 double pow = Math.Pow(x, y);
                 if (double.IsNaN(pow))
-                    throw new CodeEE("累乗結果が非数値です");
+                    throw new CodeEE(GameMessages.T("power result is not a number"));
                 else if (double.IsInfinity(pow))
-                    throw new CodeEE("累乗結果が無限大です");
+                    throw new CodeEE(GameMessages.T("power result is infinite"));
                 else if ((pow >= Int64.MaxValue) || (pow <= Int64.MinValue))
-                    throw new CodeEE("累乗結果(" + pow.ToString() + ")が64ビット符号付き整数の範囲外です");
+                    throw new CodeEE(GameMessages.T("power result (") + pow.ToString() + GameMessages.T(") is out of range for a 64-bit signed integer"));
                 return ((long)pow);
             }
         }
@@ -1077,7 +1077,7 @@ namespace MinorShift.Emuera.GameData.Function
             {
                 Int64 ret = arguments[0].GetIntValue(exm);
                 if (ret < 0)
-                    throw new CodeEE("SQRT関数のargumentに負の値が指定されました");
+                    throw new CodeEE(GameMessages.T("SQRT function: a negative value was specified"));
                 return ((Int64)Math.Sqrt(ret));
             }
         }
@@ -1094,7 +1094,7 @@ namespace MinorShift.Emuera.GameData.Function
             {
                 Int64 ret = arguments[0].GetIntValue(exm);
                 if (ret < 0)
-                    throw new CodeEE("CBRT関数のargumentに負の値が指定されました");
+                    throw new CodeEE(GameMessages.T("CBRT function: a negative value was specified"));
                 return ((Int64)Math.Pow((double)ret, 1.0 / 3.0));
             }
         }
@@ -1120,20 +1120,20 @@ namespace MinorShift.Emuera.GameData.Function
             {
                 Int64 ret = arguments[0].GetIntValue(exm);
                 if (ret <= 0)
-                    throw new CodeEE("対数関数のargumentに0以下の値が指定されました");
+                    throw new CodeEE(GameMessages.T("log function: a value of 0 or less was specified"));
                 if (Base <= 0.0d)
-                    throw new CodeEE("対数関数の底に0以下の値が指定されました");
+                    throw new CodeEE(GameMessages.T("log function: a base of 0 or less was specified"));
                 double dret = (double)ret;
                 if (Base == Math.E)
                     dret = Math.Log(dret);
                 else
                     dret = Math.Log10(dret);
                 if (double.IsNaN(dret))
-                    throw new CodeEE("計算値が非数値です");
+                    throw new CodeEE(GameMessages.T("calculated value is not a number"));
                 else if (double.IsInfinity(dret))
-                    throw new CodeEE("計算値が無限大です");
+                    throw new CodeEE(GameMessages.T("calculated value is infinite"));
                 else if ((dret >= Int64.MaxValue) || (dret <= Int64.MinValue))
-                    throw new CodeEE("計算結果(" + dret.ToString() + ")が64ビット符号付き整数の範囲外です");
+                    throw new CodeEE(GameMessages.T("calculated result (") + dret.ToString() + GameMessages.T(") is out of range for a 64-bit signed integer"));
                 return ((Int64)dret);
             }
         }
@@ -1151,11 +1151,11 @@ namespace MinorShift.Emuera.GameData.Function
                 Int64 ret = arguments[0].GetIntValue(exm);
                 double dret = Math.Exp((double)ret);
                 if (double.IsNaN(dret))
-                    throw new CodeEE("計算値が非数値です");
+                    throw new CodeEE(GameMessages.T("calculated value is not a number"));
                 else if (double.IsInfinity(dret))
-                    throw new CodeEE("計算値が無限大です");
+                    throw new CodeEE(GameMessages.T("calculated value is infinite"));
                 else if ((dret >= Int64.MaxValue) || (dret <= Int64.MinValue))
-                    throw new CodeEE("計算結果(" + dret.ToString() + ")が64ビット符号付き整数の範囲外です");
+                    throw new CodeEE(GameMessages.T("calculated result (") + dret.ToString() + GameMessages.T(") is out of range for a 64-bit signed integer"));
 
                 return ((Int64)dret);
             }
@@ -1202,7 +1202,7 @@ namespace MinorShift.Emuera.GameData.Function
         }
         #endregion
 
-        #region 変数操作系
+        #region Variable operations
         private sealed class SumArrayMethod : FunctionMethod
         {
             readonly bool isCharaRange;
@@ -1223,28 +1223,28 @@ namespace MinorShift.Emuera.GameData.Function
             public override string CheckArgumentType(string name, IOperandTerm[] arguments)
             {
                 if (arguments.Length < 1)
-                    return name + "関数には少なくとも1つのargumentが必要です";
+                    return name + GameMessages.T(" function requires at least 1 argument");
                 if (arguments.Length > 3)
-                    return name + "関数のargumentが多すぎます";
+                    return name + GameMessages.T(" function: too many arguments");
                 if (arguments[0] == null)
-                    return name + "関数の1番目のargumentは省略できません";
+                    return name + GameMessages.T(" function: argument #1 cannot be omitted");
                 if (!(arguments[0] is VariableTerm))
-                    return name + "関数の1番目のargumentが変数ではありません";
+                    return name + GameMessages.T(" function: argument #1 is not a variable");
                 VariableTerm varToken = (VariableTerm)arguments[0];
                 if (varToken.IsString)
-                    return name + "関数の1番目のargumentが数値変数ではありません";
+                    return name + GameMessages.T(" function: argument #1 is not a numeric variable");
                 if (isCharaRange && !varToken.Identifier.IsCharacterData)
-                    return name + "関数の1番目のargumentがキャラクタ変数ではありません";
+                    return name + GameMessages.T(" function: argument #1 is not a character variable");
                 if (!isCharaRange && !varToken.Identifier.IsArray1D && !varToken.Identifier.IsArray2D && !varToken.Identifier.IsArray3D)
-                    return name + "関数の1番目のargumentが配列変数ではありません";
+                    return name + GameMessages.T(" function: argument #1 is not an array variable");
                 if (arguments.Length == 1)
                     return null;
                 if ((arguments[1] != null) && (arguments[1].GetOperandType() != typeof(Int64)))
-                    return name + "関数の2番目の変数が数値ではありません";
+                    return name + GameMessages.T(" function: argument #2 is not a number");
                 if (arguments.Length == 2)
                     return null;
                 if ((arguments[2] != null) && (arguments[2].GetOperandType() != typeof(Int64)))
-                    return name + "関数の3番目の変数が数値ではありません";
+                    return name + GameMessages.T(" function: argument #3 is not a number");
                 return null;
             }
             public override Int64 GetIntValue(ExpressionMediator exm, IOperandTerm[] arguments)
@@ -1263,7 +1263,7 @@ namespace MinorShift.Emuera.GameData.Function
                 {
                     Int64 charaNum = exm.VEvaluator.CHARANUM;
                     if (index1 >= charaNum || index1 < 0 || index2 > charaNum || index2 < 0)
-                        throw new CodeEE("SUMCARRAY関数の範囲指定がキャラクタ配列の範囲を超えています(" + index1.ToString() + "～" + index2.ToString() + ")");
+                        throw new CodeEE(GameMessages.T("SUMCARRAY function: range exceeds the character array bounds (") + index1.ToString() + GameMessages.T(" to ") + index2.ToString() + ")");
                     return (exm.VEvaluator.GetArraySumChara(p, index1, index2));
                 }
             }
@@ -1291,28 +1291,28 @@ namespace MinorShift.Emuera.GameData.Function
             public override string CheckArgumentType(string name, IOperandTerm[] arguments)
             {
                 if (arguments.Length < 2)
-                    return name + "関数には少なくとも2つのargumentが必要です";
+                    return name + GameMessages.T(" function requires at least 2 arguments");
                 if (arguments.Length > 4)
-                    return name + "関数のargumentが多すぎます";
+                    return name + GameMessages.T(" function: too many arguments");
                 if (arguments[0] == null)
-                    return name + "関数の1番目のargumentは省略できません";
+                    return name + GameMessages.T(" function: argument #1 cannot be omitted");
                 if (!(arguments[0] is VariableTerm))
-                    return name + "関数の1番目のargumentが変数ではありません";
+                    return name + GameMessages.T(" function: argument #1 is not a variable");
                 VariableTerm varToken = (VariableTerm)arguments[0];
                 if (isCharaRange && !varToken.Identifier.IsCharacterData)
-                    return name + "関数の1番目のargumentがキャラクタ変数ではありません";
+                    return name + GameMessages.T(" function: argument #1 is not a character variable");
                 if (!isCharaRange && (varToken.Identifier.IsArray2D || varToken.Identifier.IsArray3D))
-                    return name + "関数は二重配列・三重配列には対応していません";
+                    return name + GameMessages.T(" function does not support double or triple arrays");
                 if (!isCharaRange && !varToken.Identifier.IsArray1D)
-                    return name + "関数の1番目のargumentが配列変数ではありません";
+                    return name + GameMessages.T(" function: argument #1 is not an array variable");
                 if (arguments[1] == null)
-                    return name + "関数の2番目のargumentは省略できません";
+                    return name + GameMessages.T(" function: argument #2 cannot be omitted");
                 if (arguments[1].GetOperandType() != arguments[0].GetOperandType())
-                    return name + "関数の1番目のargumentと2番目のargumentの型が異なります";
+                    return name + GameMessages.T(" function: argument #1 and argument #2 have different types");
                 if ((arguments.Length >= 3) && (arguments[2] != null) && (arguments[2].GetOperandType() != typeof(Int64)))
-                    return name + "関数の3番目のargumentの型が正しくありません";
+                    return name + GameMessages.T(" function: argument #3 has an invalid type");
                 if ((arguments.Length >= 4) && (arguments[3] != null) && (arguments[3].GetOperandType() != typeof(Int64)))
-                    return name + "関数の4番目のargumentの型が正しくありません";
+                    return name + GameMessages.T(" function: argument #4 has an invalid type");
                 return null;
             }
 
@@ -1341,7 +1341,7 @@ namespace MinorShift.Emuera.GameData.Function
                 {
                     Int64 charaNum = exm.VEvaluator.CHARANUM;
                     if (start >= charaNum || start < 0 || end > charaNum || end < 0)
-                        throw new CodeEE("CMATCH関数の範囲指定がキャラクタ配列の範囲を超えています(" + start.ToString() + "～" + end.ToString() + ")");
+                        throw new CodeEE(GameMessages.T("CMATCH function: range exceeds the character array bounds (") + start.ToString() + GameMessages.T(" to ") + end.ToString() + ")");
                     if (arguments[0].GetOperandType() == typeof(Int64))
                     {
                         Int64 targetValue = arguments[1].GetIntValue(exm);
@@ -1379,16 +1379,16 @@ namespace MinorShift.Emuera.GameData.Function
             public override string CheckArgumentType(string name, IOperandTerm[] arguments)
             {
                 if (arguments.Length < 2)
-                    return name + "関数には少なくとも2つのargumentが必要です";
+                    return name + GameMessages.T(" function requires at least 2 arguments");
                 if (arguments[0] == null)
-                    return name + "関数の1番目のargumentは省略できません";
+                    return name + GameMessages.T(" function: argument #1 cannot be omitted");
                 Type baseType = arguments[0].GetOperandType();
                 for (int i = 1; i < arguments.Length; i++)
                 {
                     if (arguments[i] == null)
-                        return name + "関数の" + (i + 1).ToString() + "番目のargumentは省略できません";
+                        return name + GameMessages.T(" function: argument #") + (i + 1).ToString() + GameMessages.T(" cannot be omitted");
                     if (arguments[i].GetOperandType() != baseType)
-                        return name + "関数の" + (i + 1).ToString() + "番目のargumentの型が正しくありません";
+                        return name + GameMessages.T(" function: argument #") + (i + 1).ToString() + GameMessages.T(" has an invalid type");
                 }
                 return null;
             }
@@ -1428,16 +1428,16 @@ namespace MinorShift.Emuera.GameData.Function
             public override string CheckArgumentType(string name, IOperandTerm[] arguments)
             {
                 if (arguments.Length < 2)
-                    return name + "関数には少なくとも2つのargumentが必要です";
+                    return name + GameMessages.T(" function requires at least 2 arguments");
                 if (arguments[0] == null)
-                    return name + "関数の1番目のargumentは省略できません";
+                    return name + GameMessages.T(" function: argument #1 cannot be omitted");
                 Type baseType = arguments[0].GetOperandType();
                 for (int i = 1; i < arguments.Length; i++)
                 {
                     if (arguments[i] == null)
-                        return name + "関数の" + (i + 1).ToString() + "番目のargumentは省略できません";
+                        return name + GameMessages.T(" function: argument #") + (i + 1).ToString() + GameMessages.T(" cannot be omitted");
                     if (arguments[i].GetOperandType() != baseType)
-                        return name + "関数の" + (i + 1).ToString() + "番目のargumentの型が正しくありません";
+                        return name + GameMessages.T(" function: argument #") + (i + 1).ToString() + GameMessages.T(" has an invalid type");
                 }
                 return null;
             }
@@ -1476,16 +1476,16 @@ namespace MinorShift.Emuera.GameData.Function
             public override string CheckArgumentType(string name, IOperandTerm[] arguments)
             {
                 if (arguments.Length < 2)
-                    return name + "関数には少なくとも2つのargumentが必要です";
+                    return name + GameMessages.T(" function requires at least 2 arguments");
                 if (arguments[0] == null)
-                    return name + "関数の1番目のargumentは省略できません";
+                    return name + GameMessages.T(" function: argument #1 cannot be omitted");
                 Type baseType = arguments[0].GetOperandType();
                 for (int i = 1; i < arguments.Length; i++)
                 {
                     if (arguments[i] == null)
-                        return name + "関数の" + (i + 1).ToString() + "番目のargumentは省略できません";
+                        return name + GameMessages.T(" function: argument #") + (i + 1).ToString() + GameMessages.T(" cannot be omitted");
                     if (arguments[i].GetOperandType() != baseType)
-                        return name + "関数の" + (i + 1).ToString() + "番目のargumentの型が正しくありません";
+                        return name + GameMessages.T(" function: argument #") + (i + 1).ToString() + GameMessages.T(" has an invalid type");
                 }
                 return null;
             }
@@ -1551,26 +1551,26 @@ namespace MinorShift.Emuera.GameData.Function
             public override string CheckArgumentType(string name, IOperandTerm[] arguments)
             {
                 if (arguments.Length < 1)
-                    return name + "関数には少なくとも1つのargumentが必要です";
+                    return name + GameMessages.T(" function requires at least 1 argument");
                 if (arguments.Length > 3)
-                    return name + "関数のargumentが多すぎます";
+                    return name + GameMessages.T(" function: too many arguments");
                 if (arguments[0] == null)
-                    return name + "関数の1番目のargumentは省略できません";
+                    return name + GameMessages.T(" function: argument #1 cannot be omitted");
                 if (!(arguments[0] is VariableTerm))
-                    return name + "関数の1番目のargumentが変数ではありません";
+                    return name + GameMessages.T(" function: argument #1 is not a variable");
                 VariableTerm varToken = (VariableTerm)arguments[0];
                 if (isCharaRange && !varToken.Identifier.IsCharacterData)
-                    return name + "関数の1番目のargumentがキャラクタ変数ではありません";
+                    return name + GameMessages.T(" function: argument #1 is not a character variable");
                 if (!varToken.IsInteger)
-                    return name + "関数の1番目のargumentが数値変数ではありません";
+                    return name + GameMessages.T(" function: argument #1 is not a numeric variable");
                 if (!isCharaRange && (varToken.Identifier.IsArray2D || varToken.Identifier.IsArray3D))
-                    return name + "関数は二重配列・三重配列には対応していません";
+                    return name + GameMessages.T(" function does not support double or triple arrays");
                 if (!varToken.Identifier.IsArray1D)
-                    return name + "関数の1番目のargumentが配列変数ではありません";
+                    return name + GameMessages.T(" function: argument #1 is not an array variable");
                 if ((arguments.Length >= 2) && (arguments[1] != null) && (arguments[1].GetOperandType() != typeof(Int64)))
-                    return name + "関数の2番目のargumentの型が正しくありません";
+                    return name + GameMessages.T(" function: argument #2 has an invalid type");
                 if ((arguments.Length >= 3) && (arguments[2] != null) && (arguments[2].GetOperandType() != typeof(Int64)))
-                    return name + "関数の3番目のargumentの型が正しくありません";
+                    return name + GameMessages.T(" function: argument #3 has an invalid type");
                 return null;
             }
             public override Int64 GetIntValue(ExpressionMediator exm, IOperandTerm[] arguments)
@@ -1588,7 +1588,7 @@ namespace MinorShift.Emuera.GameData.Function
                 {
                     Int64 charaNum = exm.VEvaluator.CHARANUM;
                     if (start >= charaNum || start < 0 || end > charaNum || end < 0)
-                        throw new CodeEE(funcName + "関数の範囲指定がキャラクタ配列の範囲を超えています(" + start.ToString() + "～" + end.ToString() + ")");
+                        throw new CodeEE(funcName + GameMessages.T(" function: range exceeds the character array bounds (") + start.ToString() + GameMessages.T(" to ") + end.ToString() + ")");
                     return (exm.VEvaluator.GetMaxArrayChara(p, start, end, isMax));
                 }
             }
@@ -1611,7 +1611,7 @@ namespace MinorShift.Emuera.GameData.Function
                 {
                     Int64 m = ((SingleTerm)arguments[1]).Int;
                     if (m < 0 || m > 63)
-                        return "GETBIT関数の第２argument(" + m.ToString() + ")が範囲(０～６３)を超えています";
+                        return GameMessages.T("GETBIT function: argument #2 (") + m.ToString() + GameMessages.T(") exceeds the range (0-63)");
                 }
                 return null;
             }
@@ -1620,7 +1620,7 @@ namespace MinorShift.Emuera.GameData.Function
                 Int64 n = arguments[0].GetIntValue(exm);
                 Int64 m = arguments[1].GetIntValue(exm);
                 if ((m < 0) || (m > 63))
-                    throw new CodeEE("GETBIT関数の第２argument(" + m.ToString() + ")が範囲(０～６３)を超えています");
+                    throw new CodeEE(GameMessages.T("GETBIT function: argument #2 (") + m.ToString() + GameMessages.T(") exceeds the range (0-63)"));
                 int mi = (int)m;
                 return ((n >> mi) & 1);
             }
@@ -1638,15 +1638,15 @@ namespace MinorShift.Emuera.GameData.Function
             public override string CheckArgumentType(string name, IOperandTerm[] arguments)
             {
                 if (arguments.Length != 2)
-                    return name + "関数には2つのargumentが必要です";
+                    return name + GameMessages.T(" function requires 2 arguments");
                 if (arguments[0] == null)
-                    return name + "関数の1番目のargumentは省略できません";
+                    return name + GameMessages.T(" function: argument #1 cannot be omitted");
                 if (!(arguments[0] is VariableTerm))
-                    return name + "関数の1番目のargumentの型が正しくありません";
+                    return name + GameMessages.T(" function: argument #1 has an invalid type");
                 if (arguments[1] == null)
-                    return name + "関数の2番目のargumentは省略できません";
+                    return name + GameMessages.T(" function: argument #2 cannot be omitted");
                 if (arguments[1].GetOperandType() != typeof(string))
-                    return name + "関数の2番目のargumentの型が正しくありません";
+                    return name + GameMessages.T(" function: argument #2 has an invalid type");
                 return null;
             }
             public override Int64 GetIntValue(ExpressionMediator exm, IOperandTerm[] arguments)
@@ -1680,12 +1680,12 @@ namespace MinorShift.Emuera.GameData.Function
 				if (errStr != null)
 					return errStr;
 				if (arguments[0] == null)
-					return name + "関数の1番目のargumentは省略できません";
+					return name + GameMessages.T(" function: argument #1 cannot be omitted");
 				if (arguments[0] is SingleTerm)
 				{
 					string varName = ((SingleTerm)arguments[0]).Str;
 					if (GlobalStatic.IdentifierDictionary.GetVariableToken(varName, null, true) == null)
-						return name + "関数の1番目のargumentが変数名ではありません";
+						return name + GameMessages.T(" function: argument #1 is not a variable name");
 				}
 				return null;
 			}
@@ -1693,7 +1693,7 @@ namespace MinorShift.Emuera.GameData.Function
 			{
 				VariableToken var = GlobalStatic.IdentifierDictionary.GetVariableToken(arguments[0].GetStrValue(exm), null, true);
 				if (var == null)
-					throw new CodeEE("GETNUMBの1番目のargument(\"" + arguments[0].GetStrValue(exm) + "\")が変数名ではありません");
+					throw new CodeEE(GameMessages.T("GETNUMB function: argument #1 (\"") + arguments[0].GetStrValue(exm) + GameMessages.T("\") is not a variable name"));
 				string key = arguments[1].GetStrValue(exm);
                 if (exm.VEvaluator.Constant.TryKeywordToInteger(out int ret, var.Code, key, -1))
                     return ret;
@@ -1716,7 +1716,7 @@ namespace MinorShift.Emuera.GameData.Function
                 if (errStr != null)
                     return errStr;
                 if (arguments[0] == null)
-                    return name + "関数の1番目のargumentは省略できません";
+                    return name + GameMessages.T(" function: argument #1 cannot be omitted");
                 return null;
             }
             public override Int64 GetIntValue(ExpressionMediator exm, IOperandTerm[] arguments)
@@ -1742,7 +1742,7 @@ namespace MinorShift.Emuera.GameData.Function
                 if (errStr != null)
                     return errStr;
                 if (arguments[0] == null)
-                    return name + "関数の1番目のargumentは省略できません";
+                    return name + GameMessages.T(" function: argument #1 cannot be omitted");
                 return null;
             }
             public override Int64 GetIntValue(ExpressionMediator exm, IOperandTerm[] arguments)
@@ -1760,7 +1760,7 @@ namespace MinorShift.Emuera.GameData.Function
             {
                 ReturnType = typeof(Int64);
                 argumentTypeArray = null;
-                CanRestructure = true; //すべて定数項ならできるはず
+                CanRestructure = true; //Should be possible if all are constant terms
                 HasUniqueRestructure = true;
                 isLast = last;
                 funcName = isLast ? "FINDLASTELEMENT" : "FINDELEMENT";
@@ -1771,28 +1771,28 @@ namespace MinorShift.Emuera.GameData.Function
             public override string CheckArgumentType(string name, IOperandTerm[] arguments)
             {
                 if (arguments.Length < 2)
-                    return name + "関数には少なくとも2つのargumentが必要です";
+                    return name + GameMessages.T(" function requires at least 2 arguments");
                 if (arguments.Length > 5)
-                    return name + "関数のargumentが多すぎます";
+                    return name + GameMessages.T(" function: too many arguments");
                 if (arguments[0] == null)
-                    return name + "関数の1番目のargumentは省略できません";
+                    return name + GameMessages.T(" function: argument #1 cannot be omitted");
                 if (!(arguments[0] is VariableTerm varToken))
-                    return name + "関数の1番目のargumentが変数ではありません";
+                    return name + GameMessages.T(" function: argument #1 is not a variable");
                 if (varToken.Identifier.IsArray2D || varToken.Identifier.IsArray3D)
-                    return name + "関数は二重配列・三重配列には対応していません";
+                    return name + GameMessages.T(" function does not support double or triple arrays");
                 if (!varToken.Identifier.IsArray1D)
-                    return name + "関数の1番目のargumentが配列変数ではありません";
+                    return name + GameMessages.T(" function: argument #1 is not an array variable");
                 Type baseType = arguments[0].GetOperandType();
                 if (arguments[1] == null)
-                    return name + "関数の2番目のargumentは省略できません";
+                    return name + GameMessages.T(" function: argument #2 cannot be omitted");
                 if (arguments[1].GetOperandType() != baseType)
-                    return name + "関数の2番目のargumentの型が正しくありません";
+                    return name + GameMessages.T(" function: argument #2 has an invalid type");
                 if ((arguments.Length >= 3) && (arguments[2] != null) && (arguments[2].GetOperandType() != typeof(Int64)))
-                    return name + "関数の3番目のargumentの型が正しくありません";
+                    return name + GameMessages.T(" function: argument #3 has an invalid type");
                 if ((arguments.Length >= 4) && (arguments[3] != null) && (arguments[3].GetOperandType() != typeof(Int64)))
-                    return name + "関数の4番目のargumentの型が正しくありません";
+                    return name + GameMessages.T(" function: argument #4 has an invalid type");
                 if ((arguments.Length >= 5) && (arguments[4] != null) && (arguments[4].GetOperandType() != typeof(Int64)))
-                    return name + "関数の5番目のargumentの型が正しくありません";
+                    return name + GameMessages.T(" function: argument #5 has an invalid type");
                 return null;
             }
 
@@ -1823,7 +1823,7 @@ namespace MinorShift.Emuera.GameData.Function
                     }
                     catch (ArgumentException)
                     {
-                        throw new CodeEE("第2argumentが正規表現として不正です");
+                        throw new CodeEE(GameMessages.T("argument #2 is an invalid regular expression"));
                     }
                     return exm.VEvaluator.FindElement(p, targetString, start, end, isExact, isLast);
                 }
@@ -1883,34 +1883,34 @@ namespace MinorShift.Emuera.GameData.Function
             public override string CheckArgumentType(string name, IOperandTerm[] arguments)
             {
                 if (arguments.Length < 2)
-                    return name + "関数には少なくとも2つのargumentが必要です";
+                    return name + GameMessages.T(" function requires at least 2 arguments");
                 if (arguments.Length > 6)
-                    return name + "関数のargumentが多すぎます";
+                    return name + GameMessages.T(" function: too many arguments");
                 if (arguments[0] == null)
-                    return name + "関数の1番目のargumentは省略できません";
+                    return name + GameMessages.T(" function: argument #1 cannot be omitted");
                 if (!(arguments[0] is VariableTerm))
-                    return name + "関数の1番目のargumentが変数ではありません";
+                    return name + GameMessages.T(" function: argument #1 is not a variable");
                 VariableTerm varToken = (VariableTerm)arguments[0];
                 if (isCharaRange && !varToken.Identifier.IsCharacterData)
-                    return name + "関数の1番目のargumentがキャラクタ変数ではありません";
+                    return name + GameMessages.T(" function: argument #1 is not a character variable");
                 if (!isCharaRange && (varToken.Identifier.IsArray2D || varToken.Identifier.IsArray3D))
-                    return name + "関数は二重配列・三重配列には対応していません";
+                    return name + GameMessages.T(" function does not support double or triple arrays");
                 if (!isCharaRange && !varToken.Identifier.IsArray1D)
-                    return name + "関数の1番目のargumentが配列変数ではありません";
+                    return name + GameMessages.T(" function: argument #1 is not an array variable");
                 if (!varToken.IsInteger)
-                    return name + "関数の1番目のargumentが数値型変数ではありません";
+                    return name + GameMessages.T(" function: argument #1 is not a numeric variable");
                 if (arguments[1] == null)
-                    return name + "関数の2番目のargumentは省略できません";
+                    return name + GameMessages.T(" function: argument #2 cannot be omitted");
                 if (arguments[1].GetOperandType() != typeof(Int64))
-                    return name + "関数の2番目のargumentが数値型ではありません";
+                    return name + GameMessages.T(" function: argument #2 is not numeric");
                 if (arguments[2] == null)
-                    return name + "関数の3番目のargumentは省略できません";
+                    return name + GameMessages.T(" function: argument #3 cannot be omitted");
                 if (arguments[2].GetOperandType() != typeof(Int64))
-                    return name + "関数の3番目のargumentが数値型ではありません";
+                    return name + GameMessages.T(" function: argument #3 is not numeric");
                 if ((arguments.Length >= 4) && (arguments[3] != null) && (arguments[3].GetOperandType() != typeof(Int64)))
-                    return name + "関数の4番目のargumentの型が正しくありません";
+                    return name + GameMessages.T(" function: argument #4 has an invalid type");
                 if ((arguments.Length >= 5) && (arguments[4] != null) && (arguments[4].GetOperandType() != typeof(Int64)))
-                    return name + "関数の5番目のargumentの型が正しくありません";
+                    return name + GameMessages.T(" function: argument #5 has an invalid type");
                 return null;
             }
             public override Int64 GetIntValue(ExpressionMediator exm, IOperandTerm[] arguments)
@@ -1933,7 +1933,7 @@ namespace MinorShift.Emuera.GameData.Function
                 {
                     Int64 charaNum = exm.VEvaluator.CHARANUM;
                     if (start >= charaNum || start < 0 || end > charaNum || end < 0)
-                        throw new CodeEE("INRANGECARRAY関数の範囲指定がキャラクタ配列の範囲を超えています(" + start.ToString() + "～" + end.ToString() + ")");
+                        throw new CodeEE(GameMessages.T("INRANGECARRAY function: range exceeds the character array bounds (") + start.ToString() + GameMessages.T(" to ") + end.ToString() + ")");
                     return (exm.VEvaluator.GetInRangeArrayChara(p, min, max, start, end));
                 }
             }
@@ -1951,19 +1951,19 @@ namespace MinorShift.Emuera.GameData.Function
 			public override string CheckArgumentType(string name, IOperandTerm[] arguments)
 			{
 				if (arguments.Length < 2)
-					return string.Format("{0}関数:少なくとも{1}のargumentが必要です", name, 2);
+					return string.Format(GameMessages.T("{0} function requires at least {1} arguments"), name, 2);
 				for (int i = 0; i < arguments.Length; i++)
 				{
 					if (arguments[i] == null)
-						return string.Format("{0}関数:{1}番目のargumentは省略できません", name, i + 1);
+						return string.Format(GameMessages.T("{0} function: argument {1} cannot be omitted"), name, i + 1);
                     if (!(arguments[i] is VariableTerm varTerm) || varTerm.Identifier.IsCalc || varTerm.Identifier.IsConst)
-                        return string.Format("{0}関数:{1}番目のargumentが変数ではありません", name, i + 1);
+                        return string.Format(GameMessages.T("{0} function: argument {1} is not a variable"), name, i + 1);
                     if (varTerm.Identifier.IsCharacterData)
-						return string.Format("{0}関数:{1}番目のargumentがキャラクタ変数です", name, i + 1);
+						return string.Format(GameMessages.T("{0} function: argument {1} is a character variable"), name, i + 1);
 					if (i == 0 && !varTerm.Identifier.IsArray1D)
-						return string.Format("{0}関数:{1}番目のargumentが一次元配列ではありません", name, i + 1);
+						return string.Format(GameMessages.T("{0} function: argument {1} is not a 1D array"), name, i + 1);
 					if (!varTerm.Identifier.IsArray1D && !varTerm.Identifier.IsArray2D && !varTerm.Identifier.IsArray2D)
-						return string.Format("{0}関数:{1}番目のargumentが配列変数ではありません", name, i + 1);
+						return string.Format(GameMessages.T("{0} function: argument {1} is not an array variable"), name, i + 1);
 				}
 				return null;
 			}
@@ -1983,7 +1983,7 @@ namespace MinorShift.Emuera.GameData.Function
 							return 0;
 						sortList.Add(new KeyValuePair<long, int>(array[i], i));
 					}
-                    //素ではintの範囲しか扱えないので一工夫
+                    //On its own it can only handle the int range, so a trick is needed
                     sortList.Sort((a, b) => { return Math.Sign(a.Key - b.Key); });
 					sortedArray = new int[sortList.Count];
 					for (int i = 0; i < sortedArray.Length; i++)
@@ -2004,7 +2004,7 @@ namespace MinorShift.Emuera.GameData.Function
 					for (int i = 0; i < sortedArray.Length; i++)
 						sortedArray[i] = sortList[i].Value;
 				}
-				foreach (VariableTerm term in arguments)//もう少し賢い方法はないものだろうか
+				foreach (VariableTerm term in arguments)//Could there be a smarter way?
 				{
 					if (term.Identifier.IsArray1D)
 					{
@@ -2075,7 +2075,7 @@ namespace MinorShift.Emuera.GameData.Function
 										array[i, x, y] = clone[sortedArray[i], x, y];
 						}
 					}
-					else { throw new ExeEE("異常な配列"); }
+					else { throw new ExeEE(GameMessages.T("unexpected array")); }
 				}
 				return 1;
 			}
@@ -2088,7 +2088,7 @@ namespace MinorShift.Emuera.GameData.Function
 		}
         #endregion
 
-        #region 文字列操作系
+        #region String operations
         private sealed class StrlenMethod : FunctionMethod
         {
             public StrlenMethod()
@@ -2130,21 +2130,21 @@ namespace MinorShift.Emuera.GameData.Function
 
             public override string CheckArgumentType(string name, IOperandTerm[] arguments)
             {
-                //通常３つ、２つ省略可能で１～３のargumentが必要。
+                //Usually 3, with 2 optional, so 1-3 arguments are required.
                 if (arguments.Length < 1)
-                    return name + "関数には少なくとも1つのargumentが必要です";
+                    return name + GameMessages.T(" function requires at least 1 argument");
                 if (arguments.Length > 3)
-                    return name + "関数のargumentが多すぎます";
+                    return name + GameMessages.T(" function: too many arguments");
 
                 if (arguments[0] == null)
-                    return name + "関数の1番目のargumentは省略できません";
+                    return name + GameMessages.T(" function: argument #1 cannot be omitted");
                 if (arguments[0].GetOperandType() != typeof(string))
-                    return name + "関数の1番目のargumentの型が正しくありません";
-                //2、３は省略可能
+                    return name + GameMessages.T(" function: argument #1 has an invalid type");
+                //2 and 3 are optional
                 if ((arguments.Length >= 2) && (arguments[1] != null) && (arguments[1].GetOperandType() != typeof(Int64)))
-                    return name + "関数の2番目のargumentの型が正しくありません";
+                    return name + GameMessages.T(" function: argument #2 has an invalid type");
                 if ((arguments.Length >= 3) && (arguments[2] != null) && (arguments[2].GetOperandType() != typeof(Int64)))
-                    return name + "関数の3番目のargumentの型が正しくありません";
+                    return name + GameMessages.T(" function: argument #3 has an invalid type");
                 return null;
             }
             public override string GetStrValue(ExpressionMediator exm, IOperandTerm[] arguments)
@@ -2172,21 +2172,21 @@ namespace MinorShift.Emuera.GameData.Function
 
             public override string CheckArgumentType(string name, IOperandTerm[] arguments)
             {
-                //通常３つ、２つ省略可能で１～３のargumentが必要。
+                //Usually 3, with 2 optional, so 1-3 arguments are required.
                 if (arguments.Length < 1)
-                    return name + "関数には少なくとも1つのargumentが必要です";
+                    return name + GameMessages.T(" function requires at least 1 argument");
                 if (arguments.Length > 3)
-                    return name + "関数のargumentが多すぎます";
+                    return name + GameMessages.T(" function: too many arguments");
 
                 if (arguments[0] == null)
-                    return name + "関数の1番目のargumentは省略できません";
+                    return name + GameMessages.T(" function: argument #1 cannot be omitted");
                 if (arguments[0].GetOperandType() != typeof(string))
-                    return name + "関数の1番目のargumentの型が正しくありません";
-                //2、３は省略可能
+                    return name + GameMessages.T(" function: argument #1 has an invalid type");
+                //2 and 3 are optional
                 if ((arguments.Length >= 2) && (arguments[1] != null) && (arguments[1].GetOperandType() != typeof(Int64)))
-                    return name + "関数の2番目のargumentの型が正しくありません";
+                    return name + GameMessages.T(" function: argument #2 has an invalid type");
                 if ((arguments.Length >= 3) && (arguments[2] != null) && (arguments[2].GetOperandType() != typeof(Int64)))
-                    return name + "関数の3番目のargumentの型が正しくありません";
+                    return name + GameMessages.T(" function: argument #3 has an invalid type");
                 return null;
             }
             public override string GetStrValue(ExpressionMediator exm, IOperandTerm[] arguments)
@@ -2229,22 +2229,22 @@ namespace MinorShift.Emuera.GameData.Function
             readonly bool unicode = false;
             public override string CheckArgumentType(string name, IOperandTerm[] arguments)
             {
-                //通常３つ、１つ省略可能で２～３のargumentが必要。
+                //Usually 3, with 1 optional, so 2-3 arguments are required.
                 if (arguments.Length < 2)
-                    return name + "関数には少なくとも2つのargumentが必要です";
+                    return name + GameMessages.T(" function requires at least 2 arguments");
                 if (arguments.Length > 3)
-                    return name + "関数のargumentが多すぎます";
+                    return name + GameMessages.T(" function: too many arguments");
                 if (arguments[0] == null)
-                    return name + "関数の1番目のargumentは省略できません";
+                    return name + GameMessages.T(" function: argument #1 cannot be omitted");
                 if (arguments[0].GetOperandType() != typeof(string))
-                    return name + "関数の1番目のargumentの型が正しくありません";
+                    return name + GameMessages.T(" function: argument #1 has an invalid type");
                 if (arguments[1] == null)
-                    return name + "関数の2番目のargumentは省略できません";
+                    return name + GameMessages.T(" function: argument #2 cannot be omitted");
                 if (arguments[1].GetOperandType() != typeof(string))
-                    return name + "関数の2番目のargumentの型が正しくありません";
-                //3つ目は省略可能
+                    return name + GameMessages.T(" function: argument #2 has an invalid type");
+                //The 3rd is optional
                 if ((arguments.Length >= 3) && (arguments[2] != null) && (arguments[2].GetOperandType() != typeof(Int64)))
-                    return name + "関数の3番目のargumentの型が正しくありません";
+                    return name + GameMessages.T(" function: argument #3 has an invalid type");
                 return null;
             }
             public override Int64 GetIntValue(ExpressionMediator exm, IOperandTerm[] arguments)
@@ -2293,7 +2293,7 @@ namespace MinorShift.Emuera.GameData.Function
                 }
                 catch (ArgumentException e)
                 {
-                    throw new CodeEE("第2argumentが正規表現として不正です：" + e.Message);
+                    throw new CodeEE(GameMessages.T("argument #2 is an invalid regular expression: ") + e.Message);
                 }
                 return (reg.Matches(arguments[0].GetStrValue(exm)).Count);
             }
@@ -2310,17 +2310,17 @@ namespace MinorShift.Emuera.GameData.Function
 
             public override string CheckArgumentType(string name, IOperandTerm[] arguments)
             {
-                //通常2つ、1つ省略可能で1～2のargumentが必要。
+                //Usually 2, with 1 optional, so 1-2 arguments are required.
                 if (arguments.Length < 1)
-                    return name + "関数には少なくとも1つのargumentが必要です";
+                    return name + GameMessages.T(" function requires at least 1 argument");
                 if (arguments.Length > 2)
-                    return name + "関数のargumentが多すぎます";
+                    return name + GameMessages.T(" function: too many arguments");
                 if (arguments[0] == null)
-                    return name + "関数の1番目のargumentは省略できません";
+                    return name + GameMessages.T(" function: argument #1 cannot be omitted");
                 if (arguments[0].GetOperandType() != typeof(Int64))
-                    return name + "関数の1番目のargumentの型が正しくありません";
+                    return name + GameMessages.T(" function: argument #1 has an invalid type");
                 if ((arguments.Length >= 2) && (arguments[1] != null) && (arguments[1].GetOperandType() != typeof(string)))
-                    return name + "関数の2番目のargumentの型が正しくありません";
+                    return name + GameMessages.T(" function: argument #2 has an invalid type");
                 return null;
             }
             public override string GetStrValue(ExpressionMediator exm, IOperandTerm[] arguments)
@@ -2336,7 +2336,7 @@ namespace MinorShift.Emuera.GameData.Function
                 }
                 catch (FormatException)
                 {
-                    throw new CodeEE("TOSTR関数の書式指定が間違っています");
+                    throw new CodeEE(GameMessages.T("TOSTR function: format specifier is invalid"));
                 }
                 return (ret);
             }
@@ -2356,7 +2356,7 @@ namespace MinorShift.Emuera.GameData.Function
                 string str = arguments[0].GetStrValue(exm);
                 if (str == null || str == "")
                     return (0);
-                //全角文字が入ってるなら無条件で0を返す
+                //Return 0 unconditionally if full-width characters are present
                 if (str.Length < LangManager.GetStrlenLang(str))
                     return (0);
                 StringStream st = new StringStream(str);
@@ -2386,7 +2386,7 @@ namespace MinorShift.Emuera.GameData.Function
 
         //Obfuscation attribute. Set (Exclude=true) when using enum.ToString() or enum.Parse().
         [global::System.Reflection.Obfuscation(Exclude = false)]
-        //TOUPPER等の処理を汎用化するためのenum
+        //Enum to generalize processing such as TOUPPER
         enum StrFormType
         {
             Upper = 0,
@@ -2464,7 +2464,7 @@ namespace MinorShift.Emuera.GameData.Function
                 }
                 catch (ArgumentException e)
                 {
-                    throw new CodeEE("第２argumentが正規表現として不正です：" + e.Message);
+                    throw new CodeEE(GameMessages.T("argument #2 is an invalid regular expression: ") + e.Message);
                 }
                 return (reg.Replace(baseString, arguments[2].GetStrValue(exm)));
             }
@@ -2482,16 +2482,16 @@ namespace MinorShift.Emuera.GameData.Function
             {
                 Int64 i = arguments[0].GetIntValue(exm);
                 if ((i < 0) || (i > 0xFFFF))
-                    throw new CodeEE("UNICODE関数に範囲外の値(" + i.ToString() + ")が渡されました");
-                //改行関係以外の制御文字は警告扱いに変更
-                //とはいえ、改行以外の制御文字を意図的に渡すのはそもそもコーディングに問題がありすぎるので、Errorでもいい気はする
+                    throw new CodeEE(GameMessages.T("UNICODE function: out-of-range value (") + i.ToString() + GameMessages.T(") was passed"));
+                //Control characters other than line breaks are now treated as warnings
+                //That said, intentionally passing control characters other than line breaks is a coding problem in itself, so Error would be fine too
                 if ((i < 0x001F && i != 0x000A && i != 0x000D) || (i >= 0x007F && i <= 0x009F))
                 {
-                    //コード実行中の場合
+                    //When code is running
                     if(GlobalStatic.Process.getCurrentLine != null)
-                        GlobalStatic.Console.PrintSystemLine("注意:" + GlobalStatic.Process.getCurrentLine.Position.Filename + "の" + GlobalStatic.Process.getCurrentLine.Position.LineNo.ToString() + "行目でUNICODE関数に制御文字に対応する値(0x" + String.Format("{0:X}", i) + ")が渡されました");
+                        GlobalStatic.Console.PrintSystemLine(GameMessages.T("Note: ") + GlobalStatic.Process.getCurrentLine.Position.Filename + GameMessages.T(" line ") + GlobalStatic.Process.getCurrentLine.Position.LineNo.ToString() + GameMessages.T(": control character value (0x") + String.Format("{0:X}", i) + GameMessages.T(") was passed"));
                     else
-                        ParserMediator.Warn("UNICODE関数に制御文字に対応する値(0x" + String.Format("{0:X}", i) + ")が渡されました", GlobalStatic.Process.scaningLine, 1, false, false, null);
+                        ParserMediator.Warn(GameMessages.T("UNICODE function: control character value (0x") + String.Format("{0:X}", i) + GameMessages.T(") was passed"), GlobalStatic.Process.GetScaningLine(), 1, false, false, null);
 
                     return "";
                 }
@@ -2533,7 +2533,7 @@ namespace MinorShift.Emuera.GameData.Function
             {
                 Int64 toBase = arguments[1].GetIntValue(exm);
                 if ((toBase != 2) && (toBase != 8) && (toBase != 10) && (toBase != 16))
-                    throw new CodeEE("CONVERT関数の第２argumentは2, 8, 10, 16のいずれかでなければなりません");
+                    throw new CodeEE(GameMessages.T("CONVERT function: argument #2 must be 2, 8, 10, or 16"));
                 return Convert.ToString(arguments[0].GetIntValue(exm), (int)toBase);
             }
         }
@@ -2550,7 +2550,7 @@ namespace MinorShift.Emuera.GameData.Function
             {
                 string baseStr = arguments[0].GetStrValue(exm);
 
-                //全角文字があるなら数値ではない
+                //If it contains full-width characters, it is not numeric
                 if (baseStr.Length < LangManager.GetStrlenLang(baseStr))
                     return (0);
                 StringStream st = new StringStream(baseStr);
@@ -2602,17 +2602,17 @@ namespace MinorShift.Emuera.GameData.Function
             }
             public override string CheckArgumentType(string name, IOperandTerm[] arguments)
             {
-                //通常2つ、1つ省略可能で1～2のargumentが必要。
+                //Usually 2, with 1 optional, so 1-2 arguments are required.
                 if (arguments.Length < 1)
-                    return name + "関数には少なくとも1つのargumentが必要です";
+                    return name + GameMessages.T(" function requires at least 1 argument");
                 if (arguments.Length > 2)
-                    return name + "関数のargumentが多すぎます";
+                    return name + GameMessages.T(" function: too many arguments");
                 if (arguments[0] == null)
-                    return name + "関数の1番目のargumentは省略できません";
+                    return name + GameMessages.T(" function: argument #1 cannot be omitted");
                 if (arguments[0].GetOperandType() != typeof(string))
-                    return name + "関数の1番目のargumentの型が正しくありません";
+                    return name + GameMessages.T(" function: argument #1 has an invalid type");
                 if ((arguments.Length >= 2) && (arguments[1] != null) && (arguments[1].GetOperandType() != typeof(Int64)))
-                    return name + "関数の2番目のargumentの型が正しくありません";
+                    return name + GameMessages.T(" function: argument #2 has an invalid type");
                 return null;
             }
             public override Int64 GetIntValue(ExpressionMediator exm, IOperandTerm[] arguments)
@@ -2622,9 +2622,9 @@ namespace MinorShift.Emuera.GameData.Function
                     return -1;
                 Int64 position = (arguments.Length > 1 && arguments[1] != null) ? arguments[1].GetIntValue(exm) : 0;
                 if (position < 0)
-                    throw new CodeEE("ENCOIDETOUNI関数の第２argument(" + position.ToString() + ")が負の値です");
+                    throw new CodeEE(GameMessages.T("ENCOIDETOUNI function: argument #2 (") + position.ToString() + GameMessages.T(") is negative"));
                 if (position >= baseStr.Length)
-                    throw new CodeEE("ENCOIDETOUNI関数の第２argument(" + position.ToString() + ")が第１argumentの文字列(" + baseStr + ")の文字数を超えています");
+                    throw new CodeEE(GameMessages.T("ENCOIDETOUNI function: argument #2 (") + position.ToString() + GameMessages.T(") exceeds the length of argument #1 string (") + baseStr + GameMessages.T(")"));
                 return char.ConvertToUtf32(baseStr, (int)position);
             }
         }
@@ -2659,7 +2659,7 @@ namespace MinorShift.Emuera.GameData.Function
 			{
                 string str = arguments[0].GetStrValue(exm);
 				if (string.IsNullOrEmpty(str))
-					throw new CodeEE("GETLINESTR関数のargumentが空文字列です");
+					throw new CodeEE(GameMessages.T("GETLINESTR function: argument is an empty string"));
                 return exm.Console.getStBar(str);
             }
         }
@@ -2685,21 +2685,21 @@ namespace MinorShift.Emuera.GameData.Function
 				}
 				catch(CodeEE e)
 				{
-					throw new CodeEE("STRFORM関数:文字列\"" + str + "\"の展開Error:" + e.Message);
+					throw new CodeEE(GameMessages.T("STRFORM function: string \"") + str + GameMessages.T("\" expansion error: ") + e.Message);
 				}
 				catch
 				{
-					throw new CodeEE("STRFORM関数:文字列\"" + str+ "\"の展開処理中にErrorが発生しました");
+					throw new CodeEE(GameMessages.T("STRFORM function: string \"") + str+ GameMessages.T("\" an error occurred during expansion"));
 				}
 				return destStr;
 			}
             public override bool UniqueRestructure(ExpressionMediator exm, IOperandTerm[] arguments)
             {
                 arguments[0].Restructure(exm);
-                //argumentが文字列式等ならお手上げなので諦める
+                //If the argument is a string expression or the like, we give up
                 if (!(arguments[0] is SingleTerm) && !(arguments[0] is VariableTerm))
                     return false;
-                //argumentが確定値でない文字列変数なら無条件で不可（結果が可変なため）
+                //If the argument is a string variable without a definite value, it's unconditionally disallowed (since the result varies)
                 if ((arguments[0] is VariableTerm) && !(((VariableTerm)arguments[0]).Identifier.IsConst))
                     return false;
                 string str = arguments[0].GetStrValue(exm);
@@ -2712,7 +2712,7 @@ namespace MinorShift.Emuera.GameData.Function
                 }
                 catch
                 {
-                    //パースできないのはErrorがあるかここではわからないからとりあえず考えない
+                    //If it can't be parsed, we can't tell whether there's an error here, so ignore it for now
                     return false;
                 }
                 return true;
@@ -2731,28 +2731,28 @@ namespace MinorShift.Emuera.GameData.Function
             public override string CheckArgumentType(string name, IOperandTerm[] arguments)
             {
                 if (arguments.Length < 1)
-                    return name + "関数には少なくとも1つのargumentが必要です";
+                    return name + GameMessages.T(" function requires at least 1 argument");
                 if (arguments.Length > 4)
-                    return name + "関数のargumentが多すぎます";
+                    return name + GameMessages.T(" function: too many arguments");
                 if (arguments[0] == null)
-                    return name + "関数の1番目のargumentは省略できません";
+                    return name + GameMessages.T(" function: argument #1 cannot be omitted");
                 if (!(arguments[0] is VariableTerm))
-                    return name + "関数の1番目のargumentが変数ではありません";
+                    return name + GameMessages.T(" function: argument #1 is not a variable");
                 VariableTerm varToken = (VariableTerm)arguments[0];
                 if (!varToken.Identifier.IsArray1D && !varToken.Identifier.IsArray2D && !varToken.Identifier.IsArray3D)
-                    return name + "関数の1番目のargumentが配列変数ではありません";
+                    return name + GameMessages.T(" function: argument #1 is not an array variable");
                 if (arguments.Length == 1)
                     return null;
                 if ((arguments[1] != null) && (arguments[1].GetOperandType() != typeof(string)))
-                    return name + "関数の2番目の変数が文字列ではありません";
+                    return name + GameMessages.T(" function: argument #2 is not a string");
                 if (arguments.Length == 2)
                     return null;
                 if ((arguments[2] != null) && (arguments[2].GetOperandType() != typeof(Int64)))
-                    return name + "関数の3番目の変数が数値ではありません";
+                    return name + GameMessages.T(" function: argument #3 is not a number");
                 if (arguments.Length == 3)
                     return null;
                 if ((arguments[3] != null) && (arguments[3].GetOperandType() != typeof(Int64)))
-                    return name + "関数の4番目の変数が数値ではありません";
+                    return name + GameMessages.T(" function: argument #4 is not a number");
                 return null;
             }
             public override string GetStrValue(ExpressionMediator exm, IOperandTerm[] arguments)
@@ -2765,14 +2765,14 @@ namespace MinorShift.Emuera.GameData.Function
                 FixedVariableTerm p = varTerm.GetFixedVariableTerm(exm);
 
                 if (index2 < 0)
-                    throw new CodeEE("STRJOINの第4argument(" + index2.ToString()+ ")が負の値になっています");
+                    throw new CodeEE(GameMessages.T("STRJOIN function: argument #4 (") + index2.ToString()+ GameMessages.T(") is negative"));
 
                 p.IsArrayRangeValid(index1, index1 + index2, "STRJOIN", 2L, 3L);
                 return (exm.VEvaluator.GetJoinedStr(p, delimiter, index1, index2));
             }
             public override bool UniqueRestructure(ExpressionMediator exm, IOperandTerm[] arguments)
             {                
-                //第1変数は変数名なので、定数文字列変数だと事故が起こるので独自対応
+                //The 1st variable is a variable name, so a constant string variable would cause problems; handle specially
                 VariableTerm varTerm = (VariableTerm)arguments[0];
                 bool canRerstructure = varTerm.Identifier.IsConst;
                 for (int i = 1; i < arguments.Length; i++)
@@ -2808,35 +2808,35 @@ namespace MinorShift.Emuera.GameData.Function
 			{
 				string str = arguments[0].GetStrValue(exm);
 				if(str == null || str.Length == 0)
-					throw new CodeEE(funcname + "関数に空文字列が渡されました");
+					throw new CodeEE(funcname + GameMessages.T(" function: an empty string was passed"));
 				string errMes = null;
 				SingleTerm term = ConfigData.Instance.GetConfigValueInERB(str, ref errMes);
 				if(errMes != null)
-					throw new CodeEE(funcname + "関数:" + errMes);
+					throw new CodeEE(funcname + GameMessages.T(" function: ") + errMes);
 				return term;
 			}
 			public override Int64 GetIntValue(ExpressionMediator exm, IOperandTerm[] arguments)
 			{
 				if(ReturnType != typeof(Int64))
-					throw new ExeEE(funcname + "関数:Invalid 呼び出し");
+					throw new ExeEE(funcname + GameMessages.T(" function: invalid call"));
 				SingleTerm term = GetSingleTerm(exm, arguments);
 				if(term.GetOperandType() != typeof(Int64))
-					throw new CodeEE(funcname + "関数:型が違います（GETCONFIGS関数を使用してください）");
+					throw new CodeEE(funcname + GameMessages.T(" function: type mismatch (use the GETCONFIGS function)"));
 				return term.Int;
 			}
 			public override string GetStrValue(ExpressionMediator exm, IOperandTerm[] arguments)
 			{
 				if(ReturnType != typeof(string))
-					throw new ExeEE(funcname + "関数:Invalid 呼び出し");
+					throw new ExeEE(funcname + GameMessages.T(" function: invalid call"));
 				SingleTerm term = GetSingleTerm(exm, arguments);
 				if (term.GetOperandType() != typeof(string))
-					throw new CodeEE(funcname + "関数:型が違います（GETCONFIG関数を使用してください）");
+					throw new CodeEE(funcname + GameMessages.T(" function: type mismatch (use the GETCONFIG function)"));
 				return term.Str;
 			}
 		}
         #endregion
 
-		#region html系
+		#region HTML
 
 		private sealed class HtmlGetPrintedStrMethod : FunctionMethod
 		{
@@ -2849,13 +2849,13 @@ namespace MinorShift.Emuera.GameData.Function
 
 			public override string CheckArgumentType(string name, IOperandTerm[] arguments)
 			{
-				//通常１つ。省略可能。
+				//Usually 1; optional.
 				if (arguments.Length > 1)
-					return name + "関数のargumentが多すぎます";
+					return name + GameMessages.T(" function: too many arguments");
 				if (arguments.Length == 0|| arguments[0] == null)
 					return null;
 				if (arguments[0].GetOperandType() != typeof(Int64))
-					return name + "関数の1番目のargumentの型が正しくありません";
+					return name + GameMessages.T(" function: argument #1 has an invalid type");
 				return null;
 			}
 			public override string GetStrValue(ExpressionMediator exm, IOperandTerm[] arguments)
@@ -2864,7 +2864,7 @@ namespace MinorShift.Emuera.GameData.Function
 				if (arguments.Length > 0)
 					lineNo = arguments[0].GetIntValue(exm);
 				if (lineNo < 0)
-					throw new CodeEE("argumentを0未満にできません");
+					throw new CodeEE(GameMessages.T("argument cannot be less than 0"));
 				ConsoleDisplayLine[] dispLines = exm.Console.GetDisplayLines(lineNo);
 				if (dispLines == null)
 					return "";
@@ -2949,22 +2949,22 @@ namespace MinorShift.Emuera.GameData.Function
 		}
 		#endregion
 
-		#region 画像処理系
+		#region Image processing
 		/// <summary>
-		/// argNo番目のargumentをGraphicsImageのIDを示す整数値として読み取り、 GraphicsImage又はnullを返す。
+		/// Reads the argNo-th argument as an integer value representing a GraphicsImage ID, and returns a GraphicsImage or null.
 		/// </summary>
 		private static GraphicsImage ReadGraphics(string Name, ExpressionMediator exm, IOperandTerm[] arguments, int argNo)
 		{
 			Int64 target = arguments[argNo].GetIntValue(exm);
-			if (target < 0)//funcname + "関数:GraphicsIDに負の値(" + target.ToString() + ")が指定されました"
+			if (target < 0)//funcname + ": a negative GraphicsID (" + target.ToString() + ") was specified"
 				throw new CodeEE(string.Format(Properties.Resources.RuntimeErrMesMethodGraphicsID0, Name, target));
-			else if (target > int.MaxValue)//funcname + "関数:GraphicsIDの値(" + target.ToString() + ")が大きすぎます"
+			else if (target > int.MaxValue)//funcname + ": GraphicsID value (" + target.ToString() + ") is too large"
 				throw new CodeEE(string.Format(Properties.Resources.RuntimeErrMesMethodGraphicsID1, Name, target));
             return AppContents.GetGraphics((int)target);
 		}
 
 		/// <summary>
-		/// argNo番目のargumentを整数値として読み取り、 アルファ値を含むColor構造体にして返す。
+		/// Reads the argNo-th argument as an integer value and returns it as a Color struct including the alpha value.
 		/// </summary>
 		private static Color ReadColor(string Name, ExpressionMediator exm, IOperandTerm[] arguments, int argNo)
 		{
@@ -2975,7 +2975,7 @@ namespace MinorShift.Emuera.GameData.Function
 		}
 
 		/// <summary>
-		/// argNo番目を含む2つのargumentを整数値として読み取り、Point形式にして返す。
+		/// Reads 2 arguments (including the argNo-th) as integer values and returns them in Point form.
 		/// </summary>
 		private static Point ReadPoint(string Name, ExpressionMediator exm, IOperandTerm[] arguments, int argNo)
 		{
@@ -2989,7 +2989,7 @@ namespace MinorShift.Emuera.GameData.Function
 		}
 
 		/// <summary>
-		/// argNo番目を含む4つのargumentを整数値として読み取り、Rectangle形式にして返す。
+		/// Reads 4 arguments (including the argNo-th) as integer values and returns them in Rectangle form.
 		/// </summary>
 		private static Rectangle ReadRectangle(string Name, ExpressionMediator exm, IOperandTerm[] arguments, int argNo)
 		{
@@ -3010,11 +3010,11 @@ namespace MinorShift.Emuera.GameData.Function
 		}
 
 		/// <summary>
-		/// argNo番目のargumentを5x5のカラーマトリクス配列変数として読み取り、 5x5のfloat[][]形式にして返す。
+		/// Reads the argNo-th argument as a 5x5 color-matrix array variable and returns it in 5x5 float[][] form.
 		/// </summary>
 		private static float[][] ReadColormatrix(string Name, ExpressionMediator exm, IOperandTerm[] arguments, int argNo)
 		{
-			//数値型二次元以上配列変数のはず
+			//Should be a numeric array variable with 2 or more dimensions
 			FixedVariableTerm p = ((VariableTerm)arguments[argNo]).GetFixedVariableTerm(exm);
 			Int64 e1, e2;
 			float[][] cm = new float[5][];
@@ -3098,7 +3098,7 @@ namespace MinorShift.Emuera.GameData.Function
 					case "GHEIGHT":
 						return g.Height;
 				}
-				throw new ExeEE("GraphicsState:" + Name + ":異常な分岐");
+				throw new ExeEE("GraphicsState:" + Name + GameMessages.T(": unexpected branch"));
 			}
 		}
 
@@ -3115,14 +3115,14 @@ namespace MinorShift.Emuera.GameData.Function
 				if (Config.TextDrawingMode == TextDrawingMode.WINAPI)
 					throw new CodeEE(string.Format(Properties.Resources.RuntimeErrMesMethodGDIPLUSOnly, Name));
 				GraphicsImage g = ReadGraphics(Name, exm, arguments, 0);
-				//失敗したら負の値を返す。他と戻り値違うけど仕方ないね
+				//Return a negative value on failure. Different from the others, but nothing we can do.
 				if (!g.IsCreated)
 					return -1;
 				Point p = ReadPoint(Name, exm, arguments, 1);
 				if (p.X < 0 || p.X >= g.Width || p.X < 0 || p.Y >= g.Height)
 					return -1;
 				Color c = g.GGetColor(p.X,p.Y);
-				//Color.ToArgb()はInt32の負の値をとることがあり、Int64にうまく変換できない?（と思ったが気のせいだった
+				//Color.ToArgb() can take negative Int32 values, which might not convert well to Int64? (I thought so, but it was my imagination
 				return ((Int64)c.ToArgb()) & 0xFFFFFFFFL;
 			}
 		}
@@ -3253,7 +3253,7 @@ namespace MinorShift.Emuera.GameData.Function
 					case "SPRITEPOSY":
 						return img.DestBasePosition.Y;
 				}
-				throw new ExeEE("SpriteStateMethod:" + Name + ":異常な分岐");
+				throw new ExeEE("SpriteStateMethod:" + Name + GameMessages.T(": unexpected branch"));
 			}
 		}
 
@@ -3281,7 +3281,7 @@ namespace MinorShift.Emuera.GameData.Function
 						img.DestBasePosition = p;
 						return 1;
 				}
-				throw new ExeEE("SpriteStateMethod:" + Name + ":異常な分岐");
+				throw new ExeEE("SpriteStateMethod:" + Name + GameMessages.T(": unexpected branch"));
 			}
 		}
 
@@ -3297,7 +3297,7 @@ namespace MinorShift.Emuera.GameData.Function
 			{
 				string imgname = arguments[0].GetStrValue(exm);
 				ASprite img = AppContents.GetSprite(imgname);
-				//他と違って失敗は0ではなく負の値
+				//Unlike the others, failure is a negative value, not 0
 				if (img == null || !img.IsCreated)
 					return -1;
 				Point p = ReadPoint(Name, exm, arguments, 1);
@@ -3306,8 +3306,8 @@ namespace MinorShift.Emuera.GameData.Function
 				if (p.Y < 0 || p.Y >= img.DestBaseSize.Height)
 					return -1;
 				Color c = img.SpriteGetColor(p.X, p.Y);
-				//Color.ToArgb()はInt32の負の値をとることがあり、Int64にうまく変換できない？（と思ったが気のせいだった
-				return ((Int64)c.A) << 24 + c.R << 16 + c.G << 8 + c.B;
+				//Color.ToArgb() can take negative Int32 values, which might not convert well to Int64? (I thought so, but it was my imagination
+				return c.ToArgb() & 0xFFFFFFFFL;
 			}
 		}
 
@@ -3328,7 +3328,7 @@ namespace MinorShift.Emuera.GameData.Function
 					case "CLIENTHEIGHT":
 						return exm.Console.ClientHeight;
 				}
-				throw new ExeEE("ClientSize:" + Name + ":異常な分岐");
+				throw new ExeEE("ClientSize:" + Name + GameMessages.T(": unexpected branch"));
 			}
 		}
 
@@ -3350,13 +3350,13 @@ namespace MinorShift.Emuera.GameData.Function
 
 				Point p = ReadPoint(Name, exm, arguments, 1);
 				int width = p.X; int height = p.Y;
-				if (width <= 0)//{0}関数:GraphicsのWidthに0以下の値({1})が指定されました
+				if (width <= 0)//{0}: Graphics width of 0 or less ({1}) was specified
 					throw new CodeEE(string.Format(Properties.Resources.RuntimeErrMesMethodGWidth0, Name, width));
-				else if (width > AbstractImage.MAX_IMAGESIZE)//{0}関数:GraphicsのWidthに{2}以上の値({1})が指定されました
+				else if (width > AbstractImage.MAX_IMAGESIZE)//{0}: Graphics width of {2} or more ({1}) was specified
 					throw new CodeEE(string.Format(Properties.Resources.RuntimeErrMesMethodGWidth1, Name, width, AbstractImage.MAX_IMAGESIZE));
-				if (height <= 0)//{0}関数:GraphicsのHeightに0以下の値({1})が指定されました
+				if (height <= 0)//{0}: Graphics height of 0 or less ({1}) was specified
 					throw new CodeEE(string.Format(Properties.Resources.RuntimeErrMesMethodGHeight0, Name, height));
-				else if (height > AbstractImage.MAX_IMAGESIZE)//{0}関数:GraphicsのHeightに{2}以上の値({1})が指定されました
+				else if (height > AbstractImage.MAX_IMAGESIZE)//{0}: Graphics height of {2} or more ({1}) was specified
 					throw new CodeEE(string.Format(Properties.Resources.RuntimeErrMesMethodGHeight1, Name, height, AbstractImage.MAX_IMAGESIZE));
 
 				g.GCreate(width, height, false);
@@ -3405,7 +3405,7 @@ namespace MinorShift.Emuera.GameData.Function
 					if (bmp != null)
 						bmp.Dispose();
 				}
-				//画像ファイルではなかった、などによる失敗
+				//Failure caused by e.g. the file not being an image file
 				if (!g.IsCreated)
 					return 0;
 				return 1;
@@ -3487,7 +3487,7 @@ namespace MinorShift.Emuera.GameData.Function
 
 				Rectangle rect = new Rectangle(0, 0, g.Width, g.Height);
 				if(arguments.Length == 6)
-				{//四角形は正でも負でもよいが親画像の外を指してはいけない
+				{//The rectangle may be positive or negative, but must not point outside the parent image
 					rect = ReadRectangle(Name, exm, arguments, 2);
 					if (rect.X + rect.Width < 0 || rect.X + rect.Width > g.Width || rect.Y + rect.Height < 0 || rect.Y + rect.Height > g.Height)
 						throw new CodeEE(string.Format(Properties.Resources.RuntimeErrMesMethodCIMGCreateOutOfRange0, Name));
@@ -3665,7 +3665,7 @@ namespace MinorShift.Emuera.GameData.Function
 				{
 					if (arguments[i] == null)
 						continue;
-					//11番目のargumentはColorMatrixの配列を指しているので定数にしてはいけない
+					//The 11th argument points to a ColorMatrix array, so it must not be const-ified
 					if (i == 10)
 						arguments[i].Restructure(exm);
 					else
@@ -3798,7 +3798,7 @@ namespace MinorShift.Emuera.GameData.Function
 				{
 					if (arguments[i] == null)
 						continue;
-					//7番目のargumentはColorMatrixの配列を指しているので定数にしてはいけない
+					//The 7th argument points to a ColorMatrix array, so it must not be const-ified
 					if (i == 6)
 						arguments[i].Restructure(exm);
 					else
@@ -3826,18 +3826,18 @@ namespace MinorShift.Emuera.GameData.Function
 				string imgname = arguments[0].GetStrValue(exm);
 				if (string.IsNullOrEmpty(imgname))
 					return 0;
-				//リソースチェック・既に存在しているならば失敗
+				//Resource check: fail if it already exists
 				ASprite img = AppContents.GetSprite(imgname);
 				if (img != null && img.IsCreated)
 					return 0;
 				Point pos = ReadPoint(Name, exm, arguments, 1);
-				if (pos.X <= 0)//{0}関数:GraphicsのWidthに0以下の値({1})が指定されました
+				if (pos.X <= 0)//{0}: Graphics width of 0 or less ({1}) was specified
 					throw new CodeEE(string.Format(Properties.Resources.RuntimeErrMesMethodGWidth0, Name, pos.X));
-				else if (pos.X > AbstractImage.MAX_IMAGESIZE)//{0}関数:GraphicsのWidthに{2}以上の値({1})が指定されました
+				else if (pos.X > AbstractImage.MAX_IMAGESIZE)//{0}: Graphics width of {2} or more ({1}) was specified
 					throw new CodeEE(string.Format(Properties.Resources.RuntimeErrMesMethodGWidth1, Name, pos.X, AbstractImage.MAX_IMAGESIZE));
-				if (pos.Y <= 0)//{0}関数:GraphicsのHeightに0以下の値({1})が指定されました
+				if (pos.Y <= 0)//{0}: Graphics height of 0 or less ({1}) was specified
 					throw new CodeEE(string.Format(Properties.Resources.RuntimeErrMesMethodGHeight0, Name, pos.Y));
-				else if (pos.Y > AbstractImage.MAX_IMAGESIZE)//{0}関数:GraphicsのHeightに{2}以上の値({1})が指定されました
+				else if (pos.Y > AbstractImage.MAX_IMAGESIZE)//{0}: Graphics height of {2} or more ({1}) was specified
 					throw new CodeEE(string.Format(Properties.Resources.RuntimeErrMesMethodGHeight1, Name, pos.Y, AbstractImage.MAX_IMAGESIZE));
 				AppContents.CreateSpriteAnime(imgname, pos.X, pos.Y);
 				return 1;
@@ -3871,7 +3871,7 @@ namespace MinorShift.Emuera.GameData.Function
 				if (!g.IsCreated)
 					return 0;
 				Rectangle rect = ReadRectangle(Name, exm, arguments, 2);
-				//四角形は正でなければならず、かつ親画像の外を指してはいけない
+				//The rectangle must be positive and must not point outside the parent image
 				if (rect.Width <= 0 || rect.Height <= 0 ||
 					rect.X < 0 || rect.X + rect.Width > g.Width || rect.Y < 0 || rect.Y + rect.Height > g.Height)
 					return 0;
@@ -4121,20 +4121,20 @@ namespace MinorShift.Emuera.GameData.Function
 			}
 			public override Int64 GetIntValue(ExpressionMediator exm, IOperandTerm[] arguments)
 			{
-				if (!exm.Console.IsActive)//アクティブでないならスルー
+				if (!exm.Console.IsActive)//Skip if not active
 					return 0;
 				Int64 keycode = arguments[0].GetIntValue(exm);
 				if (keycode < 0 || keycode > 255)
 					return 0;
 				short s = WinInput.GetKeyState((int)keycode);
 				short toggle = keytoggle[keycode];
-				keytoggle[keycode] = (short)((s & 1) + 1);//初期値0、トグル状態に応じて1か2を代入。
+				keytoggle[keycode] = (short)((s & 1) + 1);//Initial value 0; assign 1 or 2 depending on the toggle state.
 				switch(Name)
 				{
 					case "GETKEY": return (s < 0) ? 1 : 0;
-					case "GETKEYTRIGGERED": return (s < 0) && (toggle != keytoggle[keycode]) ? 1 : 0;//初回はtrue、2回目以降はトグル状態が前回と違う場合のみ1
+					case "GETKEYTRIGGERED": return (s < 0) && (toggle != keytoggle[keycode]) ? 1 : 0;//true on the first press; afterwards 1 only if the toggle state differs from the previous one
 				}
-				throw new ExeEE("異常な分岐");
+				throw new ExeEE(GameMessages.T("unexpected branch"));
 			}
 		}
 
@@ -4153,7 +4153,25 @@ namespace MinorShift.Emuera.GameData.Function
 					case "MOUSEX": return exm.Console.GetMousePosition().X;
 					case "MOUSEY": return exm.Console.GetMousePosition().Y;
 				}
-				throw new ExeEE("異常な名前");
+				throw new ExeEE(GameMessages.T("unexpected name"));
+			}
+		}
+
+		private sealed class MouseButtonMethod : FunctionMethod
+		{
+			public MouseButtonMethod()
+			{
+				ReturnType = typeof(string);
+				argumentTypeArray = new Type[] { };
+				CanRestructure = false;
+			}
+
+			public override string GetStrValue(ExpressionMediator exm, IOperandTerm[] arguments)
+			{
+				ConsoleButtonString pointing = exm.Console.PointingString;
+				if (pointing == null || !pointing.IsButton)
+					return "";
+				return pointing.IsInteger ? pointing.Input.ToString() : pointing.Inputs;
 			}
 		}
 
@@ -4294,7 +4312,7 @@ namespace MinorShift.Emuera.GameData.Function
                     ret = System.IO.File.ReadAllText(filepath, encoding);
                 }
                 catch { return ""; }
-                //一貫性の観点で\rには死んでもらう
+                //For consistency's sake, \r has to go
                 return ret.Replace("\r","");
 			}
 		}
@@ -4408,37 +4426,17 @@ namespace MinorShift.Emuera.GameData.Function
 			}
 
 			public override Int64 GetIntValue(ExpressionMediator exm, IOperandTerm[] arguments)
-			{
-				string funcName = arguments[0].GetStrValue(exm);
-				if (string.IsNullOrEmpty(funcName))
-					return 0;
-
-				// Convert to uppercase if case-insensitive function names is enabled
-				if (Config.ICFunction)
-					funcName = funcName.ToUpper();
-
-				// Check if it's a user-defined function
-				FunctionLabelLine label = GlobalStatic.LabelDictionary.GetNonEventLabel(funcName);
-				if (label != null)
 				{
-					if (label.IsMethod)
-					{
-						// #FUNCTION or #FUNCTIONS
-						if (label.MethodType == typeof(Int64))
-							return 2;  // Integer returning function
-						else if (label.MethodType == typeof(string))
-							return 3;  // String returning function
-					}
-					return 1;  // Normal function
+					string funcName = arguments[0].GetStrValue(exm);
+					if (string.IsNullOrEmpty(funcName))
+						return 0;
+
+					// Convert to uppercase if case-insensitive function names is enabled
+					if (Config.ICFunction)
+						funcName = funcName.ToUpper();
+
+					return FunctionResolver.ExistFunctionValue(funcName);
 				}
-
-				// Check if it's an event function
-				List<FunctionLabelLine>[] eventLabels = GlobalStatic.LabelDictionary.GetEventLabels(funcName);
-				if (eventLabels != null)
-					return 1;
-
-				return 0;  // Not found
-			}
 		}
 
 		/// <summary>
@@ -4530,108 +4528,319 @@ namespace MinorShift.Emuera.GameData.Function
 		{
 			public enum Operation { Create, Check, Release }
 			readonly Operation op;
+
 			public XmlDocumentMethod(Operation op)
 			{
 				this.op = op;
 				ReturnType = typeof(Int64);
-				argumentTypeArray = new Type[] { typeof(string) };
+				argumentTypeArray = null;
 				CanRestructure = false;
 			}
+
+			public override string CheckArgumentType(string name, IOperandTerm[] arguments)
+			{
+				int expected = op == Operation.Create ? 2 : 1;
+				if (arguments.Length != expected)
+					return name + GameMessages.T(" function: wrong number of arguments");
+				if (arguments[0] == null ||
+					(arguments[0].GetOperandType() != typeof(string) && arguments[0].GetOperandType() != typeof(Int64)))
+					return name + GameMessages.T(" function: argument #1 has an invalid type");
+				if (op == Operation.Create && (arguments[1] == null || arguments[1].GetOperandType() != typeof(string)))
+					return name + GameMessages.T(" function: XML must be a string");
+				return null;
+			}
+
+			static XmlDocument LoadXml(string text)
+			{
+				XmlDocument document = new XmlDocument { XmlResolver = null };
+				XmlReaderSettings settings = new XmlReaderSettings
+				{
+					DtdProcessing = DtdProcessing.Prohibit,
+					XmlResolver = null,
+					MaxCharactersFromEntities = 0
+				};
+				using (XmlReader reader = XmlReader.Create(new System.IO.StringReader(text), settings))
+					document.Load(reader);
+				return document;
+			}
+
 			public override Int64 GetIntValue(ExpressionMediator exm, IOperandTerm[] arguments)
 			{
-				string name = arguments[0].GetStrValue(exm).ToUpperInvariant();
-				var dict = exm.VEvaluator.VariableData.DataXmlDocuments;
-				switch (op)
+				string key = arguments[0].GetOperandType() == typeof(string)
+					? arguments[0].GetStrValue(exm)
+					: arguments[0].GetIntValue(exm).ToString();
+				var documents = exm.VEvaluator.VariableData.DataXmlDocuments;
+				if (op == Operation.Create)
 				{
-					case Operation.Create:
-						if (!dict.ContainsKey(name))
-						{
-							var doc = new XmlDocument();
-							doc.XmlResolver = null;
-							doc.AppendChild(doc.CreateElement(name));
-							dict[name] = doc;
-						}
+					if (documents.ContainsKey(key)) return 0;
+					XmlDocument document;
+					try
+					{
+						document = LoadXml(arguments[1].GetStrValue(exm));
+					}
+					catch (XmlException)
+					{
 						return 0;
-					case Operation.Check:
-						return dict.ContainsKey(name) ? 1 : 0;
-					case Operation.Release:
-						dict.Remove(name);
-						return 0;
+					}
+					documents.Add(key, document);
+					return 1;
 				}
-				return 0;
+			if (!documents.ContainsKey(key)) return 0;
+			if (op == Operation.Check) return 1;
+			documents.Remove(key);
+			return 1;
 			}
 		}
 
-		/// <summary>XML_TOSTR(name) → returns XML document as string</summary>
 		private sealed class XmlToStrMethod : FunctionMethod
 		{
 			public XmlToStrMethod()
 			{
 				ReturnType = typeof(string);
-				argumentTypeArray = new Type[] { typeof(string) };
+				argumentTypeArray = null;
 				CanRestructure = false;
 			}
+
+			public override string CheckArgumentType(string name, IOperandTerm[] arguments)
+			{
+				if (arguments.Length != 1 || arguments[0] == null ||
+					(arguments[0].GetOperandType() != typeof(string) && arguments[0].GetOperandType() != typeof(Int64)))
+					return name + GameMessages.T(" function: invalid argument type");
+				return null;
+			}
+
 			public override string GetStrValue(ExpressionMediator exm, IOperandTerm[] arguments)
 			{
-				string name = arguments[0].GetStrValue(exm).ToUpperInvariant();
-				var dict = exm.VEvaluator.VariableData.DataXmlDocuments;
-				XmlDocument doc;
-				if (!dict.TryGetValue(name, out doc)) return "";
-				return doc.OuterXml;
+				string key = arguments[0].GetOperandType() == typeof(string)
+					? arguments[0].GetStrValue(exm)
+					: arguments[0].GetIntValue(exm).ToString();
+				var documents = exm.VEvaluator.VariableData.DataXmlDocuments;
+				return documents.TryGetValue(key, out XmlDocument document) ? document.OuterXml : "";
 			}
+
 			public override Int64 GetIntValue(ExpressionMediator exm, IOperandTerm[] arguments) { return 0; }
 		}
 
 		/// <summary>XML_GET(name, xpath) → returns text at XPath node</summary>
 		private sealed class XmlGetMethod : FunctionMethod
 		{
+			readonly bool byName;
+
 			public XmlGetMethod(bool byName = false)
 			{
-				ReturnType = typeof(string);
-				argumentTypeArray = new Type[] { typeof(string), typeof(string) };
+				this.byName = byName;
+				ReturnType = typeof(Int64);
+				argumentTypeArray = null;
 				CanRestructure = false;
 			}
-			public override string GetStrValue(ExpressionMediator exm, IOperandTerm[] arguments)
+
+			public override string CheckArgumentType(string name, IOperandTerm[] arguments)
 			{
-				string name = arguments[0].GetStrValue(exm).ToUpperInvariant();
-				string xpath = arguments[1].GetStrValue(exm);
-				var dict = exm.VEvaluator.VariableData.DataXmlDocuments;
-				XmlDocument doc;
-				if (!dict.TryGetValue(name, out doc)) return "";
+				if (arguments.Length < 2 || arguments.Length > 4)
+					return name + GameMessages.T(" function: wrong number of arguments (2-4 expected)");
+				if (arguments[0] == null)
+					return name + GameMessages.T(" function: argument #1 cannot be omitted");
+				if (byName && arguments[0].GetOperandType() != typeof(string))
+					return name + GameMessages.T(" function: argument #1 must be a string");
+				if (arguments[1] == null || arguments[1].GetOperandType() != typeof(string))
+					return name + GameMessages.T(" function: argument #2 must be a string");
+				if (arguments.Length == 3)
+				{
+					if (arguments[2] == null ||
+						(arguments[2].GetOperandType() != typeof(Int64) && !IsStringArrayReference(arguments[2])))
+						return name + GameMessages.T(" function: argument #3 has an invalid type");
+				}
+				if (arguments.Length == 4)
+				{
+					if (arguments[2] == null ||
+						(arguments[2].GetOperandType() != typeof(Int64) && !IsStringArrayReference(arguments[2])))
+						return name + GameMessages.T(" function: argument #3 has an invalid type");
+					if (arguments[3] == null || arguments[3].GetOperandType() != typeof(Int64))
+						return name + GameMessages.T(" function: argument #4 must be an integer");
+				}
+				return null;
+			}
+
+			static bool IsStringArrayReference(IOperandTerm term)
+			{
+				VariableTerm variable = term as VariableTerm;
+				return variable != null && !variable.Identifier.IsConst && !variable.Identifier.IsCalc &&
+					variable.Identifier.IsArray1D && !variable.IsInteger;
+			}
+
+			static XmlDocument LoadXml(string text)
+			{
+				XmlDocument document = new XmlDocument { XmlResolver = null };
+				XmlReaderSettings settings = new XmlReaderSettings
+				{
+					DtdProcessing = DtdProcessing.Prohibit,
+					XmlResolver = null,
+					MaxCharactersFromEntities = 0
+				};
+				using (XmlReader reader = XmlReader.Create(new System.IO.StringReader(text), settings))
+					document.Load(reader);
+				return document;
+			}
+
+			static string NodeValue(XmlNode node, int outputType)
+			{
+				switch (outputType)
+				{
+					case 1: return node.InnerText;
+					case 2: return node.InnerXml;
+					case 3: return node.OuterXml;
+					case 4: return node.Name;
+					default: return node.Value ?? "";
+				}
+			}
+
+			public override Int64 GetIntValue(ExpressionMediator exm, IOperandTerm[] arguments)
+			{
+				XmlDocument document;
 				try
 				{
-					var node = doc.SelectSingleNode(xpath);
-					return node != null ? node.InnerText : "";
+					if (byName || arguments[0].GetOperandType() == typeof(Int64))
+					{
+						string key = byName
+							? arguments[0].GetStrValue(exm)
+							: arguments[0].GetIntValue(exm).ToString();
+						if (!exm.VEvaluator.VariableData.DataXmlDocuments.TryGetValue(key, out document)) return -1;
+					}
+					else
+						document = LoadXml(arguments[0].GetStrValue(exm));
+
+					XmlNodeList nodes = document.SelectNodes(arguments[1].GetStrValue(exm));
+					if (nodes == null) return 0;
+					VariableTerm outputVariable = null;
+					int doOutput = 0;
+					int outputType = 0;
+					if (arguments.Length >= 3)
+					{
+						outputVariable = arguments[2] as VariableTerm;
+						if (outputVariable == null) doOutput = (int)arguments[2].GetIntValue(exm);
+					}
+					if (arguments.Length == 4) outputType = (int)arguments[3].GetIntValue(exm);
+
+					string[] output = outputVariable == null
+						? exm.VEvaluator.RESULTS_ARRAY
+						: (string[])outputVariable.Identifier.GetArray();
+					if (outputVariable != null || doOutput != 0)
+					{
+						int limit = Math.Min(nodes.Count, output.Length);
+						for (int i = 0; i < limit; i++) output[i] = NodeValue(nodes[i], outputType);
+					}
+					return nodes.Count;
 				}
-				catch { return ""; }
+				catch (XmlException)
+				{
+					return 0;
+				}
+				catch (System.Xml.XPath.XPathException)
+				{
+					return 0;
+				}
 			}
-			public override Int64 GetIntValue(ExpressionMediator exm, IOperandTerm[] arguments) { return 0; }
 		}
 
 		/// <summary>XML_SET(name, xpath, value) → sets text at XPath node</summary>
 		private sealed class XmlSetMethod : FunctionMethod
 		{
+			readonly bool byName;
+
 			public XmlSetMethod(bool byName = false)
 			{
+				this.byName = byName;
 				ReturnType = typeof(Int64);
-				argumentTypeArray = new Type[] { typeof(string), typeof(string), typeof(string) };
+				argumentTypeArray = null;
 				CanRestructure = false;
 			}
+
+			public override string CheckArgumentType(string name, IOperandTerm[] arguments)
+			{
+				if (arguments.Length < 3 || arguments.Length > 5)
+					return name + GameMessages.T(" function: wrong number of arguments (3-5 expected)");
+				if (arguments[0] == null ||
+					(byName && arguments[0].GetOperandType() != typeof(string)) ||
+					(!byName && arguments[0].GetOperandType() != typeof(Int64) && !IsMutableXmlReference(arguments[0])))
+					return name + GameMessages.T(" function: argument #1 has an invalid type");
+				if (arguments[1] == null || arguments[1].GetOperandType() != typeof(string) ||
+					(arguments[2] == null || arguments[2].GetOperandType() != typeof(string)))
+					return name + GameMessages.T(" function: XPath and value must be strings");
+			for (int i = 3; i < arguments.Length; i++)
+				if (arguments[i] == null || arguments[i].GetOperandType() != typeof(Int64))
+					return name + GameMessages.T(" function: the additional argument must be an integer");
+			return null;
+			}
+
+			static bool IsMutableXmlReference(IOperandTerm term)
+			{
+				VariableTerm variable = term as VariableTerm;
+				return variable != null && !variable.Identifier.IsConst && !variable.Identifier.IsCalc &&
+					!variable.Identifier.IsArray1D && !variable.Identifier.IsArray2D && !variable.Identifier.IsArray3D &&
+					!variable.IsInteger;
+			}
+
+			static XmlDocument LoadXml(string text)
+			{
+				XmlDocument document = new XmlDocument { XmlResolver = null };
+				XmlReaderSettings settings = new XmlReaderSettings
+				{
+					DtdProcessing = DtdProcessing.Prohibit,
+					XmlResolver = null,
+					MaxCharactersFromEntities = 0
+				};
+				using (XmlReader reader = XmlReader.Create(new System.IO.StringReader(text), settings))
+					document.Load(reader);
+				return document;
+			}
+
+			static void SetNodeValue(XmlNode node, string value, int outputType)
+			{
+				switch (outputType)
+				{
+					case 1: node.InnerText = value; break;
+					case 2: node.InnerXml = value; break;
+					default: node.Value = value; break;
+				}
+			}
+
 			public override Int64 GetIntValue(ExpressionMediator exm, IOperandTerm[] arguments)
 			{
-				string name = arguments[0].GetStrValue(exm).ToUpperInvariant();
-				string xpath = arguments[1].GetStrValue(exm);
-				string value = arguments[2].GetStrValue(exm);
-				var dict = exm.VEvaluator.VariableData.DataXmlDocuments;
-				XmlDocument doc;
-				if (!dict.TryGetValue(name, out doc)) return 0;
+				XmlDocument document;
+				VariableTerm sourceVariable = null;
 				try
 				{
-					var node = doc.SelectSingleNode(xpath);
-					if (node != null) node.InnerText = value;
+					if (byName || arguments[0].GetOperandType() == typeof(Int64))
+					{
+						string key = byName
+							? arguments[0].GetStrValue(exm)
+							: arguments[0].GetIntValue(exm).ToString();
+						if (!exm.VEvaluator.VariableData.DataXmlDocuments.TryGetValue(key, out document)) return -1;
+					}
+					else
+					{
+						sourceVariable = (VariableTerm)arguments[0];
+						document = LoadXml(sourceVariable.GetStrValue(exm));
+					}
+
+					XmlNodeList nodes = document.SelectNodes(arguments[1].GetStrValue(exm));
+					if (nodes == null || nodes.Count == 0) return 0;
+					int doSetAll = arguments.Length >= 4 ? (int)arguments[3].GetIntValue(exm) : 0;
+					int outputType = arguments.Length == 5 ? (int)arguments[4].GetIntValue(exm) : 0;
+					if (nodes.Count != 1 && doSetAll == 0) return nodes.Count;
+					string value = arguments[2].GetStrValue(exm);
+					for (int i = 0; i < nodes.Count; i++) SetNodeValue(nodes[i], value, outputType);
+					if (sourceVariable != null) sourceVariable.SetValue(document.OuterXml, exm);
+					return nodes.Count;
 				}
-				catch { }
-				return 0;
+				catch (XmlException)
+				{
+					return 0;
+				}
+				catch (System.Xml.XPath.XPathException)
+				{
+					return 0;
+				}
 			}
 		}
 
@@ -4640,41 +4849,131 @@ namespace MinorShift.Emuera.GameData.Function
 		{
 			public enum Operation { Node, Attribute }
 			readonly Operation op;
+			readonly bool byName;
+
 			public XmlAddNodeMethod(Operation op, bool byName = false)
 			{
 				this.op = op;
+				this.byName = byName;
 				ReturnType = typeof(Int64);
-				argumentTypeArray = op == Operation.Attribute
-					? new Type[] { typeof(string), typeof(string), typeof(string), typeof(string) }
-					: new Type[] { typeof(string), typeof(string), typeof(string) };
+				argumentTypeArray = null;
 				CanRestructure = false;
 			}
+
+			public override string CheckArgumentType(string name, IOperandTerm[] arguments)
+			{
+				int min = op == Operation.Node ? 3 : 4;
+				int max = op == Operation.Node ? 5 : 6;
+				if (arguments.Length < min || arguments.Length > max)
+					return name + GameMessages.T(" function: wrong number of arguments");
+				if (arguments[0] == null ||
+					(byName && arguments[0].GetOperandType() != typeof(string)) ||
+					(!byName && arguments[0].GetOperandType() != typeof(Int64) && !IsMutableReference(arguments[0])))
+					return name + GameMessages.T(" function: argument #1 has an invalid type");
+				if (arguments[1] == null || arguments[1].GetOperandType() != typeof(string) ||
+					(arguments[2] == null || arguments[2].GetOperandType() != typeof(string)))
+					return name + GameMessages.T(" function: XPath and content must be strings");
+				int firstInteger = op == Operation.Node ? 3 : 4;
+				for (int i = firstInteger; i < arguments.Length; i++)
+					if (arguments[i] == null || arguments[i].GetOperandType() != typeof(Int64))
+						return name + GameMessages.T(" function: the additional argument must be an integer");
+				return null;
+			}
+
+			static bool IsMutableReference(IOperandTerm term)
+			{
+				VariableTerm variable = term as VariableTerm;
+				return variable != null && !variable.Identifier.IsConst && !variable.Identifier.IsCalc &&
+					!variable.Identifier.IsArray1D && !variable.Identifier.IsArray2D && !variable.Identifier.IsArray3D &&
+					!variable.IsInteger;
+			}
+
+			static XmlDocument LoadXml(string text)
+			{
+				XmlDocument document = new XmlDocument { XmlResolver = null };
+				XmlReaderSettings settings = new XmlReaderSettings
+				{
+					DtdProcessing = DtdProcessing.Prohibit,
+					XmlResolver = null,
+					MaxCharactersFromEntities = 0
+				};
+				using (XmlReader reader = XmlReader.Create(new System.IO.StringReader(text), settings))
+					document.Load(reader);
+				return document;
+			}
+
 			public override Int64 GetIntValue(ExpressionMediator exm, IOperandTerm[] arguments)
 			{
-				string name = arguments[0].GetStrValue(exm).ToUpperInvariant();
-				string xpath = arguments[1].GetStrValue(exm);
-				var dict = exm.VEvaluator.VariableData.DataXmlDocuments;
-				XmlDocument doc;
-				if (!dict.TryGetValue(name, out doc)) return 0;
+				XmlDocument document;
+				VariableTerm sourceVariable = null;
 				try
 				{
-					var parent = doc.SelectSingleNode(xpath);
-					if (parent == null) return 0;
-					if (op == Operation.Node)
+					if (byName || arguments[0].GetOperandType() == typeof(Int64))
 					{
-						string nodeName = arguments[2].GetStrValue(exm);
-						parent.AppendChild(doc.CreateElement(nodeName));
+						string key = byName
+							? arguments[0].GetStrValue(exm)
+							: arguments[0].GetIntValue(exm).ToString();
+						if (!exm.VEvaluator.VariableData.DataXmlDocuments.TryGetValue(key, out document)) return -1;
 					}
 					else
 					{
-						string attrName = arguments[2].GetStrValue(exm);
-						string attrVal = arguments.Length > 3 ? arguments[3].GetStrValue(exm) : "";
-						var el = parent as XmlElement;
-						if (el != null) el.SetAttribute(attrName, attrVal);
+						sourceVariable = (VariableTerm)arguments[0];
+						document = LoadXml(sourceVariable.GetStrValue(exm));
 					}
+
+					XmlNodeList nodes = document.SelectNodes(arguments[1].GetStrValue(exm));
+					if (nodes == null || nodes.Count == 0) return 0;
+					int methodPosition = op == Operation.Node ? 3 : 4;
+					int setAllPosition = op == Operation.Node ? 4 : 5;
+					int methodType = arguments.Length > methodPosition ? (int)arguments[methodPosition].GetIntValue(exm) : 0;
+					int doSetAll = arguments.Length > setAllPosition ? (int)arguments[setAllPosition].GetIntValue(exm) : 0;
+					if (methodType < 0 || methodType > 2) methodType = 0;
+					if (nodes.Count != 1 && doSetAll == 0) return nodes.Count;
+
+					if (op == Operation.Node)
+					{
+						XmlDocument fragment = LoadXml(arguments[2].GetStrValue(exm));
+						if (fragment.DocumentElement == null) return 0;
+						for (int i = 0; i < nodes.Count; i++)
+						{
+							XmlNode target = nodes[i];
+							XmlNode imported = document.ImportNode(fragment.DocumentElement, true);
+							if (methodType == 1 && target.ParentNode != null && target != document.DocumentElement)
+								target.ParentNode.InsertBefore(imported, target);
+							else if (methodType == 2 && target.ParentNode != null && target != document.DocumentElement)
+								target.ParentNode.InsertAfter(imported, target);
+							else if (methodType == 0)
+								target.AppendChild(imported);
+						}
+					}
+					else
+					{
+						string attributeName = arguments[2].GetStrValue(exm);
+						string attributeValue = arguments[3].GetStrValue(exm);
+						for (int i = 0; i < nodes.Count; i++)
+						{
+							if (nodes[i] is XmlElement element && methodType == 0)
+								element.SetAttribute(attributeName, attributeValue);
+							else if (nodes[i] is XmlAttribute target && target.OwnerElement != null)
+							{
+								XmlAttribute inserted = document.CreateAttribute(attributeName);
+								inserted.Value = attributeValue;
+								if (methodType == 1) target.OwnerElement.Attributes.InsertBefore(inserted, target);
+								else if (methodType == 2) target.OwnerElement.Attributes.InsertAfter(inserted, target);
+							}
+						}
+					}
+					if (sourceVariable != null) sourceVariable.SetValue(document.OuterXml, exm);
+					return nodes.Count;
 				}
-				catch { }
-				return 0;
+				catch (XmlException)
+				{
+					return 0;
+				}
+				catch (System.Xml.XPath.XPathException)
+				{
+					return 0;
+				}
 			}
 		}
 
@@ -4683,66 +4982,225 @@ namespace MinorShift.Emuera.GameData.Function
 		{
 			public enum Operation { Node, Attribute }
 			readonly Operation op;
+			readonly bool byName;
+
 			public XmlRemoveNodeMethod(Operation op, bool byName = false)
 			{
 				this.op = op;
+				this.byName = byName;
 				ReturnType = typeof(Int64);
-				argumentTypeArray = op == Operation.Attribute
-					? new Type[] { typeof(string), typeof(string), typeof(string) }
-					: new Type[] { typeof(string), typeof(string) };
+				argumentTypeArray = null;
 				CanRestructure = false;
 			}
+
+			public override string CheckArgumentType(string name, IOperandTerm[] arguments)
+			{
+				if (arguments.Length < 2 || arguments.Length > 3)
+					return name + GameMessages.T(" function: wrong number of arguments");
+				if (arguments[0] == null ||
+					(byName && arguments[0].GetOperandType() != typeof(string)) ||
+					(!byName && arguments[0].GetOperandType() != typeof(Int64) && !IsMutableReference(arguments[0])))
+					return name + GameMessages.T(" function: argument #1 has an invalid type");
+				if (arguments[1] == null || arguments[1].GetOperandType() != typeof(string))
+					return name + GameMessages.T(" function: XPath must be a string");
+				if (arguments.Length == 3 && (arguments[2] == null || arguments[2].GetOperandType() != typeof(Int64)))
+					return name + GameMessages.T(" function: argument #3 must be an integer");
+				return null;
+			}
+
+			static bool IsMutableReference(IOperandTerm term)
+			{
+				VariableTerm variable = term as VariableTerm;
+				return variable != null && !variable.Identifier.IsConst && !variable.Identifier.IsCalc &&
+					!variable.Identifier.IsArray1D && !variable.Identifier.IsArray2D && !variable.Identifier.IsArray3D &&
+					!variable.IsInteger;
+			}
+
+			static XmlDocument LoadXml(string text)
+			{
+				XmlDocument document = new XmlDocument { XmlResolver = null };
+				XmlReaderSettings settings = new XmlReaderSettings
+				{
+					DtdProcessing = DtdProcessing.Prohibit,
+					XmlResolver = null,
+					MaxCharactersFromEntities = 0
+				};
+				using (XmlReader reader = XmlReader.Create(new System.IO.StringReader(text), settings))
+					document.Load(reader);
+				return document;
+			}
+
 			public override Int64 GetIntValue(ExpressionMediator exm, IOperandTerm[] arguments)
 			{
-				string name = arguments[0].GetStrValue(exm).ToUpperInvariant();
-				string xpath = arguments[1].GetStrValue(exm);
-				var dict = exm.VEvaluator.VariableData.DataXmlDocuments;
-				XmlDocument doc;
-				if (!dict.TryGetValue(name, out doc)) return 0;
+				XmlDocument document;
+				VariableTerm sourceVariable = null;
 				try
 				{
-					var node = doc.SelectSingleNode(xpath);
-					if (op == Operation.Node)
+					if (byName || arguments[0].GetOperandType() == typeof(Int64))
 					{
-						if (node != null && node.ParentNode != null)
-							node.ParentNode.RemoveChild(node);
+						string key = byName
+							? arguments[0].GetStrValue(exm)
+							: arguments[0].GetIntValue(exm).ToString();
+						if (!exm.VEvaluator.VariableData.DataXmlDocuments.TryGetValue(key, out document)) return -1;
 					}
 					else
 					{
-						string attrName = arguments[2].GetStrValue(exm);
-						var el = node as XmlElement;
-						if (el != null) el.RemoveAttribute(attrName);
+						sourceVariable = (VariableTerm)arguments[0];
+						document = LoadXml(sourceVariable.GetStrValue(exm));
 					}
+					XmlNodeList nodes = document.SelectNodes(arguments[1].GetStrValue(exm));
+					if (nodes == null || nodes.Count == 0) return 0;
+					bool removeAll = arguments.Length == 3 && arguments[2].GetIntValue(exm) != 0;
+					int limit = nodes.Count == 1 || removeAll ? nodes.Count : 0;
+					for (int i = 0; i < limit; i++)
+					{
+						if (op == Operation.Attribute)
+						{
+							XmlAttribute attribute = nodes[i] as XmlAttribute;
+							if (attribute != null && attribute.OwnerElement != null)
+							{
+								attribute.OwnerElement.Attributes.Remove(attribute);
+
+							}
+						}
+						else if (nodes[i] != document.DocumentElement && nodes[i].ParentNode != null)
+						{
+							nodes[i].ParentNode.RemoveChild(nodes[i]);
+
+						}
+					}
+					if (sourceVariable != null) sourceVariable.SetValue(document.OuterXml, exm);
+					return nodes.Count;
 				}
-				catch { }
-				return 0;
+				catch (XmlException)
+				{
+					return 0;
+				}
+				catch (System.Xml.XPath.XPathException)
+				{
+					return 0;
+				}
 			}
 		}
 
 		/// <summary>XML_REPLACE(name, xpath, newValue) → replaces inner text at node</summary>
 		private sealed class XmlReplaceMethod : FunctionMethod
 		{
+			readonly bool byName;
+
 			public XmlReplaceMethod(bool byName = false)
 			{
+				this.byName = byName;
 				ReturnType = typeof(Int64);
-				argumentTypeArray = new Type[] { typeof(string), typeof(string), typeof(string) };
+				argumentTypeArray = null;
 				CanRestructure = false;
 			}
+
+			public override string CheckArgumentType(string name, IOperandTerm[] arguments)
+			{
+				if (arguments.Length < 2 || arguments.Length > 4)
+					return name + GameMessages.T(" function: wrong number of arguments (2-4 expected)");
+				if (arguments[0] == null ||
+					(byName && arguments[0].GetOperandType() != typeof(string)) ||
+					(!byName && arguments.Length > 2 && arguments[0].GetOperandType() != typeof(Int64) && !IsMutableReference(arguments[0])))
+					return name + GameMessages.T(" function: argument #1 has an invalid type");
+				if (arguments.Length == 2)
+				{
+					if (arguments[1] == null || arguments[1].GetOperandType() != typeof(string))
+						return name + GameMessages.T(" function: XML must be a string");
+				}
+				else
+				{
+					if (arguments[1] == null || arguments[1].GetOperandType() != typeof(string) ||
+						arguments[2] == null || arguments[2].GetOperandType() != typeof(string))
+						return name + GameMessages.T(" function: XPath and XML must be strings");
+					if (arguments.Length == 4 && arguments[3].GetOperandType() != typeof(Int64))
+						return name + GameMessages.T(" function: argument #4 must be an integer");
+				}
+				return null;
+			}
+
+			static bool IsMutableReference(IOperandTerm term)
+			{
+				VariableTerm variable = term as VariableTerm;
+				return variable != null && !variable.Identifier.IsConst && !variable.Identifier.IsCalc &&
+					!variable.Identifier.IsArray1D && !variable.Identifier.IsArray2D && !variable.Identifier.IsArray3D &&
+					!variable.IsInteger;
+			}
+
+			static XmlDocument LoadXml(string text)
+			{
+				XmlDocument document = new XmlDocument { XmlResolver = null };
+				XmlReaderSettings settings = new XmlReaderSettings
+				{
+					DtdProcessing = DtdProcessing.Prohibit,
+					XmlResolver = null,
+					MaxCharactersFromEntities = 0
+				};
+				using (XmlReader reader = XmlReader.Create(new System.IO.StringReader(text), settings))
+					document.Load(reader);
+				return document;
+			}
+
 			public override Int64 GetIntValue(ExpressionMediator exm, IOperandTerm[] arguments)
 			{
-				string name = arguments[0].GetStrValue(exm).ToUpperInvariant();
-				string xpath = arguments[1].GetStrValue(exm);
-				string newVal = arguments[2].GetStrValue(exm);
-				var dict = exm.VEvaluator.VariableData.DataXmlDocuments;
-				XmlDocument doc;
-				if (!dict.TryGetValue(name, out doc)) return 0;
+				XmlDocument replacement;
 				try
 				{
-					var node = doc.SelectSingleNode(xpath);
-					if (node != null) node.InnerText = newVal;
+					replacement = LoadXml(arguments.Length == 2
+						? arguments[1].GetStrValue(exm)
+						: arguments[2].GetStrValue(exm));
 				}
-				catch { }
-				return 0;
+				catch (XmlException)
+				{
+					return 0;
+				}
+
+				XmlDocument document;
+				VariableTerm sourceVariable = null;
+				try
+				{
+					bool stored = byName || arguments[0].GetOperandType() == typeof(Int64) || arguments.Length == 2;
+					if (stored)
+					{
+						string key = arguments[0].GetOperandType() == typeof(Int64)
+							? arguments[0].GetIntValue(exm).ToString()
+							: arguments[0].GetStrValue(exm);
+						if (!exm.VEvaluator.VariableData.DataXmlDocuments.ContainsKey(key)) return -1;
+						if (arguments.Length == 2)
+						{
+							exm.VEvaluator.VariableData.DataXmlDocuments[key] = replacement;
+							return 1;
+						}
+						document = exm.VEvaluator.VariableData.DataXmlDocuments[key];
+					}
+					else
+					{
+						sourceVariable = (VariableTerm)arguments[0];
+						document = LoadXml(sourceVariable.GetStrValue(exm));
+					}
+
+					XmlNodeList nodes = document.SelectNodes(arguments[1].GetStrValue(exm));
+					if (nodes == null || nodes.Count == 0 || replacement.DocumentElement == null) return 0;
+					bool setAll = arguments.Length == 4 && arguments[3].GetIntValue(exm) != 0;
+					if (nodes.Count == 1 || setAll)
+					{
+						int limit = nodes.Count == 1 ? 1 : nodes.Count;
+						for (int i = 0; i < limit; i++)
+							if (nodes[i].ParentNode != null)
+								nodes[i].ParentNode.ReplaceChild(document.ImportNode(replacement.DocumentElement, true), nodes[i]);
+					}
+					if (sourceVariable != null) sourceVariable.SetValue(document.OuterXml, exm);
+					return nodes.Count;
+				}
+				catch (XmlException)
+				{
+					return 0;
+				}
+				catch (System.Xml.XPath.XPathException)
+				{
+					return 0;
+				}
 			}
 		}
 
@@ -4762,9 +5220,9 @@ namespace MinorShift.Emuera.GameData.Function
 			{
 				string name = arguments[0].GetStrValue(exm).ToUpperInvariant();
 				var maps = exm.VEvaluator.VariableData.DataMaps;
-				if (!maps.ContainsKey(name))
-					maps[name] = new Dictionary<string, string>();
-				return 0;
+				if (maps.ContainsKey(name)) return 0;
+				maps[name] = new Dictionary<string, string>();
+				return 1;
 			}
 		}
 
@@ -4795,7 +5253,7 @@ namespace MinorShift.Emuera.GameData.Function
 			{
 				string name = arguments[0].GetStrValue(exm).ToUpperInvariant();
 				exm.VEvaluator.VariableData.DataMaps.Remove(name);
-				return 0;
+				return 1;
 			}
 		}
 
@@ -4855,10 +5313,9 @@ namespace MinorShift.Emuera.GameData.Function
 				string key = arguments[1].GetStrValue(exm);
 				string val = arguments[2].GetStrValue(exm);
 				var maps = exm.VEvaluator.VariableData.DataMaps;
-				if (!maps.TryGetValue(name, out var map))
-					map = maps[name] = new Dictionary<string, string>();
+				if (!maps.TryGetValue(name, out var map)) return -1;
 				map[key] = val;
-				return 0;
+				return 1;
 			}
 		}
 
@@ -4875,9 +5332,9 @@ namespace MinorShift.Emuera.GameData.Function
 				string name = arguments[0].GetStrValue(exm).ToUpperInvariant();
 				string key = arguments[1].GetStrValue(exm);
 				var maps = exm.VEvaluator.VariableData.DataMaps;
-				if (maps.TryGetValue(name, out var map))
-					map.Remove(key);
-				return 0;
+				if (!maps.TryGetValue(name, out var map)) return -1;
+				map.Remove(key);
+				return 1;
 			}
 		}
 
@@ -4893,9 +5350,9 @@ namespace MinorShift.Emuera.GameData.Function
 			{
 				string name = arguments[0].GetStrValue(exm).ToUpperInvariant();
 				var maps = exm.VEvaluator.VariableData.DataMaps;
-				if (maps.TryGetValue(name, out var map))
-					map.Clear();
-				return 0;
+				if (!maps.TryGetValue(name, out var map)) return -1;
+				map.Clear();
+				return 1;
 			}
 		}
 
@@ -4923,36 +5380,63 @@ namespace MinorShift.Emuera.GameData.Function
 		{
 			public MapGetKeysMethod()
 			{
-				ReturnType = typeof(Int64);
+				ReturnType = typeof(string);
 				argumentTypeArray = null;
 				CanRestructure = false;
 			}
+
 			public override string CheckArgumentType(string name, IOperandTerm[] arguments)
 			{
-				if (arguments.Length < 1 || arguments.Length > 2)
-					return name + "関数のargument数が正しくありません (1～2個)";
+				if (arguments.Length < 1 || arguments.Length > 3)
+					return name + GameMessages.T(" function: wrong number of arguments (1-3 expected)");
 				if (arguments[0] == null || arguments[0].GetOperandType() != typeof(string))
-					return name + "関数の1番目のargumentは文字列が必要です";
-				if (arguments.Length == 2 && (arguments[1] == null || arguments[1].GetOperandType() != typeof(Int64)))
-					return name + "関数の2番目のargumentは整数が必要です";
+					return name + GameMessages.T(" function: argument #1 must be a string");
+				if (arguments.Length == 2)
+				{
+					if (arguments[1] == null || arguments[1].GetOperandType() != typeof(Int64))
+						return name + GameMessages.T(" function: argument #2 must be an integer");
+				}
+				else if (arguments.Length == 3)
+				{
+					VariableTerm output = arguments[1] as VariableTerm;
+					if (output == null || output.Identifier.IsConst || output.Identifier.IsCalc ||
+						!output.Identifier.IsArray1D || output.IsInteger)
+						return name + GameMessages.T(" function: argument #2 must be a 1D string array");
+					if (arguments[2] == null || arguments[2].GetOperandType() != typeof(Int64))
+						return name + GameMessages.T(" function: argument #3 must be an integer");
+				}
 				return null;
 			}
-			public override Int64 GetIntValue(ExpressionMediator exm, IOperandTerm[] arguments)
+
+			public override string GetStrValue(ExpressionMediator exm, IOperandTerm[] arguments)
 			{
 				string name = arguments[0].GetStrValue(exm).ToUpperInvariant();
 				var maps = exm.VEvaluator.VariableData.DataMaps;
-				if (!maps.TryGetValue(name, out var map)) return 0;
-				string[] results = exm.VEvaluator.VariableData.DataStringArray[(int)(VariableCode.RESULTS & VariableCode.__LOWERCASE__)];
-				int limit = results.Length;
-				if (arguments.Length == 2)
-					limit = (int)Math.Min(arguments[1].GetIntValue(exm), limit);
-				int i = 0;
-				foreach (var k in map.Keys)
+				if (!maps.TryGetValue(name, out var map)) return "";
+
+				if (arguments.Length > 1)
 				{
-					if (i >= limit) break;
-					results[i++] = k;
+					if (arguments.Length == 2 && arguments[1].GetIntValue(exm) == 0) return "";
+					if (arguments.Length == 3 && arguments[2].GetIntValue(exm) == 0) return "";
+					string[] output = arguments.Length == 2
+						? exm.VEvaluator.RESULTS_ARRAY
+						: (string[])((VariableTerm)arguments[1]).Identifier.GetArray();
+					int count = 0;
+					foreach (string key in map.Keys)
+					{
+						if (count >= output.Length) break;
+						output[count++] = key;
+					}
+					exm.VEvaluator.RESULT = map.Count;
+					return arguments.Length == 2 ? exm.VEvaluator.RESULTS : "";
 				}
-				return map.Count;
+
+				return string.Join(",", map.Keys);
+			}
+
+			public override Int64 GetIntValue(ExpressionMediator exm, IOperandTerm[] arguments)
+			{
+				return 0;
 			}
 		}
 
@@ -4970,15 +5454,23 @@ namespace MinorShift.Emuera.GameData.Function
 				var maps = exm.VEvaluator.VariableData.DataMaps;
 				if (!maps.TryGetValue(name, out var map)) return "";
 				var sb = new System.Text.StringBuilder();
-				sb.Append("<map name=\"").Append(name).Append("\">");
-				foreach (var kv in map)
-					sb.Append("<item key=\"")
-					  .Append(System.Security.SecurityElement.Escape(kv.Key))
-					  .Append("\">")
-					  .Append(System.Security.SecurityElement.Escape(kv.Value))
-					  .Append("</item>");
-				sb.Append("</map>");
-				return sb.ToString();
+				using (var writer = System.Xml.XmlWriter.Create(sb, new System.Xml.XmlWriterSettings
+				{
+					OmitXmlDeclaration = true,
+					ConformanceLevel = System.Xml.ConformanceLevel.Fragment
+				}))
+				{
+					writer.WriteStartElement("map");
+					foreach (var pair in map)
+					{
+						writer.WriteStartElement("p");
+						writer.WriteElementString("k", pair.Key ?? "");
+						writer.WriteElementString("v", pair.Value ?? "");
+						writer.WriteEndElement();
+					}
+					writer.WriteEndElement();
+				}
+			return sb.ToString();
 			}
 			public override Int64 GetIntValue(ExpressionMediator exm, IOperandTerm[] arguments) => 0;
 		}
@@ -4987,34 +5479,44 @@ namespace MinorShift.Emuera.GameData.Function
 		{
 			public MapFromXmlMethod()
 			{
-				ReturnType = typeof(string);
-				argumentTypeArray = new Type[] { typeof(string) };
+				ReturnType = typeof(Int64);
+				argumentTypeArray = new Type[] { typeof(string), typeof(string) };
 				CanRestructure = false;
 			}
-			public override string GetStrValue(ExpressionMediator exm, IOperandTerm[] arguments)
+			public override Int64 GetIntValue(ExpressionMediator exm, IOperandTerm[] arguments)
 			{
-				string xml = arguments[0].GetStrValue(exm);
+				string name = arguments[0].GetStrValue(exm).ToUpperInvariant();
+				string xml = arguments[1].GetStrValue(exm);
 				try
 				{
 					var doc = new System.Xml.XmlDocument();
 					doc.XmlResolver = null;
-					doc.LoadXml(xml);
-					var root = doc.DocumentElement;
-					if (root == null) return "";
-					string name = (root.GetAttribute("name") ?? "").ToUpperInvariant();
-					if (string.IsNullOrEmpty(name)) return "";
-					var maps = exm.VEvaluator.VariableData.DataMaps;
-					var map = maps[name] = new Dictionary<string, string>();
-					foreach (System.Xml.XmlNode node in root.ChildNodes)
+					var settings = new System.Xml.XmlReaderSettings
 					{
-						if (node is System.Xml.XmlElement el)
-							map[el.GetAttribute("key")] = el.InnerText;
+						DtdProcessing = System.Xml.DtdProcessing.Prohibit,
+						XmlResolver = null,
+						MaxCharactersFromEntities = 0
+					};
+					using (var reader = System.Xml.XmlReader.Create(new System.IO.StringReader(xml), settings))
+						doc.Load(reader);
+					var root = doc.DocumentElement;
+					if (root == null || !string.Equals(root.Name, "map", StringComparison.Ordinal)) return 0;
+					var maps = exm.VEvaluator.VariableData.DataMaps;
+					if (!maps.TryGetValue(name, out var map)) return 0;
+					foreach (System.Xml.XmlNode node in root.SelectNodes("./p"))
+					{
+						System.Xml.XmlNode key = node.SelectSingleNode("./k");
+						System.Xml.XmlNode value = node.SelectSingleNode("./v");
+						if (key != null && value != null)
+							map[key.InnerText] = value.InnerText;
 					}
-					return name;
+					return 1;
 				}
-				catch { return ""; }
+				catch (System.Xml.XmlException ex)
+				{
+					throw new CodeEE("MAP_FROMXML: invalid XML: " + ex.Message);
+				}
 			}
-			public override Int64 GetIntValue(ExpressionMediator exm, IOperandTerm[] arguments) => 0;
 		}
 
 	#endregion
@@ -5111,31 +5613,34 @@ namespace MinorShift.Emuera.GameData.Function
 			}
 			public override Int64 GetIntValue(ExpressionMediator exm, IOperandTerm[] arguments)
 			{
-				string name = arguments[0].GetStrValue(exm).ToUpperInvariant();
+				string name = arguments[0].GetStrValue(exm);
 				var dict = exm.VEvaluator.VariableData.DataDataTables;
 				EraDataTable dt = null;
 				switch (op)
 				{
 					case Op.Create:
-						if (!dict.ContainsKey(name)) dict[name] = new EraDataTable();
-						return 0;
+						if (dict.ContainsKey(name)) return 0L;
+						dict[name] = new EraDataTable();
+						return 1L;
 					case Op.Check:
 						return dict.ContainsKey(name) ? 1L : 0L;
 					case Op.Release:
 						dict.Remove(name);
-						return 0;
+						return 1L;
 					case Op.Case:
-						if (dict.TryGetValue(name, out dt)) dt.IgnoreCase = arguments[1].GetIntValue(exm) != 0;
-						return 0;
+						if (!dict.TryGetValue(name, out dt)) return -1L;
+						dt.CaseSensitive = arguments[1].GetIntValue(exm) == 0;
+						return 1L;
 					case Op.Clear:
-						if (dict.TryGetValue(name, out dt)) dt.Clear();
-						return 0;
+						if (!dict.TryGetValue(name, out dt)) return -1L;
+						dt.Clear();
+						return 1L;
 					case Op.RowCount:
-						return dict.TryGetValue(name, out dt) ? (Int64)dt.RowCount : 0L;
+						return dict.TryGetValue(name, out dt) ? (Int64)dt.RowCount : -1L;
 					case Op.RowAdd:
-						return dict.TryGetValue(name, out dt) ? (Int64)dt.AddRow() : -1L;
+						return dict.TryGetValue(name, out dt) ? dt.AddRow() : -1L;
 				}
-				return 0;
+				return 0L;
 			}
 		}
 
@@ -5149,7 +5654,7 @@ namespace MinorShift.Emuera.GameData.Function
 				this.op = op;
 				ReturnType = typeof(Int64);
 				if (op == Op.Add)
-					argumentTypeArray = new Type[] { typeof(string), typeof(string), typeof(Int64) };
+					argumentTypeArray = new Type[] { typeof(string), typeof(string), typeof(Int64), typeof(Int64) };
 				else if (op == Op.Names)
 					argumentTypeArray = new Type[] { typeof(string) };
 				else
@@ -5331,13 +5836,12 @@ namespace MinorShift.Emuera.GameData.Function
 			if (string.IsNullOrEmpty(rel)) return 0;
 			try
 			{
-				string full = System.IO.Path.IsPathRooted(rel) ? rel : System.IO.Path.Combine(Program.ExeDir, rel);
-				string canonical = System.IO.Path.GetFullPath(full);
-				string baseDir = System.IO.Path.GetFullPath(Program.ExeDir);
-				if (!canonical.StartsWith(baseDir, StringComparison.OrdinalIgnoreCase)) return 0;
-				return System.IO.File.Exists(canonical) ? 1L : 0L;
+				return new GameVirtualFileSystem(Program.ExeDir).Exists(rel) ? 1L : 0L;
 			}
-			catch { return 0; }
+			catch (Exception)
+			{
+				return 0;
+			}
 		}
 	}
 
@@ -5387,22 +5891,21 @@ namespace MinorShift.Emuera.GameData.Function
 		{
 			string dir = arguments[0].GetStrValue(exm);
 			if (string.IsNullOrEmpty(dir)) return -1;
-			if (!System.IO.Path.IsPathRooted(dir))
-				dir = System.IO.Path.Combine(Program.ExeDir, dir);
-			try { dir = System.IO.Path.GetFullPath(dir); } catch { return -1; }
-			if (!System.IO.Directory.Exists(dir)) return -1;
-			string pat = arguments.Length > 1 ? arguments[1].GetStrValue(exm) : "*";
+			string pattern = arguments.Length > 1 ? arguments[1].GetStrValue(exm) : "*";
 			bool recursive = arguments.Length > 2 && arguments[2].GetIntValue(exm) != 0;
-			var opt = recursive ? System.IO.SearchOption.AllDirectories : System.IO.SearchOption.TopDirectoryOnly;
-			string[] files;
-			try { files = System.IO.Directory.GetFiles(dir, pat, opt); } catch { return -1; }
-			string exeDir = System.IO.Path.GetFullPath(Program.ExeDir);
-			for (int i = 0; i < files.Length; i++)
-				try { files[i] = System.IO.Path.GetRelativePath(exeDir, files[i]); } catch { }
-			string[] results = exm.VEvaluator.VariableData.DataStringArray[(int)(VariableCode.RESULTS & VariableCode.__LOWERCASE__)];
-			int cnt = Math.Min(files.Length, results.Length);
-			Array.Copy(files, results, cnt);
-			return files.Length;
+			try
+			{
+				GameVirtualFileSystem vfs = new GameVirtualFileSystem(Program.ExeDir);
+				string[] files = vfs.EnumerateFiles(dir, pattern, recursive);
+				string[] results = exm.VEvaluator.VariableData.DataStringArray[(int)(VariableCode.RESULTS & VariableCode.__LOWERCASE__)];
+				int cnt = Math.Min(files.Length, results.Length);
+				Array.Copy(files, results, cnt);
+				return files.Length;
+			}
+			catch (Exception)
+			{
+				return -1;
+			}
 		}
 	}
 
@@ -5499,11 +6002,11 @@ namespace MinorShift.Emuera.GameData.Function
 		public override string CheckArgumentType(string name, IOperandTerm[] arguments)
 		{
 			if (arguments.Length < 1 || arguments.Length > 2)
-				return name + "関数のargumentの数が違います";
+				return name + GameMessages.T(" function: wrong number of arguments");
 			if (arguments[0] == null || arguments[0].GetOperandType() != typeof(string))
-				return name + "関数の1番目のargumentは文字列型が必要です";
+				return name + GameMessages.T(" function: argument #1 must be a string");
 			if (arguments.Length == 2 && arguments[1] != null && arguments[1].GetOperandType() != typeof(Int64))
-				return name + "関数の2番目のargumentは整数型が必要です";
+				return name + GameMessages.T(" function: argument #2 must be an integer");
 			return null;
 		}
 		public override Int64 GetIntValue(ExpressionMediator exm, IOperandTerm[] arguments)

@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 using UnityEngine.EventSystems;
@@ -918,15 +919,52 @@ public static class GenericUtils
     
     /// <summary>
     /// Updates the loading status text displayed during initialization.
-    /// Call this from loading code to show current progress to the user.
+    /// Thread-safe: the interpreter/background thread only STAGES the value here.
+    /// The actual Unity UI update happens on the main thread in
+    /// <see cref="PumpLoadingStatus"/> (Phase 6 #44 — no Unity UI from worker threads).
     /// </summary>
     /// <param name="status">The status message to display.</param>
     public static void SetLoadingStatus(string status)
     {
-        if (text_content != null && text_content.option_window != null)
+        lock (loading_status_lock_)
         {
-            text_content.option_window.SetLoadingStatus(status);
+            loading_status_pending_ = status;
+            loading_status_dirty_ = true;
         }
+    }
+
+    /// <summary>
+    /// Applies the most recently staged loading status to the Unity UI. MUST be called
+    /// from the Unity main thread (pumped once per frame by SpriteManager). Coalesces
+    /// bursts so only the latest value is applied per frame.
+    /// </summary>
+    public static void PumpLoadingStatus()
+    {
+        string status;
+        lock (loading_status_lock_)
+        {
+            if (!loading_status_dirty_)
+                return;
+            status = loading_status_pending_;
+            loading_status_dirty_ = false;
+        }
+        var tc = text_content;
+        if (tc != null && tc.option_window != null)
+            tc.option_window.SetLoadingStatus(status);
+    }
+
+    static readonly object loading_status_lock_ = new object();
+    static string loading_status_pending_ = null;
+    static bool loading_status_dirty_ = false;
+
+    /// <summary>
+    /// Shows the relative files read during the selected game's startup.
+    /// </summary>
+    public static void ShowLoadedFileReport(string report)
+    {
+        if (string.IsNullOrEmpty(report) || text_content == null || text_content.option_window == null)
+            return;
+        text_content.option_window.ShowMessageBoxPublic("Loaded files", report);
     }
     
     static EmueraContent text_content
@@ -941,4 +979,131 @@ public static class GenericUtils
         }
     }
     static EmueraContent _text_content = null;
+}
+
+/// <summary>
+/// Thread-safe startup file tracker. It stores only normalized paths relative to the
+/// selected game root so desktop and WebGL never expose absolute local paths in the UI.
+/// </summary>
+public static class LoadedFileTracker
+{
+    const int MaxDisplayedFiles = 200;
+    static readonly object sync = new object();
+    static readonly HashSet<string> seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+    static readonly List<string> ordered = new List<string>();
+    static string gameRoot = string.Empty;
+    static bool reportTaken;
+
+    public static void Reset(string root)
+    {
+        string normalizedRoot = NormalizeRoot(root);
+        lock (sync)
+        {
+            gameRoot = normalizedRoot;
+            seen.Clear();
+            ordered.Clear();
+            reportTaken = false;
+        }
+    }
+
+    public static void Track(string path)
+    {
+        if (string.IsNullOrWhiteSpace(path))
+            return;
+
+        try
+        {
+            string fullPath = Path.GetFullPath(path);
+            lock (sync)
+            {
+                string displayPath = ToDisplayPath(fullPath, gameRoot);
+                if (string.IsNullOrEmpty(displayPath) || !seen.Add(displayPath))
+                    return;
+                ordered.Add(displayPath);
+            }
+        }
+        catch (ArgumentException)
+        {
+        }
+        catch (IOException)
+        {
+        }
+        catch (NotSupportedException)
+        {
+        }
+    }
+
+    public static bool TryTakeReport(out string report)
+    {
+        lock (sync)
+        {
+            if (reportTaken || ordered.Count == 0)
+            {
+                report = null;
+                return false;
+            }
+
+            reportTaken = true;
+            var builder = new StringBuilder();
+            builder.Append("Loaded files (");
+            builder.Append(ordered.Count);
+            builder.AppendLine("):");
+
+            int displayed = Math.Min(ordered.Count, MaxDisplayedFiles);
+            for (int i = 0; i < displayed; ++i)
+            {
+                builder.Append("- ");
+                builder.AppendLine(ordered[i]);
+            }
+
+            if (displayed < ordered.Count)
+            {
+                builder.Append("... ");
+                builder.Append(ordered.Count - displayed);
+                builder.AppendLine(" more files not shown");
+            }
+
+            report = builder.ToString();
+            return true;
+        }
+    }
+
+    static string NormalizeRoot(string root)
+    {
+        if (string.IsNullOrWhiteSpace(root))
+            return string.Empty;
+        try
+        {
+            return Path.GetFullPath(root).TrimEnd(
+                Path.DirectorySeparatorChar,
+                Path.AltDirectorySeparatorChar);
+        }
+        catch (ArgumentException)
+        {
+            return string.Empty;
+        }
+        catch (IOException)
+        {
+            return string.Empty;
+        }
+        catch (NotSupportedException)
+        {
+            return string.Empty;
+        }
+    }
+
+    static string ToDisplayPath(string fullPath, string root)
+    {
+        if (string.IsNullOrEmpty(root))
+            return Path.GetFileName(fullPath).Replace('\\', '/');
+
+        string relative = Path.GetRelativePath(root, fullPath)
+            .Replace(Path.DirectorySeparatorChar, '/')
+            .Replace(Path.AltDirectorySeparatorChar, '/');
+        if (relative == ".")
+            return string.Empty;
+        if (relative == ".." || relative.StartsWith("../", StringComparison.Ordinal))
+            return "[external]/" + Path.GetFileName(fullPath).Replace('\\', '/');
+        return relative;
+    }
 }

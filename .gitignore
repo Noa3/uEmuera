@@ -9,5 +9,7 @@ Build/
 uEmuera.zip
 .games/
 .engine/
+.codegraph/
+__pycache__/
 
 

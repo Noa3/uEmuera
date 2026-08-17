@@ -17,7 +17,18 @@ namespace MinorShift._Library
         {
             ExeDir = uEmuera.Utils.NormalizePath(_WorkFolder + "/" + folder + "/");
         }
-        
+
+        /// <summary>
+        /// Sets a game directory that already contains the ERB/config files.
+        /// This is used when a packaged build contains the game directly in its
+        /// executable directory rather than in a named child directory.
+        /// </summary>
+        public static void SetGameFolder(string folder)
+        {
+            _WorkFolder = folder;
+            ExeDir = uEmuera.Utils.NormalizePath(folder + "/");
+        }
+
 		/// <summary>
 		/// Path of the executable file
 		/// </summary>

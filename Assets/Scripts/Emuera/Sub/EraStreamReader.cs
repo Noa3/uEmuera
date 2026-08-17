@@ -44,7 +44,8 @@ namespace MinorShift.Emuera.Sub
 			try
 			{
 				stream = new FileStream(filepath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-				reader = new StreamReader(stream, Config.Encode);
+				reader = new StreamReader(stream, EraEncoding.Detect(filepath));
+                LoadedFileTracker.Track(filepath);
 			}
 			catch
 			{
@@ -92,11 +93,11 @@ namespace MinorShift.Emuera.Sub
 				if (!disabled)
 				{
 					if (st.Current == '}')
-						throw new CodeEE("予期しない行連結終端記号'}'が見つかりました", new ScriptPosition(filename, curNo));
+						throw new CodeEE(GameMessages.T("Unexpected line-continuation end marker '}' found"), new ScriptPosition(filename, curNo));
 					if (st.Current == '{')
 					{
 						if (line.Trim() != "{")
-							throw new CodeEE("行連結始端記号'{'の行に'{'以外の文字を含めることはできません", new ScriptPosition(filename, curNo));
+							throw new CodeEE(GameMessages.T("The line containing '{' cannot include characters other than '{'"), new ScriptPosition(filename, curNo));
 						break;
 					}
 				}
@@ -110,7 +111,7 @@ namespace MinorShift.Emuera.Sub
 				nextNo++;
 				if (line == null)
 				{
-					throw new CodeEE("行連結始端記号'{'が使われましたが終端記号'}'が見つかりません", new ScriptPosition(filename, curNo));
+					throw new CodeEE(GameMessages.T("Line-continuation start marker '{' used but no end marker '}' found"), new ScriptPosition(filename, curNo));
 				}
 
 				if (useRename && (line.IndexOf("[[") >= 0) && (line.IndexOf("]]") >= 0))
@@ -124,7 +125,7 @@ namespace MinorShift.Emuera.Sub
 					if (test[0] == '}')
 					{
 						if (test.Trim() != "}")
-							throw new CodeEE("行連結終端記号'}'の行に'}'以外の文字を含めることはできません", new ScriptPosition(filename, nextNo));
+							throw new CodeEE(GameMessages.T("The line containing '}' cannot include characters other than '}'"), new ScriptPosition(filename, nextNo));
 						break;
 					}
                     //A line-joining character must be a single character, otherwise FOR's numeric-variable processing misfires.
@@ -132,7 +133,7 @@ namespace MinorShift.Emuera.Sub
                     //A}
                     //we do not care about hopeless code like the following
 					if (test[0] == '{' && test.Length == 1)
-						throw new CodeEE("予期しない行連結始端記号'{'が見つかりました", new ScriptPosition(filename, nextNo));
+						throw new CodeEE(GameMessages.T("Unexpected line-continuation start marker '{' found"), new ScriptPosition(filename, nextNo));
 				}
 				b.Append(line);
 				b.Append(" ");

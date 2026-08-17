@@ -94,38 +94,38 @@ namespace MinorShift.Emuera.GameData.Variable
 
 		//Made a CodeEE, but it may actually be an ExeEE
 		public virtual Int64 GetIntValue(ExpressionMediator exm, Int64[] arguments)
-		{ throw new CodeEE("整数型でない変数" + varName + "を整数型として呼び出しました"); }
+		{ throw new CodeEE(GameMessages.T("The non-integer variable ") + varName + GameMessages.T(" was accessed as an integer variable")); }
 		public virtual string GetStrValue(ExpressionMediator exm, Int64[] arguments)
-		{ throw new CodeEE("文字列型でない変数" + varName + "を文字列型として呼び出しました"); }
+		{ throw new CodeEE(GameMessages.T("The non-string variable ") + varName + GameMessages.T(" was accessed as a string variable")); }
 		public virtual void SetValue(Int64 value, Int64[] arguments)
-		{ throw new CodeEE("整数型でない変数" + varName + "を整数型として呼び出しました"); }
+		{ throw new CodeEE(GameMessages.T("The non-integer variable ") + varName + GameMessages.T(" was accessed as an integer variable")); }
 		public virtual void SetValue(string value, Int64[] arguments)
-		{ throw new CodeEE("文字列型でない変数" + varName + "を文字列型として呼び出しました"); }
+		{ throw new CodeEE(GameMessages.T("The non-string variable ") + varName + GameMessages.T(" was accessed as a string variable")); }
 		public virtual void SetValue(Int64[] values, Int64[] arguments)
-		{ throw new CodeEE("整数型配列でない変数" + varName + "を整数型配列として呼び出しました"); }
+		{ throw new CodeEE(GameMessages.T("The non-integer-array variable ") + varName + GameMessages.T(" was accessed as an integer array")); }
 		public virtual void SetValue(string[] values, Int64[] arguments)
-		{ throw new CodeEE("文字列型配列でない変数" + varName + "を文字列型配列として呼び出しました"); }
+		{ throw new CodeEE(GameMessages.T("The non-string-array variable ") + varName + GameMessages.T(" was accessed as a string array")); }
 		public virtual void SetValueAll(Int64 value, int start, int end, int charaPos)
-		{ throw new CodeEE("整数型配列でない変数" + varName + "を整数型配列として呼び出しました"); }
+		{ throw new CodeEE(GameMessages.T("The non-integer-array variable ") + varName + GameMessages.T(" was accessed as an integer array")); }
 		public virtual void SetValueAll(string value, int start, int end, int charaPos)
-		{ throw new CodeEE("文字列型配列でない変数" + varName + "を文字列型配列として呼び出しました"); }
+		{ throw new CodeEE(GameMessages.T("The non-string-array variable ") + varName + GameMessages.T(" was accessed as a string array")); }
 		public virtual Int64 PlusValue(Int64 value, Int64[] arguments)
-		{ throw new CodeEE("整数型でない変数" + varName + "を整数型として呼び出しました"); }
+		{ throw new CodeEE(GameMessages.T("The non-integer variable ") + varName + GameMessages.T(" was accessed as an integer variable")); }
 		public virtual Int32 GetLength()
-		{ throw new CodeEE("配列型でない変数" + varName + "の長さを取得しようとしました"); }
+		{ throw new CodeEE(GameMessages.T("Attempted to get the length of the non-array variable ") + varName); }
 		public virtual Int32 GetLength(int dimension)
-		{ throw new CodeEE("配列型でない変数" + varName + "の長さを取得しようとしました"); }
+		{ throw new CodeEE(GameMessages.T("Attempted to get the length of the non-array variable ") + varName); }
 		public virtual object GetArray()
 		{
 			if (IsCharacterData)
-				throw new CodeEE("キャラクタ変数" + varName + "を非キャラ変数として呼び出しました");
-			throw new CodeEE("配列型でない変数" + varName + "の配列を取得しようとしました");
+				throw new CodeEE(GameMessages.T("The character variable ") + varName + GameMessages.T(" was accessed as a non-character variable"));
+			throw new CodeEE(GameMessages.T("Attempted to get the array of the non-array variable ") + varName);
 		}
 		public virtual object GetArrayChara(int charano)
 		{
 			if (!IsCharacterData)
-				throw new CodeEE("非キャラクタ変数" + varName + "をキャラ変数として呼び出しました");
-			throw new CodeEE("配列型でない変数" + varName + "の配列を取得しようとしました");
+				throw new CodeEE(GameMessages.T("The non-character variable ") + varName + GameMessages.T(" was accessed as a character variable"));
+			throw new CodeEE(GameMessages.T("Attempted to get the array of the non-array variable ") + varName);
 		}
 
 		public void throwOutOfRangeException(Int64[] arguments, Exception e)
@@ -261,25 +261,25 @@ namespace MinorShift.Emuera.GameData.Variable
 			if (sizes.Length == 1)
 				return sizes[0];
 			if (sizes.Length == 0)
-				throw new CodeEE("非配列型のキャラ変数" + varName + "の長さを取得しようとしました");
-			throw new CodeEE(Dimension.ToString() + "次元配列型のキャラ変数" + varName + "の長さを次元を指定せずに取得しようとしました");
+				throw new CodeEE(GameMessages.T("Attempted to get the length of the non-array character variable ") + varName);
+			throw new CodeEE(Dimension.ToString() + GameMessages.T("-dimensional character array variable ") + varName + GameMessages.T(" length was requested without specifying a dimension"));
 		}
 		public override Int32 GetLength(int dimension)
 		{
 			if (sizes.Length == 0)
-				throw new CodeEE("非配列型のキャラ変数" + varName + "の長さを取得しようとしました");
+				throw new CodeEE(GameMessages.T("Attempted to get the length of the non-array character variable ") + varName);
 			if (dimension < sizes.Length)
 				return sizes[dimension];
-			throw new CodeEE("配列型変数のキャラ変数" + varName + "の存在しない次元の長さを取得しようとしました");
+			throw new CodeEE(GameMessages.T("Attempted to get the length of a nonexistent dimension of the character array variable ") + varName);
 		}
 		public override void CheckElement(Int64[] arguments, bool[] doCheck)
 		{
 			if (doCheck[0] && ((arguments[0] < 0) || (arguments[0] >= varData.CharacterList.Count)))
-				throw new CodeEE("キャラクタ配列変数" + varName + "の第１argument(" + arguments[0].ToString() + ")はキャラ登録番号の範囲外です");
+				throw new CodeEE(GameMessages.T("The character array variable ") + varName + GameMessages.T(" has first argument (") + arguments[0].ToString() + GameMessages.T(") outside the character registration number range"));
 			if (doCheck.Length > 1 && sizes.Length > 0 && doCheck[1] && ((arguments[1] < 0) || (arguments[1] >= sizes[0])))
-				throw new CodeEE("キャラクタ配列変数" + varName + "の第２argument(" + arguments[1].ToString() + ")は配列の範囲外です");
+				throw new CodeEE(GameMessages.T("The character array variable ") + varName + GameMessages.T(" has second argument (") + arguments[1].ToString() + GameMessages.T(") outside the array range"));
 			if (doCheck.Length > 2 && sizes.Length > 1 && doCheck[2] && ((arguments[2] < 0) || (arguments[2] >= sizes[1])))
-				throw new CodeEE("キャラクタ配列変数" + varName + "の第３argument(" + arguments[2].ToString() + ")は配列の範囲外です");
+				throw new CodeEE(GameMessages.T("The character array variable ") + varName + GameMessages.T(" has third argument (") + arguments[2].ToString() + GameMessages.T(") outside the array range"));
 		}
 
 		public override void IsArrayRangeValid(Int64[] arguments, Int64 index1, Int64 index2, string funcName, Int64 i1, Int64 i2)
@@ -287,9 +287,9 @@ namespace MinorShift.Emuera.GameData.Variable
 			CheckElement(arguments);
 			//CharacterData chara = varData.CharacterList[(int)arguments[0]];
 			if ((index1 < 0) || (index1 > sizes[0]))
-				throw new CodeEE(funcName + "命令の第" + i1.ToString() + "argument(" + index1.ToString() + ")は配列" + varName + "の範囲外です");
+				throw new CodeEE(funcName + GameMessages.T(" command argument ") + i1.ToString() + GameMessages.T(" (") + index1.ToString() + GameMessages.T(") is outside the range of array ") + varName);
 			if ((index2 < 0) || (index2 > sizes[0]))
-				throw new CodeEE(funcName + "命令の第" + i2.ToString() + "argument(" + index2.ToString() + ")は配列" + varName + "の範囲外です");
+				throw new CodeEE(funcName + GameMessages.T(" command argument ") + i2.ToString() + GameMessages.T(" (") + index2.ToString() + GameMessages.T(") is outside the range of array ") + varName);
 		}
 	}
 
@@ -330,14 +330,14 @@ namespace MinorShift.Emuera.GameData.Variable
 		{
 			if (this.Dimension == 1)
 				return sizes[0];
-			throw new CodeEE(Dimension.ToString() + "次元配列型変数" + varName + "の長さを取得しようとしました");
+			throw new CodeEE(Dimension.ToString() + GameMessages.T("-dimensional array variable ") + varName + GameMessages.T(" length was requested"));
 		}
 
 		public override Int32 GetLength(int dimension)
 		{
 			if (dimension < this.Dimension)
 				return sizes[dimension];
-			throw new CodeEE("配列型変数" + varName + "の存在しない次元の長さを取得しようとしました");
+			throw new CodeEE(GameMessages.T("Attempted to get the length of a nonexistent dimension of the array variable ") + varName);
 		}
 		public override void CheckElement(Int64[] arguments, bool[] doCheck)
 		{
@@ -345,19 +345,19 @@ namespace MinorShift.Emuera.GameData.Variable
 			//	throw new ExeEE("no array is prepared for private variable " + varName);
 
 			if (doCheck[0] && ((arguments[0] < 0) || (arguments[0] >= sizes[0])))
-				throw new CodeEE("配列型変数" + varName + "の第１argument(" + arguments[0].ToString() + ")は配列の範囲外です");
+				throw new CodeEE(GameMessages.T("The array variable ") + varName + GameMessages.T(" has first argument (") + arguments[0].ToString() + GameMessages.T(") outside the array range"));
 			if (sizes.Length >= 2 && ((arguments[1] < 0) || (arguments[1] >= sizes[1])))
-				throw new CodeEE("配列型変数" + varName + "の第２argument(" + arguments[1].ToString() + ")は配列の範囲外です");
+				throw new CodeEE(GameMessages.T("The array variable ") + varName + GameMessages.T(" has second argument (") + arguments[1].ToString() + GameMessages.T(") outside the array range"));
 			if (sizes.Length >= 3 && ((arguments[2] < 0) || (arguments[2] >= sizes[2])))
-				throw new CodeEE("配列型変数" + varName + "の第３argument(" + arguments[2].ToString() + ")は配列の範囲外です");
+				throw new CodeEE(GameMessages.T("The array variable ") + varName + GameMessages.T(" has third argument (") + arguments[2].ToString() + GameMessages.T(") outside the array range"));
 		}
 		public override void IsArrayRangeValid(Int64[] arguments, Int64 index1, Int64 index2, string funcName, Int64 i1, Int64 i2)
 		{
 			CheckElement(arguments);
 			if ((index1 < 0) || (index1 > sizes[Dimension - 1]))
-				throw new CodeEE(funcName + "命令の第" + i1.ToString() + "argument(" + index1.ToString() + ")は配列" + varName + "の範囲外です");
+				throw new CodeEE(funcName + GameMessages.T(" command argument ") + i1.ToString() + GameMessages.T(" (") + index1.ToString() + GameMessages.T(") is outside the range of array ") + varName);
 			if ((index2 < 0) || (index2 > sizes[Dimension - 1]))
-				throw new CodeEE(funcName + "命令の第" + i2.ToString() + "argument(" + index2.ToString() + ")は配列" + varName + "の範囲外です");
+				throw new CodeEE(funcName + GameMessages.T(" command argument ") + i2.ToString() + GameMessages.T(" (") + index2.ToString() + GameMessages.T(") is outside the range of array ") + varName);
 		}
 		public abstract void In();
 		public abstract void Out();
@@ -424,38 +424,38 @@ namespace MinorShift.Emuera.GameData.Variable
 		public override Int32 GetLength()
 		{
 			if (array == null)
-				throw new CodeEE("参照型変数" + varName + "は何も参照していません");
+				throw new CodeEE(GameMessages.T("The reference variable ") + varName + GameMessages.T(" is not referencing anything"));
 			if (this.Dimension != 1)
-				throw new CodeEE(Dimension.ToString() + "次元配列型変数" + varName + "の長さを取得しようとしました");
+				throw new CodeEE(Dimension.ToString() + GameMessages.T("-dimensional array variable ") + varName + GameMessages.T(" length was requested"));
 			return array.Length;
 		}
 
 		public override Int32 GetLength(int dimension)
 		{
 			if (array == null)
-				throw new CodeEE("参照型変数" + varName + "は何も参照していません");
+				throw new CodeEE(GameMessages.T("The reference variable ") + varName + GameMessages.T(" is not referencing anything"));
 			if (dimension < this.Dimension)
 				return array.GetLength(dimension);
-			throw new CodeEE("配列型変数" + varName + "の存在しない次元の長さを取得しようとしました");
+			throw new CodeEE(GameMessages.T("Attempted to get the length of a nonexistent dimension of the array variable ") + varName);
 		}
 		public override void CheckElement(Int64[] arguments, bool[] doCheck)
 		{
 			if (array == null)
-				throw new CodeEE("参照型変数" + varName + "は何も参照していません");
+				throw new CodeEE(GameMessages.T("The reference variable ") + varName + GameMessages.T(" is not referencing anything"));
 			if (doCheck[0] && ((arguments[0] < 0) || (arguments[0] >= array.GetLength(0))))
-				throw new CodeEE("配列型変数" + varName + "の第１argument(" + arguments[0].ToString() + ")は配列の範囲外です");
+				throw new CodeEE(GameMessages.T("The array variable ") + varName + GameMessages.T(" has first argument (") + arguments[0].ToString() + GameMessages.T(") outside the array range"));
 			if (Dimension >= 2 && ((arguments[1] < 0) || (arguments[1] >= array.GetLength(1))))
-				throw new CodeEE("配列型変数" + varName + "の第２argument(" + arguments[1].ToString() + ")は配列の範囲外です");
+				throw new CodeEE(GameMessages.T("The array variable ") + varName + GameMessages.T(" has second argument (") + arguments[1].ToString() + GameMessages.T(") outside the array range"));
 			if (Dimension >= 3 && ((arguments[2] < 0) || (arguments[2] >= array.GetLength(2))))
-				throw new CodeEE("配列型変数" + varName + "の第３argument(" + arguments[2].ToString() + ")は配列の範囲外です");
+				throw new CodeEE(GameMessages.T("The array variable ") + varName + GameMessages.T(" has third argument (") + arguments[2].ToString() + GameMessages.T(") outside the array range"));
 		}
 		public override void IsArrayRangeValid(Int64[] arguments, Int64 index1, Int64 index2, string funcName, Int64 i1, Int64 i2)
 		{
 			CheckElement(arguments);
 			if ((index1 < 0) || (index1 > array.GetLength(Dimension - 1)))
-				throw new CodeEE(funcName + "命令の第" + i1.ToString() + "argument(" + index1.ToString() + ")は配列" + varName + "の範囲外です");
+				throw new CodeEE(funcName + GameMessages.T(" command argument ") + i1.ToString() + GameMessages.T(" (") + index1.ToString() + GameMessages.T(") is outside the range of array ") + varName);
 			if ((index2 < 0) || (index2 > array.GetLength(Dimension - 1)))
-				throw new CodeEE(funcName + "命令の第" + i2.ToString() + "argument(" + index2.ToString() + ")は配列" + varName + "の範囲外です");
+				throw new CodeEE(funcName + GameMessages.T(" command argument ") + i2.ToString() + GameMessages.T(" (") + index2.ToString() + GameMessages.T(") is outside the range of array ") + varName);
 		}
 
 		int counter = 0;
@@ -482,7 +482,7 @@ namespace MinorShift.Emuera.GameData.Variable
 		public override object GetArray()
 		{
 			if (array == null)
-				throw new CodeEE("参照型変数" + varName + "は何も参照していません");
+				throw new CodeEE(GameMessages.T("The reference variable ") + varName + GameMessages.T(" is not referencing anything"));
 			return array;
 		}
 
@@ -500,26 +500,26 @@ namespace MinorShift.Emuera.GameData.Variable
 		{
 			errMes = "";
 			if (rother == null)
-			{ errMes = "参照先変数は省略できません"; return false; }
+			{ errMes = GameMessages.T("The reference target variable cannot be omitted"); return false; }
 			if (rother.IsCalc)
-			{ errMes = "疑似変数は参照できません"; return false; }
+			{ errMes = GameMessages.T("Pseudo variables cannot be referenced"); return false; }
 			//TODO reference to const
 			//if (rother.IsConst != this.isConst)
 			if (rother.IsConst)
-			{ errMes = "定数は参照できません"; return false; }
+			{ errMes = GameMessages.T("Constants cannot be referenced"); return false; }
 			//1812 Changed the conditions for local references
 			//A REF that is local and DYNAMIC can reference locals
 			if ((!this.IsPrivate) && (rother.IsPrivate || rother.IsLocal))
-			{ errMes = "広域の参照変数はローカル変数を参照できません"; return false; }
+			{ errMes = GameMessages.T("A global reference variable cannot reference local variables"); return false; }
 			////1810beta002 Local references forbidden
 			//if ((!rother.IsReference) && (rother.IsPrivate || rother.IsLocal))
 			//{ errMes = "local variables cannot be referenced"; return false; }
 			if (rother.IsCharacterData && !allowChara)
-			{ errMes = "キャラ変数は参照できません"; return false; }
+			{ errMes = GameMessages.T("Character variables cannot be referenced"); return false; }
 			if (this.IsInteger != rother.IsInteger)
-			{ errMes = "型が異なる変数は参照できません"; return false; }
+			{ errMes = GameMessages.T("Variables of different types cannot be referenced"); return false; }
 			if (this.Dimension != rother.Dimension)
-			{ errMes = "次元数が異なる変数は参照できません"; return false; }
+			{ errMes = GameMessages.T("Variables with different numbers of dimensions cannot be referenced"); return false; }
 			return true;
 		}
 	}
@@ -545,22 +545,22 @@ namespace MinorShift.Emuera.GameData.Variable
 		{
 			if (dimension == 0)
 				return size;
-			throw new CodeEE("配列型変数" + varName + "の存在しない次元の長さを取得しようとしました");
+			throw new CodeEE(GameMessages.T("Attempted to get the length of a nonexistent dimension of the array variable ") + varName);
 		}
 		public override void CheckElement(Int64[] arguments, bool[] doCheck)
 		{
 			//if (array == null)
 			//	throw new ExeEE("no array is prepared for private variable " + varName);
 			if (doCheck[0] && ((arguments[0] < 0) || (arguments[0] >= size)))
-				throw new CodeEE("配列変数" + varName + "の第１argument(" + arguments[0].ToString() + ")は配列の範囲外です");
+				throw new CodeEE(GameMessages.T("The array variable ") + varName + GameMessages.T(" has first argument (") + arguments[0].ToString() + GameMessages.T(") outside the array range"));
 		}
 		public override void IsArrayRangeValid(Int64[] arguments, Int64 index1, Int64 index2, string funcName, Int64 i1, Int64 i2)
 		{
 			CheckElement(arguments);
 			if ((index1 < 0) || (index1 > size))
-				throw new CodeEE(funcName + "命令の第" + i1.ToString() + "argument(" + index1.ToString() + ")は配列" + varName + "の範囲外です");
+				throw new CodeEE(funcName + GameMessages.T(" command argument ") + i1.ToString() + GameMessages.T(" (") + index1.ToString() + GameMessages.T(") is outside the range of array ") + varName);
 			if ((index2 < 0) || (index2 > size))
-				throw new CodeEE(funcName + "命令の第" + i2.ToString() + "argument(" + index2.ToString() + ")は配列" + varName + "の範囲外です");
+				throw new CodeEE(funcName + GameMessages.T(" command argument ") + i2.ToString() + GameMessages.T(" (") + index2.ToString() + GameMessages.T(") is outside the range of array ") + varName);
 		}
 	}
 
@@ -646,22 +646,22 @@ namespace MinorShift.Emuera.GameData.Variable
 			{
 				if (dimension == 0)
 					return array.Length;
-				throw new CodeEE("配列型変数" + varName + "の存在しない次元の長さを取得しようとしました");
+				throw new CodeEE(GameMessages.T("Attempted to get the length of a nonexistent dimension of the array variable ") + varName);
 			}
 			public override object GetArray() { return array; }
 
 			public override void CheckElement(Int64[] arguments, bool[] doCheck)
 			{
 				if (doCheck[0] && ((arguments[0] < 0) || (arguments[0] >= array.Length)))
-					throw new CodeEE("配列変数" + varName + "の第１argument(" + arguments[0].ToString() + ")は配列の範囲外です");
+					throw new CodeEE(GameMessages.T("The array variable ") + varName + GameMessages.T(" has first argument (") + arguments[0].ToString() + GameMessages.T(") outside the array range"));
 			}
 			public override void IsArrayRangeValid(Int64[] arguments, Int64 index1, Int64 index2, string funcName, Int64 i1, Int64 i2)
 			{
 				CheckElement(arguments);
 				if ((index1 < 0) || (index1 > array.Length))
-					throw new CodeEE(funcName + "命令の第" + i1.ToString() + "argument(" + index1.ToString() + ")は配列" + varName + "の範囲外です");
+					throw new CodeEE(funcName + GameMessages.T(" command argument ") + i1.ToString() + GameMessages.T(" (") + index1.ToString() + GameMessages.T(") is outside the range of array ") + varName);
 				if ((index2 < 0) || (index2 > array.Length))
-					throw new CodeEE(funcName + "命令の第" + i2.ToString() + "argument(" + index2.ToString() + ")は配列" + varName + "の範囲外です");
+					throw new CodeEE(funcName + GameMessages.T(" command argument ") + i2.ToString() + GameMessages.T(" (") + index2.ToString() + GameMessages.T(") is outside the range of array ") + varName);
 			}
 		}
 
@@ -707,29 +707,29 @@ namespace MinorShift.Emuera.GameData.Variable
 				return array[arguments[0], arguments[1]];
 			}
 			public override Int32 GetLength()
-			{ throw new CodeEE("2次元配列型変数" + varName + "の長さを取得しようとしました"); }
+			{ throw new CodeEE(GameMessages.T("The 2D array variable ") + varName + GameMessages.T(" length was requested")); }
 			public override Int32 GetLength(int dimension)
 			{
 				if ((dimension == 0) || (dimension == 1))
 					return array.GetLength(dimension);
-				throw new CodeEE("配列型変数" + varName + "の存在しない次元の長さを取得しようとしました");
+				throw new CodeEE(GameMessages.T("Attempted to get the length of a nonexistent dimension of the array variable ") + varName);
 			}
 			public override object GetArray() { return array; }
 
 			public override void CheckElement(Int64[] arguments, bool[] doCheck)
 			{
 				if (doCheck[0] && ((arguments[0] < 0) || (arguments[0] >= array.GetLength(0))))
-					throw new CodeEE("二次元配列" + varName + "の第１argument(" + arguments[0].ToString() + ")は配列の範囲外です");
+					throw new CodeEE(GameMessages.T("The 2D array ") + varName + GameMessages.T(" has first argument (") + arguments[0].ToString() + GameMessages.T(") outside the array range"));
 				if (doCheck[1] && ((arguments[1] < 0) || (arguments[1] >= array.GetLength(1))))
-					throw new CodeEE("二次元配列" + varName + "の第２argument(" + arguments[1].ToString() + ")は配列の範囲外です");
+					throw new CodeEE(GameMessages.T("The 2D array ") + varName + GameMessages.T(" has second argument (") + arguments[1].ToString() + GameMessages.T(") outside the array range"));
 			}
 			public override void IsArrayRangeValid(Int64[] arguments, Int64 index1, Int64 index2, string funcName, Int64 i1, Int64 i2)
 			{
 				CheckElement(arguments);
 				if ((index1 < 0) || (index1 > array.GetLength(1)))
-					throw new CodeEE(funcName + "命令の第" + i1.ToString() + "argument(" + index1.ToString() + ")は配列" + varName + "の範囲外です");
+					throw new CodeEE(funcName + GameMessages.T(" command argument ") + i1.ToString() + GameMessages.T(" (") + index1.ToString() + GameMessages.T(") is outside the range of array ") + varName);
 				if ((index2 < 0) || (index2 > array.GetLength(1)))
-					throw new CodeEE(funcName + "命令の第" + i2.ToString() + "argument(" + index2.ToString() + ")は配列" + varName + "の範囲外です");
+					throw new CodeEE(funcName + GameMessages.T(" command argument ") + i2.ToString() + GameMessages.T(" (") + index2.ToString() + GameMessages.T(") is outside the range of array ") + varName);
 			}
 		}
 
@@ -777,31 +777,31 @@ namespace MinorShift.Emuera.GameData.Variable
 				return array[arguments[0], arguments[1], arguments[2]];
 			}
 			public override Int32 GetLength()
-			{ throw new CodeEE("3次元配列型変数" + varName + "の長さを取得しようとしました"); }
+			{ throw new CodeEE(GameMessages.T("The 3D array variable ") + varName + GameMessages.T(" length was requested")); }
 			public override Int32 GetLength(int dimension)
 			{
 				if ((dimension == 0) || (dimension == 1) || (dimension == 2))
 					return array.GetLength(dimension);
-				throw new CodeEE("配列型変数" + varName + "の存在しない次元の長さを取得しようとしました");
+				throw new CodeEE(GameMessages.T("Attempted to get the length of a nonexistent dimension of the array variable ") + varName);
 			}
 			public override object GetArray() { return array; }
 
 			public override void CheckElement(Int64[] arguments, bool[] doCheck)
 			{
 				if (doCheck[0] && ((arguments[0] < 0) || (arguments[0] >= array.GetLength(0))))
-					throw new CodeEE("三次元配列" + varName + "の第１argument(" + arguments[0].ToString() + ")は配列の範囲外です");
+					throw new CodeEE(GameMessages.T("The 3D array ") + varName + GameMessages.T(" has first argument (") + arguments[0].ToString() + GameMessages.T(") outside the array range"));
 				if (doCheck[1] && ((arguments[1] < 0) || (arguments[1] >= array.GetLength(1))))
-					throw new CodeEE("三次元配列" + varName + "の第２argument(" + arguments[1].ToString() + ")は配列の範囲外です");
+					throw new CodeEE(GameMessages.T("The 3D array ") + varName + GameMessages.T(" has second argument (") + arguments[1].ToString() + GameMessages.T(") outside the array range"));
 				if (doCheck[2] && ((arguments[2] < 0) || (arguments[2] >= array.GetLength(2))))
-					throw new CodeEE("三次元配列" + varName + "の第３argument(" + arguments[2].ToString() + ")は配列の範囲外です");
+					throw new CodeEE(GameMessages.T("The 3D array ") + varName + GameMessages.T(" has third argument (") + arguments[2].ToString() + GameMessages.T(") outside the array range"));
 			}
 			public override void IsArrayRangeValid(Int64[] arguments, Int64 index1, Int64 index2, string funcName, Int64 i1, Int64 i2)
 			{
 				CheckElement(arguments);
 				if ((index1 < 0) || (index1 > array.GetLength(2)))
-					throw new CodeEE(funcName + "命令の第" + i1.ToString() + "argument(" + index1.ToString() + ")は配列" + varName + "の範囲外です");
+					throw new CodeEE(funcName + GameMessages.T(" command argument ") + i1.ToString() + GameMessages.T(" (") + index1.ToString() + GameMessages.T(") is outside the range of array ") + varName);
 				if ((index2 < 0) || (index2 > array.GetLength(2)))
-					throw new CodeEE(funcName + "命令の第" + i2.ToString() + "argument(" + index2.ToString() + ")は配列" + varName + "の範囲外です");
+					throw new CodeEE(funcName + GameMessages.T(" command argument ") + i2.ToString() + GameMessages.T(" (") + index2.ToString() + GameMessages.T(") is outside the range of array ") + varName);
 			}
 		}
 
@@ -869,22 +869,22 @@ namespace MinorShift.Emuera.GameData.Variable
 			{
 				if (dimension == 0)
 					return array.Length;
-				throw new CodeEE("配列型変数" + varName + "の存在しない次元の長さを取得しようとしました");
+				throw new CodeEE(GameMessages.T("Attempted to get the length of a nonexistent dimension of the array variable ") + varName);
 			}
 			public override object GetArray() { return array; }
 
 			public override void CheckElement(Int64[] arguments, bool[] doCheck)
 			{
 				if (doCheck[0] && ((arguments[0] < 0) || (arguments[0] >= array.Length)))
-					throw new CodeEE("配列変数" + varName + "の第１argument(" + arguments[0].ToString() + ")は配列の範囲外です");
+					throw new CodeEE(GameMessages.T("The array variable ") + varName + GameMessages.T(" has first argument (") + arguments[0].ToString() + GameMessages.T(") outside the array range"));
 			}
 			public override void IsArrayRangeValid(Int64[] arguments, Int64 index1, Int64 index2, string funcName, Int64 i1, Int64 i2)
 			{
 				CheckElement(arguments);
 				if ((index1 < 0) || (index1 > array.Length))
-					throw new CodeEE(funcName + "命令の第" + i1.ToString() + "argument(" + index1.ToString() + ")は配列" + varName + "の範囲外です");
+					throw new CodeEE(funcName + GameMessages.T(" command argument ") + i1.ToString() + GameMessages.T(" (") + index1.ToString() + GameMessages.T(") is outside the range of array ") + varName);
 				if ((index2 < 0) || (index2 > array.Length))
-					throw new CodeEE(funcName + "命令の第" + i2.ToString() + "argument(" + index2.ToString() + ")は配列" + varName + "の範囲外です");
+					throw new CodeEE(funcName + GameMessages.T(" command argument ") + i2.ToString() + GameMessages.T(" (") + index2.ToString() + GameMessages.T(") is outside the range of array ") + varName);
 			}
 		}
 
@@ -924,29 +924,29 @@ namespace MinorShift.Emuera.GameData.Variable
 						array[i, j] = value;
 			}
 			public override Int32 GetLength()
-			{ throw new CodeEE("2次元配列型変数" + varName + "の長さを取得しようとしました"); }
+			{ throw new CodeEE(GameMessages.T("The 2D array variable ") + varName + GameMessages.T(" length was requested")); }
 			public override Int32 GetLength(int dimension)
 			{
 				if ((dimension == 0) || (dimension == 1))
 					return array.GetLength(dimension);
-				throw new CodeEE("配列型変数" + varName + "の存在しない次元の長さを取得しようとしました");
+				throw new CodeEE(GameMessages.T("Attempted to get the length of a nonexistent dimension of the array variable ") + varName);
 			}
 			public override object GetArray() { return array; }
 
 			public override void CheckElement(Int64[] arguments, bool[] doCheck)
 			{
 				if (doCheck[0] && ((arguments[0] < 0) || (arguments[0] >= array.GetLength(0))))
-					throw new CodeEE("二次元配列" + varName + "の第１argument(" + arguments[0].ToString() + ")は配列の範囲外です");
+					throw new CodeEE(GameMessages.T("The 2D array ") + varName + GameMessages.T(" has first argument (") + arguments[0].ToString() + GameMessages.T(") outside the array range"));
 				if (doCheck[1] && ((arguments[1] < 0) || (arguments[1] >= array.GetLength(1))))
-					throw new CodeEE("二次元配列" + varName + "の第２argument(" + arguments[1].ToString() + ")は配列の範囲外です");
+					throw new CodeEE(GameMessages.T("The 2D array ") + varName + GameMessages.T(" has second argument (") + arguments[1].ToString() + GameMessages.T(") outside the array range"));
 			}
 			public override void IsArrayRangeValid(Int64[] arguments, Int64 index1, Int64 index2, string funcName, Int64 i1, Int64 i2)
 			{
 				CheckElement(arguments);
 				if ((index1 < 0) || (index1 > array.GetLength(1)))
-					throw new CodeEE(funcName + "命令の第" + i1.ToString() + "argument(" + index1.ToString() + ")は配列" + varName + "の範囲外です");
+					throw new CodeEE(funcName + GameMessages.T(" command argument ") + i1.ToString() + GameMessages.T(" (") + index1.ToString() + GameMessages.T(") is outside the range of array ") + varName);
 				if ((index2 < 0) || (index2 > array.GetLength(1)))
-					throw new CodeEE(funcName + "命令の第" + i2.ToString() + "argument(" + index2.ToString() + ")は配列" + varName + "の範囲外です");
+					throw new CodeEE(funcName + GameMessages.T(" command argument ") + i2.ToString() + GameMessages.T(" (") + index2.ToString() + GameMessages.T(") is outside the range of array ") + varName);
 			}
 		}
 
@@ -988,31 +988,31 @@ namespace MinorShift.Emuera.GameData.Variable
 							array[i, j, k] = value;
 			}
 			public override Int32 GetLength()
-			{ throw new CodeEE("3次元配列型変数" + varName + "の長さを取得しようとしました"); }
+			{ throw new CodeEE(GameMessages.T("The 3D array variable ") + varName + GameMessages.T(" length was requested")); }
 			public override Int32 GetLength(int dimension)
 			{
 				if ((dimension == 0) || (dimension == 1) || (dimension == 2))
 					return array.GetLength(dimension);
-				throw new CodeEE("配列型変数" + varName + "の存在しない次元の長さを取得しようとしました");
+				throw new CodeEE(GameMessages.T("Attempted to get the length of a nonexistent dimension of the array variable ") + varName);
 			}
 			public override object GetArray() { return array; }
 
 			public override void CheckElement(Int64[] arguments, bool[] doCheck)
 			{
 				if (doCheck[0] && ((arguments[0] < 0) || (arguments[0] >= array.GetLength(0))))
-					throw new CodeEE("三次元配列" + varName + "の第１argument(" + arguments[0].ToString() + ")は配列の範囲外です");
+					throw new CodeEE(GameMessages.T("The 3D array ") + varName + GameMessages.T(" has first argument (") + arguments[0].ToString() + GameMessages.T(") outside the array range"));
 				if (doCheck[1] && ((arguments[1] < 0) || (arguments[1] >= array.GetLength(1))))
-					throw new CodeEE("三次元配列" + varName + "の第２argument(" + arguments[1].ToString() + ")は配列の範囲外です");
+					throw new CodeEE(GameMessages.T("The 3D array ") + varName + GameMessages.T(" has second argument (") + arguments[1].ToString() + GameMessages.T(") outside the array range"));
 				if (doCheck[2] && ((arguments[2] < 0) || (arguments[2] >= array.GetLength(2))))
-					throw new CodeEE("三次元配列" + varName + "の第３argument(" + arguments[2].ToString() + ")は配列の範囲外です");
+					throw new CodeEE(GameMessages.T("The 3D array ") + varName + GameMessages.T(" has third argument (") + arguments[2].ToString() + GameMessages.T(") outside the array range"));
 			}
 			public override void IsArrayRangeValid(Int64[] arguments, Int64 index1, Int64 index2, string funcName, Int64 i1, Int64 i2)
 			{
 				CheckElement(arguments);
 				if ((index1 < 0) || (index1 > array.GetLength(2)))
-					throw new CodeEE(funcName + "命令の第" + i1.ToString() + "argument(" + index1.ToString() + ")は配列" + varName + "の範囲外です");
+					throw new CodeEE(funcName + GameMessages.T(" command argument ") + i1.ToString() + GameMessages.T(" (") + index1.ToString() + GameMessages.T(") is outside the range of array ") + varName);
 				if ((index2 < 0) || (index2 > array.GetLength(2)))
-					throw new CodeEE(funcName + "命令の第" + i2.ToString() + "argument(" + index2.ToString() + ")は配列" + varName + "の範囲外です");
+					throw new CodeEE(funcName + GameMessages.T(" command argument ") + i2.ToString() + GameMessages.T(" (") + index2.ToString() + GameMessages.T(") is outside the range of array ") + varName);
 			}
 		}
 
@@ -1299,15 +1299,15 @@ namespace MinorShift.Emuera.GameData.Variable
 				CanRestructure = true;
 			}
 			public override void SetValue(Int64 value, Int64[] arguments)
-			{ throw new CodeEE("読み取り専用の変数" + varName + "に代入しようとしました"); }
+			{ throw new CodeEE(GameMessages.T("Attempted to assign to the read-only variable ") + varName); }
 			public override void SetValue(string value, Int64[] arguments)
-			{ throw new CodeEE("読み取り専用の変数" + varName + "に代入しようとしました"); }
+			{ throw new CodeEE(GameMessages.T("Attempted to assign to the read-only variable ") + varName); }
 			public override void SetValue(Int64[] values, Int64[] arguments)
-			{ throw new CodeEE("読み取り専用の変数" + varName + "に代入しようとしました"); }
+			{ throw new CodeEE(GameMessages.T("Attempted to assign to the read-only variable ") + varName); }
 			public override void SetValue(string[] values, Int64[] arguments)
-			{ throw new CodeEE("読み取り専用の変数" + varName + "に代入しようとしました"); }
+			{ throw new CodeEE(GameMessages.T("Attempted to assign to the read-only variable ") + varName); }
 			public override Int64 PlusValue(Int64 value, Int64[] arguments)
-			{ throw new CodeEE("読み取り専用の変数" + varName + "に代入しようとしました"); }
+			{ throw new CodeEE(GameMessages.T("Attempted to assign to the read-only variable ") + varName); }
 		}
 
 		private sealed class IntConstantToken : ConstantToken
@@ -1355,22 +1355,22 @@ namespace MinorShift.Emuera.GameData.Variable
 			{
 				if (dimension == 0)
 					return array.Length;
-				throw new CodeEE("配列型変数" + varName + "の存在しない次元の長さを取得しようとしました");
+				throw new CodeEE(GameMessages.T("Attempted to get the length of a nonexistent dimension of the array variable ") + varName);
 			}
 			public override object GetArray() { return array; }
 
 			public override void CheckElement(Int64[] arguments, bool[] doCheck)
 			{
 				if (doCheck[0] && ((arguments[0] < 0) || (arguments[0] >= array.Length)))
-					throw new CodeEE("配列変数" + varName + "の第１argument(" + arguments[0].ToString() + ")は配列の範囲外です");
+					throw new CodeEE(GameMessages.T("The array variable ") + varName + GameMessages.T(" has first argument (") + arguments[0].ToString() + GameMessages.T(") outside the array range"));
 			}
 			public override void IsArrayRangeValid(Int64[] arguments, Int64 index1, Int64 index2, string funcName, Int64 i1, Int64 i2)
 			{
 				CheckElement(arguments);
 				if ((index1 < 0) || (index1 > array.Length))
-					throw new CodeEE(funcName + "命令の第" + i1.ToString() + "argument(" + index1.ToString() + ")は配列" + varName + "の範囲外です");
+					throw new CodeEE(funcName + GameMessages.T(" command argument ") + i1.ToString() + GameMessages.T(" (") + index1.ToString() + GameMessages.T(") is outside the range of array ") + varName);
 				if ((index2 < 0) || (index2 > array.Length))
-					throw new CodeEE(funcName + "命令の第" + i2.ToString() + "argument(" + index2.ToString() + ")は配列" + varName + "の範囲外です");
+					throw new CodeEE(funcName + GameMessages.T(" command argument ") + i2.ToString() + GameMessages.T(" (") + index2.ToString() + GameMessages.T(") is outside the range of array ") + varName);
 			}
 		}
 
@@ -1400,22 +1400,22 @@ namespace MinorShift.Emuera.GameData.Variable
 			{
 				if (dimension == 0)
 					return array.Length;
-				throw new CodeEE("配列型変数" + varName + "の存在しない次元の長さを取得しようとしました");
+				throw new CodeEE(GameMessages.T("Attempted to get the length of a nonexistent dimension of the array variable ") + varName);
 			}
 			public override object GetArray() { return array; }
 
 			public override void CheckElement(Int64[] arguments, bool[] doCheck)
 			{
 				if (doCheck[0] && ((arguments[0] < 0) || (arguments[0] >= array.Length)))
-					throw new CodeEE("配列変数" + varName + "の第１argument(" + arguments[0].ToString() + ")は配列の範囲外です");
+					throw new CodeEE(GameMessages.T("The array variable ") + varName + GameMessages.T(" has first argument (") + arguments[0].ToString() + GameMessages.T(") outside the array range"));
 			}
 			public override void IsArrayRangeValid(Int64[] arguments, Int64 index1, Int64 index2, string funcName, Int64 i1, Int64 i2)
 			{
 				CheckElement(arguments);
 				if ((index1 < 0) || (index1 > array.Length))
-					throw new CodeEE(funcName + "命令の第" + i1.ToString() + "argument(" + index1.ToString() + ")は配列" + varName + "の範囲外です");
+					throw new CodeEE(funcName + GameMessages.T(" command argument ") + i1.ToString() + GameMessages.T(" (") + index1.ToString() + GameMessages.T(") is outside the range of array ") + varName);
 				if ((index2 < 0) || (index2 > array.Length))
-					throw new CodeEE(funcName + "命令の第" + i2.ToString() + "argument(" + index2.ToString() + ")は配列" + varName + "の範囲外です");
+					throw new CodeEE(funcName + GameMessages.T(" command argument ") + i2.ToString() + GameMessages.T(" (") + index2.ToString() + GameMessages.T(") is outside the range of array ") + varName);
 			}
 		}
 
@@ -1430,21 +1430,21 @@ namespace MinorShift.Emuera.GameData.Variable
 				CanRestructure = false;
 			}
 			public override void SetValue(Int64 value, Int64[] arguments)
-			{ throw new CodeEE("擬似変数" + varName + "に代入しようとしました"); }
+			{ throw new CodeEE(GameMessages.T("Attempted to assign to the pseudo variable ") + varName); }
 			public override void SetValue(string value, Int64[] arguments)
-			{ throw new CodeEE("擬似変数" + varName + "に代入しようとしました"); }
+			{ throw new CodeEE(GameMessages.T("Attempted to assign to the pseudo variable ") + varName); }
 			public override void SetValue(Int64[] values, Int64[] arguments)
-			{ throw new CodeEE("擬似変数" + varName + "に代入しようとしました"); }
+			{ throw new CodeEE(GameMessages.T("Attempted to assign to the pseudo variable ") + varName); }
 			public override void SetValue(string[] values, Int64[] arguments)
-			{ throw new CodeEE("擬似変数" + varName + "に代入しようとしました"); }
+			{ throw new CodeEE(GameMessages.T("Attempted to assign to the pseudo variable ") + varName); }
 			public override Int64 PlusValue(Int64 value, Int64[] arguments)
-			{ throw new CodeEE("擬似変数" + varName + "に代入しようとしました"); }
+			{ throw new CodeEE(GameMessages.T("Attempted to assign to the pseudo variable ") + varName); }
 			public override Int32 GetLength()
-			{ throw new CodeEE("擬似変数" + varName + "の長さを取得しようとしました"); }
+			{ throw new CodeEE(GameMessages.T("Attempted to get the length of the pseudo variable ") + varName); }
 			public override Int32 GetLength(int dimension)
-			{ throw new CodeEE("擬似変数" + varName + "の長さを取得しようとしました"); }
+			{ throw new CodeEE(GameMessages.T("Attempted to get the length of the pseudo variable ") + varName); }
 			public override object GetArray()
-			{ throw new CodeEE("擬似変数" + varName + "の配列を取得しようとしました"); }
+			{ throw new CodeEE(GameMessages.T("Attempted to get the array of the pseudo variable ") + varName); }
 		}
 
 
@@ -1458,7 +1458,7 @@ namespace MinorShift.Emuera.GameData.Variable
 			{
 				Int64 i = arguments[0];
 				if (i <= 0)
-					throw new CodeEE("RANDのargumentに0以下の値(" + i.ToString() + ")が指定されました");
+					throw new CodeEE(GameMessages.T("A value of 0 or less (") + i.ToString() + GameMessages.T(") was specified for the RAND argument"));
 				return exm.VEvaluator.GetNextRand(i);
 			}
 		}
@@ -2559,21 +2559,21 @@ namespace MinorShift.Emuera.GameData.Variable
 			public override Int64 GetIntValue(ExpressionMediator exm, Int64[] arguments)
 			{
 				if (array == null)
-					throw new CodeEE("参照型変数" + varName + "は何も参照していません");
+					throw new CodeEE(GameMessages.T("The reference variable ") + varName + GameMessages.T(" is not referencing anything"));
 				return ((Int64[])array)[arguments[0]];
 			}
 
 			public override void SetValue(Int64 value, Int64[] arguments)
 			{
 				if (array == null)
-					throw new CodeEE("参照型変数" + varName + "は何も参照していません");
+					throw new CodeEE(GameMessages.T("The reference variable ") + varName + GameMessages.T(" is not referencing anything"));
 				((Int64[])array)[arguments[0]] = value;
 			}
 
 			public override void SetValue(Int64[] values, Int64[] arguments)
 			{
 				if (array == null)
-					throw new CodeEE("参照型変数" + varName + "は何も参照していません");
+					throw new CodeEE(GameMessages.T("The reference variable ") + varName + GameMessages.T(" is not referencing anything"));
 				int start = (int)arguments[0];
 				int end = start + values.Length;
 				for (int i = start; i < end; i++)
@@ -2583,7 +2583,7 @@ namespace MinorShift.Emuera.GameData.Variable
 			public override void SetValueAll(long value, int start, int end, int charaPos)
 			{
 				if (array == null)
-					throw new CodeEE("参照型変数" + varName + "は何も参照していません");
+					throw new CodeEE(GameMessages.T("The reference variable ") + varName + GameMessages.T(" is not referencing anything"));
 				for (int i = start; i < end; i++)
 					((Int64[])array)[i] = value;
 			}
@@ -2591,7 +2591,7 @@ namespace MinorShift.Emuera.GameData.Variable
 			public override Int64 PlusValue(Int64 value, Int64[] arguments)
 			{
 				if (array == null)
-					throw new CodeEE("参照型変数" + varName + "は何も参照していません");
+					throw new CodeEE(GameMessages.T("The reference variable ") + varName + GameMessages.T(" is not referencing anything"));
 				((Int64[])array)[arguments[0]] += value;
 				return ((Int64[])array)[arguments[0]];
 			}
@@ -2609,21 +2609,21 @@ namespace MinorShift.Emuera.GameData.Variable
 			public override Int64 GetIntValue(ExpressionMediator exm, Int64[] arguments)
 			{
 				if (array == null)
-					throw new CodeEE("参照型変数" + varName + "は何も参照していません");
+					throw new CodeEE(GameMessages.T("The reference variable ") + varName + GameMessages.T(" is not referencing anything"));
 				return ((Int64[,])array)[arguments[0], arguments[1]];
 			}
 
 			public override void SetValue(Int64 value, Int64[] arguments)
 			{
 				if (array == null)
-					throw new CodeEE("参照型変数" + varName + "は何も参照していません");
+					throw new CodeEE(GameMessages.T("The reference variable ") + varName + GameMessages.T(" is not referencing anything"));
 				((Int64[,])array)[arguments[0], arguments[1]] = value;
 			}
 
 			public override void SetValue(Int64[] values, Int64[] arguments)
 			{
 				if (array == null)
-					throw new CodeEE("参照型変数" + varName + "は何も参照していません");
+					throw new CodeEE(GameMessages.T("The reference variable ") + varName + GameMessages.T(" is not referencing anything"));
 				int start = (int)arguments[1];
 				int end = start + values.Length;
 				for (int i = start; i < end; i++)
@@ -2633,7 +2633,7 @@ namespace MinorShift.Emuera.GameData.Variable
 			public override void SetValueAll(long value, int start, int end, int charaPos)
 			{
 				if (array == null)
-					throw new CodeEE("参照型変数" + varName + "は何も参照していません");
+					throw new CodeEE(GameMessages.T("The reference variable ") + varName + GameMessages.T(" is not referencing anything"));
 				int a1 = array.GetLength(0);
 				int a2 = array.GetLength(1);
 				for (int i = 0; i < a1; i++)
@@ -2645,7 +2645,7 @@ namespace MinorShift.Emuera.GameData.Variable
 			public override Int64 PlusValue(Int64 value, Int64[] arguments)
 			{
 				if (array == null)
-					throw new CodeEE("参照型変数" + varName + "は何も参照していません");
+					throw new CodeEE(GameMessages.T("The reference variable ") + varName + GameMessages.T(" is not referencing anything"));
 				((Int64[,])array)[arguments[0], arguments[1]] += value;
 				return ((Int64[,])array)[arguments[0], arguments[1]];
 			}
@@ -2662,21 +2662,21 @@ namespace MinorShift.Emuera.GameData.Variable
 			public override Int64 GetIntValue(ExpressionMediator exm, Int64[] arguments)
 			{
 				if (array == null)
-					throw new CodeEE("参照型変数" + varName + "は何も参照していません");
+					throw new CodeEE(GameMessages.T("The reference variable ") + varName + GameMessages.T(" is not referencing anything"));
 				return ((Int64[, ,])array)[arguments[0], arguments[1], arguments[2]];
 			}
 
 			public override void SetValue(Int64 value, Int64[] arguments)
 			{
 				if (array == null)
-					throw new CodeEE("参照型変数" + varName + "は何も参照していません");
+					throw new CodeEE(GameMessages.T("The reference variable ") + varName + GameMessages.T(" is not referencing anything"));
 				((Int64[, ,])array)[arguments[0], arguments[1], arguments[2]] = value;
 			}
 
 			public override void SetValue(Int64[] values, Int64[] arguments)
 			{
 				if (array == null)
-					throw new CodeEE("参照型変数" + varName + "は何も参照していません");
+					throw new CodeEE(GameMessages.T("The reference variable ") + varName + GameMessages.T(" is not referencing anything"));
 				int start = (int)arguments[2];
 				int end = start + values.Length;
 				for (int i = start; i < end; i++)
@@ -2686,7 +2686,7 @@ namespace MinorShift.Emuera.GameData.Variable
 			public override void SetValueAll(long value, int start, int end, int charaPos)
 			{
 				if (array == null)
-					throw new CodeEE("参照型変数" + varName + "は何も参照していません");
+					throw new CodeEE(GameMessages.T("The reference variable ") + varName + GameMessages.T(" is not referencing anything"));
 				int a1 = array.GetLength(0);
 				int a2 = array.GetLength(1);
 				int a3 = array.GetLength(2);
@@ -2700,7 +2700,7 @@ namespace MinorShift.Emuera.GameData.Variable
 			public override Int64 PlusValue(Int64 value, Int64[] arguments)
 			{
 				if (array == null)
-					throw new CodeEE("参照型変数" + varName + "は何も参照していません");
+					throw new CodeEE(GameMessages.T("The reference variable ") + varName + GameMessages.T(" is not referencing anything"));
 				((Int64[, ,])array)[arguments[0], arguments[1], arguments[2]] += value;
 				return ((Int64[, ,])array)[arguments[0], arguments[1], arguments[2]];
 			}
@@ -2717,21 +2717,21 @@ namespace MinorShift.Emuera.GameData.Variable
 			public override string GetStrValue(ExpressionMediator exm, Int64[] arguments)
 			{
 				if (array == null)
-					throw new CodeEE("参照型変数" + varName + "は何も参照していません");
+					throw new CodeEE(GameMessages.T("The reference variable ") + varName + GameMessages.T(" is not referencing anything"));
 				return ((string[])array)[arguments[0]];
 			}
 
 			public override void SetValue(string value, Int64[] arguments)
 			{
 				if (array == null)
-					throw new CodeEE("参照型変数" + varName + "は何も参照していません");
+					throw new CodeEE(GameMessages.T("The reference variable ") + varName + GameMessages.T(" is not referencing anything"));
 				((string[])array)[arguments[0]] = value;
 			}
 
 			public override void SetValue(string[] values, Int64[] arguments)
 			{
 				if (array == null)
-					throw new CodeEE("参照型変数" + varName + "は何も参照していません");
+					throw new CodeEE(GameMessages.T("The reference variable ") + varName + GameMessages.T(" is not referencing anything"));
 				int start = (int)arguments[0];
 				int end = start + values.Length;
 				for (int i = start; i < end; i++)
@@ -2741,7 +2741,7 @@ namespace MinorShift.Emuera.GameData.Variable
 			public override void SetValueAll(string value, int start, int end, int charaPos)
 			{
 				if (array == null)
-					throw new CodeEE("参照型変数" + varName + "は何も参照していません");
+					throw new CodeEE(GameMessages.T("The reference variable ") + varName + GameMessages.T(" is not referencing anything"));
 				for (int i = start; i < end; i++)
 					((string[])array)[i] = value;
 			}
@@ -2758,21 +2758,21 @@ namespace MinorShift.Emuera.GameData.Variable
 			public override string GetStrValue(ExpressionMediator exm, Int64[] arguments)
 			{
 				if (array == null)
-					throw new CodeEE("参照型変数" + varName + "は何も参照していません");
+					throw new CodeEE(GameMessages.T("The reference variable ") + varName + GameMessages.T(" is not referencing anything"));
 				return ((string[,])array)[arguments[0], arguments[1]];
 			}
 
 			public override void SetValue(string value, Int64[] arguments)
 			{
 				if (array == null)
-					throw new CodeEE("参照型変数" + varName + "は何も参照していません");
+					throw new CodeEE(GameMessages.T("The reference variable ") + varName + GameMessages.T(" is not referencing anything"));
 				((string[,])array)[arguments[0], arguments[1]] = value;
 			}
 
 			public override void SetValue(string[] values, Int64[] arguments)
 			{
 				if (array == null)
-					throw new CodeEE("参照型変数" + varName + "は何も参照していません");
+					throw new CodeEE(GameMessages.T("The reference variable ") + varName + GameMessages.T(" is not referencing anything"));
 				int start = (int)arguments[1];
 				int end = start + values.Length;
 				for (int i = start; i < end; i++)
@@ -2782,7 +2782,7 @@ namespace MinorShift.Emuera.GameData.Variable
 			public override void SetValueAll(string value, int start, int end, int charaPos)
 			{
 				if (array == null)
-					throw new CodeEE("参照型変数" + varName + "は何も参照していません");
+					throw new CodeEE(GameMessages.T("The reference variable ") + varName + GameMessages.T(" is not referencing anything"));
 				int a1 = array.GetLength(0);
 				int a2 = array.GetLength(1);
 				for (int i = 0; i < a1; i++)
@@ -2802,21 +2802,21 @@ namespace MinorShift.Emuera.GameData.Variable
 			public override string GetStrValue(ExpressionMediator exm, Int64[] arguments)
 			{
 				if (array == null)
-					throw new CodeEE("参照型変数" + varName + "は何も参照していません");
+					throw new CodeEE(GameMessages.T("The reference variable ") + varName + GameMessages.T(" is not referencing anything"));
 				return ((string[, ,])array)[arguments[0], arguments[1], arguments[2]];
 			}
 
 			public override void SetValue(string value, Int64[] arguments)
 			{
 				if (array == null)
-					throw new CodeEE("参照型変数" + varName + "は何も参照していません");
+					throw new CodeEE(GameMessages.T("The reference variable ") + varName + GameMessages.T(" is not referencing anything"));
 				((string[, ,])array)[arguments[0], arguments[1], arguments[2]] = value;
 			}
 
 			public override void SetValue(string[] values, Int64[] arguments)
 			{
 				if (array == null)
-					throw new CodeEE("参照型変数" + varName + "は何も参照していません");
+					throw new CodeEE(GameMessages.T("The reference variable ") + varName + GameMessages.T(" is not referencing anything"));
 				int start = (int)arguments[2];
 				int end = start + values.Length;
 				for (int i = start; i < end; i++)
@@ -2826,7 +2826,7 @@ namespace MinorShift.Emuera.GameData.Variable
 			public override void SetValueAll(string value, int start, int end, int charaPos)
 			{
 				if (array == null)
-					throw new CodeEE("参照型変数" + varName + "は何も参照していません");
+					throw new CodeEE(GameMessages.T("The reference variable ") + varName + GameMessages.T(" is not referencing anything"));
 				int a1 = array.GetLength(0);
 				int a2 = array.GetLength(1);
 				int a3 = array.GetLength(2);

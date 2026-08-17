@@ -164,7 +164,7 @@ namespace MinorShift.Emuera.Sub
 				byte type = reader.ReadByte();
 				if (type >= 0 && type <= 3)
 					return (EraSaveFileType)type;
-				throw new FileEE("ファイルデータ型異常");
+				throw new FileEE(GameMessages.T("Abnormal file data type"));
 			}
 
 			private Int64 m_ReadInt()
@@ -178,7 +178,7 @@ namespace MinorShift.Emuera.Sub
 					return reader.ReadInt32();
 				if (b == Ebdb.Int64)
 					return reader.ReadInt64();
-				throw new FileEE("バイナリデータの異常");
+				throw new FileEE(GameMessages.T("Abnormal binary data"));
 			}
 
 			public override Int64 ReadInt64()
@@ -250,7 +250,7 @@ namespace MinorShift.Emuera.Sub
 					else if (b == Ebdb.Int64)
 						refArray[x] = reader.ReadInt64();
 					else
-						throw new FileEE("バイナリデータの異常");
+						throw new FileEE(GameMessages.T("Abnormal binary data"));
 					x++;
 				}
 				if (needInit)
@@ -330,7 +330,7 @@ namespace MinorShift.Emuera.Sub
 					else if (b == Ebdb.Int64)
 						refArray[x, y] = reader.ReadInt64();
 					else
-						throw new FileEE("バイナリデータの異常");
+						throw new FileEE(GameMessages.T("Abnormal binary data"));
 					y++;
 				}
 				if (needInit)
@@ -456,7 +456,7 @@ namespace MinorShift.Emuera.Sub
 					else if (b == Ebdb.Int64)
 						refArray[x, y, z] = reader.ReadInt64();
 					else
-						throw new FileEE("バイナリデータの異常");
+						throw new FileEE(GameMessages.T("Abnormal binary data"));
 					z++;
 				}
 				if (needInit)
@@ -519,7 +519,7 @@ namespace MinorShift.Emuera.Sub
 					if (b == Ebdb.String)
 						refArray[x] = ReadString();
 					else
-						throw new FileEE("バイナリデータの異常");
+						throw new FileEE(GameMessages.T("Abnormal binary data"));
 					x++;
 				}
 				if (needInit)
@@ -593,7 +593,7 @@ namespace MinorShift.Emuera.Sub
 					if (b == Ebdb.String)
 						refArray[x, y] = ReadString();
 					else
-						throw new FileEE("バイナリデータの異常");
+						throw new FileEE(GameMessages.T("Abnormal binary data"));
 					y++;
 				}
 				if (needInit)
@@ -708,7 +708,7 @@ namespace MinorShift.Emuera.Sub
 					if (b == Ebdb.String)
 						refArray[x, y, z] = ReadString();
 					else
-						throw new FileEE("バイナリデータの異常");
+						throw new FileEE(GameMessages.T("Abnormal binary data"));
 					z++;
 				}
 				if (needInit)

@@ -59,7 +59,7 @@ namespace MinorShift.Emuera.GameProc
 					case "GLOBAL":
 					case "SAVEDATA":
 					case "CHARADATA":
-						throw new CodeEE(dims + "中では" + keyword + "キーワードは指定できません", sc);
+						throw new CodeEE(dims + GameMessages.T(": the keyword ") + keyword + GameMessages.T(" cannot be specified"), sc);
 					default:
 						ret.Name = keyword;
 						goto whilebreak;
@@ -67,9 +67,9 @@ namespace MinorShift.Emuera.GameProc
 			}
 		whilebreak:
 			if (ret.Name == null)
-				throw new CodeEE(keyword + "の後に有効な識別子が指定されていません", sc);
+				throw new CodeEE(keyword + GameMessages.T(": no valid identifier was specified after it"), sc);
 			if (wc.EOL || wc.Current.Type != '(')
-				throw new CodeEE("識別子の後にargument定義がありません", sc);
+				throw new CodeEE(GameMessages.T("No argument definition was specified after the identifier"), sc);
 			string errMes = "";
 			int errLevel = -1;
 			GlobalStatic.IdentifierDictionary.CheckUserLabelName(ref errMes, ref errLevel, true, ret.Name);
@@ -93,19 +93,19 @@ namespace MinorShift.Emuera.GameProc
 				switch (wc.Current.Type)
 				{
 					case '\0':
-						throw new CodeEE("括弧が閉じられていません", sc);
+						throw new CodeEE(GameMessages.T("Parentheses are not closed"), sc);
 					case ')':
 						if (state == 0 || state == 1)
 							goto argend;
 						if (state == 4 || state == 5)
 						{
 							if ((int)(argType & UserDifinedFunctionDataArgType.__Dimention) == 0)
-								throw new CodeEE("REFargumentは配列変数でなければなりません", sc);
+								throw new CodeEE(GameMessages.T("REF argument must be an array variable"), sc);
 							//state = 2;
 							argList.Add(argType);
 							goto argend;
 						}
-						throw new CodeEE("予期しない括弧です", sc);
+						throw new CodeEE(GameMessages.T("Unexpected parentheses"), sc);
 					case '0':
 						if (((LiteralIntegerWord)wc.Current).Int != 0)
 							goto argerr;
@@ -120,7 +120,7 @@ namespace MinorShift.Emuera.GameProc
 						{
 							state = 5;
 							argType++; if ((int)(argType & UserDifinedFunctionDataArgType.__Dimention) > 3)
-								throw new CodeEE("REFargumentは4次元以上の配列にできません", sc);
+								throw new CodeEE(GameMessages.T("REF argument cannot be a 4-dimensional or higher array"), sc);
 							continue;
 						}
 						goto argerr;
@@ -133,7 +133,7 @@ namespace MinorShift.Emuera.GameProc
 						if (state == 4 || state == 5)
 						{
 							if ((int)(argType & UserDifinedFunctionDataArgType.__Dimention) == 0)
-								throw new CodeEE("REFargumentは配列変数でなければなりません", sc);
+								throw new CodeEE(GameMessages.T("REF argument must be an array variable"), sc);
 							state = 2;
 							argList.Add(argType);
 							continue;
@@ -183,14 +183,14 @@ namespace MinorShift.Emuera.GameProc
 		argend:
 			wc.ShiftNext();
 			if (!wc.EOL)
-				throw new CodeEE("宣言の後に余分な文字があります", sc);
+				throw new CodeEE(GameMessages.T("Extra characters after the declaration"), sc);
 			ret.ArgList = new UserDifinedFunctionDataArgType[argList.Count];
 			argList.CopyTo(ret.ArgList);
 			return ret;
 		argerr:
 			if (!wc.EOL)
-				throw new CodeEE("argumentの解析中に予期しないトークン" + wc.Current.ToString() + "を発見しました", sc);
-			throw new CodeEE("argumentの解析中にErrorが発生しました", sc);
+				throw new CodeEE(GameMessages.T("Unexpected token ") + wc.Current.ToString() + GameMessages.T(" found during argument parsing"), sc);
+			throw new CodeEE(GameMessages.T("An error occurred during argument parsing"), sc);
 		}
 
 	}

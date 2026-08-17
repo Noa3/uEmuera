@@ -24,7 +24,7 @@
   </PropertyGroup>
   <PropertyGroup>
     <NoWarn>0169;USG0001</NoWarn>
-    <DefineConstants>UNITY_6000_5_4;UNITY_6000_5;UNITY_6000;UNITY_5_3_OR_NEWER;UNITY_5_4_OR_NEWER;UNITY_5_5_OR_NEWER;UNITY_5_6_OR_NEWER;UNITY_2017_1_OR_NEWER;UNITY_2017_2_OR_NEWER;UNITY_2017_3_OR_NEWER;UNITY_2017_4_OR_NEWER;UNITY_2018_1_OR_NEWER;UNITY_2018_2_OR_NEWER;UNITY_2018_3_OR_NEWER;UNITY_2018_4_OR_NEWER;UNITY_2019_1_OR_NEWER;UNITY_2019_2_OR_NEWER;UNITY_2019_3_OR_NEWER;UNITY_2019_4_OR_NEWER;UNITY_2020_1_OR_NEWER;UNITY_2020_2_OR_NEWER;UNITY_2020_3_OR_NEWER;UNITY_2021_1_OR_NEWER;UNITY_2021_2_OR_NEWER;UNITY_2021_3_OR_NEWER;UNITY_2022_1_OR_NEWER;UNITY_2022_2_OR_NEWER;UNITY_2022_3_OR_NEWER;UNITY_2023_1_OR_NEWER;UNITY_2023_2_OR_NEWER;UNITY_2023_3_OR_NEWER;UNITY_6000_0_OR_NEWER;UNITY_6000_1_OR_NEWER;UNITY_6000_2_OR_NEWER;UNITY_6000_3_OR_NEWER;UNITY_6000_4_OR_NEWER;UNITY_6000_5_OR_NEWER;PLATFORM_ARCH_64;UNITY_64;UNITY_INCLUDE_TESTS;ENABLE_AUDIO;ENABLE_AUDIO_SCRIPTABLE_PIPELINE;ENABLE_CACHING;ENABLE_CLOTH;ENABLE_MICROPHONE;ENABLE_MULTIPLE_DISPLAYS;ENABLE_PHYSICS;ENABLE_TEXTURE_STREAMING;ENABLE_VIRTUALTEXTURING;ENABLE_LZMA;ENABLE_UNITYEVENTS;ENABLE_VR;ENABLE_WEBCAM;ENABLE_UNITYWEBREQUEST;ENABLE_WWW;ENABLE_CLOUD_SERVICES;ENABLE_CLOUD_SERVICES_ADS;ENABLE_CLOUD_SERVICES_USE_WEBREQUEST;ENABLE_UNITY_CONSENT;ENABLE_UNITY_CLOUD_IDENTIFIERS;ENABLE_CLOUD_SERVICES_CRASH_REPORTING;ENABLE_CLOUD_SERVICES_PURCHASING;ENABLE_CLOUD_SERVICES_ANALYTICS;ENABLE_CLOUD_SERVICES_BUILD;ENABLE_EDITOR_GAME_SERVICES;ENABLE_UNITY_GAME_SERVICES_ANALYTICS_SUPPORT;ENABLE_CLOUD_LICENSE;ENABLE_EDITOR_HUB_LICENSE;ENABLE_WEBSOCKET_CLIENT;ENABLE_GENERATE_NATIVE_PLUGINS_FOR_ASSEMBLIES_API;ENABLE_DIRECTOR_AUDIO;ENABLE_DIRECTOR_TEXTURE;ENABLE_MANAGED_JOBS;ENABLE_MANAGED_TRANSFORM_JOBS;ENABLE_MANAGED_ANIMATION_JOBS;ENABLE_MANAGED_AUDIO_JOBS;ENABLE_MANAGED_UNITYTLS;INCLUDE_DYNAMIC_GI;ENABLE_SCRIPTING_GC_WBARRIERS;PLATFORM_SUPPORTS_MONO;RENDER_SOFTWARE_CURSOR;ENABLE_MARSHALLING_TESTS;ENABLE_VIDEO;ENABLE_NAVIGATION_OFFMESHLINK_TO_NAVMESHLINK;ENABLE_ACCELERATOR_CLIENT_DEBUGGING;TEXTCORE_1_0_OR_NEWER;EDITOR_ONLY_NAVMESH_BUILDER_DEPRECATED;PLATFORM_STANDALONE_LINUX;PLATFORM_STANDALONE;UNITY_STANDALONE_LINUX;UNITY_STANDALONE;UNITY_STANDALONE_LINUX_API;ENABLE_RUNTIME_GI;ENABLE_MOVIES;ENABLE_NETWORK;ENABLE_CRUNCH_TEXTURE_COMPRESSION;ENABLE_CLUSTER_SYNC;ENABLE_CLUSTERINPUT;ENABLE_SPATIALTRACKING;ENABLE_MODULAR_UNITYENGINE_ASSEMBLIES;PLATFORM_SUPPORTS_SPLIT_GRAPHICS_JOBS;PLATFORM_USES_EXPLICIT_MEMORY_MANAGER_INITIALIZER;PLATFORM_SUPPORTS_DISPLAYINFO_API;ENABLE_MONO;NET_4_6;NET_UNITY_4_8;ENABLE_PROFILER;DEBUG;TRACE;UNITY_ASSERTIONS;UNITY_EDITOR;UNITY_EDITOR_64;UNITY_EDITOR_WIN;ENABLE_UNITY_COLLECTIONS_CHECKS;ENABLE_BURST_AOT;UNITY_TEAM_LICENSE;ENABLE_CUSTOM_RENDER_TEXTURE;ENABLE_DIRECTOR;ENABLE_LOCALIZATION;ENABLE_SPRITES;ENABLE_TERRAIN;ENABLE_TILEMAP;ENABLE_TIMELINE;ENABLE_LEGACY_INPUT_MANAGER;TEXTCORE_FONT_ENGINE_1_5_OR_NEWER;TEXTCORE_TEXT_ENGINE_1_5_OR_NEWER;TEXTCORE_FONT_ENGINE_1_6_OR_NEWER;UNITY_POST_PROCESSING_STACK_V2;CSHARP_7_OR_LATER;CSHARP_7_3_OR_NEWER</DefineConstants>
+    <DefineConstants>UNITY_6000_5_4;UNITY_6000_5;UNITY_6000;UNITY_5_3_OR_NEWER;UNITY_5_4_OR_NEWER;UNITY_5_5_OR_NEWER;UNITY_5_6_OR_NEWER;UNITY_2017_1_OR_NEWER;UNITY_2017_2_OR_NEWER;UNITY_2017_3_OR_NEWER;UNITY_2017_4_OR_NEWER;UNITY_2018_1_OR_NEWER;UNITY_2018_2_OR_NEWER;UNITY_2018_3_OR_NEWER;UNITY_2018_4_OR_NEWER;UNITY_2019_1_OR_NEWER;UNITY_2019_2_OR_NEWER;UNITY_2019_3_OR_NEWER;UNITY_2019_4_OR_NEWER;UNITY_2020_1_OR_NEWER;UNITY_2020_2_OR_NEWER;UNITY_2020_3_OR_NEWER;UNITY_2021_1_OR_NEWER;UNITY_2021_2_OR_NEWER;UNITY_2021_3_OR_NEWER;UNITY_2022_1_OR_NEWER;UNITY_2022_2_OR_NEWER;UNITY_2022_3_OR_NEWER;UNITY_2023_1_OR_NEWER;UNITY_2023_2_OR_NEWER;UNITY_2023_3_OR_NEWER;UNITY_6000_0_OR_NEWER;UNITY_6000_1_OR_NEWER;UNITY_6000_2_OR_NEWER;UNITY_6000_3_OR_NEWER;UNITY_6000_4_OR_NEWER;UNITY_6000_5_OR_NEWER;UNITY_INCLUDE_TESTS;ENABLE_AR;ENABLE_AUDIO;ENABLE_AUDIO_SCRIPTABLE_PIPELINE;ENABLE_CACHING;ENABLE_CLOTH;ENABLE_EVENT_QUEUE;ENABLE_MICROPHONE;ENABLE_MULTIPLE_DISPLAYS;ENABLE_PHYSICS;ENABLE_TEXTURE_STREAMING;ENABLE_LZMA;ENABLE_UNITYEVENTS;ENABLE_VR;ENABLE_WEBCAM;ENABLE_UNITYWEBREQUEST;ENABLE_WWW;ENABLE_CLOUD_SERVICES;ENABLE_CLOUD_SERVICES_ADS;ENABLE_CLOUD_SERVICES_USE_WEBREQUEST;ENABLE_UNITY_CONSENT;ENABLE_UNITY_CLOUD_IDENTIFIERS;ENABLE_CLOUD_SERVICES_CRASH_REPORTING;ENABLE_CLOUD_SERVICES_NATIVE_CRASH_REPORTING;ENABLE_CLOUD_SERVICES_PURCHASING;ENABLE_CLOUD_SERVICES_ANALYTICS;ENABLE_CLOUD_SERVICES_BUILD;ENABLE_EDITOR_GAME_SERVICES;ENABLE_UNITY_GAME_SERVICES_ANALYTICS_SUPPORT;ENABLE_CLOUD_LICENSE;ENABLE_EDITOR_HUB_LICENSE;ENABLE_WEBSOCKET_CLIENT;ENABLE_GENERATE_NATIVE_PLUGINS_FOR_ASSEMBLIES_API;ENABLE_DIRECTOR_AUDIO;ENABLE_DIRECTOR_TEXTURE;ENABLE_MANAGED_JOBS;ENABLE_MANAGED_TRANSFORM_JOBS;ENABLE_MANAGED_ANIMATION_JOBS;ENABLE_MANAGED_AUDIO_JOBS;ENABLE_ENGINE_CODE_STRIPPING;ENABLE_ONSCREEN_KEYBOARD;ENABLE_MANAGED_UNITYTLS;INCLUDE_DYNAMIC_GI;ENABLE_SCRIPTING_GC_WBARRIERS;PLATFORM_SUPPORTS_MONO;ENABLE_MARSHALLING_TESTS;ENABLE_VIDEO;ENABLE_NAVIGATION_OFFMESHLINK_TO_NAVMESHLINK;ENABLE_ACCELERATOR_CLIENT_DEBUGGING;ENABLE_ACCESSIBILITY_SCREEN_READER;ENABLE_ACCESSIBILITY_SETTINGS;TEXTCORE_1_0_OR_NEWER;EDITOR_ONLY_NAVMESH_BUILDER_DEPRECATED;PLATFORM_ANDROID;UNITY_ANDROID;UNITY_ANDROID_API;ENABLE_EGL;ENABLE_NETWORK;ENABLE_RUNTIME_GI;ENABLE_CRUNCH_TEXTURE_COMPRESSION;ENABLE_CLOUD_SERVICES_ENGINE_DIAGNOSTICS;ENABLE_FIREBASE_IDENTIFIERS;UNITY_CAN_SHOW_SPLASH_SCREEN;UNITY_HAS_GOOGLEVR;UNITY_HAS_TANGO;ENABLE_SPATIALTRACKING;ENABLE_ETC_COMPRESSION;PLATFORM_EXTENDS_VULKAN_DEVICE;PLATFORM_HAS_MULTIPLE_SWAPCHAINS;UNITY_ANDROID_SUPPORTS_SHADOWFILES;PLATFORM_UPDATES_TIME_OUTSIDE_OF_PLAYER_LOOP;PLATFORM_EXTENDS_VULKAN_PIPELINE_CACHE;PLATFORM_SUPPORTS_SPLIT_GRAPHICS_JOBS;PLATFORM_HAS_ADDITIONAL_API_CHECKS;PLATFORM_HAS_GRAPHICS_JOBS_SUPPORT_CHECK_OVERRIDE;PLATFORM_IMPLEMENTS_INSIGHTS_ANR;PLATFORM_SUPPORTS_INSIGHTS_DEVICE_INFO;ENABLE_ANDROID_ADVERTISING_IDS;PLATFORM_HAS_BUGGY_MSAA_RESOLVE;ENABLE_ANDROID_APP_SET_ID;ENABLE_INSIGHTS_PLATFORM_SPECIFIC_RESOURCES;PLATFORM_REQUIRES_TETHERED_VULKAN_COMMAND_POOL;ENABLE_UNITYADS_RUNTIME;UNITY_UNITYADS_API;ENABLE_MONO;NET_4_6;NET_UNITY_4_8;ENABLE_PROFILER;DEBUG;TRACE;UNITY_ASSERTIONS;UNITY_EDITOR;UNITY_EDITOR_64;UNITY_EDITOR_WIN;ENABLE_UNITY_COLLECTIONS_CHECKS;ENABLE_BURST_AOT;UNITY_TEAM_LICENSE;ENABLE_CUSTOM_RENDER_TEXTURE;ENABLE_DIRECTOR;ENABLE_LOCALIZATION;ENABLE_SPRITES;ENABLE_TERRAIN;ENABLE_TILEMAP;ENABLE_TIMELINE;ENABLE_LEGACY_INPUT_MANAGER;TEXTCORE_FONT_ENGINE_1_5_OR_NEWER;TEXTCORE_TEXT_ENGINE_1_5_OR_NEWER;TEXTCORE_FONT_ENGINE_1_6_OR_NEWER;UNITY_POST_PROCESSING_STACK_V2;CSHARP_7_OR_LATER;CSHARP_7_3_OR_NEWER</DefineConstants>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup>
@@ -39,7 +39,7 @@
     <UnityProjectGeneratorVersion>2.0.27</UnityProjectGeneratorVersion>
     <UnityProjectGeneratorStyle>SDK</UnityProjectGeneratorStyle>
     <UnityProjectType>Game:1</UnityProjectType>
-    <UnityBuildTarget>StandaloneLinux64:24</UnityBuildTarget>
+    <UnityBuildTarget>Android:13</UnityBuildTarget>
     <UnityVersion>6000.5.4f1</UnityVersion>
   </PropertyGroup>
   <ItemGroup>
@@ -53,6 +53,9 @@
     <Analyzer Include="C:\Program Files\Unity\Hub\Editor\6000.5.4f1\Editor\Data\BCLExtensions\TargetingPacks\netstandard2.1\analyzers\dotnet\roslyn4.0\cs\System.Text.Json.SourceGeneration.dll" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Scripts\Emuera\Sub\EraEncoding.cs" />
+    <Compile Include="Assets\Scripts\Runtime\GameRuntimeManager.cs" />
+    <Compile Include="Assets\Scripts\Runtime\Detection\EmueraGameDetector.cs" />
     <Compile Include="Assets\Scripts\Emuera\GameData\Expression\ExpressionParser.cs" />
     <Compile Include="Assets\Scripts\Emuera\Content\GraphicsImage.cs" />
     <Compile Include="Assets\Scripts\Emuera\GameData\Function\UserDefinedMethodTerm.cs" />
@@ -60,28 +63,36 @@
     <Compile Include="Assets\Scripts\Emuera\Content\GraphicsSurface.cs" />
     <Compile Include="Assets\Scripts\Emuera\Config\ConfigItem.cs" />
     <Compile Include="Assets\Scripts\Monospaced.cs" />
+    <Compile Include="Assets\Scripts\Emuera\GameProc\BootStrategy.cs" />
     <Compile Include="Assets\Scripts\Emuera\Sub\EraBinaryDataReader.cs" />
     <Compile Include="Assets\Scripts\uEmuera\Forms.cs" />
+    <Compile Include="Assets\Scripts\Runtime\EraElectron\EreLocalFileServer.cs" />
     <Compile Include="Assets\Scripts\Emuera\GameProc\Process.cs" />
     <Compile Include="Assets\Scripts\Emuera\Content\AContentItem.cs" />
+    <Compile Include="Assets\Scripts\Emuera\GameProc\LazyCompileFailure.cs" />
     <Compile Include="Assets\Scripts\SpriteManager.cs" />
     <Compile Include="Assets\Scripts\Emuera\GameProc\Function\FunctionIdentifier.cs" />
     <Compile Include="Assets\Scripts\Emuera\GameView\EmueraConsole.cs" />
     <Compile Include="Assets\Scripts\Emuera\GameData\Variable\VariableLocal.cs" />
     <Compile Include="Assets\Scripts\Emuera\GameData\StrForm.cs" />
+    <Compile Include="Assets\Scripts\Runtime\EraElectronHostMode.cs" />
     <Compile Include="Assets\Scripts\Emuera\Config\KeyMacro.cs" />
     <Compile Include="Assets\Scripts\PostProcessingManager.cs" />
     <Compile Include="Assets\Scripts\Data\ModernDataStructures.cs" />
     <Compile Include="Assets\Scripts\Emuera\GameData\Variable\VariableParser.cs" />
     <Compile Include="Assets\Scripts\Emuera\GameView\EmueraConsole.Print.cs" />
     <Compile Include="Assets\Scripts\Emuera\GameView\StringMeasure.cs" />
+    <Compile Include="Assets\Scripts\Emuera\GameProc\StartupProfiler.cs" />
+    <Compile Include="Assets\Scripts\Emuera\Compatibility\RuntimeCapabilityRegistry.cs" />
     <Compile Include="Assets\Scripts\LocalizationHelper.cs" />
     <Compile Include="Assets\Scripts\Emuera\GameData\Expression\OperatorMethod.cs" />
+    <Compile Include="Assets\Scripts\Emuera\GameProc\BackgroundErbLoader.cs" />
     <Compile Include="Assets\Scripts\Emuera\GlobalStatic.cs" />
     <Compile Include="Assets\Scripts\Emuera\GameData\Variable\VariableTerm.cs" />
     <Compile Include="Assets\Scripts\Emuera\GameData\Expression\Term.cs" />
     <Compile Include="Assets\Scripts\AndroidPermissionManager.cs" />
     <Compile Include="Assets\Scripts\EmueraBehaviour.cs" />
+    <Compile Include="Assets\Scripts\Emuera\GameProc\FunctionResolver.cs" />
     <Compile Include="Assets\Scripts\uEmuera\VisualBasic.cs" />
     <Compile Include="Assets\Scripts\uEmuera\Application.cs" />
     <Compile Include="Assets\Scripts\Emuera\Config\Config.cs" />
@@ -89,6 +100,8 @@
     <Compile Include="Assets\Scripts\Emuera\Sub\LexicalAnalyzer.cs" />
     <Compile Include="Assets\Scripts\Collections\NativeCollections.cs" />
     <Compile Include="Assets\Scripts\GenericUtils.cs" />
+    <Compile Include="Assets\Scripts\GameDiscovery.cs" />
+    <Compile Include="Assets\Scripts\Emuera\Compatibility\FeatureCapabilityIds.cs" />
     <Compile Include="Assets\Scripts\Emuera\GameProc\Function\Instraction.Child.cs" />
     <Compile Include="Assets\Scripts\uEmuera\Drawing.cs" />
     <Compile Include="Assets\Scripts\Emuera\GameView\StringStyle.cs" />
@@ -106,8 +119,11 @@
     <Compile Include="Assets\Scripts\Emuera\_Library\LangManager.cs" />
     <Compile Include="Assets\Scripts\Emuera\GameProc\LogicalLine.cs" />
     <Compile Include="Assets\Scripts\Emuera\_Library\WinInput.cs" />
+    <Compile Include="Assets\Scripts\Emuera\Compatibility\RendererCapabilityRegistry.cs" />
     <Compile Include="Assets\Scripts\uEmuera\Window.cs" />
     <Compile Include="Assets\Scripts\MultiLanguage.cs" />
+    <Compile Include="Assets\Scripts\Emuera\GameProc\CatalogCacheStore.cs" />
+    <Compile Include="Assets\Scripts\Runtime\IGameRuntime.cs" />
     <Compile Include="Assets\Scripts\Emuera\GameView\AConsoleDisplayPart.cs" />
     <Compile Include="Assets\Scripts\Inputpad.cs" />
     <Compile Include="Assets\Scripts\Emuera\GameData\Variable\VariableStrArgTerm.cs" />
@@ -115,13 +131,16 @@
     <Compile Include="Assets\Scripts\Emuera\GameData\IdentifierDictionary.cs" />
     <Compile Include="Assets\Scripts\FirstWindow.cs" />
     <Compile Include="Assets\Scripts\Async\AsyncUtilities.cs" />
+    <Compile Include="Assets\Scripts\uEmuera\ImageHeaderProbe.cs" />
     <Compile Include="Assets\Scripts\EmueraImage.cs" />
     <Compile Include="Assets\Scripts\Emuera\GameProc\InputRequest.cs" />
     <Compile Include="Assets\Scripts\Emuera\GameData\Variable\VariableData.cs" />
+    <Compile Include="Assets\Scripts\Runtime\Detection\GameDetector.cs" />
     <Compile Include="Assets\Scripts\Emuera\Content\CroppedImage.cs" />
     <Compile Include="Assets\Scripts\Emuera\_Library\Sys.cs" />
     <Compile Include="Assets\Scripts\Emuera\GameProc\LabelDictionary.cs" />
     <Compile Include="Assets\Scripts\Emuera\GameProc\Function\BuiltInFunctionCode.cs" />
+    <Compile Include="Assets\Scripts\Emuera\GameData\Function\DataTableFunctionMethods.cs" />
     <Compile Include="Assets\Scripts\Emuera\GameData\ConstantData.cs" />
     <Compile Include="Assets\Scripts\Emuera\_Library\GDI.cs" />
     <Compile Include="Assets\Scripts\OnDemandRenderManager.cs" />
@@ -143,10 +162,14 @@
     <Compile Include="Assets\Scripts\uEmuera\Media.cs" />
     <Compile Include="Assets\Scripts\Emuera\GameView\PrintStringBuffer.cs" />
     <Compile Include="Assets\Scripts\MainEntry.cs" />
+    <Compile Include="Assets\Scripts\Emuera\GameProc\InterpreterThreadGuard.cs" />
+    <Compile Include="Assets\Scripts\Runtime\IEraElectronHost.cs" />
+    <Compile Include="Assets\Scripts\SafeAreaFitter.cs" />
     <Compile Include="Assets\Scripts\Emuera\GameView\ConsoleStyledString.cs" />
     <Compile Include="Assets\Scripts\Emuera\Program.cs" />
     <Compile Include="Assets\Scripts\EmueraContent.cs" />
     <Compile Include="Assets\Scripts\Emuera\Config\ConfigCode.cs" />
+    <Compile Include="Assets\Scripts\Emuera\GameData\DataTableExpressionParser.cs" />
     <Compile Include="Assets\Scripts\Emuera\GameData\Variable\VariableToken.cs" />
     <Compile Include="Assets\Scripts\Emuera\Content\AppContents.cs" />
     <Compile Include="Assets\Scripts\ResolutionHelper.cs" />
@@ -155,16 +178,24 @@
     <Compile Include="Assets\Scripts\LocalizedTextComponent.cs" />
     <Compile Include="Assets\Scripts\Emuera\GameData\EraDataTable.cs" />
     <Compile Include="Assets\Scripts\MathUtilities.cs" />
+    <Compile Include="Assets\Scripts\Runtime\RuntimeKind.cs" />
     <Compile Include="Assets\Scripts\Emuera\Sub\EmueraException.cs" />
+    <Compile Include="Assets\Scripts\Runtime\UnityRuntimeLogger.cs" />
     <Compile Include="Assets\Scripts\uEmuera\Properties.cs" />
+    <Compile Include="Assets\Scripts\Runtime\EraElectron\EreDataModel.cs" />
     <Compile Include="Assets\Scripts\uEmuera\Utils.cs" />
     <Compile Include="Assets\Scripts\Emuera\GameProc\Process.State.cs" />
     <Compile Include="Assets\Scripts\Emuera\GameView\ConsoleButtonString.cs" />
+    <Compile Include="Assets\Scripts\EmueraCoordinateMapper.cs" />
     <Compile Include="Assets\Scripts\Emuera\_Library\SFMT.cs" />
+    <Compile Include="Assets\Scripts\Runtime\EraElectron\EraElectronBridgeScript.cs" />
     <Compile Include="Assets\Scripts\Emuera\GameProc\Function\Argument.cs" />
+    <Compile Include="Assets\Scripts\Emuera\GameProc\OnDemandErbCompiler.cs" />
     <Compile Include="Assets\Scripts\Emuera\GameData\Expression\IOperandTerm.cs" />
+    <Compile Include="Assets\Scripts\Runtime\EraElectron\PlatformWebViewBridge.cs" />
     <Compile Include="Assets\Scripts\Emuera\GameData\Function\Creator.Method.cs" />
     <Compile Include="Assets\Scripts\EmueraMain.cs" />
+    <Compile Include="Assets\Scripts\Runtime\EmueraRuntimeAdapter.cs" />
     <Compile Include="Assets\Scripts\FontUtils.cs" />
     <Compile Include="Assets\Scripts\Emuera\GameData\DefineMacro.cs" />
     <Compile Include="Assets\Scripts\OptionWindow.cs" />
@@ -173,25 +204,39 @@
     <Compile Include="Assets\Scripts\Emuera\Sub\WordCollection.cs" />
     <Compile Include="Assets\Scripts\UIStyleManager.cs" />
     <Compile Include="Assets\Scripts\Emuera\GameProc\LogicalLineParser.cs" />
+    <Compile Include="Assets\Scripts\Runtime\RuntimeState.cs" />
     <Compile Include="Assets\Scripts\Emuera\GameData\GameBase.cs" />
     <Compile Include="Assets\Scripts\Emuera\GameView\HtmlManager.cs" />
+    <Compile Include="Assets\Scripts\Runtime\EraElectron\WebView2Host.cs" />
+    <Compile Include="Assets\Scripts\WebGLGameImporter.cs" />
     <Compile Include="Assets\Scripts\Emuera\GameView\ConsoleImagePart.cs" />
     <Compile Include="Assets\Scripts\Emuera\GameData\Function\FunctionMethod.cs" />
     <Compile Include="Assets\Scripts\Emuera\GameView\ConsoleShapePart.cs" />
     <Compile Include="Assets\Scripts\Emuera\GameProc\Function\ArgumentBuilder.cs" />
     <Compile Include="Assets\Scripts\EmueraLine.cs" />
+    <Compile Include="Assets\Scripts\Runtime\Detection\EraElectronGameDetector.cs" />
     <Compile Include="Assets\Scripts\Emuera\GameMessages.cs" />
+    <Compile Include="Assets\Scripts\WebPWebGLFallback.cs" />
+    <Compile Include="Assets\Scripts\Emuera\GameProc\GameSession.cs" />
     <Compile Include="Assets\Scripts\Emuera\GameProc\UserDefinedVariable.cs" />
     <Compile Include="Assets\Scripts\Emuera\GameProc\UserDefinedFunction.cs" />
     <Compile Include="Assets\Scripts\Emuera\Content\AudioManager.cs" />
     <Compile Include="Assets\Scripts\Emuera\GameView\ButtonStringCreator.cs" />
     <Compile Include="Assets\Scripts\Emuera\GameProc\ErbLoader.cs" />
+    <Compile Include="Assets\Scripts\uEmuera\GameResourceCatalog.cs" />
     <Compile Include="Assets\Scripts\Emuera\GameProc\Process.CalledFunction.cs" />
     <Compile Include="Assets\Scripts\Emuera\GameProc\Process.SystemProc.cs" />
     <Compile Include="Assets\Scripts\EmueraThread.cs" />
+    <Compile Include="Assets\Scripts\Runtime\EraElectronRuntime.cs" />
+    <Compile Include="Assets\Scripts\Runtime\Detection\IGameDetector.cs" />
+    <Compile Include="Assets\Scripts\Emuera\GameProc\FunctionCatalog.cs" />
+    <Compile Include="Assets\Scripts\AsyncIoGate.cs" />
     <Compile Include="Assets\Scripts\Emuera\Sub\EraBinaryDataWriter.cs" />
+    <Compile Include="Assets\Scripts\Runtime\GameDescriptor.cs" />
     <Compile Include="Assets\Scripts\Emuera\GameData\Function\Creator.cs" />
     <Compile Include="Assets\Scripts\Emuera\GameProc\Function\FunctionArgType.cs" />
+    <Compile Include="Assets\Scripts\Runtime\EraElectron\EreApiDispatcher.cs" />
+    <Compile Include="Assets\Scripts\Runtime\RuntimeContext.cs" />
     <Compile Include="Assets\Scripts\Scalepad.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -204,6 +249,10 @@
     </Reference>
     <Reference Include="Unity.Scripting">
       <HintPath>C:\Program Files\Unity\Hub\Editor\6000.5.4f1\Editor\Data\Managed\UnityEngine\Unity.Scripting.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.ARModule">
+      <HintPath>C:\Program Files\Unity\Hub\Editor\6000.5.4f1\Editor\Data\Managed\UnityEngine\UnityEngine.ARModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.AccessibilityModule">
@@ -228,14 +277,6 @@
     </Reference>
     <Reference Include="UnityEngine.AudioModule">
       <HintPath>C:\Program Files\Unity\Hub\Editor\6000.5.4f1\Editor\Data\Managed\UnityEngine\UnityEngine.AudioModule.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="UnityEngine.ClusterInputModule">
-      <HintPath>C:\Program Files\Unity\Hub\Editor\6000.5.4f1\Editor\Data\Managed\UnityEngine\UnityEngine.ClusterInputModule.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="UnityEngine.ClusterRendererModule">
-      <HintPath>C:\Program Files\Unity\Hub\Editor\6000.5.4f1\Editor\Data\Managed\UnityEngine\UnityEngine.ClusterRendererModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.ContentLoadModule">
@@ -304,6 +345,10 @@
     </Reference>
     <Reference Include="UnityEngine.InputLegacyModule">
       <HintPath>C:\Program Files\Unity\Hub\Editor\6000.5.4f1\Editor\Data\Managed\UnityEngine\UnityEngine.InputLegacyModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.InsightsModule">
+      <HintPath>C:\Program Files\Unity\Hub\Editor\6000.5.4f1\Editor\Data\Managed\UnityEngine\UnityEngine.InsightsModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.JSONSerializeModule">
@@ -472,10 +517,6 @@
     </Reference>
     <Reference Include="UnityEngine.VectorGraphicsModule">
       <HintPath>C:\Program Files\Unity\Hub\Editor\6000.5.4f1\Editor\Data\Managed\UnityEngine\UnityEngine.VectorGraphicsModule.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="UnityEngine.VirtualTexturingModule">
-      <HintPath>C:\Program Files\Unity\Hub\Editor\6000.5.4f1\Editor\Data\Managed\UnityEngine\UnityEngine.VirtualTexturingModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEditor">
@@ -766,6 +807,18 @@
       <HintPath>Library\PackageCache\com.unity.ext.nunit@44f7d31723bd\net472\unity-custom\nunit.framework.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="System.Windows.Forms">
+      <HintPath>Assets\Plugins\WebView2\System.Windows.Forms.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Microsoft.CodeAnalysis">
+      <HintPath>Assets\Plugins\Roslyn\Microsoft.CodeAnalysis.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Microsoft.CodeAnalysis.CSharp">
+      <HintPath>Assets\Plugins\Roslyn\Microsoft.CodeAnalysis.CSharp.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>Library\PackageCache\com.unity.nuget.newtonsoft-json@4dfd81071c64\Runtime\Newtonsoft.Json.dll</HintPath>
       <Private>False</Private>
@@ -774,12 +827,8 @@
       <HintPath>Library\PackageCache\com.unity.nuget.mono-cecil@ecb9724e46ff\Mono.Cecil.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Microsoft.CodeAnalysis.CSharp">
-      <HintPath>Assets\Plugins\Roslyn\Microsoft.CodeAnalysis.CSharp.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Microsoft.CodeAnalysis">
-      <HintPath>Assets\Plugins\Roslyn\Microsoft.CodeAnalysis.dll</HintPath>
+    <Reference Include="Microsoft.Web.WebView2.Core">
+      <HintPath>Assets\Plugins\WebView2\Microsoft.Web.WebView2.Core.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.Android.Types">

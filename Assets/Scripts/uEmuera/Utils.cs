@@ -561,7 +561,8 @@ namespace uEmuera
             {
                 var filename = bmpfilelist[i];
                 string name = Path.GetFileName(filename).ToUpper();
-                content_files.Add(name, filename);
+                if (!content_files.ContainsKey(name))
+                    content_files.Add(name, filename);
             }
             return content_files;
         }
@@ -573,6 +574,7 @@ namespace uEmuera
                 resource_csv_lines_.TryGetValue(csvpath, out lines))
                 return lines;
             lines = File.ReadAllLines(csvpath, encoding);
+            LoadedFileTracker.Track(csvpath);
             return lines;
         }
         public static void ResourcePrepare()
@@ -605,6 +607,7 @@ namespace uEmuera
 
                 List<string> newlines = new List<string>();
                 lines = File.ReadAllLines(filename, encoder);
+                LoadedFileTracker.Track(filename);
                 int fixcount = 0;
                 for(int i = 0; i < lines.Length; ++i)
                 {
@@ -645,11 +648,15 @@ namespace uEmuera
                     if(imagepath == null)
                         continue;
 
-                    var ti = SpriteManager.GetTextureInfo(name, imagepath);
-                    if(ti == null)
+                    // Phase 6 #5/#6: read dimensions from the image header only —
+                    // never decode the full image just to discover width/height.
+                    ImageHeaderInfo hdr;
+                    if (!ImageHeaderProbe.TryReadFile(imagepath, out hdr) ||
+                        hdr.Width <= 0 || hdr.Height <= 0)
                         continue;
+
                     line = string.Format("{0},{1},0,0,{2},{3}",
-                        tokens[0], tokens[1], ti.width, ti.height);
+                        tokens[0], tokens[1], hdr.Width, hdr.Height);
                     newlines.Add(line);
                     fixcount += 1;
                 }

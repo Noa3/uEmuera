@@ -60,9 +60,9 @@ namespace MinorShift.Emuera.GameData.Variable
                 if (line != null)
                 {
                     if (!func.IsSystem)
-						ParserMediator.Warn("関数宣言にargument変数\"" + varCode + "\"が使われていない関数中で\"" + varCode + "\"が使われています(関数のargument以外の用途に使うことは推奨されません。代わりに#DIMの使用を検討してください)", line, 1, false, false);
+						ParserMediator.Warn(GameMessages.T("The argument variable \"") + varCode + GameMessages.T("\" is used in a function where \"") + varCode + GameMessages.T("\" was not declared as an argument (non-argument use is not recommended; consider using #DIM instead)"), line, 1, false, false);
                     else
-						ParserMediator.Warn("システム関数" + func.LabelName + "中で\"" + varCode + "\"が使われています(関数のargument以外の用途に使うことは推奨されません。代わりに#DIMの使用を検討してください)", line, 1, false, false);
+						ParserMediator.Warn(GameMessages.T("In system function ") + func.LabelName + GameMessages.T(", \"") + varCode + GameMessages.T("\" is used (non-argument use is not recommended; consider using #DIM instead)"), line, 1, false, false);
                 }
 				//throw new CodeEE("argument variable \"" + varCode + "\" is not defined in this function");
 			}

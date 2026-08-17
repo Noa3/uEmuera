@@ -42,7 +42,7 @@ namespace MinorShift.Emuera.GameProc
 					{
 						Int64 charaNo = vTerm.GetElementInt(0, exm);
 						if ((charaNo < 0) || (charaNo >= GlobalStatic.VariableData.CharacterList.Count))
-							throw new CodeEE("キャラクタ配列変数" + vTerm.Identifier.Name + "の第１argument(" + charaNo.ToString() + ")はキャラ登録番号の範囲外です");
+							throw new CodeEE(GameMessages.T("Character array variable ") + vTerm.Identifier.Name + GameMessages.T("'s first argument(") + charaNo.ToString() + GameMessages.T(") is outside the character registration number range"));
 						TransporterRef[i] = (Array)vTerm.Identifier.GetArrayChara((int)charaNo);
 					}
 					else
@@ -82,13 +82,13 @@ namespace MinorShift.Emuera.GameProc
 			CalledFunction called = new CalledFunction(label);
 			//List<FunctionLabelLine> newLabelList = new List<FunctionLabelLine>();
 			called.Finished = false;
-			called.eventLabelList = parent.LabelDictionary.GetEventLabels(label);
+			called.eventLabelList = FunctionResolver.ResolveEventLabels(parent.LabelDictionary, label);
 			if (called.eventLabelList == null)
 			{
-				FunctionLabelLine line = parent.LabelDictionary.GetNonEventLabel(label);
+				FunctionLabelLine line = FunctionResolver.ResolveNormalLabel(parent.LabelDictionary, label);
 				if (line != null)
 				{
-					throw new CodeEE("イベント関数でない関数@" + label + "(" + line.Position.Filename + ":" + line.Position.LineNo + "行目)に対しEVENT呼び出しが行われました");
+					throw new CodeEE(GameMessages.T("EVENT call was made to a non-event function @") + label + "(" + line.Position.Filename + ":" + line.Position.LineNo + GameMessages.T(" line)."));
 				}
 				return null;
 			}
@@ -105,18 +105,18 @@ namespace MinorShift.Emuera.GameProc
 		{
 			CalledFunction called = new CalledFunction(label);
 			called.Finished = false;
-			FunctionLabelLine labelline = parent.LabelDictionary.GetNonEventLabel(label);
+			FunctionLabelLine labelline = FunctionResolver.ResolveNormalLabel(parent.LabelDictionary, label);
 			if (labelline == null)
 			{
-				if (parent.LabelDictionary.GetEventLabels(label) != null)
+				if (FunctionResolver.ResolveEventLabels(parent.LabelDictionary, label) != null)
 				{
-					throw new CodeEE("イベント関数@" + label + "に対し通常のCALLが行われました(このErrorは互換性オプション「" + Config.GetConfigName(ConfigCode.CompatiCallEvent) + "」により無視できます)");
+					throw new CodeEE(GameMessages.T("A normal CALL was made to the event function @") + label + GameMessages.T(" (this error can be ignored via the compatibility option \"") + Config.GetConfigName(ConfigCode.CompatiCallEvent) + GameMessages.T("\")"));
 				}
 				return null;
 			}
             else if (labelline.IsMethod)
             {
-                throw new CodeEE("#FUCNTION(S)が定義された関数@" + labelline.LabelName + "(" + labelline.Position.Filename + ":" + labelline.Position.LineNo.ToString() + "行目)に対し通常のCALLが行われました");
+                throw new CodeEE(GameMessages.T("A normal CALL was made to the function @") + labelline.LabelName + "(" + labelline.Position.Filename + ":" + labelline.Position.LineNo.ToString() + GameMessages.T(" line) that has #FUCNTION(S) defined."));
             }
 			called.TopLabel = labelline;
 			called.CurrentLabel = labelline;
@@ -154,7 +154,7 @@ namespace MinorShift.Emuera.GameProc
             IOperandTerm[] convertedArg = new IOperandTerm[func.Arg.Length];
 			if(convertedArg.Length < srcArgs.Length)
 			{
-				errMes = "argumentの数が関数\"@" + func.LabelName + "\"に設定された数を超えています";
+				errMes = GameMessages.T("The number of arguments exceeds the number set for the function \"@") + func.LabelName + GameMessages.T("\"");
 				return null;
 			}
 			IOperandTerm term;
@@ -169,20 +169,20 @@ namespace MinorShift.Emuera.GameProc
 				{
 					if (term == null)
 					{
-						errMes = "\"@" + func.LabelName + "\"の" + (i + 1).ToString() + "番目のargumentは参照渡しのため省略できません";
+						errMes = GameMessages.T("Argument #") + (i + 1).ToString() + GameMessages.T(" of \"@") + func.LabelName + GameMessages.T("\" cannot be omitted because it is passed by reference");
 						return null;
 					}
 					VariableTerm vTerm = term as VariableTerm;
 					if (vTerm == null || vTerm.Identifier.Dimension == 0)
 					{
-						errMes = "\"@" + func.LabelName + "\"の" + (i + 1).ToString() + "番目のargumentは参照渡しのための配列変数でなければなりません";
+						errMes = GameMessages.T("Argument #") + (i + 1).ToString() + GameMessages.T(" of \"@") + func.LabelName + GameMessages.T("\" must be an array variable for passing by reference");
 						return null;
 					}
 					//TODO 1810alpha007 want to decide clearly whether to allow chara type. currently leaning to not allow
 					//type check
 					if (!((ReferenceToken)destArg.Identifier).MatchType(vTerm.Identifier, false, out errMes))
 					{
-						errMes = "\"@" + func.LabelName + "\"の" + (i + 1).ToString() + "番目のargument:" + errMes;
+						errMes = GameMessages.T("Argument #") + (i + 1).ToString() + GameMessages.T(" of \"@") + func.LabelName + GameMessages.T("\": ") + errMes;
 						return null;
 					}
 				}
@@ -193,7 +193,7 @@ namespace MinorShift.Emuera.GameProc
 					//escape for now
 					if (term == null && !Config.CompatiFuncArgOptional)
 					{
-						errMes = "\"@" + func.LabelName + "\"の" + (i + 1).ToString() + "番目のargumentは省略できません(この警告は互換性オプション「" + Config.GetConfigName(ConfigCode.CompatiFuncArgOptional) + "」により無視できます)";
+						errMes = GameMessages.T("Argument #") + (i + 1).ToString() + GameMessages.T(" of \"@") + func.LabelName + GameMessages.T("\" cannot be omitted (this warning can be ignored via the compatibility option \"") + Config.GetConfigName(ConfigCode.CompatiFuncArgOptional) + GameMessages.T("\")");
 						return null;
 					}
 				}
@@ -201,14 +201,14 @@ namespace MinorShift.Emuera.GameProc
 				{
 					if (term.GetOperandType() == typeof(string))
 					{
-						errMes = "\"@" + func.LabelName + "\"の" + (i + 1).ToString() + "番目のargumentを文字列型から整数型に変換できません";
+						errMes = GameMessages.T("Argument #") + (i + 1).ToString() + GameMessages.T(" of \"@") + func.LabelName + GameMessages.T("\" cannot be converted from string type to integer type");
 						return null;
 					}
 					else
 					{
 						if (!Config.CompatiFuncArgAutoConvert)
 						{
-							errMes = "\"@" + func.LabelName + "\"の" + (i + 1).ToString() + "番目のargumentを整数型から文字列型に変換できません(この警告は互換性オプション「" + Config.GetConfigName(ConfigCode.CompatiFuncArgAutoConvert) + "」により無視できます)";
+							errMes = GameMessages.T("Argument #") + (i + 1).ToString() + GameMessages.T(" of \"@") + func.LabelName + GameMessages.T("\" cannot be converted from integer type to string type (this warning can be ignored via the compatibility option \"") + Config.GetConfigName(ConfigCode.CompatiFuncArgAutoConvert) + GameMessages.T("\")");
 							return null;
 						}
 						if (tostrMethod == null)

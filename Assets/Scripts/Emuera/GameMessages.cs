@@ -13,6 +13,15 @@ public static class GameMessages
         return MultiLanguage.GetText(key);
     }
 
+    /// <summary>
+    /// Gets a localized message by its English default text.
+    /// Falls back to the English text if the current language has no entry.
+    /// </summary>
+    public static string T(string englishDefault)
+    {
+        return MultiLanguage.GetText(englishDefault);
+    }
+
     // System messages - Loading/Initialization
     public static string LoadingMacroTxt => Get("[LoadingMacroTxt]");
     public static string LoadingReplaceCsv => Get("[LoadingReplaceCsv]");

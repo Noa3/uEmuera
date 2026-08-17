@@ -580,6 +580,7 @@ namespace MinorShift.Emuera.Content
             try
             {
                 byte[] fileBytes = File.ReadAllBytes(filePath);
+                LoadedFileTracker.Track(filePath);
                 return WavUtility.ToAudioClip(fileBytes, 0, Path.GetFileNameWithoutExtension(filePath));
             }
             catch (Exception ex)

@@ -665,8 +665,10 @@ namespace WebP.Extern
         #elif UNITY_EDITOR || UNITY_STANDALONE_OSX
         const string DLL_NAME = "webp";
 		#elif UNITY_ANDROID
-		const string DLL_NAME = "webp";
-		#elif UNITY_IOS
+				const string DLL_NAME = "webp";
+				#elif UNITY_STANDALONE_LINUX
+				const string DLL_NAME = "webp";
+				#elif UNITY_IOS
 		const string DLL_NAME = "__Internal";
 		#endif
 

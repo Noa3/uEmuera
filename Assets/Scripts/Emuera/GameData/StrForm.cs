@@ -78,7 +78,7 @@ namespace MinorShift.Emuera.GameData
 							termArray[i] = CallnameTarget;
 							continue;
 					}
-					throw new ExeEE("何かおかしい");
+					throw new ExeEE(GameMessages.T("Something went wrong"));
 				}
                 WordCollection wc;
 				IOperandTerm operand;
@@ -90,7 +90,7 @@ namespace MinorShift.Emuera.GameData
                     {
                         operand = ExpressionParser.ReduceIntegerTerm(wc, TermEndWith.EoL);
                         if (!wc.EOL)
-                            throw new CodeEE("三項演算子\\@の第一オペランドが異常です");
+                            throw new CodeEE(GameMessages.T("The first operand of the ternary operator \\@ is abnormal"));
                     }
                     else
                         operand = new SingleTerm(0);
@@ -108,9 +108,9 @@ namespace MinorShift.Emuera.GameData
                 if (operand == null)
                 {
                     if (SWT is CurlyBraceSubWord)
-                        throw new CodeEE("{}の中に式が存在しません");
+                        throw new CodeEE(GameMessages.T("No expression exists inside {}"));
                     else
-                        throw new CodeEE("%%の中に式が存在しません");
+                        throw new CodeEE(GameMessages.T("No expression exists inside %%"));
                 }
                 IOperandTerm second = null;
 				SingleTerm third = null;
@@ -124,25 +124,25 @@ namespace MinorShift.Emuera.GameData
                     {
                         IdentifierWord id = wc.Current as IdentifierWord;
                         if (id == null)
-                            throw new CodeEE("','の後にRIGHT又はLEFTがありません");
-                        if (string.Equals(id.Code, "LEFT", Config.SCVariable))//標準RIGHT
+                            throw new CodeEE(GameMessages.T("No RIGHT or LEFT after ','"));
+                        if (string.Equals(id.Code, "LEFT", Config.SCVariable))//default RIGHT
                             third = new SingleTerm(1);
                         else if (!string.Equals(id.Code, "RIGHT", Config.SCVariable))
-                            throw new CodeEE("','の後にRIGHT又はLEFT以外の単語があります");
+                            throw new CodeEE(GameMessages.T("A word other than RIGHT or LEFT is present after ','"));
                         wc.ShiftNext();
                     }
                     if (!wc.EOL)
-                        throw new CodeEE("RIGHT又はLEFTの後に余分な文字があります");
+                        throw new CodeEE(GameMessages.T("Extra characters after RIGHT or LEFT"));
                 }
 				if (SWT is CurlyBraceSubWord)
 				{
 					if (operand.GetOperandType() != typeof(Int64))
-						throw new CodeEE("{}の中の式が数式ではありません");
+						throw new CodeEE(GameMessages.T("The expression inside {} is not a numeric expression"));
 					termArray[i] = new FunctionMethodTerm(formatCurlyBrace, new IOperandTerm[] { operand, second, third });
 					continue;
 				}
 				if (operand.GetOperandType() != typeof(string))
-					throw new CodeEE("%%の中の式が文字列式ではありません");
+					throw new CodeEE(GameMessages.T("The expression inside %% is not a string expression"));
 				termArray[i] = new FunctionMethodTerm(formatPercent, new IOperandTerm[] { operand, second, third });
 			}
             ret.terms = termArray;
@@ -216,7 +216,7 @@ namespace MinorShift.Emuera.GameData
 			return builder.ToString();
 		}
 
-		#region FormattedStringMethod 書式付文字列の内部
+		#region FormattedStringMethod Interior of formatted string
 		private abstract class FormattedStringMethod : FunctionMethod
 		{
 			public FormattedStringMethod()
@@ -225,8 +225,8 @@ namespace MinorShift.Emuera.GameData
 				ReturnType = typeof(string);
 				argumentTypeArray = null;
 			}
-			public override string CheckArgumentType(string name, IOperandTerm[] arguments) { throw new ExeEE("型チェックは呼び出し元が行うこと"); }
-			public override Int64 GetIntValue(ExpressionMediator exm, IOperandTerm[] arguments) { throw new ExeEE("戻り値の型が違う"); }
+			public override string CheckArgumentType(string name, IOperandTerm[] arguments) { throw new ExeEE(GameMessages.T("Type checking should be done by the caller")); }
+			public override Int64 GetIntValue(ExpressionMediator exm, IOperandTerm[] arguments) { throw new ExeEE(GameMessages.T("The return value has a different type")); }
 			public override SingleTerm GetReturnValue(ExpressionMediator exm, IOperandTerm[] arguments) { return new SingleTerm(GetStrValue(exm, arguments)); }
 		}
 
@@ -254,9 +254,9 @@ namespace MinorShift.Emuera.GameData
 					return ret;
 				int totalLength = (int)arguments[1].GetIntValue(exm);
 				int currentLength = LangManager.GetStrlenLang(ret);
-				totalLength -= currentLength - ret.Length;//全角文字の数だけマイナス。タブ文字？ゼロ幅文字？知るか！
+				totalLength -= currentLength - ret.Length;//Subtract for each full-width character. Tab characters? Zero-width characters? Who knows!
 				if (totalLength < ret.Length)
-					return ret;//PadLeftは0未満を送るとExceptionを投げる
+					return ret;//PadLeft throws an Exception if a value less than 0 is passed
 				if (arguments[2] != null)
 					ret = ret.PadRight(totalLength, ' ');//LEFT
 				else
@@ -266,7 +266,7 @@ namespace MinorShift.Emuera.GameData
 		}
 
 		private sealed class FormatYenAt : FormattedStringMethod
-		{//Operator のTernaryIntStrStrとやってることは同じ
+		{//Same as what the ternary operator's TernaryIntStrStr does
 			public override string GetStrValue(ExpressionMediator exm, IOperandTerm[] arguments)
 			{
 				return (arguments[0].GetIntValue(exm) != 0) ? arguments[1].GetStrValue(exm) : arguments[2].GetStrValue(exm);

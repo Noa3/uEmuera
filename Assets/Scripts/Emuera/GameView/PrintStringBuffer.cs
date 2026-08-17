@@ -76,7 +76,7 @@ namespace MinorShift.Emuera.GameView
 				if (builder.Length > 2000)
 					return;
 				if (builder.Length + str.Length > 2000)
-					str = str.Substring(0, 2000 - builder.Length) + "※※※バッファーの文字数が2000字(全角1000字)を超えています。これ以降は表示できません※※※";
+					str = str.Substring(0, 2000 - builder.Length) + GameMessages.T("※※※Buffer exceeds 2000 characters (1000 full-width). The rest cannot be displayed.※※※");
 				builder.Append(str);
 				lastStringStyle = style;
 			}
@@ -261,7 +261,22 @@ namespace MinorShift.Emuera.GameView
 		/// <returns></returns>
 		public ConsoleDisplayLine[] PrintHtml(string str, StringMeasure stringMeasure)
 		{
-			throw new NotImplementedException();
+			if (string.IsNullOrEmpty(str))
+				return Array.Empty<ConsoleDisplayLine>();
+
+			// This legacy helper is still part of the buffer API. Route markup
+			// through the same authoritative parser used by EmueraConsole.PrintHtml
+			// instead of leaving a player-reachable NotImplementedException.
+			ConsoleDisplayLine[] buffered = Flush(stringMeasure, false);
+			ConsoleDisplayLine[] html = HtmlManager.Html2DisplayLine(str, stringMeasure, parent);
+			if (buffered.Length == 0)
+				return html;
+			if (html.Length == 0)
+				return buffered;
+			var result = new ConsoleDisplayLine[buffered.Length + html.Length];
+			Array.Copy(buffered, 0, result, 0, buffered.Length);
+			Array.Copy(html, 0, result, buffered.Length, html.Length);
+			return result;
 		}
 
 		#region Private methods for Flush

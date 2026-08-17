@@ -40,7 +40,7 @@ namespace MinorShift.Emuera.GameProc.Function
 			{
 				if (!line.IsError)
 				{
-					errmes = "命令のargument解析中に特定できないErrorが発生";
+					errmes = GameMessages.T("An unidentifiable error occurred while parsing instruction arguments");
 					goto error;
 				}
 				return false;

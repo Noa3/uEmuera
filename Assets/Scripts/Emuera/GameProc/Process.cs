@@ -72,15 +72,17 @@ namespace MinorShift.Emuera.GameProc
 						return false;
 					}
 				}
-				//Load resources folder
-				GenericUtils.SetLoadingStatus("Loading resources...");
-				if (!Content.AppContents.LoadContents())
-				{
-					ParserMediator.FlushWarningList();
-					console.PrintSystemLine(GameMessages.ResourcesLoadError);
-					return false;
-				}
+			//Load resources folder
+			GenericUtils.SetLoadingStatus("Loading resources...");
+			StartupProfiler.Mark("ResourceCatalogStart");
+			if (!Content.AppContents.LoadContents())
+			{
 				ParserMediator.FlushWarningList();
+				console.PrintSystemLine(GameMessages.ResourcesLoadError);
+				return false;
+			}
+			StartupProfiler.Mark("ResourceCatalogReady");
+			ParserMediator.FlushWarningList();
 				//Load key macros
                 if (Config.UseKeyMacro && !Program.AnalysisMode)
                 {
@@ -152,6 +154,7 @@ namespace MinorShift.Emuera.GameProc
 
 				//Load all csv files except the above
 				GenericUtils.SetLoadingStatus("Loading CSV files...");
+				StartupProfiler.Mark("CSVLoaded");
 				ConstantData constant = new ConstantData();
 				constant.LoadData(Program.CsvDir, console, Config.DisplayReport);
 				GlobalStatic.ConstantData = constant;
@@ -189,21 +192,48 @@ namespace MinorShift.Emuera.GameProc
 					console.PrintSystemLine(GameMessages.ErhLoadError);
 					return false;
 				}
+				StartupProfiler.Mark("ERHLoaded");
 				LexicalAnalyzer.UseMacro = idDic.UseMacro();
 
 				//Load CSV data for user-defined variables (if available)
 				LoadUserDefinedVariablesFromCsv(Program.CsvDir, console, Config.DisplayReport);
 
-				//Load ERB
-				GenericUtils.SetLoadingStatus("Loading ERB files...");
-				ErbLoader loader = new ErbLoader(console, exm, this);
+			//Load ERB
+			GenericUtils.SetLoadingStatus("Loading ERB files...");
+			StartupProfiler.Mark("ErbCatalogStart");
+			ErbLoader loader = new ErbLoader(console, exm, this);
+
+                // Build the FunctionCatalog (metadata-only scan) BEFORE loading bodies.
+                // This lets EXISTFUNCTION return correct answers and gives
+                // PendingUserDefinedMethodTerm the correct return type (Phase 6 #8, #11).
+                if (!Program.AnalysisMode)
+                {
+                    var erbFiles = Config.GetFiles(Program.ErbDir, "*.ERB");
+#if (UNITY_ANDROID || UNITY_IOS) && !UNITY_EDITOR
+                    erbFiles.AddRange(Config.GetFiles(Program.ErbDir, "*.erb"));
+#endif
+                    GenericUtils.SetLoadingStatus("Building function catalog...");
+                    FunctionCatalog.Build(erbFiles, Config.Encode);
+                    StartupProfiler.Mark("FunctionCatalogReady");
+                }
+
                 if (Program.AnalysisMode)
                     noError = loader.loadErbs(Program.AnalysisFiles, labelDic);
+                else if (BootConfig.UseProgressiveLoading)
+                    // Fast/lazy path (opt-in). Priority ERBs compile synchronously;
+                    // everything else compiles on demand from the interpreter thread
+                    // (OnDemandErbCompiler). Auto currently resolves to Safe.
+                    noError = loader.LoadErbFilesLazy(Program.ErbDir, Config.DisplayReport, labelDic);
                 else
+                    // Safe path: full synchronous load — the known-good compatibility
+                    // baseline. No background thread mutates semantic state.
                     noError = loader.LoadErbFiles(Program.ErbDir, Config.DisplayReport, labelDic);
-				GenericUtils.SetLoadingStatus("Initializing game...");
+			StartupProfiler.Mark("ErbCatalogReady");
+			GenericUtils.SetLoadingStatus("Initializing game...");
+			StartupProfiler.Mark("SystemTitleCompileStart");
                 initSystemProcess();
                 initialiing = false;
+			StartupProfiler.Mark("SystemTitleCompileReady");
             }
 			catch (Exception e)
 			{
@@ -216,7 +246,11 @@ namespace MinorShift.Emuera.GameProc
 				return false;
 			}
 			state.Begin(BeginType.TITLE);
-			GC.Collect();
+			StartupProfiler.Mark("FirstInteractiveTitle");
+            UnityEngine.Debug.Log(StartupProfiler.Report());
+            // NOTE (Phase 6): forced GC.Collect() removed from the hot startup path.
+            // The collection is not required for correctness and stalls time-to-title;
+            // the GC runs on its own schedule. See Docs/STARTUP_REGRESSIONS.md.
             return true;
 		}
 
@@ -245,7 +279,7 @@ namespace MinorShift.Emuera.GameProc
 			Int64[] selectcom = vEvaluator.SELECTCOM_ARRAY;
 			if (count >= selectcom.Length)
 			{
-				throw new CodeEE("CALLTRAIN命令のargumentの値がSELECTCOMの要素数を超えています");
+				throw new CodeEE(GameMessages.T("The CALLTRAIN argument value exceeds the number of SELECTCOM elements"));
 			}
 			for (int i = 0; i < (int)count; i++)
 			{
@@ -427,8 +461,25 @@ namespace MinorShift.Emuera.GameProc
 		}
 */
 		public LogicalLine scaningLine = null;
+
+		[ThreadStatic]
+		private static LogicalLine backgroundScanLine;
+
+		/// <summary>
+		/// Sets the "scanning line" for the current thread. Progressive loading runs
+		/// ErbLoader work on a background thread while the game thread is already
+		/// executing, so caller threads cannot share the single Process.scaningLine
+		/// field. The background loader stores its value here instead.
+		/// </summary>
+		public void SetBackgroundScanLine(LogicalLine line)
+		{
+			backgroundScanLine = line;
+		}
+
 		internal LogicalLine GetScaningLine()
 		{
+			if (backgroundScanLine != null)
+				return backgroundScanLine;
 			if (scaningLine != null)
 				return scaningLine;
 			LogicalLine line = state.ErrorLine;
@@ -553,7 +604,7 @@ namespace MinorShift.Emuera.GameProc
 			}
 			try
 			{
-				return position.LineNo > 0 ? File.ReadLines(path, Config.Encode).Skip(position.LineNo - 1).First() : "";
+				return position.LineNo > 0 ? File.ReadLines(path, EraEncoding.Detect(path)).Skip(position.LineNo - 1).First() : "";
 			}
 			catch (System.Exception ex)
 			{
@@ -571,7 +622,7 @@ namespace MinorShift.Emuera.GameProc
 			}
 			try
 			{
-				return position.LineNo > 0 ? File.ReadLines(path, Config.Encode).Skip(position.LineNo - 1).First() : "";
+				return position.LineNo > 0 ? File.ReadLines(path, EraEncoding.Detect(path)).Skip(position.LineNo - 1).First() : "";
 			}
 			catch (System.Exception ex)
 			{
