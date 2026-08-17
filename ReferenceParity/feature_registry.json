@@ -10,8 +10,8 @@
     "documentation": "https://evilmask.gitlab.io/emuera.em.doc/en/"
   },
   "features": [
-    {"id":"html.div","name":"HTML div layout","parser_tokens":["<div","div"],"runtime_patterns":["Html2DisplayLine","PrintHtml","HtmlManager","DivLayout","PrintDiv"],"render_patterns":["HtmlManager","Div"],"test_ids":["html.div.layout"]},
-    {"id":"html.clearbutton","name":"HTML clearbutton","parser_tokens":["clearbutton"],"runtime_patterns":["clearbutton","ClearButton","FlagClearButton","FlagClearButtonTooltip","CBG_ClearButton","HtmlManager"],"render_patterns":["clearbutton","ClearButton"],"test_ids":["html.clearbutton.basic"]},
+    {"id":"html.div","name":"HTML div layout","parser_tokens":["HTML_GETPRINTEDSTR","HTML_POPPRINTINGSTR","HTML_TOPLAINTEXT","HTML_ESCAPE","HTML_STRINGLINES","HTML_STRINGLEN"],"runtime_patterns":["Html2DisplayLine","PrintHtml","HtmlManager","DivLayout","PrintDiv"],"render_patterns":["HtmlManager","Div"],"test_ids":["html.div.layout"]},
+    {"id":"html.clearbutton","name":"HTML clearbutton","parser_tokens":["CBGCLEARBUTTON"],"runtime_patterns":["CBG_ClearButton","FlagClearButton","FlagClearButtonTooltip","ClearButton","HtmlManager"],"render_patterns":["clearbutton","ClearButton"],"test_ids":["html.clearbutton.basic"]},
     {"id":"html.img.srcb","name":"HTML image srcb","parser_tokens":["srcb"],"runtime_patterns":["srcb","SrcB"],"render_patterns":["srcb","SrcB"],"test_ids":["html.img.srcb"]},
     {"id":"html.img.srcm","name":"HTML image srcm","parser_tokens":["srcm"],"runtime_patterns":["srcm","SrcM"],"render_patterns":["srcm","SrcM"],"test_ids":["html.img.srcm"]},
     {"id":"html.print_island","name":"HTML print island","parser_tokens":["HTML_PRINT_ISLAND","HTML_PRINT_ISLAND_CLEAR"],"runtime_patterns":["HtmlPrintIsland","PrintHtmlIsland"],"render_patterns":["HtmlPrintIsland","PrintHtmlIsland"],"test_ids":["html.print_island.lifecycle"]},

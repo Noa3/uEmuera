@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "generated_at": "2025-11-14T20:59:19+09:00",
-  "uemuera_revision": "0268d4bfdf9c846cd37efcc4eea1e26550dceac6",
+  "uemuera_revision": "1b4ee5399a4df475e90f3a53f38ad7417c0f736f",
   "reference": {
     "schema_version": 1,
     "repository": "https://gitlab.com/EvilMask/emuera.em",
@@ -693,18 +693,18 @@
     {
       "id": "html.div",
       "name": "HTML div layout",
-      "status": "IMPLEMENTED_UNVERIFIED",
+      "status": "PARTIAL",
       "verification": {
         "registered": true,
         "implemented": true,
-        "signature_match": true,
+        "signature_match": false,
         "local_tests": "MISSING",
         "reference_tests": "MISSING",
         "reference_version": "55"
       },
       "dimensions": {
-        "parser": "PARTIAL",
-        "argument_parity": "FULL",
+        "parser": "FULL",
+        "argument_parity": "PARTIAL",
         "runtime": "FULL",
         "rendering": "FULL",
         "input": "N/A",
@@ -714,10 +714,15 @@
       },
       "evidence": {
         "parser": [
-          "div"
+          "HTML_GETPRINTEDSTR",
+          "HTML_POPPRINTINGSTR",
+          "HTML_TOPLAINTEXT",
+          "HTML_ESCAPE",
+          "HTML_STRINGLINES",
+          "HTML_STRINGLEN"
         ],
         "argument_parity": [
-          "div: ArgumentBuilder.cs"
+          "HTML_STRINGLINES: Creator.Method.cs"
         ],
         "signature_missing_reference": [],
         "signature_missing_local": [],
@@ -760,7 +765,7 @@
       },
       "dimensions": {
         "parser": "FULL",
-        "argument_parity": "MISSING",
+        "argument_parity": "PARTIAL",
         "runtime": "FULL",
         "rendering": "FULL",
         "input": "N/A",
@@ -770,17 +775,18 @@
       },
       "evidence": {
         "parser": [
-          "clearbutton"
+          "CBGCLEARBUTTON"
         ],
-        "argument_parity": [],
+        "argument_parity": [
+          "CBGCLEARBUTTON: Creator.Method.cs"
+        ],
         "signature_missing_reference": [],
         "signature_missing_local": [],
         "runtime": [
-          "clearbutton: Assets/Scripts/Emuera/Compatibility/FeatureCapabilityIds.cs",
-          "ClearButton: Assets/Scripts/Emuera/Compatibility/FeatureCapabilityIds.cs",
+          "CBG_ClearButton: Assets/Scripts/Emuera/GameView/EmueraConsole.cs",
           "FlagClearButton: Assets/Scripts/Emuera/GameView/HtmlManager.cs",
           "FlagClearButtonTooltip: Assets/Scripts/Emuera/GameView/HtmlManager.cs",
-          "CBG_ClearButton: Assets/Scripts/Emuera/GameView/EmueraConsole.cs",
+          "ClearButton: Assets/Scripts/Emuera/Compatibility/FeatureCapabilityIds.cs",
           "HtmlManager: Assets/Scripts/Emuera/GameView/ConsoleShapePart.cs"
         ],
         "rendering": [

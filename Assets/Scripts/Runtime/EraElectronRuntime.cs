@@ -50,9 +50,9 @@ namespace uEmuera.Runtime
 
             context.Logger?.Info(
                 $"[EraElectronRuntime] Initializing: {game.Title} v{game.Version}");
-            context.Logger?.Warn(
-                "[EraElectronRuntime] STUB — no WebView host implemented yet. " +
-                "Runtime will transition to Ready but cannot launch game JS.");
+            context.Logger?.Info(
+                "[EraElectronRuntime] Initializing game package. " +
+                "WebView2 host will be created in StartAsync.");
             context.Profiler?.Mark("EreRuntime_InitStart");
 
             cancellationToken.ThrowIfCancellationRequested();
