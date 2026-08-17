@@ -1,0 +1,61 @@
+// html.clearbutton test
+// Tests: CBGCLEARBUTTON, <clearbutton> tag, FlagClearButton, FlagClearButtonTooltip
+
+<HTML>
+<HEAD>
+<TITLE>html.clearbutton test</TITLE>
+</HEAD>
+<BODY>
+
+// Test 1: Basic <clearbutton> tag
+mes "Test: basic clearbutton"
+<clearbutton>
+mes "inside clearbutton"
+</clearbutton>
+mes "after clearbutton"
+if result == "inside clearbutton"
+  mes "PASS: clearbutton basic"
+else
+  mes "FAIL: clearbutton basic, expected 'inside clearbutton', got '" + result + "'"
+endif
+
+// Test 2: Nested <clearbutton> should throw error
+mes "Test: nested clearbutton error"
+try
+<clearbutton>
+<clearbutton>
+nested
+</clearbutton>
+</clearbutton>
+mes "FAIL: nested clearbutton should have thrown error"
+catch
+  mes "PASS: nested clearbutton threw error as expected"
+endtry
+
+// Test 3: <clearbutton> with name attribute
+mes "Test: clearbutton with name attribute"
+<clearbutton name="test_name">
+mes "named clearbutton"
+</clearbutton>
+mes "PASS: clearbutton with name attribute"
+
+// Test 4: <clearbutton> with notooltip attribute
+mes "Test: clearbutton with notooltip attribute"
+<clearbutton notooltip>
+mes "no tooltip clearbutton"
+</clearbutton>
+mes "PASS: clearbutton with notooltip attribute"
+
+// Test 5: <clearbutton> without closing should throw error
+mes "Test: unclosed clearbutton error"
+try
+<clearbutton>
+mes "unclosed"
+mes "FAIL: unclosed clearbutton should have thrown error"
+catch
+  mes "PASS: unclosed clearbutton threw error as expected"
+endtry
+
+mes "html.clearbutton test complete"
+</BODY>
+</HTML>

@@ -54,6 +54,30 @@
       "reference_version": "EMv18/EEv55",
       "reference_commit": "cde11d69048f87d4a70d1452da79ae6e56462386",
       "expected": {"console": [], "result": null, "results": [], "state": {}, "render_tree": null, "image": null}
+    },
+    {
+      "id": "html.div.layout",
+      "feature_id": "html.div",
+      "category": "HTML",
+      "commands": ["HTML_GETPRINTEDSTR", "HTML_POPPRINTINGSTR", "HTML_TOPLAINTEXT", "HTML_STRINGLINES", "HTML_STRINGLEN"],
+      "fixture": "fixtures/html_div_layout.erb",
+      "reference_status": "pending",
+      "local_status": "pending",
+      "reference_version": "EMv18/EEv55",
+      "reference_commit": "cde11d69048f87d4a70d1452da79ae6e56462386",
+      "expected": {"console": [], "result": null, "results": [], "state": {}, "render_tree": null, "image": null}
+    },
+    {
+      "id": "html.clearbutton.basic",
+      "feature_id": "html.clearbutton",
+      "category": "HTML",
+      "commands": ["CBGCLEARBUTTON"],
+      "fixture": "fixtures/html_clearbutton_basic.erb",
+      "reference_status": "pending",
+      "local_status": "pending",
+      "reference_version": "EMv18/EEv55",
+      "reference_commit": "cde11d69048f87d4a70d1452da79ae6e56462386",
+      "expected": {"console": [], "result": null, "results": [], "state": {}, "render_tree": null, "image": null}
     }
   ]
 }

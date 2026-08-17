@@ -1,0 +1,91 @@
+// html.div layout test
+// Tests: <div> tag parsing, HTML_GETPRINTEDSTR, HTML_POPPRINTINGSTR, HTML_TOPLAINTEXT
+
+<HTML>
+<HEAD>
+<TITLE>html.div test</TITLE>
+</HEAD>
+<BODY>
+
+// Test 1: Basic <div> tag
+<div>
+test1
+</div>
+result = HTML_GETPRINTEDSTR()
+if result == "test1"
+  mes "PASS: html.div basic"
+else
+  mes "FAIL: html.div basic, expected 'test1', got '" + result + "'"
+endif
+
+// Test 2: Nested <div> tags
+<div>
+<div>
+nested
+</div>
+</div>
+result = HTML_GETPRINTEDSTR()
+if result == "nested"
+  mes "PASS: html.div nested"
+else
+  mes "FAIL: html.div nested, expected 'nested', got '" + result + "'"
+endif
+
+// Test 3: HTML_TOPLAINTEXT
+<div>
+plain text
+</div>
+plaintext = HTML_TOPLAINTEXT()
+if plaintext == "plain text"
+  mes "PASS: html.div plaintext"
+else
+  mes "FAIL: html.div plaintext, expected 'plain text', got '" + plaintext + "'"
+endif
+
+// Test 4: Multiple <div> elements
+<div>first</div>
+<div>second</div>
+result = HTML_GETPRINTEDSTR()
+if result == "firstsecond"
+  mes "PASS: html.div multiple"
+else
+  mes "FAIL: html.div multiple, expected 'firstsecond', got '" + result + "'"
+endif
+
+// Test 5: HTML_POPPRINTINGSTR clears the buffer
+<div>temp</div>
+HTML_POPPRINTINGSTR()
+result = HTML_GETPRINTEDSTR()
+if result == ""
+  mes "PASS: html.div pop clears"
+else
+  mes "FAIL: html.div pop clears, expected '', got '" + result + "'"
+endif
+
+// Test 6: HTML_STRINGLINES counts lines
+<div>
+line1
+line2
+line3
+</div>
+linecount = HTML_STRINGLINES()
+if linecount == 3
+  mes "PASS: html.div line count"
+else
+  mes "FAIL: html.div line count, expected 3, got " + linecount
+endif
+
+// Test 7: HTML_STRINGLEN counts length
+<div>
+hello
+</div>
+length = HTML_STRINGLEN()
+if length == 5
+  mes "PASS: html.div string len"
+else
+  mes "FAIL: html.div string len, expected 5, got " + length
+endif
+
+mes "html.div test complete"
+</BODY>
+</HTML>
