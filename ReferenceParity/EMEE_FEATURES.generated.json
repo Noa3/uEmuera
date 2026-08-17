@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "generated_at": "2025-11-14T20:59:19+09:00",
-  "uemuera_revision": "495e701cfc32aadcba3129e1caabbac5f5736bcd",
+  "uemuera_revision": "ed32e69246398e0f36b4d36c43649524a8a38f90",
   "reference": {
     "schema_version": 1,
     "repository": "https://gitlab.com/EvilMask/emuera.em",
@@ -1168,9 +1168,9 @@
           "DT_RELEASE"
         ],
         "argument_parity": [
-          "DT_CREATE: Creator.Method.cs",
-          "DT_EXIST: Creator.Method.cs",
-          "DT_RELEASE: Creator.Method.cs"
+          "DT_CREATE: Creator.cs",
+          "DT_EXIST: Creator.cs",
+          "DT_RELEASE: Creator.cs"
         ],
         "signature_missing_reference": [],
         "signature_missing_local": [],
@@ -1229,10 +1229,11 @@
           "DT_COLUMN_EXIST"
         ],
         "argument_parity": [
-          "DT_COLUMN_ADD: Creator.Method.cs",
-          "DT_COLUMN_REMOVE: Creator.Method.cs",
-          "DT_COLUMN_NAMES: Creator.Method.cs",
-          "DT_COLUMN_EXIST: Creator.Method.cs"
+          "DT_COLUMN_ADD: Creator.cs",
+          "DT_COLUMN_OPTIONS: Creator.cs",
+          "DT_COLUMN_REMOVE: Creator.cs",
+          "DT_COLUMN_NAMES: Creator.cs",
+          "DT_COLUMN_EXIST: Creator.cs"
         ],
         "signature_missing_reference": [],
         "signature_missing_local": [],
@@ -1289,8 +1290,10 @@
           "DT_ROW_LENGTH"
         ],
         "argument_parity": [
-          "DT_ROW_ADD: Creator.Method.cs",
-          "DT_ROW_REMOVE: Creator.Method.cs"
+          "DT_ROW_ADD: Creator.cs",
+          "DT_ROW_SET: Creator.cs",
+          "DT_ROW_REMOVE: Creator.cs",
+          "DT_ROW_LENGTH: Creator.cs"
         ],
         "signature_missing_reference": [],
         "signature_missing_local": [],
@@ -1347,7 +1350,12 @@
           "DT_CELL_ISNULL",
           "DT_CELL_SET"
         ],
-        "argument_parity": [],
+        "argument_parity": [
+          "DT_CELL_GET: Creator.cs",
+          "DT_CELL_GETS: Creator.cs",
+          "DT_CELL_ISNULL: Creator.cs",
+          "DT_CELL_SET: Creator.cs"
+        ],
         "signature_missing_reference": [],
         "signature_missing_local": [],
         "runtime": [
@@ -1398,7 +1406,9 @@
         "parser": [
           "DT_SELECT"
         ],
-        "argument_parity": [],
+        "argument_parity": [
+          "DT_SELECT: Creator.cs"
+        ],
         "signature_missing_reference": [],
         "signature_missing_local": [],
         "runtime": [
@@ -1453,7 +1463,8 @@
           "DT_FROMXML"
         ],
         "argument_parity": [
-          "DT_TOXML: Creator.Method.cs"
+          "DT_TOXML: Creator.cs",
+          "DT_FROMXML: Creator.cs"
         ],
         "signature_missing_reference": [],
         "signature_missing_local": [],
@@ -1510,7 +1521,11 @@
           "MAP_EXIST",
           "MAP_RELEASE"
         ],
-        "argument_parity": [],
+        "argument_parity": [
+          "MAP_CREATE: Creator.cs",
+          "MAP_EXIST: Creator.cs",
+          "MAP_RELEASE: Creator.cs"
+        ],
         "signature_missing_reference": [],
         "signature_missing_local": [],
         "runtime": [
@@ -1566,7 +1581,11 @@
           "MAP_SIZE"
         ],
         "argument_parity": [
-          "MAP_GET: Creator.Method.cs"
+          "MAP_SET: Creator.cs",
+          "MAP_GET: Creator.cs",
+          "MAP_REMOVE: Creator.cs",
+          "MAP_CLEAR: Creator.cs",
+          "MAP_SIZE: Creator.cs"
         ],
         "signature_missing_reference": [],
         "signature_missing_local": [],
@@ -1622,7 +1641,8 @@
           "MAP_FROMXML"
         ],
         "argument_parity": [
-          "MAP_FROMXML: Creator.Method.cs"
+          "MAP_TOXML: Creator.cs",
+          "MAP_FROMXML: Creator.cs"
         ],
         "signature_missing_reference": [],
         "signature_missing_local": [],
@@ -1679,7 +1699,8 @@
           "XML_GET_BYNAME"
         ],
         "argument_parity": [
-          "XML_GET: Creator.Method.cs"
+          "XML_GET: Creator.cs",
+          "XML_GET_BYNAME: Creator.cs"
         ],
         "signature_missing_reference": [],
         "signature_missing_local": [],
@@ -1734,7 +1755,8 @@
           "XML_SET_BYNAME"
         ],
         "argument_parity": [
-          "XML_SET: Creator.Method.cs"
+          "XML_SET: Creator.cs",
+          "XML_SET_BYNAME: Creator.cs"
         ],
         "signature_missing_reference": [],
         "signature_missing_local": [],
@@ -1791,11 +1813,11 @@
           "XML_REMOVEATTRIBUTE"
         ],
         "argument_parity": [
-          "XML_ADDNODE: Creator.Method.cs",
-          "XML_REMOVENODE: Creator.Method.cs",
-          "XML_REPLACE: Creator.Method.cs",
-          "XML_ADDATTRIBUTE: Creator.Method.cs",
-          "XML_REMOVEATTRIBUTE: Creator.Method.cs"
+          "XML_ADDNODE: Creator.cs",
+          "XML_REMOVENODE: Creator.cs",
+          "XML_REPLACE: Creator.cs",
+          "XML_ADDATTRIBUTE: Creator.cs",
+          "XML_REMOVEATTRIBUTE: Creator.cs"
         ],
         "signature_missing_reference": [],
         "signature_missing_local": [],
@@ -2072,9 +2094,9 @@
           "DT_RELEASE"
         ],
         "argument_parity": [
-          "DT_CREATE: Creator.Method.cs",
-          "DT_EXIST: Creator.Method.cs",
-          "DT_RELEASE: Creator.Method.cs"
+          "DT_CREATE: Creator.cs",
+          "DT_EXIST: Creator.cs",
+          "DT_RELEASE: Creator.cs"
         ],
         "signature_missing_reference": [],
         "signature_missing_local": [],
@@ -2191,18 +2213,14 @@
       },
       "evidence": {
         "parser": [
-          "Shift-JIS",
-          "UTF-8"
+          "EraEncoding",
+          "Detect",
+          "Cp932",
+          "Utf8"
         ],
-        "argument_parity": [
-          "UTF-8: Creator.Method.cs"
-        ],
-        "signature_missing_reference": [
-          "CP932"
-        ],
-        "signature_missing_local": [
-          "CP932"
-        ],
+        "argument_parity": [],
+        "signature_missing_reference": [],
+        "signature_missing_local": [],
         "runtime": [
           "EraEncoding: Assets/Scripts/Emuera/Compatibility/CompatibilityScanner.cs",
           "DetectBytes: Assets/Scripts/Emuera/Sub/EraEncoding.cs",

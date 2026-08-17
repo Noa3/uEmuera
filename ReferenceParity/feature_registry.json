@@ -10,32 +10,544 @@
     "documentation": "https://evilmask.gitlab.io/emuera.em.doc/en/"
   },
   "features": [
-    {"id":"html.div","name":"HTML div layout","parser_tokens":["HTML_GETPRINTEDSTR","HTML_POPPRINTINGSTR","HTML_TOPLAINTEXT","HTML_ESCAPE","HTML_STRINGLINES","HTML_STRINGLEN"],"runtime_patterns":["Html2DisplayLine","PrintHtml","HtmlManager","DivLayout","PrintDiv"],"render_patterns":["HtmlManager","Div"],"test_ids":["html.div.layout"]},
-    {"id":"html.clearbutton","name":"HTML clearbutton","parser_tokens":["CBGCLEARBUTTON"],"runtime_patterns":["CBG_ClearButton","FlagClearButton","FlagClearButtonTooltip","ClearButton","HtmlManager"],"render_patterns":["clearbutton","ClearButton"],"test_ids":["html.clearbutton.basic"]},
-    {"id":"html.img.srcb","name":"HTML image srcb","parser_tokens":["srcb"],"runtime_patterns":["srcb","SrcB"],"render_patterns":["srcb","SrcB"],"test_ids":["html.img.srcb"]},
-    {"id":"html.img.srcm","name":"HTML image srcm","parser_tokens":["srcm"],"runtime_patterns":["srcm","SrcM"],"render_patterns":["srcm","SrcM"],"test_ids":["html.img.srcm"]},
-    {"id":"html.print_island","name":"HTML print island","parser_tokens":["HTML_PRINT_ISLAND","HTML_PRINT_ISLAND_CLEAR"],"runtime_patterns":["HtmlPrintIsland","PrintHtmlIsland"],"render_patterns":["HtmlPrintIsland","PrintHtmlIsland"],"test_ids":["html.print_island.lifecycle"]},
-    {"id":"cbg.sprite","name":"CBG sprite rendering","parser_tokens":["CBGSETG","CBGSETSPRITE"],"runtime_patterns":["CBG_SetGraphics","CBG_SetImage","CBGSetGraphicsMethod"],"render_patterns":["EmuleraCbgRenderer","CbgEntry"],"test_ids":["cbg.sprite.render"]},
-    {"id":"cbg.buttonmap","name":"CBG button map","parser_tokens":["CBGSETBMAPG","CBGSETBUTTONSPRITE"],"runtime_patterns":["CBG_SetButtonMap","CBG_SetButtonImage","CBGSETButtonSpriteMethod"],"render_patterns":["CBG","buttonMap","ButtonMap"],"input_patterns":["GetCBG","OnCBGButtonClick","CBG"],"test_ids":["cbg.buttonmap.hit_test"]},
-    {"id":"cbg.ordering","name":"CBG deterministic ordering","parser_tokens":["CBGSETG","CBGSETSPRITE"],"runtime_patterns":["cbgList","CbgEntry"],"render_patterns":["zdepth","zDepth","creationSequence"],"test_ids":["cbg.ordering.same_depth"]},
-    {"id":"dt.create","name":"DataTable create/exist/release","parser_tokens":["DT_CREATE","DT_EXIST","DT_RELEASE"],"runtime_patterns":["DtManageMethod","DataDataTables","EraDataTable"],"test_ids":["dt.create.basic"]},
-    {"id":"dt.column","name":"DataTable columns/types/defaults","parser_tokens":["DT_COLUMN_ADD","DT_COLUMN_OPTIONS","DT_COLUMN_REMOVE","DT_COLUMN_NAMES","DT_COLUMN_EXIST"],"runtime_patterns":["DtColMethod","DT_COLUMN_OPTIONS","ColType","DefaultValue"],"test_ids":["dt.column.types_defaults"]},
-    {"id":"dt.row","name":"DataTable rows and stable IDs","parser_tokens":["DT_ROW_ADD","DT_ROW_SET","DT_ROW_REMOVE","DT_ROW_LENGTH"],"runtime_patterns":["DtRowOpMethod","DataRow","AddRow","RowId"],"test_ids":["dt.row.stable_id"]},
-    {"id":"dt.cell","name":"DataTable cell/null semantics","parser_tokens":["DT_CELL_GET","DT_CELL_GETS","DT_CELL_ISNULL","DT_CELL_SET"],"runtime_patterns":["DtCellGetMethod","DtCellSetMethod","IsNull","DBNull","IsNull"],"test_ids":["dt.cell.null_and_id"]},
-    {"id":"dt.select","name":"DataTable filter/sort selection","parser_tokens":["DT_SELECT"],"runtime_patterns":["DtSelectMethod","DataTableExpressionParser","Select"],"test_ids":["dt.select.filter_sort"]},
-    {"id":"dt.serialization","name":"DataTable schema/data XML","parser_tokens":["DT_TOXML","DT_FROMXML"],"runtime_patterns":["DtToXmlMethod","DtFromXmlMethod","ToXmlSchema","FromXml"],"persistence_patterns":["DataDataTables","WriteXml","ReadXml"],"test_ids":["dt.serialization.roundtrip"]},
-    {"id":"map.create","name":"MAP create/exist/release","parser_tokens":["MAP_CREATE","MAP_EXIST","MAP_RELEASE"],"runtime_patterns":["MapCreateMethod","MapExistMethod","MapReleaseMethod"],"test_ids":["map.create.return_values"]},
-    {"id":"map.operations","name":"MAP operations","parser_tokens":["MAP_SET","MAP_GET","MAP_REMOVE","MAP_CLEAR","MAP_SIZE"],"runtime_patterns":["MapSetMethod","MapGetMethod","MapRemoveMethod","MapClearMethod","MapSizeMethod"],"test_ids":["map.operations.no_autocreate"]},
-    {"id":"map.serialization","name":"MAP XML serialization","parser_tokens":["MAP_TOXML","MAP_FROMXML"],"runtime_patterns":["MapToXmlMethod","MapFromXmlMethod"],"persistence_patterns":["DataMaps","MAP_TOXML","MAP_FROMXML"],"test_ids":["map.serialization.roundtrip"]},
-    {"id":"xml.get","name":"XML_GET overloads","parser_tokens":["XML_GET","XML_GET_BYNAME"],"runtime_patterns":["XmlGetMethod","XML_GET","SelectNodes","SelectSingleNode"],"test_ids":["xml.get.overloads"]},
-    {"id":"xml.set","name":"XML_SET overloads","parser_tokens":["XML_SET","XML_SET_BYNAME"],"runtime_patterns":["XmlSetMethod","XML_SET","SelectNodes"],"test_ids":["xml.set.multiple"]},
-    {"id":"xml.mutation","name":"XML mutation API","parser_tokens":["XML_ADDNODE","XML_REMOVENODE","XML_REPLACE","XML_ADDATTRIBUTE","XML_REMOVEATTRIBUTE"],"runtime_patterns":["XmlAddNodeMethod","XmlRemoveNodeMethod","XmlReplaceMethod","XmlResolver"],"test_ids":["xml.mutation.safe"]},
-    {"id":"erd.named_indices","name":"ERD named indices","parser_tokens":["ERDNAME"],"runtime_patterns":["ErdNameMethod","TryIntegerToKeyword"],"test_ids":["erd.named_indices.fixture"]},
-    {"id":"input.mouseb","name":"MOUSEB state","parser_tokens":["MOUSEB"],"runtime_patterns":["MOUSEB","GetMouseButton","MouseB"],"input_patterns":["Mouse","Pointer","MOUSEB"],"test_ids":["input.mouse.buttons"]},
-    {"id":"input.coordinates","name":"MOUSEX/MOUSEY coordinates","parser_tokens":["MOUSEX","MOUSEY"],"runtime_patterns":["MOUSEX","MOUSEY","CoordinateMapper"],"input_patterns":["Coordinate","MousePosition","PointToClient"],"test_ids":["input.mouse.coordinates"]},
-    {"id":"save.extended_data","name":"MAP/XML/DataTable persistence","parser_tokens":["RESETDATA","RESETGLOBAL"],"runtime_patterns":["DataDataTables","DataXmlDocuments","DataMaps"],"persistence_patterns":["VarExt","Save","Load"],"test_ids":["save.extended_data.lifetime"]},
-    {"id":"save.multidimensional_strings","name":"Multidimensional string save","parser_tokens":["DT_CREATE","DT_EXIST","DT_RELEASE"],"runtime_patterns":["dataStringArray2D","dataStringArray3D","WriteExtended","ReadStrArray2D","ReadStrArray3D","WriteStrArray2D","WriteStrArray3D"],"persistence_patterns":["SaveGlobalToStream1808","LoadGlobalFromStream1808","SaveGlobalToStreamBinary","LoadVariableBinary","DataStringArray2D","DataStringArray3D"],"test_ids":["save.string_arrays.2d3d"]},
-    {"id":"filesystem.virtual","name":"Game virtual filesystem","parser_tokens":["EXISTFILE","ENUMFILES"],"runtime_patterns":["GameVirtualFileSystem","IGameFileSystem","ResolveExistingFilePath"],"persistence_patterns":["EXISTFILE","ENUMFILES"],"test_ids":["filesystem.sandbox_and_ambiguity"]},
-    {"id":"filesystem.encoding","name":"Per-file text encoding","parser_tokens":["CP932","Shift-JIS","UTF-8"],"runtime_patterns":["EraEncoding","DetectBytes","Detect","Cp932","Utf8","CodePagesEncodingProvider"],"test_ids":["filesystem.encoding.matrix"]}
+    {
+      "id": "html.div",
+      "name": "HTML div layout",
+      "parser_tokens": [
+        "HTML_GETPRINTEDSTR",
+        "HTML_POPPRINTINGSTR",
+        "HTML_TOPLAINTEXT",
+        "HTML_ESCAPE",
+        "HTML_STRINGLINES",
+        "HTML_STRINGLEN"
+      ],
+      "runtime_patterns": [
+        "Html2DisplayLine",
+        "PrintHtml",
+        "HtmlManager",
+        "DivLayout",
+        "PrintDiv"
+      ],
+      "render_patterns": [
+        "HtmlManager",
+        "Div"
+      ],
+      "test_ids": [
+        "html.div.layout"
+      ]
+    },
+    {
+      "id": "html.clearbutton",
+      "name": "HTML clearbutton",
+      "parser_tokens": [
+        "CBGCLEARBUTTON"
+      ],
+      "runtime_patterns": [
+        "CBG_ClearButton",
+        "FlagClearButton",
+        "FlagClearButtonTooltip",
+        "ClearButton",
+        "HtmlManager"
+      ],
+      "render_patterns": [
+        "clearbutton",
+        "ClearButton"
+      ],
+      "test_ids": [
+        "html.clearbutton.basic"
+      ]
+    },
+    {
+      "id": "html.img.srcb",
+      "name": "HTML image srcb",
+      "parser_tokens": [
+        "srcb"
+      ],
+      "runtime_patterns": [
+        "srcb",
+        "SrcB"
+      ],
+      "render_patterns": [
+        "srcb",
+        "SrcB"
+      ],
+      "test_ids": [
+        "html.img.srcb"
+      ]
+    },
+    {
+      "id": "html.img.srcm",
+      "name": "HTML image srcm",
+      "parser_tokens": [
+        "srcm"
+      ],
+      "runtime_patterns": [
+        "srcm",
+        "SrcM"
+      ],
+      "render_patterns": [
+        "srcm",
+        "SrcM"
+      ],
+      "test_ids": [
+        "html.img.srcm"
+      ]
+    },
+    {
+      "id": "html.print_island",
+      "name": "HTML print island",
+      "parser_tokens": [
+        "HTML_PRINT_ISLAND",
+        "HTML_PRINT_ISLAND_CLEAR"
+      ],
+      "runtime_patterns": [
+        "HtmlPrintIsland",
+        "PrintHtmlIsland"
+      ],
+      "render_patterns": [
+        "HtmlPrintIsland",
+        "PrintHtmlIsland"
+      ],
+      "test_ids": [
+        "html.print_island.lifecycle"
+      ]
+    },
+    {
+      "id": "cbg.sprite",
+      "name": "CBG sprite rendering",
+      "parser_tokens": [
+        "CBGSETG",
+        "CBGSETSPRITE"
+      ],
+      "runtime_patterns": [
+        "CBG_SetGraphics",
+        "CBG_SetImage",
+        "CBGSetGraphicsMethod"
+      ],
+      "render_patterns": [
+        "EmuleraCbgRenderer",
+        "CbgEntry"
+      ],
+      "test_ids": [
+        "cbg.sprite.render"
+      ]
+    },
+    {
+      "id": "cbg.buttonmap",
+      "name": "CBG button map",
+      "parser_tokens": [
+        "CBGSETBMAPG",
+        "CBGSETBUTTONSPRITE"
+      ],
+      "runtime_patterns": [
+        "CBG_SetButtonMap",
+        "CBG_SetButtonImage",
+        "CBGSETButtonSpriteMethod"
+      ],
+      "render_patterns": [
+        "CBG",
+        "buttonMap",
+        "ButtonMap"
+      ],
+      "input_patterns": [
+        "GetCBG",
+        "OnCBGButtonClick",
+        "CBG"
+      ],
+      "test_ids": [
+        "cbg.buttonmap.hit_test"
+      ]
+    },
+    {
+      "id": "cbg.ordering",
+      "name": "CBG deterministic ordering",
+      "parser_tokens": [
+        "CBGSETG",
+        "CBGSETSPRITE"
+      ],
+      "runtime_patterns": [
+        "cbgList",
+        "CbgEntry"
+      ],
+      "render_patterns": [
+        "zdepth",
+        "zDepth",
+        "creationSequence"
+      ],
+      "test_ids": [
+        "cbg.ordering.same_depth"
+      ]
+    },
+    {
+      "id": "dt.create",
+      "name": "DataTable create/exist/release",
+      "parser_tokens": [
+        "DT_CREATE",
+        "DT_EXIST",
+        "DT_RELEASE"
+      ],
+      "runtime_patterns": [
+        "DtManageMethod",
+        "DataDataTables",
+        "EraDataTable"
+      ],
+      "test_ids": [
+        "dt.create.basic"
+      ]
+    },
+    {
+      "id": "dt.column",
+      "name": "DataTable columns/types/defaults",
+      "parser_tokens": [
+        "DT_COLUMN_ADD",
+        "DT_COLUMN_OPTIONS",
+        "DT_COLUMN_REMOVE",
+        "DT_COLUMN_NAMES",
+        "DT_COLUMN_EXIST"
+      ],
+      "runtime_patterns": [
+        "DtColMethod",
+        "DT_COLUMN_OPTIONS",
+        "ColType",
+        "DefaultValue"
+      ],
+      "test_ids": [
+        "dt.column.types_defaults"
+      ]
+    },
+    {
+      "id": "dt.row",
+      "name": "DataTable rows and stable IDs",
+      "parser_tokens": [
+        "DT_ROW_ADD",
+        "DT_ROW_SET",
+        "DT_ROW_REMOVE",
+        "DT_ROW_LENGTH"
+      ],
+      "runtime_patterns": [
+        "DtRowOpMethod",
+        "DataRow",
+        "AddRow",
+        "RowId"
+      ],
+      "test_ids": [
+        "dt.row.stable_id"
+      ]
+    },
+    {
+      "id": "dt.cell",
+      "name": "DataTable cell/null semantics",
+      "parser_tokens": [
+        "DT_CELL_GET",
+        "DT_CELL_GETS",
+        "DT_CELL_ISNULL",
+        "DT_CELL_SET"
+      ],
+      "runtime_patterns": [
+        "DtCellGetMethod",
+        "DtCellSetMethod",
+        "IsNull",
+        "DBNull",
+        "IsNull"
+      ],
+      "test_ids": [
+        "dt.cell.null_and_id"
+      ]
+    },
+    {
+      "id": "dt.select",
+      "name": "DataTable filter/sort selection",
+      "parser_tokens": [
+        "DT_SELECT"
+      ],
+      "runtime_patterns": [
+        "DtSelectMethod",
+        "DataTableExpressionParser",
+        "Select"
+      ],
+      "test_ids": [
+        "dt.select.filter_sort"
+      ]
+    },
+    {
+      "id": "dt.serialization",
+      "name": "DataTable schema/data XML",
+      "parser_tokens": [
+        "DT_TOXML",
+        "DT_FROMXML"
+      ],
+      "runtime_patterns": [
+        "DtToXmlMethod",
+        "DtFromXmlMethod",
+        "ToXmlSchema",
+        "FromXml"
+      ],
+      "persistence_patterns": [
+        "DataDataTables",
+        "WriteXml",
+        "ReadXml"
+      ],
+      "test_ids": [
+        "dt.serialization.roundtrip"
+      ]
+    },
+    {
+      "id": "map.create",
+      "name": "MAP create/exist/release",
+      "parser_tokens": [
+        "MAP_CREATE",
+        "MAP_EXIST",
+        "MAP_RELEASE"
+      ],
+      "runtime_patterns": [
+        "MapCreateMethod",
+        "MapExistMethod",
+        "MapReleaseMethod"
+      ],
+      "test_ids": [
+        "map.create.return_values"
+      ]
+    },
+    {
+      "id": "map.operations",
+      "name": "MAP operations",
+      "parser_tokens": [
+        "MAP_SET",
+        "MAP_GET",
+        "MAP_REMOVE",
+        "MAP_CLEAR",
+        "MAP_SIZE"
+      ],
+      "runtime_patterns": [
+        "MapSetMethod",
+        "MapGetMethod",
+        "MapRemoveMethod",
+        "MapClearMethod",
+        "MapSizeMethod"
+      ],
+      "test_ids": [
+        "map.operations.no_autocreate"
+      ]
+    },
+    {
+      "id": "map.serialization",
+      "name": "MAP XML serialization",
+      "parser_tokens": [
+        "MAP_TOXML",
+        "MAP_FROMXML"
+      ],
+      "runtime_patterns": [
+        "MapToXmlMethod",
+        "MapFromXmlMethod"
+      ],
+      "persistence_patterns": [
+        "DataMaps",
+        "MAP_TOXML",
+        "MAP_FROMXML"
+      ],
+      "test_ids": [
+        "map.serialization.roundtrip"
+      ]
+    },
+    {
+      "id": "xml.get",
+      "name": "XML_GET overloads",
+      "parser_tokens": [
+        "XML_GET",
+        "XML_GET_BYNAME"
+      ],
+      "runtime_patterns": [
+        "XmlGetMethod",
+        "XML_GET",
+        "SelectNodes",
+        "SelectSingleNode"
+      ],
+      "test_ids": [
+        "xml.get.overloads"
+      ]
+    },
+    {
+      "id": "xml.set",
+      "name": "XML_SET overloads",
+      "parser_tokens": [
+        "XML_SET",
+        "XML_SET_BYNAME"
+      ],
+      "runtime_patterns": [
+        "XmlSetMethod",
+        "XML_SET",
+        "SelectNodes"
+      ],
+      "test_ids": [
+        "xml.set.multiple"
+      ]
+    },
+    {
+      "id": "xml.mutation",
+      "name": "XML mutation API",
+      "parser_tokens": [
+        "XML_ADDNODE",
+        "XML_REMOVENODE",
+        "XML_REPLACE",
+        "XML_ADDATTRIBUTE",
+        "XML_REMOVEATTRIBUTE"
+      ],
+      "runtime_patterns": [
+        "XmlAddNodeMethod",
+        "XmlRemoveNodeMethod",
+        "XmlReplaceMethod",
+        "XmlResolver"
+      ],
+      "test_ids": [
+        "xml.mutation.safe"
+      ]
+    },
+    {
+      "id": "erd.named_indices",
+      "name": "ERD named indices",
+      "parser_tokens": [
+        "ERDNAME"
+      ],
+      "runtime_patterns": [
+        "ErdNameMethod",
+        "TryIntegerToKeyword"
+      ],
+      "test_ids": [
+        "erd.named_indices.fixture"
+      ]
+    },
+    {
+      "id": "input.mouseb",
+      "name": "MOUSEB state",
+      "parser_tokens": [
+        "MOUSEB"
+      ],
+      "runtime_patterns": [
+        "MOUSEB",
+        "GetMouseButton",
+        "MouseB"
+      ],
+      "input_patterns": [
+        "Mouse",
+        "Pointer",
+        "MOUSEB"
+      ],
+      "test_ids": [
+        "input.mouse.buttons"
+      ]
+    },
+    {
+      "id": "input.coordinates",
+      "name": "MOUSEX/MOUSEY coordinates",
+      "parser_tokens": [
+        "MOUSEX",
+        "MOUSEY"
+      ],
+      "runtime_patterns": [
+        "MOUSEX",
+        "MOUSEY",
+        "CoordinateMapper"
+      ],
+      "input_patterns": [
+        "Coordinate",
+        "MousePosition",
+        "PointToClient"
+      ],
+      "test_ids": [
+        "input.mouse.coordinates"
+      ]
+    },
+    {
+      "id": "save.extended_data",
+      "name": "MAP/XML/DataTable persistence",
+      "parser_tokens": [
+        "RESETDATA",
+        "RESETGLOBAL"
+      ],
+      "runtime_patterns": [
+        "DataDataTables",
+        "DataXmlDocuments",
+        "DataMaps"
+      ],
+      "persistence_patterns": [
+        "VarExt",
+        "Save",
+        "Load"
+      ],
+      "test_ids": [
+        "save.extended_data.lifetime"
+      ]
+    },
+    {
+      "id": "save.multidimensional_strings",
+      "name": "Multidimensional string save",
+      "parser_tokens": [
+        "DT_CREATE",
+        "DT_EXIST",
+        "DT_RELEASE"
+      ],
+      "runtime_patterns": [
+        "dataStringArray2D",
+        "dataStringArray3D",
+        "WriteExtended",
+        "ReadStrArray2D",
+        "ReadStrArray3D",
+        "WriteStrArray2D",
+        "WriteStrArray3D"
+      ],
+      "persistence_patterns": [
+        "SaveGlobalToStream1808",
+        "LoadGlobalFromStream1808",
+        "SaveGlobalToStreamBinary",
+        "LoadVariableBinary",
+        "DataStringArray2D",
+        "DataStringArray3D"
+      ],
+      "test_ids": [
+        "save.string_arrays.2d3d"
+      ]
+    },
+    {
+      "id": "filesystem.virtual",
+      "name": "Game virtual filesystem",
+      "parser_tokens": [
+        "EXISTFILE",
+        "ENUMFILES"
+      ],
+      "runtime_patterns": [
+        "GameVirtualFileSystem",
+        "IGameFileSystem",
+        "ResolveExistingFilePath"
+      ],
+      "persistence_patterns": [
+        "EXISTFILE",
+        "ENUMFILES"
+      ],
+      "test_ids": [
+        "filesystem.sandbox_and_ambiguity"
+      ]
+    },
+    {
+      "id": "filesystem.encoding",
+      "name": "Per-file text encoding",
+      "parser_tokens": [
+        "EraEncoding",
+        "DetectBytes",
+        "Detect",
+        "Cp932",
+        "Utf8"
+      ],
+      "runtime_patterns": [
+        "EraEncoding",
+        "DetectBytes",
+        "Detect",
+        "Cp932",
+        "Utf8",
+        "CodePagesEncodingProvider"
+      ],
+      "test_ids": [
+        "filesystem.encoding.matrix"
+      ]
+    }
   ]
 }

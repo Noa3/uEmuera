@@ -3,7 +3,7 @@
 > Generated from source registries and regression metadata. This file is not hand-maintained.
 > `FULL` requires a verified reference fixture; registration alone never produces `FULL`.
 
-- uEmuera revision: `495e701cfc32aadcba3129e1caabbac5f5736bcd`
+- uEmuera revision: `ed32e69246398e0f36b4d36c43649524a8a38f90`
 - Reference: `EMv18 / EEv55`
 - Reference Emuera.EM revision: `cde11d69048f87d4a70d1452da79ae6e56462386`
 - Reference tag: `Emuera.NET1824+v22+EMv18+EEv55`

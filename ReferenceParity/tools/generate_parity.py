@@ -201,7 +201,13 @@ def build_features(registry: dict, inv: dict[str, object], upstream: dict) -> li
         signature, signature_missing_reference, signature_missing_local = signature_parity(tokens, upstream, local_commands)
         argument_hits = evidence_for(tokens, {ROOT / "ArgumentBuilder.cs": argument_sources})
         if not argument_hits and parser != "MISSING":
-            argument_hits = evidence_for(tokens, {ROOT / "Creator.Method.cs": next((t for p, t in texts.items() if p.name == "Creator.Method.cs"), "")})
+            # For DT_*, MAP_*, XML_* features, check Creator.cs (where these commands are registered)
+            if any(token.startswith(("DT_", "MAP_", "XML_")) for token in tokens):
+                creator_text = next((t for p, t in texts.items() if p.name == "Creator.cs"), "")
+                if creator_text:
+                    argument_hits = evidence_for(tokens, {ROOT / "Creator.cs": creator_text})
+            if not argument_hits:
+                argument_hits = evidence_for(tokens, {ROOT / "Creator.Method.cs": next((t for p, t in texts.items() if p.name == "Creator.Method.cs"), "")})
         # Source text can show that argument code exists, but only the
         # extracted reference/local signature comparison can produce FULL.
         argument = signature if signature != "N/A" else ("FULL" if argument_hits else "MISSING")
