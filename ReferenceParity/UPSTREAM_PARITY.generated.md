@@ -3,7 +3,7 @@
 > Generated from source registries and regression metadata. This file is not hand-maintained.
 > `FULL` requires a verified reference fixture; registration alone never produces `FULL`.
 
-- uEmuera revision: `c5ff6c7cdcf960a6abef01b8ef4b8d08963e82f3`
+- uEmuera revision: `0268d4bfdf9c846cd37efcc4eea1e26550dceac6`
 - Reference: `EMv18 / EEv55`
 - Reference Emuera.EM revision: `cde11d69048f87d4a70d1452da79ae6e56462386`
 - Reference tag: `Emuera.NET1824+v22+EMv18+EEv55`
@@ -35,7 +35,7 @@
 | input.mouseb | FULL | PARTIAL | FULL | N/A | FULL | N/A | FULL | MISSING | PARTIAL |
 | input.coordinates | FULL | PARTIAL | FULL | N/A | FULL | N/A | FULL | MISSING | PARTIAL |
 | save.extended_data | FULL | PARTIAL | FULL | N/A | N/A | FULL | FULL | MISSING | PARTIAL |
-| save.multidimensional_strings | MISSING | MISSING | FULL | N/A | N/A | FULL | FULL | MISSING | MISSING |
+| save.multidimensional_strings | FULL | PARTIAL | FULL | N/A | N/A | FULL | FULL | MISSING | PARTIAL |
 | filesystem.virtual | FULL | PARTIAL | FULL | N/A | N/A | FULL | FULL | MISSING | PARTIAL |
 | filesystem.encoding | PARTIAL | MISSING | FULL | N/A | N/A | N/A | FULL | MISSING | PARTIAL |
 

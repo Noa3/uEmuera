@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "generated_at": "2025-11-14T20:59:19+09:00",
-  "uemuera_revision": "c5ff6c7cdcf960a6abef01b8ef4b8d08963e82f3",
+  "uemuera_revision": "0268d4bfdf9c846cd37efcc4eea1e26550dceac6",
   "reference": {
     "schema_version": 1,
     "repository": "https://gitlab.com/EvilMask/emuera.em",
@@ -723,7 +723,8 @@
         "signature_missing_local": [],
         "runtime": [
           "Html2DisplayLine: Assets/Scripts/Emuera/GameView/EmueraConsole.Print.cs",
-          "PrintHtml: Assets/Scripts/Emuera/GameView/EmueraConsole.Print.cs"
+          "PrintHtml: Assets/Scripts/Emuera/GameView/EmueraConsole.Print.cs",
+          "HtmlManager: Assets/Scripts/Emuera/GameView/ConsoleShapePart.cs"
         ],
         "rendering": [
           "HtmlManager: Assets/Scripts/Emuera/GameView/ConsoleShapePart.cs",
@@ -776,7 +777,11 @@
         "signature_missing_local": [],
         "runtime": [
           "clearbutton: Assets/Scripts/Emuera/Compatibility/FeatureCapabilityIds.cs",
-          "ClearButton: Assets/Scripts/Emuera/Compatibility/FeatureCapabilityIds.cs"
+          "ClearButton: Assets/Scripts/Emuera/Compatibility/FeatureCapabilityIds.cs",
+          "FlagClearButton: Assets/Scripts/Emuera/GameView/HtmlManager.cs",
+          "FlagClearButtonTooltip: Assets/Scripts/Emuera/GameView/HtmlManager.cs",
+          "CBG_ClearButton: Assets/Scripts/Emuera/GameView/EmueraConsole.cs",
+          "HtmlManager: Assets/Scripts/Emuera/GameView/ConsoleShapePart.cs"
         ],
         "rendering": [
           "clearbutton: Assets/Scripts/Emuera/Compatibility/FeatureCapabilityIds.cs",
@@ -1389,7 +1394,7 @@
         "runtime": [
           "DtSelectMethod: Assets/Scripts/Emuera/GameData/Function/Creator.Method.cs",
           "DataTableExpressionParser: Assets/Scripts/Emuera/GameData/DataTableExpressionParser.cs",
-          "Select: Assets/Scripts/LocalizationHelper.cs"
+          "Select: Assets/Scripts/FirstWindow.cs"
         ],
         "rendering": [],
         "input": [],
@@ -2012,7 +2017,7 @@
         "input": [],
         "persistence": [
           "Save: Assets/Scripts/EmueraMain.cs",
-          "Load: Assets/Scripts/EmueraImage.cs"
+          "Load: Assets/Scripts/AsyncIoGate.cs"
         ],
         "runtime_registry": "registered",
         "renderer_registry": "missing",
@@ -2031,9 +2036,9 @@
     {
       "id": "save.multidimensional_strings",
       "name": "Multidimensional string save",
-      "status": "MISSING",
+      "status": "PARTIAL",
       "verification": {
-        "registered": false,
+        "registered": true,
         "implemented": true,
         "signature_match": false,
         "local_tests": "MISSING",
@@ -2041,8 +2046,8 @@
         "reference_version": "55"
       },
       "dimensions": {
-        "parser": "MISSING",
-        "argument_parity": "MISSING",
+        "parser": "FULL",
+        "argument_parity": "PARTIAL",
         "runtime": "FULL",
         "rendering": "N/A",
         "input": "N/A",
@@ -2051,21 +2056,34 @@
         "tests": "MISSING"
       },
       "evidence": {
-        "parser": [],
-        "argument_parity": [],
+        "parser": [
+          "DT_CREATE",
+          "DT_EXIST",
+          "DT_RELEASE"
+        ],
+        "argument_parity": [
+          "DT_CREATE: Creator.Method.cs",
+          "DT_EXIST: Creator.Method.cs",
+          "DT_RELEASE: Creator.Method.cs"
+        ],
         "signature_missing_reference": [],
         "signature_missing_local": [],
         "runtime": [
           "dataStringArray2D: Assets/Scripts/Emuera/GameData/Variable/CharacterData.cs",
-          "dataStringArray3D: Assets/Scripts/Emuera/GameData/Variable/CharacterData.cs"
+          "dataStringArray3D: Assets/Scripts/Emuera/GameData/Variable/CharacterData.cs",
+          "WriteExtended: Assets/Scripts/Emuera/Sub/EraDataStream.cs",
+          "ReadStrArray2D: Assets/Scripts/Emuera/Sub/EraBinaryDataReader.cs",
+          "ReadStrArray3D: Assets/Scripts/Emuera/Sub/EraBinaryDataReader.cs"
         ],
         "rendering": [],
         "input": [],
         "persistence": [
-          "Save: Assets/Scripts/EmueraMain.cs",
-          "Load: Assets/Scripts/EmueraImage.cs",
-          "StringArray2D: Assets/Scripts/Emuera/Sub/EraDataStream.cs",
-          "StringArray3D: Assets/Scripts/Emuera/Sub/EraDataStream.cs"
+          "SaveGlobalToStream1808: Assets/Scripts/Emuera/GameData/Variable/VariableData.cs",
+          "LoadGlobalFromStream1808: Assets/Scripts/Emuera/GameData/Variable/VariableData.cs",
+          "SaveGlobalToStreamBinary: Assets/Scripts/Emuera/GameData/Variable/VariableData.cs",
+          "LoadVariableBinary: Assets/Scripts/Emuera/GameData/Variable/VariableData.cs",
+          "DataStringArray2D: Assets/Scripts/Emuera/GameData/Variable/CharacterData.cs",
+          "DataStringArray3D: Assets/Scripts/Emuera/GameData/Variable/VariableData.cs"
         ],
         "runtime_registry": "registered",
         "renderer_registry": "missing",
@@ -2116,6 +2134,7 @@
         "signature_missing_local": [],
         "runtime": [
           "GameVirtualFileSystem: Assets/Scripts/Emuera/Compatibility/CompatibilityScanner.cs",
+          "IGameFileSystem: Assets/Scripts/Runtime/RuntimeContext.cs",
           "ResolveExistingFilePath: Assets/Scripts/uEmuera/Utils.cs"
         ],
         "rendering": [],
@@ -2175,6 +2194,11 @@
           "CP932"
         ],
         "runtime": [
+          "EraEncoding: Assets/Scripts/Emuera/Compatibility/CompatibilityScanner.cs",
+          "DetectBytes: Assets/Scripts/Emuera/Sub/EraEncoding.cs",
+          "Detect: Assets/Scripts/EmueraMain.cs",
+          "Cp932: Assets/Scripts/Emuera/Sub/EraEncoding.cs",
+          "Utf8: Assets/Scripts/Emuera/Sub/EraEncoding.cs",
           "CodePagesEncodingProvider: Assets/Scripts/Emuera/Program.cs"
         ],
         "rendering": [],
@@ -2196,7 +2220,7 @@
     }
   ],
   "stub_audit": {
-    "count": 42,
-    "player_reachable": 9
+    "count": 61,
+    "player_reachable": 16
   }
 }

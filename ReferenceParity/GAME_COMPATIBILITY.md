@@ -20,7 +20,17 @@ era-electron games (erauma, ere-kanon) require a JS runtime and are not C# Emuer
 | eratohoLiG | 568 | 0 | ✅ Should load (game-specific user functions only) |
 | eraQueen | 344 | 0 | ✅ Should load (0 unknown tokens) |
 | eraAkumaMaid (English) | 892 | 0 | ⚠️ Should load; TR_NAME function missing from English mod (game-side issue) |
-| erauma | 0 ERB | — | ❌ era-electron game — requires JS runtime, not C# Emuera compatible |
+|| eraFL | 1,097 | 0 | ✅ Should load |
+|| EraJK | 282 | 0 | ✅ Should load |
+|| EraRL | 1,156 | 0 | ✅ Should load |
+|| EraSekaQ | 606 | 0 | ✅ Should load |
+|| EraFGO-K | 2,320 | 0 | ✅ Should load |
+|| EraMegaten | 8,876 | 0 | ✅ Should load (large game — Persona/Megaten Crossover) |
+|| EraMaouEx | 320 | 0 | ✅ Should load |
+|| EraTohoReverse | 862 | 0 | ✅ Should load |
+|| eraAS | 407 | 0 | ✅ Should load |
+|| eraBlueResort | 2,813 | 0 | ✅ Should load |
+|| erauma | 0 ERB | — | ❌ era-electron game — requires JS runtime, not C# Emuera compatible |
 | ere-kanon | 0 ERB | — | ❌ era-electron game — requires JS runtime |
 | erauma (data only) | 0 ERB | — | 📦 CSV data loadable; game logic requires era-electron runtime |
 
