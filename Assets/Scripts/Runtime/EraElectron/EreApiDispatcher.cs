@@ -2,6 +2,8 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace uEmuera.Runtime.EraElectron
 {
@@ -80,14 +82,28 @@ namespace uEmuera.Runtime.EraElectron
         public int BeginAsync(string method, string argsJson)
         {
             int id = _nextCallId++;
-            var tcs = new TaskCompletionSource<string>();
+            var tcs = new TaskCompletionSource<string>(
+                TaskCreationOptions.RunContinuationsAsynchronously);
             lock (_pending) _pending[id] = tcs;
 
-            // Start async resolution on Unity main thread.
-            _context.MainThread?.Post(() =>
+            // The WebView2 message callback runs on its STA thread. A null
+            // dispatcher must not leave the Promise permanently unresolved;
+            // use the current thread as a safe fallback for APIs that do not
+            // require Unity objects (delay/save model work are self-contained).
+            if (_context.MainThread != null)
             {
+                _context.MainThread.Post(() =>
+                {
+                    _ = ResolveAsyncAsync(id, method, argsJson);
+                });
+            }
+            else
+            {
+                _context.Logger?.Warn(
+                    "[EreApiDispatcher] RuntimeContext.MainThread is null; " +
+                    "executing async ERA call on the bridge thread.");
                 _ = ResolveAsyncAsync(id, method, argsJson);
-            });
+            }
 
             return id;
         }
@@ -102,11 +118,16 @@ namespace uEmuera.Runtime.EraElectron
                     return "null"; // already resolved or unknown
             }
 
-            using (cancellationToken.Register(() => tcs.TrySetCanceled()))
+            using (cancellationToken.Register(() => tcs.TrySetCanceled(cancellationToken)))
             {
-                string result = await tcs.Task;
-                lock (_pending) _pending.Remove(callId);
-                return result;
+                try
+                {
+                    return await tcs.Task;
+                }
+                finally
+                {
+                    lock (_pending) _pending.Remove(callId);
+                }
             }
         }
 
@@ -335,43 +356,64 @@ namespace uEmuera.Runtime.EraElectron
         }
 
         // ------------------------------------------------------------------ //
-        //  Argument parsing helpers (TODO: replace with proper JSON parser)   //
+        //  Argument parsing helpers                                             //
         // ------------------------------------------------------------------ //
 
         static string ParseVarName(string argsJson)
         {
-            // Extremely naive; replace with real JSON parsing
-            var s = argsJson?.Trim('[', ']', '"', '\'');
-            return string.IsNullOrEmpty(s) ? "unknown" : s.Split(',')[0].Trim('"', ' ');
+            JArray args = ParseArgs(argsJson);
+            string value = args != null && args.Count > 0
+                ? args[0]?.Value<string>()
+                : null;
+            return string.IsNullOrEmpty(value) ? "unknown" : value;
         }
 
         static string ParseLogMessage(string argsJson)
         {
-            // era.logger.*(message) — extract first string argument
-            if (string.IsNullOrEmpty(argsJson)) return string.Empty;
-            string s = argsJson.Trim();
-            // Strip outer array brackets if present
-            if (s.StartsWith("[") && s.EndsWith("]"))
-                s = s.Substring(1, s.Length - 2).Trim();
-            // Strip surrounding quotes
-            if (s.Length >= 2 && s[0] == '"' && s[s.Length - 1] == '"')
-                s = s.Substring(1, s.Length - 2);
-            return s;
+            JArray args = ParseArgs(argsJson);
+            return args != null && args.Count > 0
+                ? args[0]?.ToString(Formatting.None) ?? string.Empty
+                : string.Empty;
         }
 
         static object ParseValue(string argsJson)
         {
-            // TODO: real JSON parse
-            return 0L;
+            JArray args = ParseArgs(argsJson);
+            if (args == null || args.Count < 2 || args[1] == null)
+                return null;
+
+            JToken value = args[1];
+            switch (value.Type)
+            {
+                case JTokenType.Integer: return value.Value<long>();
+                case JTokenType.Float:   return value.Value<double>();
+                case JTokenType.Boolean: return value.Value<bool>();
+                case JTokenType.String:  return value.Value<string>();
+                case JTokenType.Null:    return null;
+                default:                 return value.ToString(Formatting.None);
+            }
         }
 
         static int ParseIntArg(string argsJson)
         {
-            // TODO: real JSON parse
-            if (string.IsNullOrEmpty(argsJson)) return 0;
-            var s = argsJson.Trim('[', ']', ' ');
-            int.TryParse(s.Split(',')[0].Trim(), out int v);
-            return v;
+            JArray args = ParseArgs(argsJson);
+            if (args == null || args.Count == 0 || args[0] == null) return 0;
+            return args[0].Type == JTokenType.Integer
+                ? args[0].Value<int>()
+                : int.TryParse(args[0].ToString(), out int value) ? value : 0;
+        }
+
+        static JArray ParseArgs(string argsJson)
+        {
+            if (string.IsNullOrWhiteSpace(argsJson)) return null;
+            try
+            {
+                return JToken.Parse(argsJson) as JArray;
+            }
+            catch
+            {
+                return null;
+            }
         }
 
         // ------------------------------------------------------------------ //
@@ -382,9 +424,7 @@ namespace uEmuera.Runtime.EraElectron
 
         static string SerializeValue(object v)
         {
-            if (v == null) return "null";
-            if (v is string s) return "\"" + s.Replace("\"", "\\\"") + "\"";
-            return v.ToString();
+            return JsonConvert.SerializeObject(v);
         }
 
         static string SerializeBool(bool v) => v ? "true" : "false";

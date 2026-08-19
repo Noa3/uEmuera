@@ -280,7 +280,11 @@ namespace MinorShift.Emuera.GameData
             return false;
         }
 
-        public void Clear() { rows.Clear(); }
+        public void Clear()
+        {
+            rows.Clear();
+            if (cols.Count > 1) cols.RemoveRange(1, cols.Count - 1);
+        }
 
         public Row GetRowById(long id)
         {
@@ -349,6 +353,7 @@ namespace MinorShift.Emuera.GameData
             if (row == null) { error = "row"; return false; }
             if (index < 0) { error = "column"; return false; }
             if (index == 0) { error = "id"; return false; }
+            if (value == null && cols[index].HasDefault) { error = cols[index].Name; return false; }
             object converted;
             if (!TryConvertValue(value, cols[index], out converted)) { error = cols[index].Name; return false; }
             row.Values[index] = converted;
@@ -482,7 +487,7 @@ namespace MinorShift.Emuera.GameData
                     ColDef c = cols[i];
                     writer.WriteStartElement("column");
                     writer.WriteAttributeString("name", c.Name);
-                    writer.WriteAttributeString("type", c.Type.ToString().ToLowerInvariant());
+                    writer.WriteAttributeString("type", ((int)c.Type).ToString(CultureInfo.InvariantCulture));
                     writer.WriteAttributeString("nullable", c.Nullable ? "1" : "0");
                     if (c.HasDefault) writer.WriteAttributeString("default", GetStrValue(c.DefaultValue));
                     writer.WriteEndElement();

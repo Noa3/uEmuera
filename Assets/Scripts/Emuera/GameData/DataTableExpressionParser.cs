@@ -45,6 +45,7 @@ namespace MinorShift.Emuera.GameData
 
         bool Matches(EraDataTable.Row row)
         {
+            position = 0;
             if (tokens.Count == 1) return true;
             bool result = ParseOr(row);
             if (Current().Kind != TokenKind.End) throw new FormatException("Unexpected DataTable filter token: " + Current().Text);

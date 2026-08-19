@@ -274,8 +274,20 @@ namespace MinorShift.Emuera.Compatibility
             GameVirtualFileSystem vfs;
             try { vfs = new GameVirtualFileSystem(dir); }
             catch { return; }
-            into.AddRange(vfs.EnumerateFiles(string.Empty, "*.ERB", true));
-            into.AddRange(vfs.EnumerateFiles(string.Empty, "*.ERH", true));
+            string[] erbFiles = vfs.EnumerateFiles(string.Empty, "*.ERB", true);
+            string[] erhFiles = vfs.EnumerateFiles(string.Empty, "*.ERH", true);
+            for (int i = 0; i < erbFiles.Length; i++)
+            {
+                string fullPath;
+                if (vfs.TryResolve(erbFiles[i], out fullPath) && File.Exists(fullPath))
+                    into.Add(fullPath);
+            }
+            for (int i = 0; i < erhFiles.Length; i++)
+            {
+                string fullPath;
+                if (vfs.TryResolve(erhFiles[i], out fullPath) && File.Exists(fullPath))
+                    into.Add(fullPath);
+            }
         }
 
         static IEnumerable<string> SafeDirectories(string dir)

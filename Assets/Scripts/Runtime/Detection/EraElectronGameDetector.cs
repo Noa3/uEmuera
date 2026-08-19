@@ -57,6 +57,8 @@ namespace uEmuera.Runtime.Detection
         /// </summary>
         static readonly string[] BuiltEntryPoints =
         {
+            "main.bundle.js",
+            Path.Combine("dist", "main.bundle.js"),
             "main.js",
             Path.Combine("dist", "main.js"),
         };

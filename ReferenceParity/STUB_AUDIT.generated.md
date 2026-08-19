@@ -4,8 +4,8 @@
 
 | Classification | Count |
 |---|---:|
-| COMMENT_ONLY | 41 |
-| PLAYER_REACHABLE | 16 |
+| COMMENT_ONLY | 36 |
+| PLAYER_REACHABLE | 18 |
 | TEST_FIXTURE | 4 |
 
 | File | Line | Kind | Classification | Evidence |
@@ -32,26 +32,23 @@
 | `Assets/Scripts/Emuera/Sub/EraEncoding.cs` | 190 | `NotSupportedException` | `PLAYER_REACHABLE` | `catch (Exception ex) when (ex is ArgumentException \|\| ex is IOException \|\| ex is NotSupportedException)` |
 | `Assets/Scripts/Emuera/Sub/LexicalAnalyzer.cs` | 116 | `TODO` | `COMMENT_ONLY` | `//		double d = Convert.ToDouble(numstr);` |
 | `Assets/Scripts/Emuera/Sub/LexicalAnalyzer.cs` | 313 | `TODO` | `PLAYER_REACHABLE` | `return Convert.ToDouble(st.Substring(start, st.CurrentPosition - start));` |
-| `Assets/Scripts/FirstWindow.cs` | 616 | `NotSupportedException` | `PLAYER_REACHABLE` | `string userMsg = ex is System.NotSupportedException` |
+| `Assets/Scripts/FirstWindow.cs` | 617 | `NotSupportedException` | `PLAYER_REACHABLE` | `string userMsg = ex is System.NotSupportedException` |
 | `Assets/Scripts/GameDiscovery.cs` | 132 | `NotSupportedException` | `PLAYER_REACHABLE` | `catch (NotSupportedException)` |
 | `Assets/Scripts/GenericUtils.cs` | 1031 | `NotSupportedException` | `PLAYER_REACHABLE` | `catch (NotSupportedException)` |
 | `Assets/Scripts/GenericUtils.cs` | 1089 | `NotSupportedException` | `PLAYER_REACHABLE` | `catch (NotSupportedException)` |
 | `Assets/Scripts/MathUtilities.cs` | 116 | `NotImplementedException` | `PLAYER_REACHABLE` | `throw new NotImplementedException("Binary search requires NativeArray-based line storage");` |
-| `Assets/Scripts/Runtime/EraElectron/EreApiDispatcher.cs` | 21 | `NotImplementedException` | `COMMENT_ONLY` | `/// All methods return placeholder values or throw NotImplementedException.` |
-| `Assets/Scripts/Runtime/EraElectron/EreApiDispatcher.cs` | 66 | `NotImplementedException` | `PLAYER_REACHABLE` | `catch (NotImplementedException)` |
-| `Assets/Scripts/Runtime/EraElectron/EreApiDispatcher.cs` | 255 | `TODO` | `COMMENT_ONLY` | `// TODO: present to player, await input, resolve with player value` |
-| `Assets/Scripts/Runtime/EraElectron/EreApiDispatcher.cs` | 338 | `TODO` | `COMMENT_ONLY` | `//  Argument parsing helpers (TODO: replace with proper JSON parser)   //` |
-| `Assets/Scripts/Runtime/EraElectron/EreApiDispatcher.cs` | 364 | `TODO` | `COMMENT_ONLY` | `// TODO: real JSON parse` |
-| `Assets/Scripts/Runtime/EraElectron/EreApiDispatcher.cs` | 370 | `TODO` | `COMMENT_ONLY` | `// TODO: real JSON parse` |
+| `Assets/Scripts/Runtime/EraElectron/EreApiDispatcher.cs` | 23 | `NotImplementedException` | `COMMENT_ONLY` | `/// All methods return placeholder values or throw NotImplementedException.` |
+| `Assets/Scripts/Runtime/EraElectron/EreApiDispatcher.cs` | 68 | `NotImplementedException` | `PLAYER_REACHABLE` | `catch (NotImplementedException)` |
+| `Assets/Scripts/Runtime/EraElectron/EreApiDispatcher.cs` | 276 | `TODO` | `COMMENT_ONLY` | `// TODO: present to player, await input, resolve with player value` |
 | `Assets/Scripts/Runtime/EraElectron/EreDataModel.cs` | 467 | `TODO` | `COMMENT_ONLY` | `// TODO: replace with a proper JSON parser (JsonUtility, etc.)` |
-| `Assets/Scripts/Runtime/EraElectron/PlatformWebViewBridge.cs` | 23 | `NotSupportedException` | `COMMENT_ONLY` | `/// and throws <see cref="NotSupportedException"/> on StartAsync so the launcher` |
-| `Assets/Scripts/Runtime/EraElectron/PlatformWebViewBridge.cs` | 64 | `TODO` | `COMMENT_ONLY` | `// TODO (Milestone 13): locate and launch official EraElectron sidecar.` |
-| `Assets/Scripts/Runtime/EraElectron/PlatformWebViewBridge.cs` | 120 | `NotSupportedException` | `COMMENT_ONLY` | `/// clear <see cref="NotSupportedException"/> on <see cref="LoadGameAsync"/> so` |
-| `Assets/Scripts/Runtime/EraElectron/PlatformWebViewBridge.cs` | 164 | `NotSupportedException` | `COMMENT_ONLY` | `// Surface as NotSupportedException so EraElectronRuntime propagates` |
-| `Assets/Scripts/Runtime/EraElectron/PlatformWebViewBridge.cs` | 166 | `NotSupportedException` | `PLAYER_REACHABLE` | `throw new NotSupportedException(` |
-| `Assets/Scripts/Runtime/EraElectronRuntime.cs` | 14 | `NotImplementedException` | `COMMENT_ONLY` | `///   - All era.* API calls return NotImplementedException stubs.` |
-| `Assets/Scripts/Runtime/EraElectronRuntime.cs` | 116 | `NotSupportedException` | `COMMENT_ONLY` | `// NullHost throws NotSupportedException (surfaced as error dialog).` |
-| `Assets/Scripts/Runtime/GameRuntimeManager.cs` | 174 | `NotSupportedException` | `PLAYER_REACHABLE` | `throw new NotSupportedException(` |
+| `Assets/Scripts/Runtime/EraElectron/PlatformWebViewBridge.cs` | 25 | `NotSupportedException` | `COMMENT_ONLY` | `/// and throws <see cref="NotSupportedException"/> on StartAsync so the launcher` |
+| `Assets/Scripts/Runtime/EraElectron/PlatformWebViewBridge.cs` | 156 | `NotSupportedException` | `PLAYER_REACHABLE` | `throw new NotSupportedException(` |
+| `Assets/Scripts/Runtime/EraElectron/PlatformWebViewBridge.cs` | 236 | `NotSupportedException` | `PLAYER_REACHABLE` | `throw new NotSupportedException(` |
+| `Assets/Scripts/Runtime/EraElectron/PlatformWebViewBridge.cs` | 339 | `NotSupportedException` | `COMMENT_ONLY` | `/// clear <see cref="NotSupportedException"/> on <see cref="LoadGameAsync"/> so` |
+| `Assets/Scripts/Runtime/EraElectron/PlatformWebViewBridge.cs` | 383 | `NotSupportedException` | `COMMENT_ONLY` | `// Surface as NotSupportedException so EraElectronRuntime propagates` |
+| `Assets/Scripts/Runtime/EraElectron/PlatformWebViewBridge.cs` | 385 | `NotSupportedException` | `PLAYER_REACHABLE` | `throw new NotSupportedException(` |
+| `Assets/Scripts/Runtime/EraElectronRuntime.cs` | 15 | `NotSupportedException` | `COMMENT_ONLY` | `/// currently surface a clear <see cref="NotSupportedException"/> through the` |
+| `Assets/Scripts/Runtime/GameRuntimeManager.cs` | 188 | `NotSupportedException` | `PLAYER_REACHABLE` | `throw new NotSupportedException(` |
 | `Assets/Scripts/SpriteManager.cs` | 758 | `TODO` | `COMMENT_ONLY` | `//Todo: ??????` |
 | `Assets/Scripts/uEmuera/Forms.cs` | 170 | `TODO` | `COMMENT_ONLY` | `//todo` |
 | `Assets/Scripts/uEmuera/Forms.cs` | 196 | `Point.Empty` | `PLAYER_REACHABLE` | `return mousePosition is Point point ? point : Point.Empty;` |

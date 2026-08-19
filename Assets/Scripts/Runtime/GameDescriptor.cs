@@ -159,6 +159,12 @@ namespace uEmuera.Runtime
         public string EraElectronHostMode { get; set; }
 
         /// <summary>
+        /// Optional absolute path to the official EraElectron executable used by
+        /// OfficialSidecar mode. Null uses the configured environment/default paths.
+        /// </summary>
+        public string EraElectronExecutablePath { get; set; }
+
+        /// <summary>
         /// Emuera boot strategy override.
         /// Null = use global default (currently Auto→Safe).
         /// </summary>

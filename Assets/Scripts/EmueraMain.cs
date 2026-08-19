@@ -134,6 +134,9 @@ public class EmueraMain : MonoBehaviour
     
     void Update()
     {
+        // Apply staged loading-file status on the Unity main thread every frame.
+        GenericUtils.PumpLoadingStatus();
+
         if(restart)
         {
             Restart();

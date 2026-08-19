@@ -105,7 +105,12 @@ namespace uEmuera.Runtime.EraElectron
         {
             if (string.IsNullOrEmpty(gameRoot))
                 throw new ArgumentNullException(nameof(gameRoot));
-            GameRoot  = Path.GetFullPath(gameRoot);
+            string fullRoot = Path.GetFullPath(gameRoot);
+            GameRoot = fullRoot.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+            if (GameRoot.Length == 0)
+                GameRoot = Path.DirectorySeparatorChar.ToString();
+            else if (GameRoot.EndsWith(":", StringComparison.Ordinal))
+                GameRoot += Path.DirectorySeparatorChar;
             _bridgeJs = bridgeJs ?? string.Empty;
             Token     = Guid.NewGuid().ToString("N");
         }
@@ -211,7 +216,11 @@ namespace uEmuera.Runtime.EraElectron
 
                 // Canonicalise and block path traversal
                 string fullPath = Path.GetFullPath(Path.Combine(GameRoot, relPath));
-                if (!fullPath.StartsWith(GameRoot, StringComparison.OrdinalIgnoreCase))
+                string rootPrefix = GameRoot.EndsWith(Path.DirectorySeparatorChar.ToString(), StringComparison.Ordinal)
+                    ? GameRoot
+                    : GameRoot + Path.DirectorySeparatorChar;
+                if (!string.Equals(fullPath, GameRoot, StringComparison.OrdinalIgnoreCase) &&
+                    !fullPath.StartsWith(rootPrefix, StringComparison.OrdinalIgnoreCase))
                 {
                     Respond(res, 403, "text/plain", "Forbidden");
                     return;
@@ -258,34 +267,82 @@ namespace uEmuera.Runtime.EraElectron
         /// </summary>
         string BuildLoaderHtml()
         {
-            string entryUrl = ResolveEntryUrl();
             var sb = new StringBuilder();
             sb.Append("<!DOCTYPE html><html><head>");
             sb.Append("<meta charset=\"utf-8\">");
             sb.Append("<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">");
             sb.Append("<title>uEmuera EraElectron</title>");
-            sb.Append("</head><body><script>\n");
-            // 1. Load era.* bridge
-            sb.Append($"var s1=document.createElement('script');s1.src='{BaseUrl}/bridge.js';\n");
-            sb.Append($"s1.onload=function(){{");
-            // 2. After bridge loads, load game entry
-            sb.Append($"var s2=document.createElement('script');s2.src='{entryUrl}';\n");
-            sb.Append("document.head.appendChild(s2);");
-            sb.Append("};document.head.appendChild(s1);\n");
+            sb.Append("</head><body><div id=\"uemuera-load-error\"></div><script>\n");
+            sb.Append("function post(v){if(window.chrome&&window.chrome.webview)window.chrome.webview.postMessage(JSON.stringify(v));}\n");
+            sb.Append("function fail(e){var m=(e&&e.message)||String(e);document.getElementById('uemuera-load-error').textContent=m;post({type:'uemuera-load-error',error:m});}\n");
+            sb.Append("function ready(){post({type:'uemuera-ready'});}\n");
+            sb.Append("function run(entry){if(entry&&typeof entry.default==='function')entry=entry.default;if(typeof entry!=='function'){fail(new Error('ERE entry point did not export a function'));return;}Promise.resolve().then(function(){return entry();}).then(ready,fail);}\n");
+            sb.Append("function load(src,next){var s=document.createElement('script');s.src=src;s.onload=next;s.onerror=function(){fail(new Error('Failed to load '+src));};document.head.appendChild(s);}\n");
+            sb.Append("window.addEventListener('unhandledrejection',function(e){fail(e.reason);});\n");
+
+            string eraUrl, mainUrl;
+            if (!TryResolveBundleUrls(out eraUrl, out mainUrl))
+            {
+                string sourcePath = File.Exists(Path.Combine(GameRoot, "ere", "main.js"))
+                    ? "ere/main.js"
+                    : File.Exists(Path.Combine(GameRoot, "main.js")) ? "main.js" : null;
+                if (sourcePath == null)
+                {
+                    sb.Append("fail(new Error('ERE package has no main entry point.'));\n");
+                }
+                else
+                {
+                    string sourceUrl = $"{BaseUrl}/game/{sourcePath}";
+                    sb.Append($"load('{BaseUrl}/bridge.js',function(){{");
+                    sb.Append("window.module={exports:{}};window.exports=window.module.exports;");
+                    sb.Append("window.require=function(id){if(id==='#/era-electron')return window.era;throw new Error('Source module requires a compiled bundle: '+id);};");
+                    sb.Append($"load('{sourceUrl}',function(){{run(window.module.exports);}});");
+                    sb.Append("});\n");
+                }
+            }
+            else
+            {
+                string staticUrl = ResolveOptionalBundleUrl("static.bundle.js");
+                sb.Append($"load('{eraUrl}',function(){{load('{BaseUrl}/bridge.js',function(){{");
+                if (!string.IsNullOrEmpty(staticUrl))
+                    sb.Append($"load('{staticUrl}',function(){{");
+                sb.Append($"load('{mainUrl}',function(){{run(window.game);}});");
+                if (!string.IsNullOrEmpty(staticUrl)) sb.Append("});");
+                sb.Append("});});\n");
+            }
             sb.Append("</script></body></html>");
             return sb.ToString();
         }
 
-        string ResolveEntryUrl()
+        bool TryResolveBundleUrls(out string eraUrl, out string mainUrl)
         {
-            // Prefer ere/main.js (source layout verified in EraUma 3.0)
-            if (File.Exists(Path.Combine(GameRoot, "ere", "main.js")))
-                return $"{BaseUrl}/game/ere/main.js";
-            if (File.Exists(Path.Combine(GameRoot, "main.js")))
-                return $"{BaseUrl}/game/main.js";
-            if (File.Exists(Path.Combine(GameRoot, "dist", "main.js")))
-                return $"{BaseUrl}/game/dist/main.js";
-            return $"{BaseUrl}/game/main.js"; // fallback
+            string[][] candidates =
+            {
+                new[] { "era.bundle.js", "main.bundle.js" },
+                new[] { "dist/era.bundle.js", "dist/main.bundle.js" },
+            };
+            foreach (var pair in candidates)
+            {
+                if (File.Exists(Path.Combine(GameRoot, pair[0])) &&
+                    File.Exists(Path.Combine(GameRoot, pair[1])))
+                {
+                    eraUrl = $"{BaseUrl}/game/{pair[0]}";
+                    mainUrl = $"{BaseUrl}/game/{pair[1]}";
+                    return true;
+                }
+            }
+            eraUrl = null;
+            mainUrl = null;
+            return false;
+        }
+
+        string ResolveOptionalBundleUrl(string fileName)
+        {
+            if (File.Exists(Path.Combine(GameRoot, fileName)))
+                return $"{BaseUrl}/game/{fileName}";
+            if (File.Exists(Path.Combine(GameRoot, "dist", fileName)))
+                return $"{BaseUrl}/game/dist/{fileName}";
+            return null;
         }
 
         static void Respond(HttpListenerResponse res, int code, string contentType, string body)

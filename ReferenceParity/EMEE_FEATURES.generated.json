@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "generated_at": "2025-11-14T20:59:19+09:00",
-  "uemuera_revision": "15782fec13cb5ab71fadb72fdc829bac8a128efe",
+  "uemuera_revision": "1323223cc3b42721fff63ec8b07c01216c0c5852",
   "reference": {
     "schema_version": 1,
     "repository": "https://gitlab.com/EvilMask/emuera.em",
@@ -2248,7 +2248,7 @@
     }
   ],
   "stub_audit": {
-    "count": 61,
-    "player_reachable": 16
+    "count": 58,
+    "player_reachable": 18
   }
 }

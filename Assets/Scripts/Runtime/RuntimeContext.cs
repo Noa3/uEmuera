@@ -107,4 +107,21 @@ namespace uEmuera.Runtime
     {
         void Post(Action action);
     }
+
+    /// <summary>Unity-backed dispatcher used by the launcher runtime context.</summary>
+    public sealed class UnityRuntimeMainThreadDispatcher : IMainThreadDispatcher
+    {
+        public UnityRuntimeMainThreadDispatcher()
+        {
+            // Constructed by the launcher on Unity's main thread before the
+            // WebView2 STA can emit bridge callbacks.
+            _ = uEmuera.Async.UnityMainThreadDispatcher.Instance;
+        }
+
+        public void Post(Action action)
+        {
+            if (action == null) return;
+            uEmuera.Async.UnityMainThreadDispatcher.Enqueue(action);
+        }
+    }
 }

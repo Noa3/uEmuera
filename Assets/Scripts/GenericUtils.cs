@@ -935,19 +935,30 @@ public static class GenericUtils
 
     /// <summary>
     /// Applies the most recently staged loading status to the Unity UI. MUST be called
-    /// from the Unity main thread (pumped once per frame by SpriteManager). Coalesces
+    /// from the Unity main thread (pumped once per frame by EmueraMain). Coalesces
     /// bursts so only the latest value is applied per frame.
     /// </summary>
     public static void PumpLoadingStatus()
     {
         string status;
-        lock (loading_status_lock_)
+        if (!LoadedFileTracker.TryGetLiveStatus(out status))
         {
-            if (!loading_status_dirty_)
-                return;
-            status = loading_status_pending_;
-            loading_status_dirty_ = false;
+            lock (loading_status_lock_)
+            {
+                if (!loading_status_dirty_)
+                    return;
+                status = loading_status_pending_;
+                loading_status_dirty_ = false;
+            }
         }
+        else
+        {
+            lock (loading_status_lock_)
+            {
+                loading_status_dirty_ = false;
+            }
+        }
+
         var tc = text_content;
         if (tc != null && tc.option_window != null)
             tc.option_window.SetLoadingStatus(status);
@@ -1004,6 +1015,7 @@ public static class LoadedFileTracker
             ordered.Clear();
             reportTaken = false;
         }
+        GenericUtils.SetLoadingStatus("Loading files (0):\n- waiting for first file");
     }
 
     public static void Track(string path)
@@ -1011,6 +1023,7 @@ public static class LoadedFileTracker
         if (string.IsNullOrWhiteSpace(path))
             return;
 
+        string liveStatus = null;
         try
         {
             string fullPath = Path.GetFullPath(path);
@@ -1020,7 +1033,9 @@ public static class LoadedFileTracker
                 if (string.IsNullOrEmpty(displayPath) || !seen.Add(displayPath))
                     return;
                 ordered.Add(displayPath);
+                liveStatus = BuildLiveStatusLocked();
             }
+            GenericUtils.SetLoadingStatus(liveStatus);
         }
         catch (ArgumentException)
         {
@@ -1031,6 +1046,55 @@ public static class LoadedFileTracker
         catch (NotSupportedException)
         {
         }
+    }
+
+    /// <summary>
+    /// Returns a compact, thread-safe status for the in-progress loading indicator.
+    /// The full list remains available through TryTakeReport after initialization.
+    /// </summary>
+    public static bool TryGetLiveStatus(out string status)
+    {
+        lock (sync)
+        {
+            if (reportTaken)
+            {
+                status = null;
+                return false;
+            }
+            if (ordered.Count == 0)
+            {
+                status = "Loading files (0):\n- waiting for first file";
+                return true;
+            }
+            status = BuildLiveStatusLocked();
+            return true;
+        }
+    }
+
+    static string BuildLiveStatusLocked()
+    {
+        var builder = new StringBuilder();
+        builder.Append("Loading files (");
+        builder.Append(ordered.Count);
+        builder.AppendLine("):");
+
+        int first = Math.Max(0, ordered.Count - 3);
+        if (first > 0)
+            builder.AppendLine("...");
+        for (int i = first; i < ordered.Count; ++i)
+        {
+            builder.Append("- ");
+            builder.AppendLine(ShortenLivePath(ordered[i]));
+        }
+        return builder.ToString();
+    }
+
+    static string ShortenLivePath(string path)
+    {
+        const int maxLength = 72;
+        if (path == null || path.Length <= maxLength)
+            return path ?? string.Empty;
+        return "..." + path.Substring(path.Length - (maxLength - 3));
     }
 
     public static bool TryTakeReport(out string report)

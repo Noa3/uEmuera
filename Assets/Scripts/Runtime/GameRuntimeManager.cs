@@ -68,13 +68,14 @@ namespace uEmuera.Runtime
             if (game == null) throw new ArgumentNullException(nameof(game));
 
             await _lock.WaitAsync(cancellationToken);
+            IGameRuntime runtime = null;
             try
             {
                 // Stop whatever is running first.
                 await StopCurrentInternalAsync();
 
                 // Create the new runtime.
-                IGameRuntime runtime = CreateRuntime(game, context);
+                runtime = CreateRuntime(game, context);
 
                 context?.Logger?.Info(
                     $"[GameRuntimeManager] Launching {game.Title} " +
@@ -95,6 +96,19 @@ namespace uEmuera.Runtime
                 // Ensure a faulted runtime is not left as current.
                 _current     = null;
                 _currentGame = null;
+                // LaunchAsync assigns _current only after StartAsync succeeds,
+                // so a partial startup must be disposed through the local value.
+                // Otherwise a failed EraElectron host can leak its loopback server
+                // and WebView2 STA thread.
+                if (runtime != null)
+                {
+                    try { runtime.Dispose(); }
+                    catch (Exception cleanupError)
+                    {
+                        context?.Logger?.Warn(
+                            $"[GameRuntimeManager] Failed to clean up faulted runtime: {cleanupError.Message}");
+                    }
+                }
                 throw;
             }
             finally

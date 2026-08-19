@@ -46,6 +46,32 @@ namespace uEmuera.Tests.EditMode
         }
 
         [Test]
+        public void Build_WiresWebView2SynchronousHostObject()
+        {
+            Assert.IsTrue(_js.Contains("chrome.webview.hostObjects.sync.eraNative"),
+                "Sync ERA APIs must use WebView2's synchronous host-object proxy.");
+            Assert.IsTrue(_js.Contains("DispatchSync"),
+                "The generated bridge must call the native DispatchSync entry point.");
+        }
+
+        [Test]
+        public void Build_WiresAsyncWebMessagePromises()
+        {
+            Assert.IsTrue(_js.Contains("_wv.postMessage"),
+                "Async ERA APIs must post a message to the WebView2 host.");
+            Assert.IsTrue(_js.Contains("window._eraResolve"));
+            Assert.IsTrue(_js.Contains("window._eraReject"));
+        }
+
+        [Test]
+        public void Build_MergesBridgeIntoSdkObject()
+        {
+            Assert.IsTrue(_js.Contains("window._era"));
+            Assert.IsTrue(_js.Contains("Object.keys"),
+                "The bridge must preserve SDK helpers while overriding native API methods.");
+        }
+
+        [Test]
         public void Build_DefinesEraObject()
         {
             Assert.IsTrue(_js.Contains("window.era="), "era object must be on window");
@@ -171,6 +197,37 @@ namespace uEmuera.Tests.EditMode
         {
             Assert.IsTrue(_js.Contains("_uEmuera:true"),
                 "_uEmuera sentinel lets game JS detect uEmuera host if needed");
+        }
+
+        [Test]
+        public void Build_DefinesBrowserRenderer()
+        {
+            Assert.IsTrue(_js.Contains("uemuera-output"));
+            Assert.IsTrue(_js.Contains("_gridElement"));
+            Assert.IsTrue(_js.Contains("printMultiColumns"));
+        }
+
+        [Test]
+        public void Build_UsesTwentyFourColumnLayout()
+        {
+            Assert.IsTrue(_js.Contains("repeat(24,minmax(0,1fr))"));
+            Assert.IsTrue(_js.Contains("gridColumn"));
+        }
+
+        [Test]
+        public void Build_MapsImageAnchorsAndFit()
+        {
+            Assert.IsTrue(_js.Contains("bottomright:'right bottom'"));
+            Assert.IsTrue(_js.Contains("objectPosition"));
+            Assert.IsTrue(_js.Contains("backgroundPosition"));
+        }
+
+        [Test]
+        public void Build_ProvidesInteractiveInput()
+        {
+            Assert.IsTrue(_js.Contains("_supplyInput"));
+            Assert.IsTrue(_js.Contains("uemuera-input"));
+            Assert.IsTrue(_js.Contains("waitAnyKey"));
         }
     }
 }

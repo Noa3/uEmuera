@@ -1176,7 +1176,6 @@ internal static class SpriteManager
         while(true)
         {
             AppContents.ExecutePendingGraphicsOps();
-            GenericUtils.PumpLoadingStatus();
             yield return null;
         }
     }

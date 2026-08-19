@@ -156,16 +156,17 @@ public class FirstWindow : MonoBehaviour
     }
     
 #if UNITY_ANDROID && !UNITY_EDITOR
+    bool androidHadStoragePermission_;
+
     /// <summary>
     /// Initializes Android storage access with proper permission handling.
     /// Checks for storage permissions and requests them if not granted.
     /// </summary>
     IEnumerator InitAndroidStorage()
     {
-        // Check if we already have permissions
-        if (AndroidPermissionManager.HasStoragePermissions())
+        androidHadStoragePermission_ = AndroidPermissionManager.HasStoragePermissions();
+        if (androidHadStoragePermission_)
         {
-            // Permissions already granted, load game list
             LoadAndroidGameList();
             yield break;
         }
@@ -269,10 +270,25 @@ public class FirstWindow : MonoBehaviour
     /// </summary>
     void LoadAndroidGameList()
     {
+        string customDir = PlayerPrefs.GetString(CUSTOM_DIR_KEY, "");
+        if(!string.IsNullOrEmpty(customDir) && uEmuera.Utils.DirectoryExistsInsensitive(customDir))
+            GetList(uEmuera.Utils.NormalizeExistingDirectoryPath(customDir));
+
         foreach (var path in AndroidStoragePaths)
         {
             GetList(path);
         }
+    }
+
+    void OnApplicationFocus(bool hasFocus)
+    {
+        if(!hasFocus)
+            return;
+
+        bool hasPermission = AndroidPermissionManager.HasStoragePermissions();
+        if(hasPermission && !androidHadStoragePermission_)
+            RefreshGameList();
+        androidHadStoragePermission_ = hasPermission;
     }
 #endif
     
@@ -307,6 +323,10 @@ public class FirstWindow : MonoBehaviour
             return;
             
         string currentDir = PlayerPrefs.GetString(CUSTOM_DIR_KEY, "");
+#if UNITY_ANDROID && !UNITY_EDITOR
+        if(string.IsNullOrEmpty(currentDir))
+            currentDir = AndroidStoragePaths[0];
+#endif
         ow.ShowDirectoryInputBox(currentDir, OnDirectorySet);
     }
     
@@ -601,6 +621,7 @@ public class FirstWindow : MonoBehaviour
         {
             SessionId = System.Guid.NewGuid().ToString("N"),
             Logger    = new uEmuera.Runtime.UnityRuntimeLogger("[EraElectron]"),
+            MainThread = new uEmuera.Runtime.UnityRuntimeMainThreadDispatcher(),
         };
 
         var task = uEmuera.Runtime.GameRuntimeManager.Instance

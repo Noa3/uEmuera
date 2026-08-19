@@ -536,7 +536,7 @@ namespace uEmuera
         {
             if(content_files != null)
                 return content_files;
-            content_files = new Dictionary<string, string>();
+            content_files = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
             var contentdir = MinorShift._Library.Sys.ExeDir + "resources/";
             if(!Directory.Exists(contentdir))
@@ -560,9 +560,18 @@ namespace uEmuera
             for(int i=0; i<filecount; ++i)
             {
                 var filename = bmpfilelist[i];
-                string name = Path.GetFileName(filename).ToUpper();
-                if (!content_files.ContainsKey(name))
-                    content_files.Add(name, filename);
+                string name = Path.GetFileName(filename).ToUpperInvariant();
+                if (content_files.TryGetValue(name, out var existingFilename))
+                {
+                    if (!string.Equals(existingFilename, filename, StringComparison.OrdinalIgnoreCase))
+                    {
+                        UnityEngine.Debug.LogWarning(
+                            $"Utils.GetContentFiles: duplicate image key '{name}'. " +
+                            $"Keeping '{existingFilename}' and ignoring '{filename}'.");
+                    }
+                    continue;
+                }
+                content_files.Add(name, filename);
             }
             return content_files;
         }

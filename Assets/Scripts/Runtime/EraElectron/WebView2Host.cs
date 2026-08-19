@@ -57,18 +57,19 @@ namespace uEmuera.Runtime.EraElectron
         CoreWebView2Environment    _env;
         CoreWebView2Controller     _controller;
         CoreWebView2               _webView;
+        SyncBridgeHostObject       _syncBridge;
 
         Thread  _staThread;
         string  _dataDirPath;   // captured on Unity main thread before STA start
-        volatile bool _running = true;
+        volatile bool _running;
         IntPtr        _nativeHwnd;
-        volatile bool _webViewReady;
         TaskCompletionSource<bool> _initTcs;
         TaskCompletionSource<bool> _loadTcs;
 
-        // Pending JS-to-C# calls (from WV2 thread → resolved on same thread)
-        readonly ConcurrentQueue<(int id, string method, string argsJson, bool isAsync)> _pendingCalls
-            = new ConcurrentQueue<(int, string, string, bool)>();
+        readonly ConcurrentQueue<Action> _callbacks = new ConcurrentQueue<Action>();
+        static readonly ConcurrentDictionary<IntPtr, WebView2Host> HostsByWindow =
+            new ConcurrentDictionary<IntPtr, WebView2Host>();
+        static readonly WndProcDelegate WindowProcedure = WindowProc;
 
         static readonly HostCapabilities _defaultCaps = new HostCapabilities
         {
@@ -89,26 +90,29 @@ namespace uEmuera.Runtime.EraElectron
             IEraNativeBridge  bridge,
             CancellationToken cancellationToken = default)
         {
-            _game      = game;
-            _bridge    = bridge;
-            _initTcs   = new TaskCompletionSource<bool>();
+            if (UnityEngine.Application.isEditor)
+                throw new NotSupportedException(
+                    "In-process WebView2 is disabled in Unity Editor because native " +
+                    "initialization can terminate the Editor. Use OfficialSidecar or " +
+                    "a Windows standalone player.");
+
+            _game      = game ?? throw new ArgumentNullException(nameof(game));
+            _bridge    = bridge ?? throw new ArgumentNullException(nameof(bridge));
+            _initTcs   = new TaskCompletionSource<bool>(
+                TaskCreationOptions.RunContinuationsAsynchronously);
 
             cancellationToken.ThrowIfCancellationRequested();
 
-            // Register this host so the static WndProc can dispatch callbacks to it.
-            _allHosts.Add(this);
-
-            // Capture Unity main-thread-only path BEFORE starting the STA thread.
             _dataDirPath = System.IO.Path.Combine(
                 UnityEngine.Application.temporaryCachePath, "WebView2Data");
 
-            // Start STA thread that owns WebView2
+            _running = true;
             _staThread = new Thread(StaThreadProc) { IsBackground = true, Name = "WebView2STA" };
             _staThread.SetApartmentState(ApartmentState.STA);
             _staThread.Start();
 
-            // Wait for the WV2 environment to be ready (or fail)
-            await _initTcs.Task;
+            using (cancellationToken.Register(() => _initTcs.TrySetCanceled(cancellationToken)))
+                await _initTcs.Task;
 
             _caps = new HostCapabilities
             {
@@ -131,57 +135,124 @@ namespace uEmuera.Runtime.EraElectron
         {
             if (_env == null)
                 throw new InvalidOperationException("[WebView2Host] Not initialized.");
+            if (string.IsNullOrWhiteSpace(gameOriginUrl))
+                throw new ArgumentException("Game origin URL is required.", nameof(gameOriginUrl));
 
-            _startUrl = gameOriginUrl + "/index.html";
-            _loadTcs  = new TaskCompletionSource<bool>();
+            cancellationToken.ThrowIfCancellationRequested();
+            _startUrl = gameOriginUrl.TrimEnd('/') + "/index.html";
+            _loadTcs  = new TaskCompletionSource<bool>(
+                TaskCreationOptions.RunContinuationsAsynchronously);
 
-            // Post CreateController to run on the STA thread via a Windows message.
-            PostCallback(CreateController);
+            if (!PostCallback(CreateController))
+                throw new InvalidOperationException(
+                    "[WebView2Host] STA message window is not available.");
 
-            await _loadTcs.Task;
+            using (cancellationToken.Register(() => _loadTcs.TrySetCanceled(cancellationToken)))
+                await _loadTcs.Task;
             UnityEngine.Debug.Log("[WebView2Host] Game JS loaded.");
         }
 
         public void Show()
         {
             if (_controller != null)
-                PostCallback(() => { try { _controller.IsVisible = true; } catch { } });
+                PostCallback(() =>
+                {
+                    try
+                    {
+                        ShowWindow(_nativeHwnd, 5);
+                        _controller.IsVisible = true;
+                    }
+                    catch { }
+                });
         }
 
         public void Hide()
         {
             if (_controller != null)
-                PostCallback(() => { try { _controller.IsVisible = false; } catch { } });
+                PostCallback(() =>
+                {
+                    try
+                    {
+                        _controller.IsVisible = false;
+                        ShowWindow(_nativeHwnd, 0);
+                    }
+                    catch { }
+                });
         }
 
         public async Task StopAsync()
         {
-            _running = false;
-            PostCallback(() =>
+            if (!_running && (_staThread == null || !_staThread.IsAlive))
+                return;
+
+            var stopTcs = new TaskCompletionSource<bool>(
+                TaskCreationOptions.RunContinuationsAsynchronously);
+            if (!PostCallback(() =>
             {
-                try { _controller?.Close(); } catch { }
-                // WM_QUIT will stop RunMessageLoopUntil
-                PostMessage(_nativeHwnd, 0x0012 /* WM_QUIT */, IntPtr.Zero, IntPtr.Zero);
-            });
-            await Task.Delay(300);
+                try
+                {
+                    if (_webView != null)
+                    {
+                        _webView.WebMessageReceived -= OnWebMessageReceived;
+                        _webView.NavigationStarting -= OnNavigationStarting;
+                        _webView.DOMContentLoaded -= OnDomContentLoaded;
+                        try { _webView.RemoveHostObjectFromScript("eraNative"); } catch { }
+                    }
+                    _syncBridge = null;
+                    _controller?.Close();
+                }
+                finally
+                {
+                    _controller = null;
+                    _webView = null;
+                    _running = false;
+                    stopTcs.TrySetResult(true);
+                }
+            }))
+            {
+                _running = false;
+                stopTcs.TrySetResult(true);
+            }
+
+            Task completed = await Task.WhenAny(stopTcs.Task, Task.Delay(2000));
+            if (completed != stopTcs.Task)
+                UnityEngine.Debug.LogWarning("[WebView2Host] Timed out while stopping the STA host.");
+
+            if (_staThread != null && _staThread.IsAlive)
+                _staThread.Join(2000);
+            _staThread = null;
         }
 
         public async Task<string> EvaluateJsAsync(string js)
         {
-            if (_webView == null) return "null";
-            var tcs = new TaskCompletionSource<string>();
-            PostCallback(async () =>
+            if (_webView == null || !_running) return "null";
+            var tcs = new TaskCompletionSource<string>(
+                TaskCreationOptions.RunContinuationsAsynchronously);
+            if (!PostCallback(() =>
             {
-                try   { tcs.SetResult(await _webView.ExecuteScriptAsync(js)); }
-                catch { tcs.SetResult("null"); }
-            });
+                try
+                {
+                    _ = _webView.ExecuteScriptAsync(js).ContinueWith(task =>
+                    {
+                        try { tcs.TrySetResult(task.GetAwaiter().GetResult()); }
+                        catch { tcs.TrySetResult("null"); }
+                    }, CancellationToken.None, TaskContinuationOptions.ExecuteSynchronously,
+                        TaskScheduler.Default);
+                }
+                catch { tcs.TrySetResult("null"); }
+            }))
+                return "null";
             return await tcs.Task;
         }
 
         public void Dispose()
         {
-            _running = false;
-            try { PostMessage(_nativeHwnd, 0x0012 /* WM_QUIT */, IntPtr.Zero, IntPtr.Zero); } catch { }
+            try { StopAsync().GetAwaiter().GetResult(); }
+            catch (Exception ex)
+            {
+                UnityEngine.Debug.LogWarning("[WebView2Host] Dispose failed: " + ex.Message);
+                _running = false;
+            }
         }
 
         // ------------------------------------------------------------------ //
@@ -203,6 +274,7 @@ namespace uEmuera.Runtime.EraElectron
                         Marshal.GetLastWin32Error()));
                     return;
                 }
+                HostsByWindow[_nativeHwnd] = this;
 
                 // Create WebView2 environment.  This is async-over-native: it starts
                 // the Edge process and completes via PostMessage to our HWND.
@@ -234,38 +306,32 @@ namespace uEmuera.Runtime.EraElectron
             {
                 if (_nativeHwnd != IntPtr.Zero)
                 {
+                    HostsByWindow.TryRemove(_nativeHwnd, out _);
                     try { DestroyWindow(_nativeHwnd); } catch { }
                     _nativeHwnd = IntPtr.Zero;
                 }
+                _running = false;
             }
         }
-
-        volatile bool _running = true;
-        IntPtr        _nativeHwnd;
 
         const string WC_CLASS = "uEmueraWV2Host";
 
         IntPtr CreateMessageWindow()
         {
-            // Register a minimal window class.
             WNDCLASSEX wc = new WNDCLASSEX
             {
                 cbSize        = Marshal.SizeOf<WNDCLASSEX>(),
-                lpfnWndProc   = Marshal.GetFunctionPointerForDelegate(
-                                    (WndProcDelegate)DefWindowProcWrapper),
+                lpfnWndProc   = Marshal.GetFunctionPointerForDelegate(WindowProcedure),
                 lpszClassName = WC_CLASS,
                 hInstance     = GetModuleHandle(null),
             };
-            RegisterClassEx(ref wc); // ok to fail if already registered
+            RegisterClassEx(ref wc);
 
             return CreateWindowEx(
-                0, WC_CLASS, "uEmuera WebView2 Host",
-                0x00800000 /* WS_POPUP */, 0, 0, 800, 600,
+                0, WC_CLASS, "uEmuera EraElectron",
+                0x00CF0000, 100, 100, 1280, 720,
                 IntPtr.Zero, IntPtr.Zero, GetModuleHandle(null), IntPtr.Zero);
         }
-
-        static IntPtr DefWindowProcWrapper(IntPtr hwnd, uint msg, IntPtr wParam, IntPtr lParam)
-            => DefWindowProc(hwnd, msg, wParam, lParam);
 
         static void RunMessageLoopUntil(Func<bool> done)
         {
@@ -286,37 +352,33 @@ namespace uEmuera.Runtime.EraElectron
         //  Create WebView2 controller (called on STA thread after init)        //
         // ------------------------------------------------------------------ //
 
-        async void CreateController()
+        void CreateController()
         {
             try
             {
-                // Parent is our native message window (stable HWND).
-                _controller = await _env.CreateCoreWebView2ControllerAsync(_nativeHwnd);
+                var controllerTask = _env.CreateCoreWebView2ControllerAsync(_nativeHwnd);
+                RunMessageLoopUntil(() => controllerTask.IsCompleted);
+                _controller = controllerTask.GetAwaiter().GetResult();
                 _webView    = _controller.CoreWebView2;
 
-                // Configure
+                _syncBridge = new SyncBridgeHostObject(_bridge);
+                _webView.AddHostObjectToScript("eraNative", _syncBridge);
+
                 _webView.Settings.AreDefaultContextMenusEnabled = false;
                 _webView.Settings.IsStatusBarEnabled            = false;
                 _webView.Settings.AreDevToolsEnabled            = true;
                 _webView.Settings.IsZoomControlEnabled          = false;
 
-                // Bridge: JS → C# via postMessage
                 _webView.WebMessageReceived += OnWebMessageReceived;
-
-                // Navigation guard
                 _webView.NavigationStarting += OnNavigationStarting;
-
-                // DOM loaded → resolve LoadGameAsync
                 _webView.DOMContentLoaded += OnDomContentLoaded;
 
-                // Resize to Unity window area
                 ResizeToCoverUnityWindow();
                 _controller.IsVisible = true;
+                ShowWindow(_nativeHwnd, 5);
 
-                // Navigate to the loopback file server
                 _webView.Navigate(_startUrl ?? "about:blank");
 
-                _webViewReady = true;
                 UnityEngine.Debug.Log($"[WebView2Host] Controller created → {_startUrl}");
             }
             catch (Exception ex)
@@ -330,14 +392,11 @@ namespace uEmuera.Runtime.EraElectron
         {
             try
             {
-                IntPtr unityHwnd = GetUnityWindowHwnd();
-                if (unityHwnd == IntPtr.Zero) return;
+                if (_controller == null || _nativeHwnd == IntPtr.Zero) return;
 
                 RECT r;
-                if (GetClientRect(unityHwnd, out r))
+                if (GetClientRect(_nativeHwnd, out r))
                 {
-                    // Reparent the WebView2 controller's bounds window under the Unity HWND
-                    _controller.ParentWindow = unityHwnd;
                     _controller.Bounds = new System.Drawing.Rectangle(
                         0, 0, r.Right - r.Left, r.Bottom - r.Top);
                 }
@@ -354,8 +413,7 @@ namespace uEmuera.Runtime.EraElectron
 
         void OnDomContentLoaded(object sender, CoreWebView2DOMContentLoadedEventArgs e)
         {
-            // Navigation completed — game JS is running
-            _loadTcs?.TrySetResult(true);
+            UnityEngine.Debug.Log("[WebView2Host] Loader DOM ready; waiting for game entry signal.");
         }
 
         void OnNavigationStarting(object sender, CoreWebView2NavigationStartingEventArgs e)
@@ -364,7 +422,9 @@ namespace uEmuera.Runtime.EraElectron
             // Allow only our game origin
             Uri origin = new Uri(_startUrl);
             Uri nav    = new Uri(e.Uri);
-            if (nav.Host != origin.Host || nav.Port != origin.Port)
+            if (!string.Equals(nav.Scheme, origin.Scheme, StringComparison.OrdinalIgnoreCase) ||
+                !string.Equals(nav.Host, origin.Host, StringComparison.OrdinalIgnoreCase) ||
+                nav.Port != origin.Port)
             {
                 e.Cancel = true;
                 UnityEngine.Debug.LogWarning($"[WebView2Host] Blocked navigation to external URL: {e.Uri}");
@@ -380,32 +440,42 @@ namespace uEmuera.Runtime.EraElectron
 
         void ProcessBridgeMessage(string json)
         {
-            if (string.IsNullOrEmpty(json) || _bridge == null) return;
+            if (string.IsNullOrWhiteSpace(json)) return;
 
-            // Minimal JSON extraction (replace with proper parser when available)
-            int    callId   = ExtractInt(json, "\"id\"");
-            string method   = ExtractString(json, "\"method\"");
-            string argsJson = ExtractString(json, "\"args\"");
-            bool   isAsync  = json.Contains("\"async\":true") || json.Contains("\"async\": true");
-
-            if (string.IsNullOrEmpty(method)) return;
-
-            if (!isAsync)
+            BridgeMessage message;
+            try
             {
-                try
-                {
-                    string result = _bridge.DispatchSync(method, argsJson);
-                    ResolveJs(callId, result);
-                }
-                catch (Exception ex)
-                {
-                    RejectJs(callId, ex.Message);
-                }
+                message = JsonUtility.FromJson<BridgeMessage>(json);
             }
-            else
+            catch (Exception ex)
             {
-                int asyncCallId = _bridge.BeginAsync(method, argsJson);
-                _ = ResolveAsyncAsync(callId, asyncCallId);
+                UnityEngine.Debug.LogWarning("[WebView2Host] Invalid bridge message: " + ex.Message);
+                return;
+            }
+
+            if (message == null) return;
+            if (string.Equals(message.type, "uemuera-ready", StringComparison.Ordinal))
+            {
+                _loadTcs?.TrySetResult(true);
+                return;
+            }
+            if (string.Equals(message.type, "uemuera-load-error", StringComparison.Ordinal))
+            {
+                _loadTcs?.TrySetException(new InvalidOperationException(
+                    message.error ?? "EraElectron game entry failed to load."));
+                return;
+            }
+            if (_bridge == null || !message.isAsync || string.IsNullOrEmpty(message.method))
+                return;
+
+            try
+            {
+                int asyncCallId = _bridge.BeginAsync(message.method, message.args ?? "[]");
+                _ = ResolveAsyncAsync(message.id, asyncCallId);
+            }
+            catch (Exception ex)
+            {
+                RejectJs(message.id, ex.Message);
             }
         }
 
@@ -424,20 +494,19 @@ namespace uEmuera.Runtime.EraElectron
 
         void ResolveJs(int callId, string resultJson)
         {
-            string js = $"window._eraResolve({callId}, {resultJson ?? "null"});";
-            PostCallback(async () =>
+            string js = $"window._eraResolve({callId}, {ToJsString(resultJson ?? "null")});";
+            PostCallback(() =>
             {
-                try { await _webView?.ExecuteScriptAsync(js); } catch { }
+                try { _ = _webView?.ExecuteScriptAsync(js); } catch { }
             });
         }
 
         void RejectJs(int callId, string errorMsg)
         {
-            string escaped = errorMsg?.Replace("\"", "\\\"").Replace("\n", "\\n") ?? "";
-            string js = $"window._eraReject({callId}, \"{escaped}\");";
-            PostCallback(async () =>
+            string js = $"window._eraReject({callId}, {ToJsString(errorMsg ?? "ERA call failed")});";
+            PostCallback(() =>
             {
-                try { await _webView?.ExecuteScriptAsync(js); } catch { }
+                try { _ = _webView?.ExecuteScriptAsync(js); } catch { }
             });
         }
 
@@ -446,45 +515,77 @@ namespace uEmuera.Runtime.EraElectron
         // ------------------------------------------------------------------ //
 
         const uint WM_APP_CALLBACK = 0x8001;
-        readonly ConcurrentQueue<Action> _callbacks = new ConcurrentQueue<Action>();
 
         /// <summary>Posts an action to run on the STA thread's message loop.</summary>
-        void PostCallback(Action a)
+        bool PostCallback(Action action)
         {
-            if (_nativeHwnd == IntPtr.Zero) return;
-            _callbacks.Enqueue(a);
-            PostMessage(_nativeHwnd, WM_APP_CALLBACK, IntPtr.Zero, IntPtr.Zero);
+            if (action == null || !_running || _nativeHwnd == IntPtr.Zero)
+                return false;
+            _callbacks.Enqueue(action);
+            if (PostMessage(_nativeHwnd, WM_APP_CALLBACK, IntPtr.Zero, IntPtr.Zero))
+                return true;
+
+            _callbacks.TryDequeue(out _);
+            return false;
         }
 
-        // Our message loop should handle WM_APP_CALLBACK.
-        // RunMessageLoopUntil pumps messages generically, so we need the WNDPROC to dispatch.
-        // Override DefWindowProc to drain the callback queue on WM_APP_CALLBACK.
-        static IntPtr DefWindowProcWrapper(IntPtr hwnd, uint msg, IntPtr wParam, IntPtr lParam)
+        static IntPtr WindowProc(IntPtr hwnd, uint msg, IntPtr wParam, IntPtr lParam)
         {
-            // Drain pending callbacks; safe because this is the STA thread.
-            if (msg == WM_APP_CALLBACK)
+            if (HostsByWindow.TryGetValue(hwnd, out var host))
             {
-                // Walk the global list — static, so cast is via host lookup
-                // (simple approach: iterate the queue via the singleton pattern)
-                foreach (var host in _allHosts)
+                if (msg == WM_APP_CALLBACK)
                 {
-                    if (host._nativeHwnd == hwnd)
+                    while (host._callbacks.TryDequeue(out var action))
                     {
-                        Action a;
-                        while (host._callbacks.TryDequeue(out a))
-                            try { a(); } catch (Exception ex) {
-                                UnityEngine.Debug.LogWarning("[WebView2Host] Callback error: " + ex.Message);
-                            }
-                        return IntPtr.Zero;
+                        try { action(); }
+                        catch (Exception ex)
+                        {
+                            UnityEngine.Debug.LogWarning(
+                                "[WebView2Host] Callback error: " + ex.Message);
+                        }
                     }
+                    return IntPtr.Zero;
+                }
+
+                if (msg == 0x0005)
+                {
+                    host.ResizeToCoverUnityWindow();
+                    return IntPtr.Zero;
                 }
             }
             return DefWindowProc(hwnd, msg, wParam, lParam);
         }
 
-        // Track all hosts so the static WndProc can find them
-        static readonly System.Collections.Concurrent.ConcurrentBag<WebView2Host> _allHosts
-            = new System.Collections.Concurrent.ConcurrentBag<WebView2Host>();
+        [ComVisible(true)]
+        [ClassInterface(ClassInterfaceType.AutoDual)]
+        public sealed class SyncBridgeHostObject
+        {
+            readonly IEraNativeBridge _nativeBridge;
+
+            public SyncBridgeHostObject(IEraNativeBridge nativeBridge)
+            {
+                _nativeBridge = nativeBridge
+                    ?? throw new ArgumentNullException(nameof(nativeBridge));
+            }
+
+            public string DispatchSync(string method, string argsJson)
+            {
+                return _nativeBridge.DispatchSync(method, argsJson);
+            }
+        }
+
+        #pragma warning disable 0649
+        [Serializable]
+        sealed class BridgeMessage
+        {
+            public string type;
+            public int id;
+            public string method;
+            public string args;
+            public bool isAsync;
+            public string error;
+        }
+        #pragma warning restore 0649
 
         // ------------------------------------------------------------------ //
         //  Helpers                                                             //
@@ -496,35 +597,16 @@ namespace uEmuera.Runtime.EraElectron
             catch { return IntPtr.Zero; }
         }
 
-        // Very simple JSON field extractors (no dependency on proper JSON parser)
-        static int ExtractInt(string json, string key)
+        static string ToJsString(string value)
         {
-            int ki = json.IndexOf(key, StringComparison.Ordinal);
-            if (ki < 0) return -1;
-            int ci = json.IndexOf(':', ki + key.Length);
-            if (ci < 0) return -1;
-            int s = ci + 1;
-            while (s < json.Length && (json[s] == ' ' || json[s] == '\t')) s++;
-            int e = s;
-            while (e < json.Length && (char.IsDigit(json[e]) || json[e] == '-')) e++;
-            int v; int.TryParse(json.Substring(s, e - s), out v);
-            return v;
-        }
-
-        static string ExtractString(string json, string key)
-        {
-            int ki = json.IndexOf(key, StringComparison.Ordinal);
-            if (ki < 0) return null;
-            int ci = json.IndexOf(':', ki + key.Length);
-            if (ci < 0) return null;
-            int q1 = json.IndexOf('"', ci + 1);
-            if (q1 < 0) return null;
-            int q2 = q1 + 1;
-            while (q2 < json.Length && json[q2] != '"') {
-                if (json[q2] == '\\') q2++;
-                q2++;
-            }
-            return json.Substring(q1 + 1, q2 - q1 - 1);
+            if (value == null) return "\"\"";
+            return "\"" + value
+                .Replace("\\", "\\\\")
+                .Replace("\"", "\\\"")
+                .Replace("\r", "\\r")
+                .Replace("\n", "\\n")
+                .Replace("\u2028", "\\u2028")
+                .Replace("\u2029", "\\u2029") + "\"";
         }
 
         // ------------------------------------------------------------------ //
@@ -564,6 +646,8 @@ namespace uEmuera.Runtime.EraElectron
         static extern IntPtr CreateWindowEx(uint dwExStyle, string lpClassName, string lpWindowName,
             uint dwStyle, int x, int y, int nWidth, int nHeight,
             IntPtr hWndParent, IntPtr hMenu, IntPtr hInstance, IntPtr lpParam);
+
+        [DllImport("user32.dll")] static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
         [DllImport("user32.dll")] static extern bool DestroyWindow(IntPtr hWnd);
         [DllImport("user32.dll")] static extern bool PostMessage(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
         [DllImport("user32.dll")] static extern bool PeekMessage(out MSG lpMsg, IntPtr hWnd, uint min, uint max, uint remove);

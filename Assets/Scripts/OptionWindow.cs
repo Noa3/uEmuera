@@ -27,15 +27,13 @@ public class OptionWindow : MonoBehaviour
         GenericUtils.SetListenerOnClick(menu_1_resolution, OnMenuResolution);
         GenericUtils.SetListenerOnClick(menu_1_language, ShowLanguageBox);
         GenericUtils.SetListenerOnClick(menu_1_settings, ShowSettingsBox);
-        // Only show directory option on standalone platforms (Windows, Linux, macOS)
-        // Hide on Android
+        // Show directory option where direct filesystem paths are supported.
         if(menu_1_directory != null)
         {
-#if UNITY_STANDALONE || UNITY_EDITOR
+#if UNITY_STANDALONE || UNITY_EDITOR || UNITY_ANDROID
             menu_1_directory.SetActive(true);
             GenericUtils.SetListenerOnClick(menu_1_directory, OnMenuDirectory);
 #else
-            // Hide directory button on Android and other non-standalone platforms
             menu_1_directory.SetActive(false);
 #endif
         }
@@ -255,7 +253,7 @@ public class OptionWindow : MonoBehaviour
     
     /// <summary>
     /// Called when the directory menu item is clicked.
-    /// Shows the directory selection dialog. Only available on standalone platforms.
+    /// Shows the directory selection dialog.
     /// </summary>
     void OnMenuDirectory()
     {
@@ -789,7 +787,7 @@ public class OptionWindow : MonoBehaviour
     
     /// <summary>
     /// Initializes the directory input box by wiring up button events.
-    /// Called from Start(). Only active on standalone platforms (Windows, Linux, macOS).
+    /// Called from Start().
     /// </summary>
     void InitDirectoryInputBox()
     {
@@ -799,14 +797,12 @@ public class OptionWindow : MonoBehaviour
         // Ensure directory box starts hidden on all platforms
         directoryInputBox.SetActive(false);
         
-#if UNITY_STANDALONE || UNITY_EDITOR
-        // Wire up confirm button (only on standalone platforms)
+#if UNITY_STANDALONE || UNITY_EDITOR || UNITY_ANDROID
         if(directoryInputConfirm != null)
         {
             GenericUtils.SetListenerOnClick(directoryInputConfirm, OnDirInputConfirm);
         }
         
-        // Wire up cancel button (only on standalone platforms)
         if(directoryInputCancel != null)
         {
             GenericUtils.SetListenerOnClick(directoryInputCancel, OnDirInputCancel);
@@ -816,14 +812,12 @@ public class OptionWindow : MonoBehaviour
     
     /// <summary>
     /// Shows the directory input dialog box.
-    /// Only available on standalone platforms (Windows, Linux, macOS).
     /// </summary>
     /// <param name="currentPath">The current path to display in the input field.</param>
     /// <param name="callback">Callback when directory is confirmed.</param>
     public void ShowDirectoryInputBox(string currentPath, System.Action<string> callback)
     {
-#if !UNITY_STANDALONE && !UNITY_EDITOR
-        // Directory selection is not available on Android
+#if !UNITY_STANDALONE && !UNITY_EDITOR && !UNITY_ANDROID
         return;
 #endif
         if(directoryInputBox == null)
@@ -833,14 +827,15 @@ public class OptionWindow : MonoBehaviour
         }
         
         dir_input_callback_ = callback;
+        directoryInputBox.SetActive(true);
         
         // Set the current path
         if(directoryInputField != null)
         {
             directoryInputField.text = currentPath ?? "";
+            directoryInputField.Select();
+            directoryInputField.ActivateInputField();
         }
-        
-        directoryInputBox.SetActive(true);
     }
     
     /// <summary>

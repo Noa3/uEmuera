@@ -11,5 +11,5 @@ uEmuera.zip
 .engine/
 .codegraph/
 __pycache__/
-
-
+Builds/
+ProjectSettings/ProjectAuditorSettings.asset
