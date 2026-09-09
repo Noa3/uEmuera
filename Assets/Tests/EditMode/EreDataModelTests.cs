@@ -304,6 +304,48 @@ namespace uEmuera.Tests.EditMode
         // ------------------------------------------------------------------ //
 
         [Test]
+        public void EraCsvParser_Utf8WithoutBom_PreservesJapanese()
+        {
+            string path = TempCsvBytes(
+                "0,日本語\n1,テスト\n",
+                new System.Text.UTF8Encoding(false));
+            try
+            {
+                var result = new System.Collections.Generic.Dictionary<int, string>();
+                foreach (var kv in EraCsvParser.ParseIndexTable(path))
+                    result[kv.Key] = kv.Value;
+
+                Assert.AreEqual("日本語", result[0]);
+                Assert.AreEqual("テスト", result[1]);
+            }
+            finally { File.Delete(path); }
+        }
+
+        [Test]
+        public void EraCsvParser_Cp932_FallsBackWhenAvailable()
+        {
+            System.Text.Encoding cp932;
+            try { cp932 = System.Text.Encoding.GetEncoding(932); }
+            catch
+            {
+                Assert.Ignore("CP932 encoding provider is unavailable on this runtime.");
+                return;
+            }
+
+            string path = TempCsvBytes("0,日本語\n", cp932);
+            try
+            {
+                foreach (var kv in EraCsvParser.ParseIndexTable(path))
+                {
+                    Assert.AreEqual("日本語", kv.Value);
+                    return;
+                }
+                Assert.Fail("Expected one CP932 CSV entry.");
+            }
+            finally { File.Delete(path); }
+        }
+
+        [Test]
         public void EraCsvParser_ParseIndexTable_BasicEntries()
         {
             string path = TempCsv(
@@ -379,6 +421,15 @@ namespace uEmuera.Tests.EditMode
             GameRoot    = Path.GetTempPath(), // empty dir; no real CSV
             SaveNamespace = "test",
         };
+
+        static string TempCsvBytes(string content, System.Text.Encoding encoding)
+        {
+            string path = Path.Combine(
+                Path.GetTempPath(),
+                "uEmuera_ere_" + System.IO.Path.GetRandomFileName() + ".csv");
+            File.WriteAllBytes(path, encoding.GetBytes(content));
+            return path;
+        }
 
         static string TempCsv(string content)
         {

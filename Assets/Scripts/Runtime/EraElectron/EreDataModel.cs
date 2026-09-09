@@ -588,11 +588,46 @@ namespace uEmuera.Runtime.EraElectron
     internal static class EraCsvParser
     {
         static readonly Encoding Sjis = GetSjis();
+        static readonly Encoding StrictUtf8 = new UTF8Encoding(
+            encoderShouldEmitUTF8Identifier: false,
+            throwOnInvalidBytes: true);
 
         static Encoding GetSjis()
         {
             try   { return Encoding.GetEncoding(932); }
             catch { return Encoding.UTF8; }
+        }
+
+        /// <summary>
+        /// EraElectron projects commonly live in modern UTF-8 repositories while
+        /// older ERA data may still be CP932. Prefer BOM/strict UTF-8 and fall back
+        /// to CP932 only when the byte stream is not valid UTF-8.
+        /// </summary>
+        static string[] ReadAllLinesAuto(string path)
+        {
+            byte[] bytes = File.ReadAllBytes(path);
+            string text;
+
+            if (bytes.Length >= 3 &&
+                bytes[0] == 0xEF && bytes[1] == 0xBB && bytes[2] == 0xBF)
+            {
+                text = Encoding.UTF8.GetString(bytes, 3, bytes.Length - 3);
+            }
+            else
+            {
+                try
+                {
+                    text = StrictUtf8.GetString(bytes);
+                }
+                catch (DecoderFallbackException)
+                {
+                    text = Sjis.GetString(bytes);
+                }
+            }
+
+            return text.Replace("\r\n", "\n")
+                       .Replace("\r", "\n")
+                       .Split(new[] { '\n' });
         }
 
         /// <summary>
@@ -603,7 +638,7 @@ namespace uEmuera.Runtime.EraElectron
         {
             if (!File.Exists(path)) yield break;
             string[] lines;
-            try   { lines = File.ReadAllLines(path, Sjis); }
+            try   { lines = ReadAllLinesAuto(path); }
             catch { yield break; }
 
             foreach (var raw in lines)
@@ -631,7 +666,7 @@ namespace uEmuera.Runtime.EraElectron
         {
             if (!File.Exists(path)) yield break;
             string[] lines;
-            try   { lines = File.ReadAllLines(path, Sjis); }
+            try   { lines = ReadAllLinesAuto(path); }
             catch { yield break; }
 
             foreach (var raw in lines)
