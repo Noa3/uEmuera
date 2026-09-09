@@ -150,8 +150,16 @@ namespace uEmuera.Runtime.EraElectron
                     "[WebView2Host] STA message window is not available.");
 
             using (cancellationToken.Register(() => _loadTcs.TrySetCanceled(cancellationToken)))
+            {
+                Task timeout = Task.Delay(30000);
+                Task completed = await Task.WhenAny(_loadTcs.Task, timeout);
+                if (completed != _loadTcs.Task)
+                    throw new TimeoutException(
+                        "[WebView2Host] Timed out waiting for the ERE entry point to start.");
+
                 await _loadTcs.Task;
-            UnityEngine.Debug.Log("[WebView2Host] Game JS loaded.");
+            }
+            UnityEngine.Debug.Log("[WebView2Host] Game entry started.");
         }
 
         public void Show()

@@ -193,6 +193,24 @@ namespace uEmuera.Tests.EditMode
         }
 
         [Test]
+        public void Get_IndexHtml_ReadyMeansEntryStarted_NotGamePromiseCompleted()
+        {
+            string body = GetString($"{_server.BaseUrl}/index.html");
+
+            int invoke = body.IndexOf("var running=entry()", StringComparison.Ordinal);
+            int ready = body.IndexOf("ready()", invoke, StringComparison.Ordinal);
+            int observePromise = body.IndexOf("Promise.resolve(running).catch(fail)", StringComparison.Ordinal);
+
+            Assert.That(invoke, Is.GreaterThanOrEqualTo(0));
+            Assert.That(ready, Is.GreaterThan(invoke),
+                "Loader should report ready immediately after invoking the game entry.");
+            Assert.That(observePromise, Is.GreaterThan(ready),
+                "The long-lived game Promise is only observed for errors after ready.");
+            Assert.IsFalse(body.Contains(".then(ready,fail)"),
+                "Waiting for the game Promise to resolve would block StartAsync for the entire session.");
+        }
+
+        [Test]
         public void Get_IndexHtml_SourceOnlyPackageLoadsCommonJsEntry()
         {
             File.Delete(Path.Combine(_tempDir, "era.bundle.js"));
@@ -254,7 +272,11 @@ namespace uEmuera.Tests.EditMode
                 Path.GetTempPath(),
                 "uEmuera_RuntimeTests_" + Guid.NewGuid().ToString("N").Substring(0, 8));
             Directory.CreateDirectory(_tempDir);
-            File.WriteAllText(Path.Combine(_tempDir, ".ere-min-version"), "4.8.0");
+            File.WriteAllText(Path.Combine(_tempDir, ".ere-min-version"), "2200");
+            File.WriteAllText(Path.Combine(_tempDir, "era.bundle.js"),
+                "window._era={version:{sdk:'4.7.0'}};", Encoding.UTF8);
+            File.WriteAllText(Path.Combine(_tempDir, "main.bundle.js"),
+                "window.game=async function(){};", Encoding.UTF8);
         }
 
         [TearDown]
@@ -342,11 +364,13 @@ namespace uEmuera.Tests.EditMode
             Version = "1.0",
             RuntimeKind = RuntimeKind.EraElectron,
             GameRoot = _tempDir,
-            RequiredRuntimeVersion = "4.8.0",
+            RequiredRuntimeVersion = "2200",
         };
 
         sealed class RecordingHost : IEraElectronHost
         {
+            public event Action CloseRequested;
+
             public EraElectronHostMode HostMode => EraElectronHostMode.Embedded;
             public HostCapabilities Capabilities { get; } = new HostCapabilities
             {
@@ -362,6 +386,8 @@ namespace uEmuera.Tests.EditMode
             public bool DisposeCalled { get; private set; }
             public string OriginUrl { get; private set; }
             public Exception LoadException { get; set; }
+
+            public void SimulateClose() => CloseRequested?.Invoke();
 
             public Task InitializeAsync(
                 GameDescriptor game,

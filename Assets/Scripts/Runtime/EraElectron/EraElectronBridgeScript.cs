@@ -35,8 +35,9 @@ namespace uEmuera.Runtime.EraElectron
         /// Builds the full bootstrap JS string.
         /// </summary>
         /// <param name="engineVersion">
-        /// The minimum engine version from the game's <c>.ere-min-version</c> file
-        /// (e.g. "2200"). Surfaced as <c>era.version.engine</c>.
+        /// The engine compatibility version the active host may truthfully report
+        /// (e.g. "2200"). Surfaced as <c>era.version.engine</c>. This must not simply
+        /// echo a newer game requirement that the embedded runtime does not support.
         /// </param>
         public static string Build(string engineVersion)
         {
