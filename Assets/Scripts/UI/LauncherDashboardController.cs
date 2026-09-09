@@ -21,6 +21,7 @@ public sealed class LauncherDashboardController : MonoBehaviour
         public GameObject Root;
         public string SearchText;
         public RuntimeKind Runtime;
+        public string SortKey;
     }
 
     readonly List<CardEntry> cards_ = new List<CardEntry>();
@@ -43,7 +44,6 @@ public sealed class LauncherDashboardController : MonoBehaviour
     Text settingsText_;
     Text displayText_;
     Text languageText_;
-    Text moreText_;
     Text projectText_;
     Text exitText_;
     GameObject runtimeChoiceOverlay_;
@@ -67,6 +67,8 @@ public sealed class LauncherDashboardController : MonoBehaviour
             try { font_ = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf"); }
             catch { }
         }
+        if (font_ == null)
+            return false;
 
         var legacyChildren = new List<GameObject>();
         for (int i = 0; i < transform.childCount; i++)
@@ -260,8 +262,6 @@ public sealed class LauncherDashboardController : MonoBehaviour
             () => GetOptions()?.ShowResolutionBox(), false, true);
         languageText_ = CreateButton("Language", actions.transform, 100,
             () => GetOptions()?.ShowLanguageBox(), false, true);
-        moreText_ = CreateButton("More", actions.transform, 78,
-            () => GetOptions()?.ShowMenu(), false, true);
         projectText_ = CreateButton("Project", actions.transform, 86,
             () => GetOptions()?.OpenProjectPage(), false, true);
         exitText_ = CreateButton("Exit", actions.transform, 72,
@@ -407,8 +407,10 @@ public sealed class LauncherDashboardController : MonoBehaviour
             Root = card,
             Runtime = descriptor.RuntimeKind,
             SearchText = BuildSearchText(descriptor, title, runtime),
+            SortKey = (title ?? "") + "\n" + runtime,
         };
         cards_.Add(entry);
+        SortCards();
         if (descriptor.RuntimeKind == RuntimeKind.EraElectron)
             eraElectronCount_++;
         else
@@ -434,31 +436,59 @@ public sealed class LauncherDashboardController : MonoBehaviour
         RefreshLibraryPath();
     }
 
+    void SortCards()
+    {
+        cards_.Sort((a, b) =>
+            string.Compare(a.SortKey, b.SortKey, StringComparison.OrdinalIgnoreCase));
+        for (int i = 0; i < cards_.Count; i++)
+        {
+            if (cards_[i].Root != null)
+                cards_[i].Root.transform.SetSiblingIndex(i);
+        }
+    }
+
     void FilterCards(string query)
     {
         string normalized = (query ?? "").Trim();
         int visible = 0;
+        int visibleEmuera = 0;
+        int visibleEraElectron = 0;
         for (int i = 0; i < cards_.Count; i++)
         {
             bool match = MatchesSearch(cards_[i].SearchText, normalized);
             if (cards_[i].Root != null)
                 cards_[i].Root.SetActive(match);
-            if (match) visible++;
+            if (!match)
+                continue;
+
+            visible++;
+            if (cards_[i].Runtime == RuntimeKind.EraElectron)
+                visibleEraElectron++;
+            else
+                visibleEmuera++;
         }
-        UpdateLibraryState(visible, !string.IsNullOrEmpty(normalized));
+        UpdateLibraryState(
+            visible,
+            visibleEmuera,
+            visibleEraElectron,
+            !string.IsNullOrEmpty(normalized));
     }
 
     void UpdateLibraryState()
     {
-        UpdateLibraryState(cards_.Count, false);
+        UpdateLibraryState(cards_.Count, emueraCount_, eraElectronCount_, false);
     }
 
-    void UpdateLibraryState(int visible, bool hasQuery)
+    void UpdateLibraryState(
+        int visible,
+        int visibleEmuera,
+        int visibleEraElectron,
+        bool hasQuery)
     {
         if (countText_ != null)
         {
             countText_.text = string.Format("{0} {1}   •   {2} Emuera   •   {3} EraElectron",
-                visible, T("[LauncherGames]", "games"), emueraCount_, eraElectronCount_);
+                visible, T("[LauncherGames]", "games"), visibleEmuera, visibleEraElectron);
         }
 
         bool empty = visible == 0;
@@ -494,8 +524,6 @@ public sealed class LauncherDashboardController : MonoBehaviour
             displayText_.text = T("[LauncherDisplay]", "Display");
         if (languageText_ != null)
             languageText_.text = T("[LauncherLanguage]", "Language");
-        if (moreText_ != null)
-            moreText_.text = T("[LauncherMore]", "More");
         if (projectText_ != null)
             projectText_.text = T("[LauncherProject]", "GitHub");
         if (exitText_ != null)
@@ -616,6 +644,9 @@ public sealed class LauncherDashboardController : MonoBehaviour
             UIStyleManager.ModernTheme.TextPrimary, TextAnchor.MiddleCenter);
         Stretch(text.rectTransform);
         text.raycastTarget = false;
+        text.resizeTextForBestFit = true;
+        text.resizeTextMinSize = compact ? 9 : 10;
+        text.resizeTextMaxSize = compact ? 12 : 13;
         return text;
     }
 

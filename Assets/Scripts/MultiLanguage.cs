@@ -21,8 +21,10 @@ public static class MultiLanguage
                 string.CompareOrdinal(l, 0, ";", 0, 1) == 0)
                 continue;
             var s = l.IndexOf('=');
+            if(s <= 0)
+                continue;
             var left = l.Substring(0, s).Trim();
-            var right = l.Substring(s + 1).Trim();
+            var right = DecodeEscapes(l.Substring(s + 1).Trim());
             if(string.IsNullOrEmpty(right))
                 continue;
 
@@ -30,6 +32,22 @@ public static class MultiLanguage
         }
         return list;
     }
+    /// <summary>
+    /// Decodes the small escape set supported in language text files.
+    /// Existing resources use literal \\n sequences for multi-line dialogs.
+    /// </summary>
+    public static string DecodeEscapes(string value)
+    {
+        if(string.IsNullOrEmpty(value))
+            return value;
+
+        return value
+            .Replace("\\r\\n", "\n")
+            .Replace("\\n", "\n")
+            .Replace("\\r", "\r")
+            .Replace("\\t", "\t");
+    }
+
     public static bool SetLanguage()
     {
         var lang = PlayerPrefs.GetString("language", "");

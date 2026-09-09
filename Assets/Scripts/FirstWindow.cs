@@ -671,12 +671,11 @@ public class FirstWindow : MonoBehaviour
             return;
 
         var detection = descriptor.DetectionResult;
-        if (detection != null && detection.AmbiguousAlternative.HasValue &&
-            dashboard_ != null && dashboard_.IsBuilt)
+        if (detection != null && detection.AmbiguousAlternative.HasValue)
         {
             var alternative = uEmuera.Runtime.Detection.GameDetector.CreateDefault()
                 .DetectAs(descriptor.GameRoot, detection.AmbiguousAlternative.Value);
-            if (alternative != null)
+            if (alternative != null && dashboard_ != null && dashboard_.IsBuilt)
             {
                 dashboard_.ShowRuntimeChoice(
                     descriptor,
@@ -684,6 +683,18 @@ public class FirstWindow : MonoBehaviour
                     LaunchDescriptorConfirmed);
                 return;
             }
+
+            var ow = EmueraContent.instance?.option_window;
+            if (ow != null)
+            {
+                string body = MultiLanguage.GetText("[LauncherRuntimeChoiceBody]");
+                if (string.IsNullOrEmpty(body) || body == "[LauncherRuntimeChoiceBody]")
+                    body = "This folder matches more than one runtime. Please use the modern launcher to choose how to start it.\n\nFolder: {0}";
+                ow.ShowMessageBoxPublic(
+                    MultiLanguage.GetText("[LauncherRuntimeChoiceTitle]"),
+                    string.Format(body, descriptor.GameRoot ?? ""));
+            }
+            return;
         }
 
         LaunchDescriptorConfirmed(descriptor);
