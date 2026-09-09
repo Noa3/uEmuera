@@ -90,6 +90,19 @@ namespace uEmuera.Runtime.Detection
         }
 
         /// <summary>
+        /// Returns the only detected game under <paramref name="root"/>, or null
+        /// when the workspace contains zero or multiple games.
+        ///
+        /// Unlike the legacy GameDiscovery.FindSingle path this method is runtime
+        /// neutral and therefore supports both Emuera and EraElectron packages.
+        /// </summary>
+        public GameDescriptor FindSingle(string root)
+        {
+            var games = DiscoverAll(root);
+            return games.Count == 1 ? games[0] : null;
+        }
+
+        /// <summary>
         /// Detect a single directory and return its <see cref="GameDescriptor"/>,
         /// or null if no registered detector recognises it.
         /// </summary>

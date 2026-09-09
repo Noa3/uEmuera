@@ -1,11 +1,23 @@
 # ADR: Web Runtime Host for EraElectron Embedded Mode
 
-**Status:** PROPOSED — technical spike required before final decision  
-**Date:** 2026-08-12  
+**Status:** ACCEPTED — partially implemented; platform verification ongoing  
+**Date:** 2026-08-12 · Updated: 2026-09-09  
 **Deciders:** uEmuera maintainers  
 **Supersedes:** ERA_ELECTRON_PLAN.md (stale)
 
 ---
+
+## Current implementation (2026-09-09)
+
+- Windows standalone: custom `WebView2Host` is implemented.
+- Windows Editor: embedded WebView2 is intentionally disabled because native
+  initialization can terminate the editor; sidecar/null-host paths are used.
+- Desktop sidecar: `OfficialSidecarHost` is implemented but remains unverified
+  against a current packaged EraUma release.
+- Android embedded host: not implemented.
+- Linux embedded host: not implemented.
+- The original technology comparison below is retained as design history; implementation
+  status is authoritative in `CURRENT_STATE_AUDIT.md`.
 
 ## Context
 
@@ -240,7 +252,9 @@ Success criteria:
 - `await era.input()` suspends game JS until C# resolves the Promise
 - CJK text input works
 
-Until spike completes, `EraElectronRuntime` remains a stub.
+The runtime is no longer a stub: Windows WebView2, a native bridge, loopback file server
+and sidecar host exist. The remaining spike is **compatibility verification** plus
+Android/Linux host implementation.
 
 ---
 

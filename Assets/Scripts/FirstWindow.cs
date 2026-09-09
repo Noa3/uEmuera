@@ -116,12 +116,17 @@ public class FirstWindow : MonoBehaviour
         }
     }
 
-    IEnumerator StartSingleGame(string gamePath)
+    IEnumerator StartSingleGame(uEmuera.Runtime.GameDescriptor descriptor)
     {
         yield return null;
-        var path = gamePath;
+        if (descriptor == null)
+            yield break;
+
         gameObject.SetActive(false);
-        yield return Run(path);
+        if (descriptor.RuntimeKind == uEmuera.Runtime.RuntimeKind.EraElectron)
+            yield return LaunchEreGameCoroutine(descriptor);
+        else
+            yield return Run(descriptor.GameRoot);
     }
 
     void Awake()
@@ -612,8 +617,9 @@ public class FirstWindow : MonoBehaviour
 
     /// <summary>
     /// Launches an EraElectron game via <see cref="uEmuera.Runtime.GameRuntimeManager"/>.
-    /// Currently routes to the EraElectronRuntime stub (logs STUB warning).
-    /// Full implementation requires WebView host spike (see Docs/ADR/WEB_RUNTIME_HOST.md).
+    /// Windows standalone builds can use the embedded WebView2 host; source-form
+    /// packages can use the configured official sidecar. Other embedded platform
+    /// hosts currently report a clear capability error.
     /// </summary>
     System.Collections.IEnumerator LaunchEreGameCoroutine(uEmuera.Runtime.GameDescriptor descriptor)
     {
@@ -707,11 +713,12 @@ public class FirstWindow : MonoBehaviour
 #if UNITY_WEBGL
         return false;
 #else
-        var gamePath = GameDiscovery.FindSingle(root);
-        if (string.IsNullOrEmpty(gamePath))
+        var game = uEmuera.Runtime.Detection.GameDetector.CreateDefault()
+            .FindSingle(root);
+        if (game == null)
             return false;
 
-        GenericUtils.StartCoroutine(StartSingleGame(gamePath));
+        GenericUtils.StartCoroutine(StartSingleGame(game));
         return true;
 #endif
     }

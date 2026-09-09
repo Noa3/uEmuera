@@ -70,7 +70,8 @@ def run_extractor(sdk_path: Path, out_dir: Path) -> dict | None:
     """Run extract_api.py and return the new API dict."""
     out = out_dir / 'API.new.generated.json'
     result = subprocess.run(
-        [sys.executable, str(EXTRACT), str(sdk_path), '--output', str(out)],
+        [sys.executable, str(EXTRACT), str(sdk_path), '--output', str(out),
+         '--repo-root', str(REPO_ROOT)],
         capture_output=True, text=True)
     if result.returncode != 0:
         print(f'extract_api.py failed:\n{result.stderr}', file=sys.stderr)

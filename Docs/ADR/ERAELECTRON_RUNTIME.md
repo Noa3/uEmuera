@@ -1,10 +1,20 @@
 # ADR: EraElectron Runtime Architecture
 
-**Status:** PROPOSED  
-**Date:** 2026-08-12  
+**Status:** ACCEPTED — implementation in progress  
+**Date:** 2026-08-12 · Updated: 2026-09-09  
 **Depends on:** WEB_RUNTIME_HOST.md
 
 ---
+
+## Current implementation (2026-09-09)
+
+The architecture described by this ADR now exists in code: `EraElectronRuntime`,
+`GameRuntimeManager`, `EreDataModel`, `EreApiDispatcher`, the JS bridge,
+loopback file server, Windows `WebView2Host`, and desktop sidecar host.
+
+Several API methods are still simplified or placeholders and full EraUma gameplay has
+not been verified. This ADR defines the accepted boundary; current status belongs in
+`Docs/CURRENT_STATE_AUDIT.md`.
 
 ## Context
 

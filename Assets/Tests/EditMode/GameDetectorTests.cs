@@ -359,6 +359,39 @@ namespace uEmuera.Tests.EditMode
         }
 
         // ------------------------------------------------------------------ //
+        //  Runtime-neutral single-game discovery                               //
+        // ------------------------------------------------------------------ //
+
+        [Test]
+        public void GameDetector_FindSingle_EraElectron_ReturnsDescriptor()
+        {
+            MakeEraUmaSourceLayout("only-ere");
+            var result = GameDetector.CreateDefault().FindSingle(_tempRoot);
+
+            Assert.IsNotNull(result);
+            Assert.AreEqual(RuntimeKind.EraElectron, result.RuntimeKind);
+        }
+
+        [Test]
+        public void GameDetector_FindSingle_Emuera_ReturnsDescriptor()
+        {
+            MakeEmueraLayout("only-emu");
+            var result = GameDetector.CreateDefault().FindSingle(_tempRoot);
+
+            Assert.IsNotNull(result);
+            Assert.AreEqual(RuntimeKind.Emuera, result.RuntimeKind);
+        }
+
+        [Test]
+        public void GameDetector_FindSingle_MultipleGames_ReturnsNull()
+        {
+            MakeEraUmaSourceLayout("ere-game");
+            MakeEmueraLayout("emu-game");
+
+            Assert.IsNull(GameDetector.CreateDefault().FindSingle(_tempRoot));
+        }
+
+        // ------------------------------------------------------------------ //
         //  GameDescriptor field validation                                     //
         // ------------------------------------------------------------------ //
 
