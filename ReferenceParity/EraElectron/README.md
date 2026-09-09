@@ -1,25 +1,34 @@
 # EraElectron Reference Parity
 
-This directory contains generated EraElectron SDK/game-usage snapshots.
+This directory contains reproducible EraElectron reference and usage data.
 
-## Source of truth
+## Files
 
-- Upstream API signatures come from the SDK extractor in
-  `Tools/EraElectronReference/extract_api.py`.
-- Local implementation evidence is inferred conservatively from
-  `EreApiDispatcher.cs` and `EraElectronBridgeScript.cs`.
-- Real compatibility must come from reference/integration tests.
+- `UPSTREAM_REFERENCE.generated.json` — captured upstream/game baseline.
+- `ERAUMA_USAGE.generated.json` — EraUma call/dependency usage scan.
+- `CONFIG_SCHEMA.generated.json` — captured configuration schema.
+- `LOCAL_IMPLEMENTATION.generated.json` — conservative local source-wiring evidence.
+- `API.generated.json` — created by `extract_api.py` from an actual EraElectron SDK
+  snapshot. It may be absent until the extractor establishes/refreshes a baseline.
 
-Status meanings:
+## Status model
 
-- `IMPLEMENTED_UNVERIFIED` — both JS bridge and native dispatcher contain a path.
+The source scanners deliberately do **not** assign VERIFIED.
+
+- `WIRED_UNVERIFIED` — both JS bridge and native dispatcher contain a path.
 - `PARTIAL` — only one side contains a path.
 - `MISSING` — no local path was detected.
-- `VERIFIED` — reserved for explicit reference/integration evidence; the source
-  inference tool does not assign it.
+- `VERIFIED` — reserved for explicit reference/integration evidence.
 
-Run the upstream checker with a current `era-electron.js` snapshot to regenerate API
-metadata. Generated reports must not be manually treated as timeless documentation.
+Run:
 
-Superseded pre-runtime plans and old snapshots are stored under
+```bash
+python Tools/EraElectronReference/generate_local_status.py
+python Tools/EraElectronReference/check_upstream.py --sdk-path /path/to/era-electron.js
+```
+
+When the upstream signature set changes, inspect the generated delta and use
+`--accept` only after review.
+
+Superseded plans and misleading old generated snapshots are stored under
 `../Archive/`.

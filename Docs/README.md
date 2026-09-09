@@ -6,7 +6,7 @@ This directory contains the maintained developer documentation for uEmuera.
 
 - [Current State Audit](CURRENT_STATE_AUDIT.md) — current implementation status and known gaps.
 - [ERA Platform Architecture](ERA_PLATFORM_ARCHITECTURE.md) — multi-runtime architecture.
-- [Runtime Support](RUNTIME_SUPPORT.generated.md) — generated support snapshot.
+- [Runtime Support](RUNTIME_SUPPORT.md) — generated support snapshot.
 - [Licensing Architecture](LICENSING_ARCHITECTURE.md) — third-party/runtime licensing boundaries.
 
 ## Emuera runtime

@@ -1,6 +1,6 @@
 # EraElectron Testing Strategy
 
-> Phase 8 · 2026-08-12
+> Updated: 2026-09-09
 
 ---
 
@@ -10,7 +10,7 @@
 Unit tests (EditMode)
   └── EreDataModelTests.cs       — VarAddress, get/set/add, CSV parser
   └── (future) EreApiDispatcherTests.cs
-  └── (future) GameDetectorTests.cs
+  └── GameDetectorTests.cs
 
 Integration tests (EditMode)
   └── GameRuntimeManager routing
@@ -143,8 +143,8 @@ Run: 10+ times minimum; check memory before/after.
 
 | Suite | Tests | Status |
 |---|---|---|
-| `EreDataModelTests` | 26 | ✅ Written; awaiting compile |
-| EraElectron.Core | 0 | 🔲 MISSING |
-| EraElectron.Reference | 0 | 🔲 MISSING (synthetic fixture exists) |
+| `EreDataModelTests` | present | ✅ Local unit coverage exists |
+| EraElectron.Core | partial | Bridge/detector/data tests exist; host integration still needed |
+| EraElectron.Reference | partial | Synthetic fixture exists; reference capture still needed |
 | EraUma milestone | 0 | 🔲 MISSING (blocked on WebView spike) |
 | Cross-runtime switch | 0 | 🔲 MISSING (blocked on EraElectron M6) |
