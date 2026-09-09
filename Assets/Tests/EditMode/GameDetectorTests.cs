@@ -315,6 +315,29 @@ namespace uEmuera.Tests.EditMode
         }
 
         [Test]
+        public void GameDetector_AmbiguousLayout_CanDetectEachRuntimeExplicitly()
+        {
+            string dir = MakeAmbiguousLayout();
+            var gd = GameDetector.CreateDefault();
+
+            var emu = gd.DetectAs(dir, RuntimeKind.Emuera);
+            var ere = gd.DetectAs(dir, RuntimeKind.EraElectron);
+
+            Assert.IsNotNull(emu);
+            Assert.IsNotNull(ere);
+            Assert.AreEqual(RuntimeKind.Emuera, emu.RuntimeKind);
+            Assert.AreEqual(RuntimeKind.EraElectron, ere.RuntimeKind);
+        }
+
+        [Test]
+        public void GameDetector_DetectAsWrongRuntime_ReturnsNull()
+        {
+            string dir = MakeEmueraLayout();
+            Assert.IsNull(GameDetector.CreateDefault().DetectAs(
+                dir, RuntimeKind.EraElectron));
+        }
+
+        [Test]
         public void GameDetector_UnknownDir_ReturnsNull()
         {
             string dir = MakeEmptyLayout();

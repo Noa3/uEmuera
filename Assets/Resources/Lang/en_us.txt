@@ -154,3 +154,7 @@ FirstWindow.Titlebar.title=Game List
 [LauncherSearchHint]=Try another title, path, or runtime.
 [LauncherAutomaticLibrary]=Automatic game discovery
 [LauncherLibrary]=Library
+
+[LauncherRuntimeChoiceTitle]=Choose runtime
+[LauncherRuntimeChoiceBody]=This folder matches more than one runtime. Choose how uEmuera should start it.\n\nFolder: {0}
+[LauncherCancel]=Cancel

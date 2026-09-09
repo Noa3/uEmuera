@@ -670,6 +670,30 @@ public class FirstWindow : MonoBehaviour
         if (descriptor == null)
             return;
 
+        var detection = descriptor.DetectionResult;
+        if (detection != null && detection.AmbiguousAlternative.HasValue &&
+            dashboard_ != null && dashboard_.IsBuilt)
+        {
+            var alternative = uEmuera.Runtime.Detection.GameDetector.CreateDefault()
+                .DetectAs(descriptor.GameRoot, detection.AmbiguousAlternative.Value);
+            if (alternative != null)
+            {
+                dashboard_.ShowRuntimeChoice(
+                    descriptor,
+                    alternative,
+                    LaunchDescriptorConfirmed);
+                return;
+            }
+        }
+
+        LaunchDescriptorConfirmed(descriptor);
+    }
+
+    void LaunchDescriptorConfirmed(uEmuera.Runtime.GameDescriptor descriptor)
+    {
+        if (descriptor == null)
+            return;
+
         gameObject.SetActive(false);
         if (descriptor.RuntimeKind == uEmuera.Runtime.RuntimeKind.EraElectron)
             GenericUtils.StartCoroutine(LaunchEreGameCoroutine(descriptor));

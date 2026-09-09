@@ -155,3 +155,7 @@ FirstWindow.Titlebar.title=Spielliste
 [LauncherSearchHint]=Versuche einen anderen Titel, Pfad oder eine andere Laufzeit.
 [LauncherAutomaticLibrary]=Automatische Spielsuche
 [LauncherLibrary]=Bibliothek
+
+[LauncherRuntimeChoiceTitle]=Laufzeit wählen
+[LauncherRuntimeChoiceBody]=Dieser Ordner passt zu mehr als einer Laufzeit. Wähle, wie uEmuera ihn starten soll.\n\nOrdner: {0}
+[LauncherCancel]=Abbrechen

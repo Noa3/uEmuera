@@ -153,3 +153,7 @@ FirstWindow.Titlebar.title=游戏列表
 [LauncherSearchHint]=尝试其他标题、路径或运行时。
 [LauncherAutomaticLibrary]=自动发现游戏
 [LauncherLibrary]=游戏库
+
+[LauncherRuntimeChoiceTitle]=选择运行时
+[LauncherRuntimeChoiceBody]=此文件夹匹配多个运行时。请选择 uEmuera 应如何启动它。\n\n文件夹: {0}
+[LauncherCancel]=取消

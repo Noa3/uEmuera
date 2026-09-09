@@ -649,3 +649,7 @@ When omitting the elements of the target variable  = 対象となる変数
 [LauncherSearchHint]=別のタイトル、パス、ランタイムを試してください。
 [LauncherAutomaticLibrary]=自動ゲーム検出
 [LauncherLibrary]=ライブラリ
+
+[LauncherRuntimeChoiceTitle]=ランタイムを選択
+[LauncherRuntimeChoiceBody]=このフォルダーは複数のランタイムとして認識されました。uEmueraでの起動方法を選択してください。\n\nフォルダー: {0}
+[LauncherCancel]=キャンセル

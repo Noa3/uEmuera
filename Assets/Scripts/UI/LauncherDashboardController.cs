@@ -46,6 +46,7 @@ public sealed class LauncherDashboardController : MonoBehaviour
     Text moreText_;
     Text projectText_;
     Text exitText_;
+    GameObject runtimeChoiceOverlay_;
 
     int emueraCount_;
     int eraElectronCount_;
@@ -270,6 +271,79 @@ public sealed class LauncherDashboardController : MonoBehaviour
     OptionWindow GetOptions()
     {
         return EmueraContent.instance != null ? EmueraContent.instance.option_window : null;
+    }
+
+    public void ShowRuntimeChoice(
+        GameDescriptor primary,
+        GameDescriptor alternative,
+        Action<GameDescriptor> launch)
+    {
+        if (!IsBuilt || primary == null || alternative == null)
+            return;
+
+        if (runtimeChoiceOverlay_ != null)
+            Destroy(runtimeChoiceOverlay_);
+
+        runtimeChoiceOverlay_ = CreatePanel("RuntimeChoiceOverlay", modernRoot_.transform,
+            new Color(0f, 0f, 0f, 0.78f));
+        Stretch(runtimeChoiceOverlay_.GetComponent<RectTransform>());
+
+        var panel = CreatePanel("RuntimeChoicePanel", runtimeChoiceOverlay_.transform,
+            UIStyleManager.ModernTheme.Surface);
+        SetAnchored(panel.GetComponent<RectTransform>(),
+            new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
+            Vector2.zero, new Vector2(590, 286), new Vector2(0.5f, 0.5f));
+
+        var title = CreateText("Title", panel.transform, 22, FontStyle.Bold,
+            UIStyleManager.ModernTheme.TextPrimary, TextAnchor.MiddleLeft);
+        SetAnchored(title.rectTransform, new Vector2(0, 1), new Vector2(1, 1),
+            new Vector2(24, -22), new Vector2(-48, 42), new Vector2(0, 1));
+        title.text = T("[LauncherRuntimeChoiceTitle]", "Choose runtime");
+
+        var body = CreateText("Body", panel.transform, 14, FontStyle.Normal,
+            UIStyleManager.ModernTheme.TextSecondary, TextAnchor.UpperLeft);
+        SetAnchored(body.rectTransform, new Vector2(0, 0), new Vector2(1, 1),
+            new Vector2(24, -72), new Vector2(-48, -124), new Vector2(0, 1));
+        body.text = string.Format(
+            T("[LauncherRuntimeChoiceBody]",
+              "This folder matches more than one runtime. Choose how uEmuera should start it.\n\nFolder: {0}"),
+            primary.GameRoot ?? "");
+
+        var buttons = CreateObject("Buttons", panel.transform);
+        SetAnchored(buttons.GetComponent<RectTransform>(),
+            new Vector2(0, 0), new Vector2(1, 0), new Vector2(24, 22),
+            new Vector2(-48, 46), new Vector2(0, 0));
+        var layout = buttons.AddComponent<HorizontalLayoutGroup>();
+        layout.spacing = 10;
+        layout.childAlignment = TextAnchor.MiddleLeft;
+        layout.childForceExpandWidth = false;
+        layout.childForceExpandHeight = true;
+        layout.childControlWidth = false;
+
+        CreateButton("PrimaryRuntime", buttons.transform, 150,
+            () => ChooseRuntime(primary, launch), true).text =
+            primary.RuntimeKind.ToString();
+
+        CreateButton("AlternativeRuntime", buttons.transform, 150,
+            () => ChooseRuntime(alternative, launch), true).text =
+            alternative.RuntimeKind.ToString();
+
+        CreateButton("Cancel", buttons.transform, 100,
+            CloseRuntimeChoice, false).text =
+            T("[LauncherCancel]", "Cancel");
+    }
+
+    void ChooseRuntime(GameDescriptor descriptor, Action<GameDescriptor> launch)
+    {
+        CloseRuntimeChoice();
+        launch?.Invoke(descriptor);
+    }
+
+    void CloseRuntimeChoice()
+    {
+        if (runtimeChoiceOverlay_ != null)
+            Destroy(runtimeChoiceOverlay_);
+        runtimeChoiceOverlay_ = null;
     }
 
     public GameObject AddGame(GameDescriptor descriptor, Action launch)
