@@ -10,6 +10,23 @@ public class UIStyleManager : MonoBehaviour
     /// <summary>
     /// Dark theme color palette for ERA-style UI.
     /// </summary>
+    public static class ModernTheme
+    {
+        public static readonly Color Background = new Color(0.035f, 0.043f, 0.058f, 1f);
+        public static readonly Color Surface = new Color(0.065f, 0.078f, 0.102f, 1f);
+        public static readonly Color SurfaceElevated = new Color(0.090f, 0.110f, 0.145f, 1f);
+        public static readonly Color InputBackground = new Color(0.045f, 0.055f, 0.074f, 1f);
+        public static readonly Color AccentPrimary = new Color(0.22f, 0.48f, 0.86f, 1f);
+        public static readonly Color AccentSecondary = new Color(0.48f, 0.34f, 0.82f, 1f);
+        public static readonly Color TextPrimary = new Color(0.93f, 0.95f, 0.98f, 1f);
+        public static readonly Color TextSecondary = new Color(0.66f, 0.71f, 0.79f, 1f);
+        public static readonly Color TextMuted = new Color(0.46f, 0.51f, 0.59f, 1f);
+        public static readonly Color Border = new Color(0.15f, 0.19f, 0.25f, 1f);
+        public static readonly Color Success = new Color(0.32f, 0.76f, 0.54f, 1f);
+        public static readonly Color Warning = new Color(0.95f, 0.68f, 0.28f, 1f);
+        public static readonly Color Danger = new Color(0.94f, 0.38f, 0.42f, 1f);
+    }
+
     public static class DarkTheme
     {
         // Background colors - very dark with slight blue tint
@@ -93,6 +110,33 @@ public class UIStyleManager : MonoBehaviour
         }
     }
     
+    /// <summary>
+    /// Applies consistent interaction colors to modern launcher buttons.
+    /// </summary>
+    public static void ConfigureButton(Button button, bool primary = false)
+    {
+        if (button == null)
+            return;
+
+        var colors = button.colors;
+        colors.normalColor = primary ? ModernTheme.AccentPrimary : ModernTheme.SurfaceElevated;
+        colors.highlightedColor = primary
+            ? new Color(0.29f, 0.57f, 0.98f, 1f)
+            : new Color(0.13f, 0.16f, 0.22f, 1f);
+        colors.pressedColor = primary
+            ? new Color(0.17f, 0.38f, 0.70f, 1f)
+            : new Color(0.055f, 0.070f, 0.098f, 1f);
+        colors.selectedColor = colors.highlightedColor;
+        colors.disabledColor = new Color(
+            ModernTheme.SurfaceElevated.r,
+            ModernTheme.SurfaceElevated.g,
+            ModernTheme.SurfaceElevated.b,
+            0.45f);
+        colors.colorMultiplier = 1f;
+        colors.fadeDuration = 0.08f;
+        button.colors = colors;
+    }
+
     /// <summary>
     /// Applies a solid color to an Image component.
     /// Note: Unity UI doesn't support gradients natively without custom shaders.

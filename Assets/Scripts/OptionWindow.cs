@@ -280,6 +280,23 @@ public class OptionWindow : MonoBehaviour
         HideMenu();
     }
 
+    public void ShowResolutionBox()
+    {
+        HideMenu();
+        if (resolution_pad != null)
+            resolution_pad.SetActive(true);
+    }
+
+    public void OpenProjectPage()
+    {
+        OnGithub();
+    }
+
+    public void ShowExitConfirmation()
+    {
+        OnMenuExit();
+    }
+
     void OnResolutionOut()
     {
         resolution_pad.SetActive(false);
@@ -449,6 +466,7 @@ public class OptionWindow : MonoBehaviour
     {
         MultiLanguage.SetLanguage(e.pointerPress.name);
         language_box.SetActive(false);
+        FirstWindow.instance?.RefreshDashboardLocalization();
     }
     
     /// <summary>
