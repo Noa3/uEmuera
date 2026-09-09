@@ -21,6 +21,7 @@ import argparse
 import json
 import subprocess
 import sys
+from typing import Optional
 from pathlib import Path
 from datetime import datetime, timezone
 
@@ -35,11 +36,11 @@ SCAN      = HERE / 'scan_game_usage.py'
 
 def load_json(path: Path) -> dict:
     if path.exists():
-        return json.loads(path.read_text(encoding='utf-8'))
+        return json.loads(path.read_text(encoding='utf-8-sig'))
     return {}
 
 
-def fetch_sdk(sdk_path_override: str | None) -> Path | None:
+def fetch_sdk(sdk_path_override: Optional[str]) -> Optional[Path]:
     """Locate or fetch era-electron.js. Returns path or None on failure."""
     if sdk_path_override:
         p = Path(sdk_path_override)
@@ -66,7 +67,7 @@ def fetch_sdk(sdk_path_override: str | None) -> Path | None:
     return None
 
 
-def run_extractor(sdk_path: Path, out_dir: Path) -> dict | None:
+def run_extractor(sdk_path: Path, out_dir: Path):
     """Run extract_api.py and return the new API dict."""
     out = out_dir / 'API.new.generated.json'
     result = subprocess.run(
@@ -77,7 +78,12 @@ def run_extractor(sdk_path: Path, out_dir: Path) -> dict | None:
         print(f'extract_api.py failed:\n{result.stderr}', file=sys.stderr)
         return None
     print(result.stdout.strip())
-    return json.loads(out.read_text(encoding='utf-8'))
+    data = json.loads(out.read_text(encoding='utf-8-sig'))
+    try:
+        out.unlink()
+    except OSError:
+        pass
+    return data
 
 
 def diff_apis(baseline: dict, latest: dict) -> dict:
@@ -162,6 +168,8 @@ def main():
     ap.add_argument('--sdk-path', help='Path to era-electron.js (skips git fetch)')
     ap.add_argument('--output-dir', default=str(PARITY),
                     help='Output directory (default: ReferenceParity/EraElectron)')
+    ap.add_argument('--accept', action='store_true',
+                    help='Accept a reviewed upstream API signature change as the new baseline')
     args = ap.parse_args()
 
     out_dir = Path(args.output_dir)
@@ -177,23 +185,32 @@ def main():
 
     baseline = load_json(API_BASELINE)
     if not baseline:
-        print('No baseline API.generated.json found; treating everything as new.')
-        baseline = {'apis': [], 'sdk_version': 'unknown'}
+        API_BASELINE.write_text(
+            json.dumps(latest, indent=2, ensure_ascii=False) + '\n',
+            encoding='utf-8')
+        print(f'Established initial API baseline → {API_BASELINE}')
+        return
 
     delta = diff_apis(baseline, latest)
     out_md = out_dir / 'API_DELTA.generated.md'
     write_delta_markdown(delta, out_md)
 
-    # Summary
     print(f'\nAdded: {len(delta["added"])}  '
           f'Removed: {len(delta["removed"])}  '
           f'Changed: {len(delta["changed"])}')
 
-    if delta['added'] or delta['removed'] or delta['changed']:
-        print('\nUpstream has changed. Review API_DELTA.generated.md and update uEmuera status.')
-        sys.exit(2)  # non-zero so CI can detect changes
+    changed = bool(delta['added'] or delta['removed'] or delta['changed'])
+    if changed and not args.accept:
+        print('\nUpstream has changed. Review API_DELTA.generated.md, then rerun with --accept.')
+        sys.exit(2)
+
+    API_BASELINE.write_text(
+        json.dumps(latest, indent=2, ensure_ascii=False) + '\n',
+        encoding='utf-8')
+    if changed:
+        print(f'Accepted new upstream API baseline → {API_BASELINE}')
     else:
-        print('No API changes detected.')
+        print('No upstream API changes detected; refreshed local implementation evidence.')
 
 
 if __name__ == '__main__':

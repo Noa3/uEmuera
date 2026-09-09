@@ -84,7 +84,7 @@ def apply_local_implementation_status(apis, repo_root):
     """Merge local C# implementation evidence into extracted upstream API metadata.
 
     Presence in both bridge and dispatcher means the API has an end-to-end code
-    path, but it remains IMPLEMENTED_UNVERIFIED until reference tests prove parity.
+    path, but it remains WIRED_UNVERIFIED until reference tests prove parity.
     Presence in only one side is PARTIAL. This intentionally avoids false FULL
     claims and fixes the older generator behaviour that marked every API MISSING.
     """
@@ -118,7 +118,7 @@ def apply_local_implementation_status(apis, repo_root):
         in_bridge = _contains_api(bridge, name)
 
         if in_dispatcher and in_bridge:
-            api['uEmuera_status'] = 'IMPLEMENTED_UNVERIFIED'
+            api['uEmuera_status'] = 'WIRED_UNVERIFIED'
         elif in_dispatcher or in_bridge:
             api['uEmuera_status'] = 'PARTIAL'
         else:
@@ -161,7 +161,7 @@ def extract_sdk_version(content):
 
 
 def extract_apis(path: Path, repo_root=None) -> dict:
-    content = path.read_text(encoding='utf-8')
+    content = path.read_text(encoding='utf-8-sig')
     sdk_version = extract_sdk_version(content)
 
     # Remove comment-only lines to simplify matching
