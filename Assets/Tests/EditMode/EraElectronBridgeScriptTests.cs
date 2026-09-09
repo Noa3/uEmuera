@@ -257,6 +257,23 @@ namespace uEmuera.Tests.EditMode
         }
 
         [Test]
+        public void Build_DefaultInputEcho_IsEnabled()
+        {
+            Assert.IsTrue(_js.Contains("var _hideUserInput=false"));
+            Assert.IsTrue(_js.Contains("_echoInput(value)"));
+            Assert.IsTrue(_js.Contains("_generatedNative.print(String(value),{})"),
+                "Input echo must pass through native print so line count matches DOM output.");
+        }
+
+        [Test]
+        public void Build_HideUserInput_DisablesEchoAtRuntime()
+        {
+            string js = EraElectronBridgeScript.Build("2200", true);
+            Assert.IsTrue(js.Contains("var _hideUserInput=true"));
+            Assert.IsTrue(js.Contains("if(_hideUserInput)return"));
+        }
+
+        [Test]
         public void Build_ProvidesInteractiveInput()
         {
             Assert.IsTrue(_js.Contains("_supplyInput"));

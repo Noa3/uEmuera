@@ -145,7 +145,9 @@ namespace uEmuera.Runtime
                 _bridge.SetEngineVersion(reportedEngineVersion);
 
                 string bootstrapJs =
-                    EraElectronBridgeScript.Build(reportedEngineVersion);
+                    EraElectronBridgeScript.Build(
+                        reportedEngineVersion,
+                        _data.Config.HideUserInput);
                 _fileServer = new EreLocalFileServer(_game.GameRoot, bootstrapJs);
                 _fileServer.Start();
                 _context?.Logger?.Info(

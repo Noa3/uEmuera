@@ -27,6 +27,9 @@
     const input = await era.input();
     if (input !== 1)
       throw new Error('Expected button accelerator 1, got ' + String(input));
+    if (era.getLineCount() !== 6)
+      throw new Error('Input echo/line count mismatch: expected 6, got ' +
+        String(era.getLineCount()));
 
     await era.clear();
     era.print('Input bridge: OK');

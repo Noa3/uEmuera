@@ -39,7 +39,9 @@ namespace uEmuera.Runtime.EraElectron
         /// (e.g. "2200"). Surfaced as <c>era.version.engine</c>. This must not simply
         /// echo a newer game requirement that the embedded runtime does not support.
         /// </param>
-        public static string Build(string engineVersion)
+        public static string Build(
+            string engineVersion,
+            bool hideUserInput = false)
         {
             var sb = new StringBuilder(4096);
             sb.Append("(function(){\n");
@@ -51,6 +53,9 @@ namespace uEmuera.Runtime.EraElectron
             //    Async APIs use postMessage and are completed by _eraResolve/_eraReject.
             // ----------------------------------------------------------------
             sb.Append("var _pending=Object.create(null),_nextCallId=1;\n");
+            sb.Append("var _hideUserInput=")
+              .Append(hideUserInput ? "true" : "false")
+              .Append(";\n");
             sb.Append("window._eraResolve=function(id,r){var p=_pending[id];if(!p)return;delete _pending[id];p.resolve(r);};\n");
             sb.Append("window._eraReject=function(id,e){var p=_pending[id];if(!p)return;delete _pending[id];p.reject(new Error(e||'ERA call failed'));};\n");
             sb.Append("var _wv=(window.chrome&&window.chrome.webview)?window.chrome.webview:null;\n");
@@ -148,7 +153,8 @@ namespace uEmuera.Runtime.EraElectron
             sb.Append("window.era.setAlign=function(v){var r=_generatedNative.setAlign(v);_layout.align=v||'left';return r;};window.era.setColor=function(v){var r=_generatedNative.setColor(v);_layout.color=v||'';return r;};window.era.setOffset=function(v){var r=_generatedNative.setOffset(v);_layout.offset=_clamp(v,0,23,0);return r;};window.era.setWidth=function(v){var r=_generatedNative.setWidth(v);_layout.width=_clamp(v,1,24,24);return r;};\n");
             sb.Append("window.era.setHorizontalAlign=function(v){var r=_generatedNative.setHorizontalAlign(v);_layout.horizontal=v||'start';return r;};window.era.setVerticalAlign=function(v){var r=_generatedNative.setVerticalAlign(v);_layout.vertical=v||'top';return r;};\n");
             sb.Append("window.era.setBack=function(name,cfg){var r=_generatedNative.setBack(name,cfg);_layer('uemuera-background',name,cfg,0);return r;};window.era.setOverlay=function(name,cfg){var r=_generatedNative.setOverlay(name,cfg);_layer('uemuera-overlay',name,cfg,2);return r;};window.era.setTitle=function(title){var r=_generatedNative.setTitle(title);document.title=String(title||'');return r;};\n");
-            sb.Append("window.era.input=function(){var input=document.createElement('input');input.id='uemuera-input';input.autocomplete='off';var row=_row({type:'text',content:''},{});row.appendChild(input);input.focus();return new Promise(function(resolve){var done=false;function finish(value){if(done)return;done=true;var index=_inputWaiters.indexOf(finish);if(index>=0)_inputWaiters.splice(index,1);row.remove();resolve(value);}input.addEventListener('keydown',function(e){if(e.key!=='Enter')return;var value=input.value;/^-?[0-9]+$/.test(value)&&(value=Number(value));finish(value);});_inputWaiters.push(finish);});};\n");
+            sb.Append("function _echoInput(value){if(_hideUserInput)return;_generatedNative.print(String(value),{});_row({type:'text',content:String(value),config:{}},{});}\n");
+            sb.Append("window.era.input=function(){var input=document.createElement('input');input.id='uemuera-input';input.autocomplete='off';var row=_row({type:'text',content:''},{});row.appendChild(input);input.focus();return new Promise(function(resolve){var done=false;function finish(value){if(done)return;done=true;var index=_inputWaiters.indexOf(finish);if(index>=0)_inputWaiters.splice(index,1);row.remove();_echoInput(value);resolve(value);}input.addEventListener('keydown',function(e){if(e.key!=='Enter')return;var value=input.value;/^-?[0-9]+$/.test(value)&&(value=Number(value));finish(value);});_inputWaiters.push(finish);});};\n");
             sb.Append("window.era.waitAnyKey=function(){return _waitInput().then(function(){return null;});};window.era.printAndWait=function(content,config){window.era.print(content,config);return _waitInput().then(function(){return _root().children.length;});};window.era.clear=function(lineCount){return _generatedNative.clear.apply(null,arguments).then(function(result){var r=_root();if(lineCount===undefined||lineCount===null){while(r.firstChild)r.removeChild(r.firstChild);}else{var n=Math.max(0,Math.floor(Number(lineCount)||0));while(n-->0&&r.lastElementChild)r.removeChild(r.lastElementChild);}return result;});};\n");
 
             // ----------------------------------------------------------------
