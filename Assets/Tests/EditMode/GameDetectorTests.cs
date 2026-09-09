@@ -166,6 +166,8 @@ namespace uEmuera.Tests.EditMode
                 ".ere-min-version content must be read into RequiredRuntimeVersion");
             Assert.AreEqual("erauma", desc.Title,
                 "Title must be read from package.json name field");
+            Assert.AreEqual("3.0.00", desc.Version,
+                "Version must be read from package.json for launcher metadata");
         }
 
         [Test]
@@ -201,7 +203,7 @@ namespace uEmuera.Tests.EditMode
         }
 
         [Test]
-        public void EreDetector_RootMainJsOnly_ReturnsLow()
+        public void EreDetector_RootMainJsOnly_IsRejected()
         {
             string dir = MakeRootMainJsOnlyLayout();
             var detector = new EraElectronGameDetector();
@@ -209,10 +211,8 @@ namespace uEmuera.Tests.EditMode
 
             var result = detector.TryDetect(dir, files);
 
-            // Root main.js alone should return Low confidence (very generic)
-            if (result != null)
-                Assert.AreEqual(DetectionConfidence.Low, result.Confidence,
-                    "A bare root main.js must not exceed Low confidence");
+            Assert.IsNull(result,
+                "A bare root main.js is generic JavaScript and must not be listed as an ERE game.");
         }
 
         [Test]

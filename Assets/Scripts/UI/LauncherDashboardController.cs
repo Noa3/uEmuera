@@ -574,10 +574,14 @@ public sealed class LauncherDashboardController : MonoBehaviour
         if (warnings > 0)
             return confidence + " • " + warnings + (warnings == 1 ? " warning" : " warnings");
 
-        if (descriptor.RuntimeKind == RuntimeKind.EraElectron)
-            return confidence + " • Experimental";
+        string suffix = string.IsNullOrWhiteSpace(descriptor.Version)
+            ? ""
+            : " • v" + descriptor.Version;
 
-        return confidence + " • Ready";
+        if (descriptor.RuntimeKind == RuntimeKind.EraElectron)
+            return confidence + " • Experimental" + suffix;
+
+        return confidence + " • Ready" + suffix;
     }
 
     static string ShortenPath(string path, int maxLength)
