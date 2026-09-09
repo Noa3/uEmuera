@@ -14,6 +14,12 @@ namespace uEmuera.Runtime
     /// </summary>
     public interface IEraElectronHost : IDisposable
     {
+        /// <summary>
+        /// Raised when the player closes the native host window/process directly.
+        /// The runtime translates this into a clean StopCurrentAsync + launcher return.
+        /// </summary>
+        event Action CloseRequested;
+
         /// <summary>Which hosting strategy this instance uses.</summary>
         EraElectronHostMode HostMode { get; }
 

@@ -42,6 +42,8 @@ namespace uEmuera.Runtime.EraElectron
         //  IEraElectronHost                                                    //
         // ------------------------------------------------------------------ //
 
+        public event Action CloseRequested;
+
         public EraElectronHostMode HostMode    => EraElectronHostMode.Embedded;
         public HostCapabilities    Capabilities => _caps ?? _defaultCaps;
 
@@ -543,6 +545,20 @@ namespace uEmuera.Runtime.EraElectron
                             UnityEngine.Debug.LogWarning(
                                 "[WebView2Host] Callback error: " + ex.Message);
                         }
+                    }
+                    return IntPtr.Zero;
+                }
+
+                if (msg == 0x0010 /* WM_CLOSE */)
+                {
+                    // Do not let DefWindowProc destroy the HWND behind the runtime.
+                    // The manager owns teardown; keep the native window alive until
+                    // StopAsync closes the controller and STA loop cleanly.
+                    try { host.CloseRequested?.Invoke(); }
+                    catch (Exception ex)
+                    {
+                        UnityEngine.Debug.LogWarning(
+                            "[WebView2Host] CloseRequested handler failed: " + ex.Message);
                     }
                     return IntPtr.Zero;
                 }

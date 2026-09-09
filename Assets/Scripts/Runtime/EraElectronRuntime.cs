@@ -27,6 +27,7 @@ namespace uEmuera.Runtime
         EreApiDispatcher       _bridge;
         DateTime               _startedAt;
         readonly Func<EraElectronHostMode, IEraElectronHost> _hostFactory;
+        int _returnToLauncherRequested;
 
         public EraElectronRuntime()
             : this(PlatformWebViewBridge.Create)
@@ -116,6 +117,7 @@ namespace uEmuera.Runtime
                 _host = _hostFactory(_hostMode)
                     ?? throw new InvalidOperationException(
                         "[EraElectronRuntime] Host factory returned null.");
+                _host.CloseRequested += OnHostCloseRequested;
 
                 string requiredEngineVersion =
                     PlatformWebViewBridge.ReadEreMinVersion(_game);
@@ -228,6 +230,7 @@ namespace uEmuera.Runtime
             _host = null;
             if (host != null)
             {
+                try { host.CloseRequested -= OnHostCloseRequested; } catch { }
                 try { await host.StopAsync(); }
                 catch (Exception ex)
                 {
@@ -262,6 +265,51 @@ namespace uEmuera.Runtime
             {
                 _context?.Logger?.Warn(
                     $"[EraElectronRuntime] Data model dispose failed: {ex.Message}");
+            }
+        }
+
+        // ------------------------------------------------------------------ //
+        //  Host lifecycle                                                       //
+        // ------------------------------------------------------------------ //
+
+        void OnHostCloseRequested()
+        {
+            if (System.Threading.Interlocked.Exchange(
+                    ref _returnToLauncherRequested, 1) != 0)
+                return;
+
+            _context?.Logger?.Info(
+                "[EraElectronRuntime] Host requested close; returning to launcher.");
+
+            var dispatcher = _context?.MainThread;
+            if (dispatcher != null)
+            {
+                dispatcher.Post(() => { _ = StopAndReturnToLauncherAsync(dispatcher); });
+            }
+            else
+            {
+                _ = StopAndReturnToLauncherAsync(null);
+            }
+        }
+
+        async Task StopAndReturnToLauncherAsync(IMainThreadDispatcher dispatcher)
+        {
+            try
+            {
+                await GameRuntimeManager.Instance.StopCurrentAsync();
+            }
+            catch (Exception ex)
+            {
+                _context?.Logger?.Warn(
+                    "[EraElectronRuntime] Failed to stop after host close: " + ex.Message);
+            }
+            finally
+            {
+                Action showLauncher = () => FirstWindow.Show();
+                if (dispatcher != null)
+                    dispatcher.Post(showLauncher);
+                else
+                    showLauncher();
             }
         }
 
