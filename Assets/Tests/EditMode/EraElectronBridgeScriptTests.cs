@@ -87,6 +87,29 @@ namespace uEmuera.Tests.EditMode
         }
 
         [Test]
+        public void Build_ReportsEmulatedSdkVersion()
+        {
+            Assert.IsTrue(_js.Contains(
+                "\"" + EraElectronCompatibility.EmulatedSdkVersion + "\""),
+                "era.version.sdk must report the emulated EraElectron SDK target, " +
+                "not uEmuera's internal bridge version.");
+        }
+
+        [Test]
+        public void Build_ExposesIsEraProperty()
+        {
+            Assert.IsTrue(_js.Contains("isEra:true"),
+                "EraElectron games use era.isEra to identify the ERA runtime.");
+        }
+
+        [Test]
+        public void Build_ExposesSeparateBridgeVersion()
+        {
+            Assert.IsTrue(_js.Contains("_uEmueraBridgeVersion"),
+                "uEmuera bridge version must be separate from era.version.sdk.");
+        }
+
+        [Test]
         public void Build_ContainsLoggerSubObject()
         {
             Assert.IsTrue(_js.Contains("logger:"), "era.logger sub-object must exist");

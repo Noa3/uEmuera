@@ -55,6 +55,19 @@ This audit intentionally separates implemented code from verified compatibility.
 | Linux embedded host | MISSING | WebKitGTK/Chromium host decision/implementation still required. |
 | Full EraUma gameplay | UNVERIFIED | Do not claim compatibility until an unmodified package passes integration milestones. |
 
+## Embedded compatibility profile
+
+The embedded ERE runtime currently advertises an explicit compatibility target instead
+of echoing the game's minimum requirement:
+
+- engine compatibility level: `2200`
+- captured SDK target: `4.7.0`
+- latest upstream stable observed during this audit: `4.8.0`
+
+The 4.8.0 SDK/API delta must be captured and reviewed before the embedded target is
+upgraded. A source-form game without compiled webpack bundles now requires the official
+sidecar rather than falling into the intentionally incomplete CommonJS fallback.
+
 ## Immediate engineering priorities
 
 1. Run and record a real Windows standalone synthetic ERE test through WebView2.

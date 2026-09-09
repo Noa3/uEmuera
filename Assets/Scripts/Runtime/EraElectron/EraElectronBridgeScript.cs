@@ -27,8 +27,8 @@ namespace uEmuera.Runtime.EraElectron
     /// </summary>
     public static class EraElectronBridgeScript
     {
-        // Keep in sync with ReferenceParity/EraElectron/API.generated.json
-        private const string UEmueraSdkVersion = "0.1.0-stub";
+        // These are compatibility claims, not the uEmuera application version.
+        // Keep them synchronized through EraElectronCompatibility and parity tests.
         private const string EraElectronSdkAlias = "#/era-electron";
 
         /// <summary>
@@ -76,12 +76,18 @@ namespace uEmuera.Runtime.EraElectron
 
             // era.version (property object, accessed as era.version.engine / era.version.sdk)
             sb.Append("var _ver={engine:").Append(JsonString(engineVersion ?? "")).Append(",");
-            sb.Append("sdk:").Append(JsonString(UEmueraSdkVersion)).Append("};\n");
+            sb.Append("sdk:")
+              .Append(JsonString(EraElectronCompatibility.EmulatedSdkVersion))
+              .Append("};\n");
 
             sb.Append("window.era={\n");
 
-            // --- version ---
+            // --- version / runtime identity ---
             sb.Append("  version:_ver,\n");
+            sb.Append("  isEra:true,\n");
+            sb.Append("  _uEmueraBridgeVersion:")
+              .Append(JsonString(EraElectronCompatibility.BridgeVersion))
+              .Append(",\n");
 
             // --- Output APIs (sync) ---
             foreach (var m in SyncOutputApis)

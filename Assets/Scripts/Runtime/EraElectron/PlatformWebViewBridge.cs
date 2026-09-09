@@ -18,18 +18,14 @@ namespace uEmuera.Runtime.EraElectron
     ///
     ///   Auto     → picks best available platform host
     ///   Embedded → requires PlatformWebViewHost (not yet built; falls back gracefully)
-    ///   Sidecar  → launches official EraElectron executable (future)
+    ///   Sidecar  → launches a configured official EraElectron executable
     ///
-    /// Current status: STUB.
-    /// Only <see cref="NullEraElectronHost"/> is returned; it logs detailed info
-    /// and throws <see cref="NotSupportedException"/> on StartAsync so the launcher
-    /// shows an informative dialog instead of a silent black screen.
+    /// Current status:
+    ///   Windows standalone: WebView2Host
+    ///   Desktop source packages: optional OfficialSidecarHost
+    ///   Android/Linux embedded: NullEraElectronHost until platform hosts exist
     ///
-    /// To implement the real embedded host:
-    ///   Windows:  wrap WebView2 (Microsoft.Web.WebView2) in PlatformWebViewHost
-    ///   Android:  wrap android.webkit.WebView in an AndroidWebViewHost plugin
-    ///   Linux:    wrap WebKitGTK or host-installed Chromium
-    ///   All:      inject EraElectronBridgeScript.Build() before game JS loads
+    /// All embedded hosts must inject EraElectronBridgeScript.Build() before game JS loads
     ///
     /// See Docs/ADR/WEB_RUNTIME_HOST.md for the selection rationale.
     /// </summary>
