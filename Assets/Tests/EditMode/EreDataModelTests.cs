@@ -243,6 +243,62 @@ namespace uEmuera.Tests.EditMode
                 "Loading global data must not overwrite normal save variables.");
         }
 
+        [Test]
+        public void GameBase_GetReturnsReadOnlyMetadataObjectWithNumericVersion()
+        {
+            string root = Path.Combine(
+                Path.GetTempPath(),
+                "uEmuera_gamebase_" + System.Guid.NewGuid().ToString("N"));
+            string csv = Path.Combine(root, "csv");
+            Directory.CreateDirectory(csv);
+            File.WriteAllText(Path.Combine(csv, "GameBase.csv"),
+                "タイトル,Synthetic Title\n" +
+                "作者,Test Author\n" +
+                "製作年,2026\n" +
+                "追加情報,Fixture Info\n" +
+                "コード,77\n" +
+                "バージョン,1001\n" +
+                "バージョン違い認める,1\n" +
+                "最初からいるキャラ,3\n" +
+                "アイテムなし,1\n",
+                System.Text.Encoding.UTF8);
+
+            try
+            {
+                using (var model = EreDataModel.Create(new GameDescriptor
+                {
+                    GameId = "gamebase-test",
+                    Title = "Fixture",
+                    RuntimeKind = RuntimeKind.EraElectron,
+                    GameRoot = root,
+                    SaveNamespace = "gamebase-test",
+                }))
+                {
+                    var gamebase = model.Get("gamebase") as
+                        System.Collections.Generic.Dictionary<string, object>;
+                    Assert.IsNotNull(gamebase);
+                    Assert.AreEqual("Synthetic Title", gamebase["title"]);
+                    Assert.AreEqual("Test Author", gamebase["author"]);
+                    Assert.AreEqual("2026", gamebase["year"]);
+                    Assert.AreEqual(77L, gamebase["code"]);
+                    Assert.AreEqual(1001L, gamebase["version"]);
+                    Assert.AreEqual(1L, gamebase["allowVersion"]);
+                    Assert.AreEqual(3L, gamebase["defaultChara"]);
+                    Assert.AreEqual(1L, gamebase["noItem"]);
+
+                    // GAMEBASE is static/read-only.
+                    model.Set("gamebase", 123);
+                    var after = model.Get("gamebase") as
+                        System.Collections.Generic.Dictionary<string, object>;
+                    Assert.AreEqual(1001L, after["version"]);
+                }
+            }
+            finally
+            {
+                try { Directory.Delete(root, true); } catch { }
+            }
+        }
+
         // ------------------------------------------------------------------ //
         //  EraCsvParser                                                        //
         // ------------------------------------------------------------------ //

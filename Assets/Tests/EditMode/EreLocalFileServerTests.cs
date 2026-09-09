@@ -448,6 +448,20 @@ namespace uEmuera.Tests.EditMode
         }
 
         [Test]
+        public void Dispatcher_ReplaceText_DoesNotIncrementLineCount()
+        {
+            using (var model = EreDataModel.Create(BuildDescriptor()))
+            {
+                var dispatcher = new EreApiDispatcher(model, new RuntimeContext());
+                dispatcher.DispatchSync("print", "[\"first\"]");
+                dispatcher.DispatchSync("print", "[\"second\"]");
+
+                Assert.AreEqual("2", dispatcher.DispatchSync("replaceText", "[\"replacement\"]"));
+                Assert.AreEqual("2", dispatcher.DispatchSync("getLineCount", "[]"));
+            }
+        }
+
+        [Test]
         public void Dispatcher_ParsesAndSerializesJsonArguments()
         {
             using (var model = EreDataModel.Create(BuildDescriptor()))

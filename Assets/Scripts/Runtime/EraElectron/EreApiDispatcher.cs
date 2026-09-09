@@ -152,7 +152,7 @@ namespace uEmuera.Runtime.EraElectron
                 case "printProgress":  return StubLineNumber();
                 case "printWholeImage": return StubLineNumber();
                 case "printLineChart": return StubLineNumber();
-                case "replaceText":    return StubLineNumber();
+                case "replaceText":    return _lineCount.ToString();
                 case "replaceInColRows": return StubLineNumber();
                 case "setToBottom":    return StubLineNumber();
 

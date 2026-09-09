@@ -9,6 +9,12 @@
     if (!era.version || typeof era.version.sdk !== 'string')
       throw new Error('era.version.sdk missing');
 
+    const gamebase = era.get('gamebase');
+    if (!gamebase || gamebase.version !== 1001)
+      throw new Error('gamebase bridge failed: expected version 1001');
+    if (gamebase.title !== 'uEmuera Synthetic ERE')
+      throw new Error('gamebase title missing');
+
     await era.clear();
     era.setAlign('center');
     era.drawLine({ isSolid: true });
@@ -29,6 +35,7 @@
     era.add('flag:0', 1);
     if (era.get('flag:0') !== 42)
       throw new Error('Data bridge failed: flag:0 != 42');
+    era.print('Static GAMEBASE: OK');
     era.print('Data bridge: OK');
 
     const saved = await era.saveData(0, 'synthetic smoke save');

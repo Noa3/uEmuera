@@ -63,6 +63,20 @@ namespace uEmuera.Runtime.EraElectron
         public string GameAuthor  { get; private set; } = "";
         public string GameVersion { get; private set; } = "";
 
+        readonly Dictionary<string, object> _gameBase =
+            new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
+            {
+                { "title", "" },
+                { "author", "" },
+                { "year", "" },
+                { "info", "" },
+                { "code", 0L },
+                { "version", 0L },
+                { "allowVersion", 0L },
+                { "defaultChara", 0L },
+                { "noItem", 0L },
+            };
+
         // ------------------------------------------------------------------ //
         //  Construction                                                        //
         // ------------------------------------------------------------------ //
@@ -122,11 +136,61 @@ namespace uEmuera.Runtime.EraElectron
         {
             foreach (var kv in EraCsvParser.ParseKeyValue(path))
             {
-                switch (kv.Key.ToUpperInvariant())
+                string key = kv.Key.Trim();
+                string upper = key.ToUpperInvariant();
+                switch (upper)
                 {
-                    case "タイトル":   case "TITLE":   GameTitle   = kv.Value; break;
-                    case "作者":       case "AUTHOR":  GameAuthor  = kv.Value; break;
-                    case "バージョン": case "VERSION": GameVersion = kv.Value; break;
+                    case "タイトル":
+                    case "TITLE":
+                        GameTitle = kv.Value ?? "";
+                        _gameBase["title"] = GameTitle;
+                        break;
+
+                    case "作者":
+                    case "AUTHOR":
+                        GameAuthor = kv.Value ?? "";
+                        _gameBase["author"] = GameAuthor;
+                        break;
+
+                    case "製作年":
+                    case "YEAR":
+                        _gameBase["year"] = kv.Value ?? "";
+                        break;
+
+                    case "追加情報":
+                    case "INFO":
+                    case "ADDITIONAL INFO":
+                        _gameBase["info"] = kv.Value ?? "";
+                        break;
+
+                    case "コード":
+                    case "CODE":
+                        _gameBase["code"] = ParseLong(kv.Value);
+                        break;
+
+                    case "バージョン":
+                    case "VERSION":
+                        GameVersion = kv.Value ?? "";
+                        _gameBase["version"] = ParseLong(kv.Value);
+                        break;
+
+                    case "バージョン違い認める":
+                    case "ALLOWVERSION":
+                    case "ALLOW VERSION DIFFERENCE":
+                        _gameBase["allowVersion"] = ParseLong(kv.Value);
+                        break;
+
+                    case "最初からいるキャラ":
+                    case "DEFAULTCHARA":
+                    case "STARTING CHARACTERS":
+                        _gameBase["defaultChara"] = ParseLong(kv.Value);
+                        break;
+
+                    case "アイテムなし":
+                    case "NOITEM":
+                    case "NO ITEMS":
+                        _gameBase["noItem"] = ParseLong(kv.Value);
+                        break;
                 }
             }
         }
@@ -151,6 +215,14 @@ namespace uEmuera.Runtime.EraElectron
         /// </summary>
         public object Get(string varName)
         {
+            if (string.Equals(varName, "gamebase", StringComparison.OrdinalIgnoreCase))
+            {
+                // Return a copy so game scripts cannot mutate static metadata by
+                // retaining and editing the object returned by era.get().
+                return new Dictionary<string, object>(
+                    _gameBase, StringComparer.OrdinalIgnoreCase);
+            }
+
             VarAddress addr;
             if (!VarAddress.TryParse(varName, out addr)) return null;
 
@@ -166,6 +238,9 @@ namespace uEmuera.Runtime.EraElectron
 
         public object Set(string varName, object value)
         {
+            if (string.Equals(varName, "gamebase", StringComparison.OrdinalIgnoreCase))
+                return Get("gamebase");
+
             VarAddress addr;
             if (!VarAddress.TryParse(varName, out addr)) return value;
 
@@ -180,6 +255,9 @@ namespace uEmuera.Runtime.EraElectron
 
         public object Add(string varName, object value)
         {
+            if (string.Equals(varName, "gamebase", StringComparison.OrdinalIgnoreCase))
+                return Get("gamebase");
+
             VarAddress addr;
             if (!VarAddress.TryParse(varName, out addr)) return value;
 
@@ -437,6 +515,13 @@ namespace uEmuera.Runtime.EraElectron
         // ------------------------------------------------------------------ //
         //  Utility                                                             //
         // ------------------------------------------------------------------ //
+
+        static long ParseLong(string value)
+        {
+            return long.TryParse((value ?? "").Trim(), out long parsed)
+                ? parsed
+                : 0L;
+        }
 
         static long ToLong(object v)
         {
