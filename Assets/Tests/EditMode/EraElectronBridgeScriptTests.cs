@@ -238,6 +238,21 @@ namespace uEmuera.Tests.EditMode
         }
 
         [Test]
+        public void Build_DrawLineDistinguishesSolidAndDashed()
+        {
+            Assert.IsTrue(_js.Contains("cfg.isSolid?'solid':'dashed'"),
+                "drawLine({isSolid:true}) needs a visibly solid separator.");
+        }
+
+        [Test]
+        public void Build_SetToBottomCreatesViewportSpacer()
+        {
+            Assert.IsTrue(_js.Contains("uemuera-bottom-spacer"));
+            Assert.IsTrue(_js.Contains("row.style.minHeight='100vh'"),
+                "setToBottom should emit a viewport-height blank program row.");
+        }
+
+        [Test]
         public void Build_MapsImageAnchorsAndFit()
         {
             Assert.IsTrue(_js.Contains("bottomright:'right bottom'"));
