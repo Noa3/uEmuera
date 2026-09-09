@@ -260,6 +260,10 @@ namespace uEmuera.Runtime.EraElectron
         /// Builds a minimal HTML loader page that:
         ///   1. Injects bridge.js (era.* surface)
         ///   2. Loads the game's main entry point
+        ///   3. Signals host-ready as soon as the entry function is invoked successfully.
+        ///
+        /// IMPORTANT: the game's main Promise usually lives for the entire game session,
+        /// so host-ready must never wait for that Promise to resolve.
         ///
         /// The entry-point path is derived from GameRoot structure:
         ///   ere/main.js (source layout) → /game/ere/main.js
@@ -276,7 +280,7 @@ namespace uEmuera.Runtime.EraElectron
             sb.Append("function post(v){if(window.chrome&&window.chrome.webview)window.chrome.webview.postMessage(JSON.stringify(v));}\n");
             sb.Append("function fail(e){var m=(e&&e.message)||String(e);document.getElementById('uemuera-load-error').textContent=m;post({type:'uemuera-load-error',error:m});}\n");
             sb.Append("function ready(){post({type:'uemuera-ready'});}\n");
-            sb.Append("function run(entry){if(entry&&typeof entry.default==='function')entry=entry.default;if(typeof entry!=='function'){fail(new Error('ERE entry point did not export a function'));return;}Promise.resolve().then(function(){return entry();}).then(ready,fail);}\n");
+            sb.Append("function run(entry){if(entry&&typeof entry.default==='function')entry=entry.default;if(typeof entry!=='function'){fail(new Error('ERE entry point did not export a function'));return;}try{var running=entry();ready();Promise.resolve(running).catch(fail);}catch(e){fail(e);}}\n");
             sb.Append("function load(src,next){var s=document.createElement('script');s.src=src;s.onload=next;s.onerror=function(){fail(new Error('Failed to load '+src));};document.head.appendChild(s);}\n");
             sb.Append("window.addEventListener('unhandledrejection',function(e){fail(e.reason);});\n");
 

@@ -133,3 +133,27 @@ FirstWindow.Titlebar.title=游戏列表
 [LogFileOutputFailed]=日志文件只能保存在可执行文件所在目录下
 [LogFileOutputFailedTitle]=日志输出失败
 [UnrecognizedIdentifier]="{0}"是无法识别的标识符
+
+; 现代启动器
+[LauncherTitle]=游戏库
+[LauncherSubtitle]=选择要启动的游戏
+[LauncherChooseFolder]=游戏文件夹
+[LauncherRefresh]=刷新
+[LauncherSettings]=设置
+[LauncherDisplay]=显示
+[LauncherLanguage]=语言
+[LauncherMore]=更多
+[LauncherProject]=GitHub
+[LauncherExit]=退出
+[LauncherSearch]=搜索游戏、路径或运行时...
+[LauncherGames]=游戏
+[LauncherNoGames]=未找到游戏
+[LauncherNoGamesHint]=选择游戏文件夹或刷新游戏库。
+[LauncherNoSearchResults]=没有符合搜索条件的游戏
+[LauncherSearchHint]=尝试其他标题、路径或运行时。
+[LauncherAutomaticLibrary]=自动发现游戏
+[LauncherLibrary]=游戏库
+
+[LauncherRuntimeChoiceTitle]=选择运行时
+[LauncherRuntimeChoiceBody]=此文件夹匹配多个运行时。请选择 uEmuera 应如何启动它。\n\n文件夹: {0}
+[LauncherCancel]=取消

@@ -1,6 +1,6 @@
 # EraElectron Platform Matrix
 
-> Phase 8 · 2026-08-12
+> Updated: 2026-09-09
 
 ---
 
@@ -8,7 +8,7 @@
 
 | Platform | Embedded host | Sidecar | Priority |
 |---|---|---|---|
-| Windows 10/11 | WebView2 (proposed) | Official EraElectron exe | P0 |
+| Windows 10/11 | WebView2 implemented, unverified | Official sidecar implemented, unverified | P0 |
 | Android (API 26+) | Android WebView | N/A | P0 |
 | Linux (x64) | WebKitGTK or CEF | If available | P1 |
 | macOS | WKWebView | If available | Deferred |
@@ -20,7 +20,7 @@
 
 **Embedded host:** Microsoft WebView2 (Chromium-based, ships with Windows 10/11)  
 **Sidecar:** User-provided official EraElectron compatible executable  
-**Spike status:** Spike required (see WEB_RUNTIME_HOST.md ADR)
+**Implementation status:** WebView2Host exists for Windows standalone; packaged-game compatibility verification remains required.
 
 Requirements:
 - WebView2 Runtime installed (evergreen; auto-updated via Windows Update)
@@ -65,8 +65,7 @@ Requirements:
 ## Unity Editor (Windows)
 
 **Purpose:** Development and automated testing  
-**Host:** Same as Windows embedded host  
-**Requirement:** Works in Edit Play mode; test runner compatible
+**Host:** Embedded WebView2 is intentionally disabled in Windows Editor because native initialization can terminate the Editor. Use sidecar/null-host paths for editor workflows.
 
 ---
 

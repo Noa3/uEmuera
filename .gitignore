@@ -1,15 +1,33 @@
 .vs/
+.idea/
 Library/
 Logs/
 Temp/
 UserSettings/
+obj/
+bin/
+
+# Unity/IDE generated project files
+*.csproj
+*.sln
+*.slnx
+*.user
+*.userprefs
+*.pidb
+*.booproj
+
+# Local game/runtime data
 era/
-Build/
-*.keystore
-uEmuera.zip
 .games/
 .engine/
 .codegraph/
 __pycache__/
+Build/
 Builds/
+*.keystore
+uEmuera.zip
+
+# Local scratch / temporary exports
+temp_*.txt
+
 ProjectSettings/ProjectAuditorSettings.asset

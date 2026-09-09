@@ -51,16 +51,15 @@ namespace uEmuera.Runtime.Detection
             Path.Combine("ere", "main.js");
 
         /// <summary>
-        /// Possible compiled-output entry points for built/distributed ERE games.
-        /// These are inferred from the webpack config output type ("self");
-        /// NOT yet verified against a real distribution bundle.
+        /// Browser-ready distribution bundle pairs. A generic root main.js alone is
+        /// intentionally NOT sufficient evidence because many unrelated JavaScript
+        /// projects contain that filename.
         /// </summary>
-        static readonly string[] BuiltEntryPoints =
+        static readonly string[][] BuiltBundlePairs =
         {
-            "main.bundle.js",
-            Path.Combine("dist", "main.bundle.js"),
-            "main.js",
-            Path.Combine("dist", "main.js"),
+            new[] { "era.bundle.js", "main.bundle.js" },
+            new[] { Path.Combine("dist", "era.bundle.js"),
+                    Path.Combine("dist", "main.bundle.js") },
         };
 
         // ------------------------------------------------------------------ //
@@ -98,19 +97,20 @@ namespace uEmuera.Runtime.Detection
             if (hasGameEntry)
                 evidence.Add($"entry: {GameEntrySourcePath}");
 
-            // ---- Fallback: compiled/distribution entry -------------------
+            // ---- Fallback: compiled/distribution bundle pair ---------------
             bool hasBuiltEntry = false;
+            string builtMainEntry = null;
             if (!hasGameEntry)
             {
-                foreach (var ep in BuiltEntryPoints)
+                foreach (var pair in BuiltBundlePairs)
                 {
-                    if (File.Exists(Path.Combine(directory, ep)))
+                    if (File.Exists(Path.Combine(directory, pair[0])) &&
+                        File.Exists(Path.Combine(directory, pair[1])))
                     {
                         hasBuiltEntry = true;
-                        evidence.Add($"built-entry: {ep}");
-                        warnings.Add(
-                            "Only a compiled entry point found; no ere/ source tree. " +
-                            "This may be a distribution bundle — verify against a reference distribution.");
+                        builtMainEntry = pair[1];
+                        evidence.Add($"built-sdk: {pair[0]}");
+                        evidence.Add($"built-entry: {pair[1]}");
                         break;
                     }
                 }
@@ -147,11 +147,9 @@ namespace uEmuera.Runtime.Detection
             }
             else
             {
-                // Only a compiled root main.js — very generic, low confidence
-                confidence = DetectionConfidence.Low;
-                warnings.Add(
-                    "Only root main.js found with no other ERE indicators. " +
-                    "Could be any JavaScript project.");
+                // A complete era.bundle.js + main.bundle.js pair is strong enough
+                // to identify a browser-ready ERE distribution without source files.
+                confidence = DetectionConfidence.High;
             }
 
             return new DetectionResult
@@ -180,18 +178,19 @@ namespace uEmuera.Runtime.Detection
                 entryRel = SdkSourcePath;   // unusual but non-null
             else
             {
-                foreach (var ep in BuiltEntryPoints)
+                foreach (var pair in BuiltBundlePairs)
                 {
-                    if (File.Exists(Path.Combine(directory, ep)))
+                    if (File.Exists(Path.Combine(directory, pair[0])) &&
+                        File.Exists(Path.Combine(directory, pair[1])))
                     {
-                        entryRel = ep;
+                        entryRel = pair[1];
                         break;
                     }
                 }
             }
 
-            // Read game title from package.json "name" field if possible
-            string title = ReadPackageName(directory) ?? folderName;
+            string title = ReadPackageString(directory, "name") ?? folderName;
+            string version = ReadPackageString(directory, "version") ?? string.Empty;
 
             string gameId = EmueraGameDetector.MakeId("ere-", directory);
 
@@ -199,7 +198,7 @@ namespace uEmuera.Runtime.Detection
             {
                 GameId                  = gameId,
                 Title                   = title,
-                Version                 = string.Empty, // read from package.json at runtime
+                Version                 = version,
                 RuntimeKind             = RuntimeKind.EraElectron,
                 GameRoot                = directory,
                 EntryPoint              = entryRel,
@@ -225,24 +224,49 @@ namespace uEmuera.Runtime.Detection
             catch { return string.Empty; }
         }
 
-        static string ReadPackageName(string directory)
+        static string ReadPackageString(string directory, string property)
         {
             string pkgPath = Path.Combine(directory, "package.json");
-            if (!File.Exists(pkgPath)) return null;
+            if (!File.Exists(pkgPath) || string.IsNullOrEmpty(property))
+                return null;
+
             try
             {
                 string text = File.ReadAllText(pkgPath, System.Text.Encoding.UTF8);
-                // Minimal JSON parse: find "name": "..."
-                int nameIdx = text.IndexOf("\"name\"", StringComparison.Ordinal);
-                if (nameIdx < 0) return null;
-                int colon = text.IndexOf(':', nameIdx);
+                string needle = "\"" + property + "\"";
+                int keyIndex = text.IndexOf(needle, StringComparison.Ordinal);
+                if (keyIndex < 0) return null;
+                int colon = text.IndexOf(':', keyIndex + needle.Length);
                 if (colon < 0) return null;
                 int q1 = text.IndexOf('"', colon + 1);
                 if (q1 < 0) return null;
-                int q2 = text.IndexOf('"', q1 + 1);
-                if (q2 < 0) return null;
-                string name = text.Substring(q1 + 1, q2 - q1 - 1).Trim();
-                return string.IsNullOrEmpty(name) ? null : name;
+
+                // Handle simple JSON string escapes while looking for the closing quote.
+                int q2 = q1 + 1;
+                bool escaped = false;
+                for (; q2 < text.Length; q2++)
+                {
+                    char ch = text[q2];
+                    if (escaped)
+                    {
+                        escaped = false;
+                        continue;
+                    }
+                    if (ch == '\\')
+                    {
+                        escaped = true;
+                        continue;
+                    }
+                    if (ch == '"')
+                        break;
+                }
+                if (q2 >= text.Length) return null;
+
+                string value = text.Substring(q1 + 1, q2 - q1 - 1)
+                    .Replace("\\\"", "\"")
+                    .Replace("\\\\", "\\")
+                    .Trim();
+                return string.IsNullOrEmpty(value) ? null : value;
             }
             catch { return null; }
         }

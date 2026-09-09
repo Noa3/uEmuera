@@ -27,6 +27,7 @@ namespace uEmuera.Runtime
         EreApiDispatcher       _bridge;
         DateTime               _startedAt;
         readonly Func<EraElectronHostMode, IEraElectronHost> _hostFactory;
+        int _returnToLauncherRequested;
 
         public EraElectronRuntime()
             : this(PlatformWebViewBridge.Create)
@@ -70,6 +71,16 @@ namespace uEmuera.Runtime
                 _hostMode = ResolveHostMode(game);
                 context.Logger?.Info($"[EraElectronRuntime] Host mode: {_hostMode}");
 
+                if (_hostMode != EraElectronHostMode.OfficialSidecar &&
+                    !EraElectronCompatibility.CanRunEmbedded(
+                        game.RequiredRuntimeVersion, out string compatibilityReason))
+                {
+                    throw new NotSupportedException(
+                        compatibilityReason +
+                        " Configure a compatible official EraElectron sidecar " +
+                        "or update the embedded compatibility layer.");
+                }
+
                 if (string.IsNullOrWhiteSpace(game.GameRoot))
                     throw new InvalidOperationException(
                         "[EraElectronRuntime] GameDescriptor.GameRoot is empty.");
@@ -106,16 +117,37 @@ namespace uEmuera.Runtime
                 _host = _hostFactory(_hostMode)
                     ?? throw new InvalidOperationException(
                         "[EraElectronRuntime] Host factory returned null.");
+                _host.CloseRequested += OnHostCloseRequested;
 
-                string engineVersion = PlatformWebViewBridge.ReadEreMinVersion(_game);
+                string requiredEngineVersion =
+                    PlatformWebViewBridge.ReadEreMinVersion(_game);
+                string reportedEngineVersion =
+                    _host.HostMode == EraElectronHostMode.OfficialSidecar
+                        ? requiredEngineVersion
+                        : EraElectronCompatibility.EmulatedEngineVersion.ToString();
+
                 _context?.Logger?.Info(
-                    $"[EraElectronRuntime] Host={_host.HostMode}, ereMinVersion={engineVersion}");
+                    $"[EraElectronRuntime] Host={_host.HostMode}, " +
+                    $"requiredEngine={requiredEngineVersion}, " +
+                    $"embeddedTarget={EraElectronCompatibility.EmulatedEngineVersion}, " +
+                    $"sdkTarget={EraElectronCompatibility.EmulatedSdkVersion}");
+
+                if (_context.Storage == null)
+                {
+                    string saveNamespace = !string.IsNullOrWhiteSpace(_game.SaveNamespace)
+                        ? _game.SaveNamespace
+                        : _game.GameId;
+                    _context.Storage = new FileGameStorage(saveNamespace);
+                }
 
                 _data = EreDataModel.Create(_game);
                 _bridge = new EreApiDispatcher(_data, _context);
-                _bridge.SetEngineVersion(engineVersion);
+                _bridge.SetEngineVersion(reportedEngineVersion);
 
-                string bootstrapJs = EraElectronBridgeScript.Build(engineVersion);
+                string bootstrapJs =
+                    EraElectronBridgeScript.Build(
+                        reportedEngineVersion,
+                        _data.Config.HideUserInput);
                 _fileServer = new EreLocalFileServer(_game.GameRoot, bootstrapJs);
                 _fileServer.Start();
                 _context?.Logger?.Info(
@@ -181,7 +213,8 @@ namespace uEmuera.Runtime
                 State           = _state,
                 GameTitle       = _game?.Title,
                 GameVersion     = _game?.Version,
-                RuntimeVersion  = "EraElectron-uEmuera-0.1.0",
+                RuntimeVersion  = "EraElectron-uEmuera-" +
+                                  EraElectronCompatibility.BridgeVersion,
                 SessionId       = _context?.SessionId,
                 UptimeMs        = _state == RuntimeState.Running || _state == RuntimeState.Suspended
                                   ? (long)(DateTime.UtcNow - _startedAt).TotalMilliseconds
@@ -208,6 +241,7 @@ namespace uEmuera.Runtime
             _host = null;
             if (host != null)
             {
+                try { host.CloseRequested -= OnHostCloseRequested; } catch { }
                 try { await host.StopAsync(); }
                 catch (Exception ex)
                 {
@@ -246,25 +280,88 @@ namespace uEmuera.Runtime
         }
 
         // ------------------------------------------------------------------ //
+        //  Host lifecycle                                                       //
+        // ------------------------------------------------------------------ //
+
+        void OnHostCloseRequested()
+        {
+            if (System.Threading.Interlocked.Exchange(
+                    ref _returnToLauncherRequested, 1) != 0)
+                return;
+
+            _context?.Logger?.Info(
+                "[EraElectronRuntime] Host requested close; returning to launcher.");
+
+            var dispatcher = _context?.MainThread;
+            if (dispatcher != null)
+            {
+                dispatcher.Post(() => { _ = StopAndReturnToLauncherAsync(dispatcher); });
+            }
+            else
+            {
+                _ = StopAndReturnToLauncherAsync(null);
+            }
+        }
+
+        async Task StopAndReturnToLauncherAsync(IMainThreadDispatcher dispatcher)
+        {
+            try
+            {
+                await GameRuntimeManager.Instance.StopCurrentAsync();
+            }
+            catch (Exception ex)
+            {
+                _context?.Logger?.Warn(
+                    "[EraElectronRuntime] Failed to stop after host close: " + ex.Message);
+            }
+            finally
+            {
+                Action showLauncher = () => FirstWindow.Show();
+                if (dispatcher != null)
+                    dispatcher.Post(showLauncher);
+                else
+                    showLauncher();
+            }
+        }
+
+        // ------------------------------------------------------------------ //
         //  Internals                                                           //
         // ------------------------------------------------------------------ //
 
         static EraElectronHostMode ResolveHostMode(GameDescriptor game)
         {
-            // Per-game override wins.
-            if (game.UserSettings?.EraElectronHostMode != null)
-            {
-                if (System.Enum.TryParse<EraElectronHostMode>(
+            bool hasBundles = HasCompiledBundles(game);
+            bool sidecarAvailable = OfficialSidecarHost.IsAvailable(game);
+
+            // Per-game override wins, but an explicitly embedded source package
+            // must fail clearly rather than reaching a partial CommonJS fallback.
+            if (game.UserSettings?.EraElectronHostMode != null &&
+                System.Enum.TryParse<EraElectronHostMode>(
                     game.UserSettings.EraElectronHostMode, true, out var overrideMode))
-                    return overrideMode;
+            {
+                if (overrideMode == EraElectronHostMode.Embedded && !hasBundles)
+                    throw new NotSupportedException(
+                        "Embedded EraElectron mode requires compiled era.bundle.js " +
+                        "and main.bundle.js. Build the game distribution first or " +
+                        "configure an official EraElectron sidecar.");
+                return overrideMode;
             }
 
-            // Source-form ERE packages contain CommonJS entry files and cannot
-            // execute directly in a browser WebView. Prefer the official engine
-            // when it is configured; compiled bundles remain eligible for the
-            // embedded host.
-            if (!HasCompiledBundles(game) && OfficialSidecarHost.IsAvailable(game))
-                return EraElectronHostMode.OfficialSidecar;
+            // Normal source-form ERE projects use CommonJS/webpack and are not a
+            // browser-ready distribution. Prefer the official engine when present.
+            if (!hasBundles)
+            {
+                if (sidecarAvailable)
+                    return EraElectronHostMode.OfficialSidecar;
+
+                throw new NotSupportedException(
+                    "This is a source-form EraElectron package without compiled " +
+                    "era.bundle.js/main.bundle.js. The embedded host intentionally " +
+                    "does not emulate an incomplete CommonJS loader. Use a packaged " +
+                    "distribution or configure an official EraElectron sidecar.");
+            }
+
+            // A packaged browser-ready game can use the platform embedded host.
             return EraElectronHostMode.Auto;
         }
 

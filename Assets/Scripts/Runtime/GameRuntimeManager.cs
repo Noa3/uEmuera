@@ -83,10 +83,16 @@ namespace uEmuera.Runtime
                 context?.Profiler?.Mark("GameRuntimeManager_LaunchStart");
 
                 await runtime.InitializeAsync(game, context, cancellationToken);
-                await runtime.StartAsync(cancellationToken);
 
+                // Publish the initialized runtime before StartAsync. Native hosts can
+                // become visible as part of StartAsync and may emit CloseRequested
+                // immediately. StopCurrentAsync is serialized by _lock, so a close
+                // request waits for startup to finish and then tears down this same
+                // runtime rather than leaving an orphaned host.
                 _current     = runtime;
                 _currentGame = game;
+
+                await runtime.StartAsync(cancellationToken);
 
                 context?.Logger?.Info(
                     $"[GameRuntimeManager] {game.Title} is running.");

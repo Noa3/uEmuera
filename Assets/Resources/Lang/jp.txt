@@ -629,3 +629,27 @@ Variables of different types cannot be referenced = 型が異なる変数は参�
 Variables with different numbers of dimensions cannot be referenced = 次元数が異なる変数は参照できません
 Variables with the CONST keyword cannot be multidimensional arrays = CONSTキーワードが指定された変数を多次元配列にはできません
 When omitting the elements of the target variable  = 対象となる変数
+
+; モダンランチャー
+[LauncherTitle]=ゲームライブラリ
+[LauncherSubtitle]=起動するゲームを選択
+[LauncherChooseFolder]=ゲームフォルダー
+[LauncherRefresh]=更新
+[LauncherSettings]=設定
+[LauncherDisplay]=表示
+[LauncherLanguage]=言語
+[LauncherMore]=その他
+[LauncherProject]=GitHub
+[LauncherExit]=終了
+[LauncherSearch]=ゲーム、パス、ランタイムを検索...
+[LauncherGames]=ゲーム
+[LauncherNoGames]=ゲームが見つかりません
+[LauncherNoGamesHint]=ゲームフォルダーを選択するか、ライブラリを更新してください。
+[LauncherNoSearchResults]=検索に一致するゲームがありません
+[LauncherSearchHint]=別のタイトル、パス、ランタイムを試してください。
+[LauncherAutomaticLibrary]=自動ゲーム検出
+[LauncherLibrary]=ライブラリ
+
+[LauncherRuntimeChoiceTitle]=ランタイムを選択
+[LauncherRuntimeChoiceBody]=このフォルダーは複数のランタイムとして認識されました。uEmueraでの起動方法を選択してください。\n\nフォルダー: {0}
+[LauncherCancel]=キャンセル

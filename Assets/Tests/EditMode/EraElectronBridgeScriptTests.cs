@@ -87,6 +87,29 @@ namespace uEmuera.Tests.EditMode
         }
 
         [Test]
+        public void Build_ReportsEmulatedSdkVersion()
+        {
+            Assert.IsTrue(_js.Contains(
+                "\"" + EraElectronCompatibility.EmulatedSdkVersion + "\""),
+                "era.version.sdk must report the emulated EraElectron SDK target, " +
+                "not uEmuera's internal bridge version.");
+        }
+
+        [Test]
+        public void Build_ExposesIsEraProperty()
+        {
+            Assert.IsTrue(_js.Contains("isEra:true"),
+                "EraElectron games use era.isEra to identify the ERA runtime.");
+        }
+
+        [Test]
+        public void Build_ExposesSeparateBridgeVersion()
+        {
+            Assert.IsTrue(_js.Contains("_uEmueraBridgeVersion"),
+                "uEmuera bridge version must be separate from era.version.sdk.");
+        }
+
+        [Test]
         public void Build_ContainsLoggerSubObject()
         {
             Assert.IsTrue(_js.Contains("logger:"), "era.logger sub-object must exist");
@@ -215,11 +238,54 @@ namespace uEmuera.Tests.EditMode
         }
 
         [Test]
+        public void Build_DrawLineDistinguishesSolidAndDashed()
+        {
+            Assert.IsTrue(_js.Contains("cfg.isSolid?'solid':'dashed'"),
+                "drawLine({isSolid:true}) needs a visibly solid separator.");
+        }
+
+        [Test]
+        public void Build_SetToBottomCreatesViewportSpacer()
+        {
+            Assert.IsTrue(_js.Contains("uemuera-bottom-spacer"));
+            Assert.IsTrue(_js.Contains("row.style.minHeight='100vh'"),
+                "setToBottom should emit a viewport-height blank program row.");
+        }
+
+        [Test]
         public void Build_MapsImageAnchorsAndFit()
         {
             Assert.IsTrue(_js.Contains("bottomright:'right bottom'"));
             Assert.IsTrue(_js.Contains("objectPosition"));
             Assert.IsTrue(_js.Contains("backgroundPosition"));
+        }
+
+        [Test]
+        public void Build_ClearSupportsTrailingLineCount()
+        {
+            Assert.IsTrue(_js.Contains("lineCount===undefined||lineCount===null"),
+                "era.clear() must distinguish full clear from clear(lineCount).");
+            Assert.IsTrue(_js.Contains("r.lastElementChild"),
+                "Partial clear must remove rows from the bottom.");
+            Assert.IsTrue(_js.Contains("while(n-->0"),
+                "Partial clear must remove only the requested number of program rows.");
+        }
+
+        [Test]
+        public void Build_DefaultInputEcho_IsEnabled()
+        {
+            Assert.IsTrue(_js.Contains("var _hideUserInput=false"));
+            Assert.IsTrue(_js.Contains("_echoInput(value)"));
+            Assert.IsTrue(_js.Contains("_generatedNative.print(String(value),{})"),
+                "Input echo must pass through native print so line count matches DOM output.");
+        }
+
+        [Test]
+        public void Build_HideUserInput_DisablesEchoAtRuntime()
+        {
+            string js = EraElectronBridgeScript.Build("2200", true);
+            Assert.IsTrue(js.Contains("var _hideUserInput=true"));
+            Assert.IsTrue(js.Contains("if(_hideUserInput)return"));
         }
 
         [Test]

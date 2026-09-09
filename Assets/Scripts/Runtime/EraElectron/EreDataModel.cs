@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using Newtonsoft.Json;
 
 namespace uEmuera.Runtime.EraElectron
 {
@@ -62,6 +63,20 @@ namespace uEmuera.Runtime.EraElectron
         public string GameAuthor  { get; private set; } = "";
         public string GameVersion { get; private set; } = "";
 
+        readonly Dictionary<string, object> _gameBase =
+            new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
+            {
+                { "title", "" },
+                { "author", "" },
+                { "year", "" },
+                { "info", "" },
+                { "code", 0L },
+                { "version", 0L },
+                { "allowVersion", 0L },
+                { "defaultChara", 0L },
+                { "noItem", 0L },
+            };
+
         // ------------------------------------------------------------------ //
         //  Construction                                                        //
         // ------------------------------------------------------------------ //
@@ -121,11 +136,61 @@ namespace uEmuera.Runtime.EraElectron
         {
             foreach (var kv in EraCsvParser.ParseKeyValue(path))
             {
-                switch (kv.Key.ToUpperInvariant())
+                string key = kv.Key.Trim();
+                string upper = key.ToUpperInvariant();
+                switch (upper)
                 {
-                    case "タイトル":   case "TITLE":   GameTitle   = kv.Value; break;
-                    case "作者":       case "AUTHOR":  GameAuthor  = kv.Value; break;
-                    case "バージョン": case "VERSION": GameVersion = kv.Value; break;
+                    case "タイトル":
+                    case "TITLE":
+                        GameTitle = kv.Value ?? "";
+                        _gameBase["title"] = GameTitle;
+                        break;
+
+                    case "作者":
+                    case "AUTHOR":
+                        GameAuthor = kv.Value ?? "";
+                        _gameBase["author"] = GameAuthor;
+                        break;
+
+                    case "製作年":
+                    case "YEAR":
+                        _gameBase["year"] = kv.Value ?? "";
+                        break;
+
+                    case "追加情報":
+                    case "INFO":
+                    case "ADDITIONAL INFO":
+                        _gameBase["info"] = kv.Value ?? "";
+                        break;
+
+                    case "コード":
+                    case "CODE":
+                        _gameBase["code"] = ParseLong(kv.Value);
+                        break;
+
+                    case "バージョン":
+                    case "VERSION":
+                        GameVersion = kv.Value ?? "";
+                        _gameBase["version"] = ParseLong(kv.Value);
+                        break;
+
+                    case "バージョン違い認める":
+                    case "ALLOWVERSION":
+                    case "ALLOW VERSION DIFFERENCE":
+                        _gameBase["allowVersion"] = ParseLong(kv.Value);
+                        break;
+
+                    case "最初からいるキャラ":
+                    case "DEFAULTCHARA":
+                    case "STARTING CHARACTERS":
+                        _gameBase["defaultChara"] = ParseLong(kv.Value);
+                        break;
+
+                    case "アイテムなし":
+                    case "NOITEM":
+                    case "NO ITEMS":
+                        _gameBase["noItem"] = ParseLong(kv.Value);
+                        break;
                 }
             }
         }
@@ -150,6 +215,14 @@ namespace uEmuera.Runtime.EraElectron
         /// </summary>
         public object Get(string varName)
         {
+            if (string.Equals(varName, "gamebase", StringComparison.OrdinalIgnoreCase))
+            {
+                // Return a copy so game scripts cannot mutate static metadata by
+                // retaining and editing the object returned by era.get().
+                return new Dictionary<string, object>(
+                    _gameBase, StringComparer.OrdinalIgnoreCase);
+            }
+
             VarAddress addr;
             if (!VarAddress.TryParse(varName, out addr)) return null;
 
@@ -165,6 +238,9 @@ namespace uEmuera.Runtime.EraElectron
 
         public object Set(string varName, object value)
         {
+            if (string.Equals(varName, "gamebase", StringComparison.OrdinalIgnoreCase))
+                return Get("gamebase");
+
             VarAddress addr;
             if (!VarAddress.TryParse(varName, out addr)) return value;
 
@@ -179,6 +255,9 @@ namespace uEmuera.Runtime.EraElectron
 
         public object Add(string varName, object value)
         {
+            if (string.Equals(varName, "gamebase", StringComparison.OrdinalIgnoreCase))
+                return Get("gamebase");
+
             VarAddress addr;
             if (!VarAddress.TryParse(varName, out addr)) return value;
 
@@ -257,16 +336,161 @@ namespace uEmuera.Runtime.EraElectron
         //  Save / Load                                                         //
         // ------------------------------------------------------------------ //
 
+        const string InternalSaveHeader = "UEMUERA-ERE-SAVE-1\n";
+
+        [Serializable]
+        sealed class InternalSaveState
+        {
+            public int formatVersion = 1;
+            public string kind;
+            public string comment;
+            public string timestampUtc;
+            public Dictionary<string, long> intVars;
+            public Dictionary<string, string> strVars;
+            public List<int> addedCharacters;
+            public List<int> trainCharacters;
+        }
+
+        /// <summary>
+        /// Serializes uEmuera's internal fallback save format.
+        /// This is intentionally NOT advertised as official EraElectron-compatible.
+        /// </summary>
         public byte[] Serialize(string comment = null)
         {
-            // STUB — proper format documented in ERAELECTRON_SAVE_FORMAT.md
-            return new byte[] { 0x45, 0x52, 0x45, 0x53 }; // "ERES"
+            return SerializeState("slot", comment, globalOnly: false);
         }
 
         public bool Deserialize(byte[] data)
         {
-            _ = data;
-            return data != null && data.Length >= 4;
+            return DeserializeState(data, expectedKind: "slot", globalOnly: false);
+        }
+
+        public byte[] SerializeGlobal()
+        {
+            return SerializeState("global", null, globalOnly: true);
+        }
+
+        public bool DeserializeGlobal(byte[] data)
+        {
+            return DeserializeState(data, expectedKind: "global", globalOnly: true);
+        }
+
+        public void ResetGlobal()
+        {
+            RemoveGlobalKeys(_intVars);
+            RemoveGlobalKeys(_strVars);
+        }
+
+        byte[] SerializeState(string kind, string comment, bool globalOnly)
+        {
+            var state = new InternalSaveState
+            {
+                kind = kind,
+                comment = comment ?? "",
+                timestampUtc = DateTime.UtcNow.ToString("O"),
+                intVars = CopyVars(_intVars, globalOnly),
+                strVars = CopyVars(_strVars, globalOnly),
+                addedCharacters = globalOnly
+                    ? new List<int>()
+                    : new List<int>(_addedCharacters),
+                trainCharacters = globalOnly
+                    ? new List<int>()
+                    : new List<int>(_trainCharacters),
+            };
+
+            string json = JsonConvert.SerializeObject(state, Formatting.None);
+            return Encoding.UTF8.GetBytes(InternalSaveHeader + json);
+        }
+
+        bool DeserializeState(byte[] data, string expectedKind, bool globalOnly)
+        {
+            if (data == null || data.Length <= InternalSaveHeader.Length)
+                return false;
+
+            string text;
+            try { text = Encoding.UTF8.GetString(data); }
+            catch { return false; }
+
+            if (!text.StartsWith(InternalSaveHeader, StringComparison.Ordinal))
+                return false;
+
+            InternalSaveState state;
+            try
+            {
+                state = JsonConvert.DeserializeObject<InternalSaveState>(
+                    text.Substring(InternalSaveHeader.Length));
+            }
+            catch
+            {
+                return false;
+            }
+
+            if (state == null || state.formatVersion != 1 ||
+                !string.Equals(state.kind, expectedKind, StringComparison.Ordinal))
+                return false;
+
+            var ints = state.intVars ?? new Dictionary<string, long>();
+            var strings = state.strVars ?? new Dictionary<string, string>();
+
+            if (globalOnly)
+            {
+                RemoveGlobalKeys(_intVars);
+                RemoveGlobalKeys(_strVars);
+                foreach (var kv in ints)
+                    if (IsGlobalSaveKey(kv.Key)) _intVars[kv.Key] = kv.Value;
+                foreach (var kv in strings)
+                    if (IsGlobalSaveKey(kv.Key)) _strVars[kv.Key] = kv.Value ?? "";
+            }
+            else
+            {
+                _intVars.Clear();
+                _strVars.Clear();
+                _addedCharacters.Clear();
+                _trainCharacters.Clear();
+
+                foreach (var kv in ints) _intVars[kv.Key] = kv.Value;
+                foreach (var kv in strings) _strVars[kv.Key] = kv.Value ?? "";
+                if (state.addedCharacters != null)
+                    _addedCharacters.AddRange(state.addedCharacters);
+                if (state.trainCharacters != null)
+                    _trainCharacters.AddRange(state.trainCharacters);
+            }
+
+            return true;
+        }
+
+        static Dictionary<string, T> CopyVars<T>(
+            Dictionary<string, T> source, bool globalOnly)
+        {
+            var result = new Dictionary<string, T>(StringComparer.OrdinalIgnoreCase);
+            foreach (var kv in source)
+            {
+                if (!globalOnly || IsGlobalSaveKey(kv.Key))
+                    result[kv.Key] = kv.Value;
+            }
+            return result;
+        }
+
+        static bool IsGlobalSaveKey(string key)
+        {
+            if (string.IsNullOrEmpty(key))
+                return false;
+
+            int colon = key.IndexOf(':');
+            string table = colon >= 0 ? key.Substring(0, colon) : key;
+            return table.Equals("global", StringComparison.OrdinalIgnoreCase) ||
+                   table.Equals("globals", StringComparison.OrdinalIgnoreCase) ||
+                   table.Equals("globalstr", StringComparison.OrdinalIgnoreCase) ||
+                   table.Equals("global.str", StringComparison.OrdinalIgnoreCase);
+        }
+
+        static void RemoveGlobalKeys<T>(Dictionary<string, T> source)
+        {
+            var keys = new List<string>();
+            foreach (var key in source.Keys)
+                if (IsGlobalSaveKey(key)) keys.Add(key);
+            foreach (var key in keys)
+                source.Remove(key);
         }
 
         // ------------------------------------------------------------------ //
@@ -291,6 +515,13 @@ namespace uEmuera.Runtime.EraElectron
         // ------------------------------------------------------------------ //
         //  Utility                                                             //
         // ------------------------------------------------------------------ //
+
+        static long ParseLong(string value)
+        {
+            return long.TryParse((value ?? "").Trim(), out long parsed)
+                ? parsed
+                : 0L;
+        }
 
         static long ToLong(object v)
         {
@@ -357,11 +588,46 @@ namespace uEmuera.Runtime.EraElectron
     internal static class EraCsvParser
     {
         static readonly Encoding Sjis = GetSjis();
+        static readonly Encoding StrictUtf8 = new UTF8Encoding(
+            encoderShouldEmitUTF8Identifier: false,
+            throwOnInvalidBytes: true);
 
         static Encoding GetSjis()
         {
             try   { return Encoding.GetEncoding(932); }
             catch { return Encoding.UTF8; }
+        }
+
+        /// <summary>
+        /// EraElectron projects commonly live in modern UTF-8 repositories while
+        /// older ERA data may still be CP932. Prefer BOM/strict UTF-8 and fall back
+        /// to CP932 only when the byte stream is not valid UTF-8.
+        /// </summary>
+        static string[] ReadAllLinesAuto(string path)
+        {
+            byte[] bytes = File.ReadAllBytes(path);
+            string text;
+
+            if (bytes.Length >= 3 &&
+                bytes[0] == 0xEF && bytes[1] == 0xBB && bytes[2] == 0xBF)
+            {
+                text = Encoding.UTF8.GetString(bytes, 3, bytes.Length - 3);
+            }
+            else
+            {
+                try
+                {
+                    text = StrictUtf8.GetString(bytes);
+                }
+                catch (DecoderFallbackException)
+                {
+                    text = Sjis.GetString(bytes);
+                }
+            }
+
+            return text.Replace("\r\n", "\n")
+                       .Replace("\r", "\n")
+                       .Split(new[] { '\n' });
         }
 
         /// <summary>
@@ -372,7 +638,7 @@ namespace uEmuera.Runtime.EraElectron
         {
             if (!File.Exists(path)) yield break;
             string[] lines;
-            try   { lines = File.ReadAllLines(path, Sjis); }
+            try   { lines = ReadAllLinesAuto(path); }
             catch { yield break; }
 
             foreach (var raw in lines)
@@ -400,7 +666,7 @@ namespace uEmuera.Runtime.EraElectron
         {
             if (!File.Exists(path)) yield break;
             string[] lines;
-            try   { lines = File.ReadAllLines(path, Sjis); }
+            try   { lines = ReadAllLinesAuto(path); }
             catch { yield break; }
 
             foreach (var raw in lines)

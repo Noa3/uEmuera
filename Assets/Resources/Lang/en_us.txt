@@ -134,3 +134,27 @@ FirstWindow.Titlebar.title=Game List
 [LogFileOutputFailed]=Log files can only be saved in directories under the executable file
 [LogFileOutputFailedTitle]=Log Output Failed
 [UnrecognizedIdentifier]="{0}" is an unrecognized identifier
+
+; Modern launcher
+[LauncherTitle]=Game Library
+[LauncherSubtitle]=Choose a game to start
+[LauncherChooseFolder]=Game Folder
+[LauncherRefresh]=Refresh
+[LauncherSettings]=Settings
+[LauncherDisplay]=Display
+[LauncherLanguage]=Language
+[LauncherMore]=More
+[LauncherProject]=GitHub
+[LauncherExit]=Exit
+[LauncherSearch]=Search games, paths, or runtimes...
+[LauncherGames]=games
+[LauncherNoGames]=No games found
+[LauncherNoGamesHint]=Choose a game folder or refresh the library.
+[LauncherNoSearchResults]=No games match your search
+[LauncherSearchHint]=Try another title, path, or runtime.
+[LauncherAutomaticLibrary]=Automatic game discovery
+[LauncherLibrary]=Library
+
+[LauncherRuntimeChoiceTitle]=Choose runtime
+[LauncherRuntimeChoiceBody]=This folder matches more than one runtime. Choose how uEmuera should start it.\n\nFolder: {0}
+[LauncherCancel]=Cancel

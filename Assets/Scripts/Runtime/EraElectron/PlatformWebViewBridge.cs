@@ -18,18 +18,14 @@ namespace uEmuera.Runtime.EraElectron
     ///
     ///   Auto     → picks best available platform host
     ///   Embedded → requires PlatformWebViewHost (not yet built; falls back gracefully)
-    ///   Sidecar  → launches official EraElectron executable (future)
+    ///   Sidecar  → launches a configured official EraElectron executable
     ///
-    /// Current status: STUB.
-    /// Only <see cref="NullEraElectronHost"/> is returned; it logs detailed info
-    /// and throws <see cref="NotSupportedException"/> on StartAsync so the launcher
-    /// shows an informative dialog instead of a silent black screen.
+    /// Current status:
+    ///   Windows standalone: WebView2Host
+    ///   Desktop source packages: optional OfficialSidecarHost
+    ///   Android/Linux embedded: NullEraElectronHost until platform hosts exist
     ///
-    /// To implement the real embedded host:
-    ///   Windows:  wrap WebView2 (Microsoft.Web.WebView2) in PlatformWebViewHost
-    ///   Android:  wrap android.webkit.WebView in an AndroidWebViewHost plugin
-    ///   Linux:    wrap WebKitGTK or host-installed Chromium
-    ///   All:      inject EraElectronBridgeScript.Build() before game JS loads
+    /// All embedded hosts must inject EraElectronBridgeScript.Build() before game JS loads
     ///
     /// See Docs/ADR/WEB_RUNTIME_HOST.md for the selection rationale.
     /// </summary>
@@ -127,6 +123,9 @@ namespace uEmuera.Runtime.EraElectron
         GameDescriptor _game;
         Process _process;
         string _sessionDirectory;
+        volatile bool _stopping;
+
+        public event Action CloseRequested;
 
         static readonly HostCapabilities SidecarCapabilities = new HostCapabilities
         {
@@ -180,6 +179,10 @@ namespace uEmuera.Runtime.EraElectron
             if (_process == null)
                 throw new InvalidOperationException(
                     "Failed to start the EraElectron sidecar process.");
+
+            _stopping = false;
+            _process.EnableRaisingEvents = true;
+            _process.Exited += OnProcessExited;
             return Task.CompletedTask;
         }
 
@@ -210,12 +213,14 @@ namespace uEmuera.Runtime.EraElectron
 
         public async Task StopAsync()
         {
+            _stopping = true;
             Process process = _process;
             _process = null;
             if (process != null)
             {
                 try
                 {
+                    process.Exited -= OnProcessExited;
                     if (!process.HasExited)
                     {
                         process.CloseMainWindow();
@@ -232,6 +237,19 @@ namespace uEmuera.Runtime.EraElectron
 
             RemoveSessionDirectory();
             await Task.CompletedTask;
+        }
+
+        void OnProcessExited(object sender, EventArgs e)
+        {
+            if (_stopping)
+                return;
+
+            try { CloseRequested?.Invoke(); }
+            catch (Exception ex)
+            {
+                Debug.LogWarning(
+                    "[OfficialSidecarHost] CloseRequested handler failed: " + ex.Message);
+            }
         }
 
         public Task<string> EvaluateJsAsync(string js)
@@ -355,6 +373,12 @@ namespace uEmuera.Runtime.EraElectron
         {
             _mode   = mode;
             _reason = reason ?? "WebView host not implemented.";
+        }
+
+        public event Action CloseRequested
+        {
+            add { }
+            remove { }
         }
 
         public EraElectronHostMode HostMode    => _mode;

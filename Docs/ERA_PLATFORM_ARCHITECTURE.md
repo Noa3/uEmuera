@@ -1,126 +1,73 @@
-# uEmuera ERA Platform Architecture
+# ERA Platform Architecture
 
-> Phase 8 · 2026-08-12
+> Current architecture: 2026-09-09
 
----
+uEmuera is evolving into one Unity launcher with isolated runtime backends.
 
-## Vision
-
-uEmuera is a cross-platform ERA game launcher and runtime platform.
-
-One launcher → multiple isolated runtimes → any ERA game family.
-
-```
+```text
 uEmuera Launcher
-  │
-  ├── Game Library (multi-runtime)
-  │     ├── Emuera game cards  [EM+EE]
-  │     └── EraElectron game cards  [EraUma, ereKanon, ...]
-  │
-  ├── Shared Services
-  │     ├── GameDetector (RuntimeKind dispatch)
-  │     ├── GameFileManifest (one FS walk per session)
-  │     ├── CatalogCacheStore (per-game keyed cache)
-  │     ├── StartupProfiler
-  │     ├── GameSession (stale-callback guard)
-  │     └── IRuntimeLogger / IPermissionService
-  │
-  ├── EmueraRuntimeAdapter  ─→  EmueraMain / EmueraThread / Process
-  │       (existing EM+EE interpreter, untouched)
-  │
-  └── EraElectronRuntime    ─→  IEraElectronHost
-          (JavaScript / Vue / Element Plus / Chart.js)
+  |
+  +-- GameDetector
+  |     +-- EmueraGameDetector
+  |     +-- EraElectronGameDetector
+  |
+  +-- GameRuntimeManager
+        |
+        +-- EmueraRuntimeAdapter
+        |     +-- existing EmueraMain / EmueraThread / Process
+        |
+        +-- EraElectronRuntime
+              +-- EreDataModel
+              +-- EreApiDispatcher
+              +-- EreLocalFileServer
+              +-- IEraElectronHost
+                    +-- WebView2Host (Windows standalone)
+                    +-- OfficialSidecarHost (desktop fallback)
+                    +-- Android host (pending)
+                    +-- Linux host (pending)
 ```
 
----
+## Runtime boundaries
 
-## Core rules (permanent)
+### Emuera
 
-### Emuera rules
-- Parser/runtime semantic state on one interpreter thread only.
-- Function existence never depends on filename.
-- Fast boot exposes no half-initialized functions.
-- Image render order never depends on async completion order.
+Owns ERB parsing, variables, console state, HTML/CBG/G* graphics, Emuera saves and
+Fast/Safe boot semantics. EraElectron code must not mutate these structures.
 
-### EraElectron rules
-- JavaScript/web behavior belongs to EraElectronRuntime.
-- Do not translate web UI into EmueraConsole.
-- Do not expose unrestricted Node host access.
-- Do not claim API compatibility without a reference test.
-- Do not hardcode EraUma behavior into generic engine code.
+### EraElectron
 
-### Shared rules
-- One launcher. Multiple isolated runtimes.
-- One game session at a time.
-- Game files are untrusted code/data.
-- Runtime-specific saves are isolated.
-- Old async work cannot mutate a new session.
-- Correctness before optimization.
-- Measured compatibility before documentation claims.
+Owns JavaScript/web execution, ERE data state, bridge calls, browser presentation and
+ERE saves. It must not instantiate Emuera parser/runtime state to emulate web games.
 
----
+## Shared services
 
-## Component inventory
+Runtime-neutral services include game detection, session IDs, logging, startup
+profiling, permissions, storage interfaces and launcher lifecycle.
 
-### Milestone 0 baseline (existing)
+## Current launcher integration
 
-| Component | Location | Status |
-|---|---|---|
-| `FunctionCatalog` | `GameProc/FunctionCatalog.cs` | WORKING |
-| `FunctionResolver` | `GameProc/FunctionResolver.cs` | WORKING |
-| `OnDemandErbCompiler` | `GameProc/OnDemandErbCompiler.cs` | WORKING |
-| `CatalogCacheStore` | `GameProc/CatalogCacheStore.cs` | WORKING |
-| `GameSession` | `GameProc/GameSession.cs` | WORKING |
-| `BootStrategy` / `BootConfig` | `GameProc/BootStrategy.cs` | WORKING |
-| `StartupProfiler` | `GameProc/StartupProfiler.cs` | WORKING |
-| `GameResourceCatalog` | `uEmuera/GameResourceCatalog.cs` | WORKING |
-| `EmueraMain` + `EmueraThread` | `EmueraMain.cs`, `EmueraThread.cs` | WORKING |
-| `FirstWindow` (game picker) | `FirstWindow.cs` | WORKING (Emuera-only) |
+The game list uses the multi-runtime GameDetector. EraElectron rows launch through
+GameRuntimeManager. Emuera rows intentionally still use the established launch path
+until EmueraRuntimeAdapter is proven equivalent for cleanup/startup behavior.
 
-### Milestone 1 (runtime abstraction)
+Single-game autostart must also use GameDetector; keeping the old Emuera-only
+GameDiscovery there causes EraElectron packages to be invisible to packaged autostart.
 
-| Component | Location | Status |
-|---|---|---|
-| `RuntimeKind` | `Runtime/RuntimeKind.cs` | DONE |
-| `RuntimeState` | `Runtime/RuntimeState.cs` | DONE |
-| `GameDescriptor` | `Runtime/GameDescriptor.cs` | DONE |
-| `IGameRuntime` + `RuntimeDiagnostics` | `Runtime/IGameRuntime.cs` | DONE |
-| `RuntimeContext` + service interfaces | `Runtime/RuntimeContext.cs` | DONE |
-| `EmueraRuntimeAdapter` | `Runtime/EmueraRuntimeAdapter.cs` | DONE |
-| `IGameDetector` | `Runtime/Detection/IGameDetector.cs` | DONE |
-| `EmueraGameDetector` | `Runtime/Detection/EmueraGameDetector.cs` | DONE |
-| `EraElectronGameDetector` | `Runtime/Detection/EraElectronGameDetector.cs` | DONE (provisional) |
-| `GameDetector` | `Runtime/Detection/GameDetector.cs` | DONE |
+## Platform host strategy
 
-### Milestone 3-4 (EraElectron architecture)
+- Windows standalone: WebView2 embedded host exists.
+- Windows Editor: embedded WebView2 is intentionally disabled; use sidecar/test stubs.
+- Android: platform WebView host pending.
+- Linux: embedded host pending.
+- Desktop source-form ERE packages may use the official sidecar when configured.
 
-| Component | Location | Status |
-|---|---|---|
-| `EraElectronHostMode` | `Runtime/EraElectronHostMode.cs` | DONE |
-| `IEraElectronHost` + `HostCapabilities` + `IEraNativeBridge` | `Runtime/IEraElectronHost.cs` | DONE |
-| `EraElectronRuntime` | `Runtime/EraElectronRuntime.cs` | STUB |
+See [ADR/WEB_RUNTIME_HOST.md](ADR/WEB_RUNTIME_HOST.md).
 
-### Pending
+## Invariants
 
-| Component | Milestone | Notes |
-|---|---|---|
-| `GameRuntimeManager` | M4 | Lifecycle coordinator for both runtimes |
-| `EreDataModel` | M4/M5 | ERA data tables for EraElectron |
-| `EreApiDispatcher` | M5 | Routes era.* calls to C# implementations |
-| Embedded WebView host | M3 spike → M4 | After WEB_RUNTIME_HOST.md spike |
-| Sidecar host | M13 | Official EraElectron process |
-| `GameFileManifest` | M8 | Shared one-walk FS inventory |
-| `GameSessionCoordinator` | M8 | Unified session management |
-| Launcher UI upgrade | M14 | Multi-runtime game cards |
-
----
-
-## Reference material
-
-- `Docs/CURRENT_STATE_AUDIT.md` — baseline audit
-- `Docs/ADR/WEB_RUNTIME_HOST.md` — WebView host selection
-- `Docs/ADR/ERAELECTRON_RUNTIME.md` — EraElectron component design
-- `ReferenceParity/EraElectron/UPSTREAM_REFERENCE.generated.json` — SDK version
-- `ReferenceParity/EraElectron/API.generated.json` — SDK API inventory (56 methods)
-- `ReferenceParity/EraElectron/ERAUMA_USAGE.generated.json` — call-site counts
-- `ReferenceParity/EraElectron/ERAUMA_DEPENDENCIES.generated.md` — dependency graph
+1. Only one active game runtime at a time.
+2. Runtime state must be isolated between game sessions.
+3. Old async callbacks must not mutate a new session.
+4. Emuera compatibility cannot regress for EraElectron progress.
+5. EraElectron compatibility is measured against real ERE packages and reference output.
+6. No game-name-specific compatibility hacks.

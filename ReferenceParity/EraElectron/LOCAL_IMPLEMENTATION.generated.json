@@ -1,0 +1,463 @@
+{
+  "generated_at": "2026-09-09",
+  "source_usage": "ERAUMA_USAGE.generated.json",
+  "game_name": "erauma",
+  "game_version": "3.0.00",
+  "ere_min_version": "2200",
+  "note": "Source-wiring evidence only. WIRED_UNVERIFIED is not semantic compatibility and never implies VERIFIED.",
+  "summary": {
+    "WIRED_UNVERIFIED": 50
+  },
+  "apis": [
+    {
+      "name": "printAndWait",
+      "call_count": 21359,
+      "status": "WIRED_UNVERIFIED",
+      "evidence": {
+        "dispatcher": true,
+        "bridge": true
+      }
+    },
+    {
+      "name": "get",
+      "call_count": 5809,
+      "status": "WIRED_UNVERIFIED",
+      "evidence": {
+        "dispatcher": true,
+        "bridge": true
+      }
+    },
+    {
+      "name": "println",
+      "call_count": 4266,
+      "status": "WIRED_UNVERIFIED",
+      "evidence": {
+        "dispatcher": true,
+        "bridge": true
+      }
+    },
+    {
+      "name": "printButton",
+      "call_count": 4054,
+      "status": "WIRED_UNVERIFIED",
+      "evidence": {
+        "dispatcher": true,
+        "bridge": true
+      }
+    },
+    {
+      "name": "input",
+      "call_count": 3412,
+      "status": "WIRED_UNVERIFIED",
+      "evidence": {
+        "dispatcher": true,
+        "bridge": true
+      }
+    },
+    {
+      "name": "set",
+      "call_count": 2244,
+      "status": "WIRED_UNVERIFIED",
+      "evidence": {
+        "dispatcher": true,
+        "bridge": true
+      }
+    },
+    {
+      "name": "print",
+      "call_count": 890,
+      "status": "WIRED_UNVERIFIED",
+      "evidence": {
+        "dispatcher": true,
+        "bridge": true
+      }
+    },
+    {
+      "name": "drawLine",
+      "call_count": 869,
+      "status": "WIRED_UNVERIFIED",
+      "evidence": {
+        "dispatcher": true,
+        "bridge": true
+      }
+    },
+    {
+      "name": "add",
+      "call_count": 562,
+      "status": "WIRED_UNVERIFIED",
+      "evidence": {
+        "dispatcher": true,
+        "bridge": true
+      }
+    },
+    {
+      "name": "waitAnyKey",
+      "call_count": 388,
+      "status": "WIRED_UNVERIFIED",
+      "evidence": {
+        "dispatcher": true,
+        "bridge": true
+      }
+    },
+    {
+      "name": "printMultiColumns",
+      "call_count": 102,
+      "status": "WIRED_UNVERIFIED",
+      "evidence": {
+        "dispatcher": true,
+        "bridge": true
+      }
+    },
+    {
+      "name": "clear",
+      "call_count": 84,
+      "status": "WIRED_UNVERIFIED",
+      "evidence": {
+        "dispatcher": true,
+        "bridge": true
+      }
+    },
+    {
+      "name": "printInColRows",
+      "call_count": 50,
+      "status": "WIRED_UNVERIFIED",
+      "evidence": {
+        "dispatcher": true,
+        "bridge": true
+      }
+    },
+    {
+      "name": "getLineCount",
+      "call_count": 45,
+      "status": "WIRED_UNVERIFIED",
+      "evidence": {
+        "dispatcher": true,
+        "bridge": true
+      }
+    },
+    {
+      "name": "logger.debug",
+      "call_count": 27,
+      "status": "WIRED_UNVERIFIED",
+      "evidence": {
+        "dispatcher": true,
+        "bridge": true
+      }
+    },
+    {
+      "name": "setAlign",
+      "call_count": 22,
+      "status": "WIRED_UNVERIFIED",
+      "evidence": {
+        "dispatcher": true,
+        "bridge": true
+      }
+    },
+    {
+      "name": "getCharactersInTrain",
+      "call_count": 20,
+      "status": "WIRED_UNVERIFIED",
+      "evidence": {
+        "dispatcher": true,
+        "bridge": true
+      }
+    },
+    {
+      "name": "setOffset",
+      "call_count": 19,
+      "status": "WIRED_UNVERIFIED",
+      "evidence": {
+        "dispatcher": true,
+        "bridge": true
+      }
+    },
+    {
+      "name": "setWidth",
+      "call_count": 19,
+      "status": "WIRED_UNVERIFIED",
+      "evidence": {
+        "dispatcher": true,
+        "bridge": true
+      }
+    },
+    {
+      "name": "setHorizontalAlign",
+      "call_count": 16,
+      "status": "WIRED_UNVERIFIED",
+      "evidence": {
+        "dispatcher": true,
+        "bridge": true
+      }
+    },
+    {
+      "name": "getAddedCharacters",
+      "call_count": 16,
+      "status": "WIRED_UNVERIFIED",
+      "evidence": {
+        "dispatcher": true,
+        "bridge": true
+      }
+    },
+    {
+      "name": "setVerticalAlign",
+      "call_count": 14,
+      "status": "WIRED_UNVERIFIED",
+      "evidence": {
+        "dispatcher": true,
+        "bridge": true
+      }
+    },
+    {
+      "name": "setToBottom",
+      "call_count": 12,
+      "status": "WIRED_UNVERIFIED",
+      "evidence": {
+        "dispatcher": true,
+        "bridge": true
+      }
+    },
+    {
+      "name": "version",
+      "call_count": 8,
+      "status": "WIRED_UNVERIFIED",
+      "evidence": {
+        "dispatcher": true,
+        "bridge": true
+      }
+    },
+    {
+      "name": "checkImage",
+      "call_count": 8,
+      "status": "WIRED_UNVERIFIED",
+      "evidence": {
+        "dispatcher": true,
+        "bridge": true
+      }
+    },
+    {
+      "name": "delay",
+      "call_count": 7,
+      "status": "WIRED_UNVERIFIED",
+      "evidence": {
+        "dispatcher": true,
+        "bridge": true
+      }
+    },
+    {
+      "name": "saveData",
+      "call_count": 6,
+      "status": "WIRED_UNVERIFIED",
+      "evidence": {
+        "dispatcher": true,
+        "bridge": true
+      }
+    },
+    {
+      "name": "setColor",
+      "call_count": 6,
+      "status": "WIRED_UNVERIFIED",
+      "evidence": {
+        "dispatcher": true,
+        "bridge": true
+      }
+    },
+    {
+      "name": "playMusic",
+      "call_count": 5,
+      "status": "WIRED_UNVERIFIED",
+      "evidence": {
+        "dispatcher": true,
+        "bridge": true
+      }
+    },
+    {
+      "name": "printLineChart",
+      "call_count": 5,
+      "status": "WIRED_UNVERIFIED",
+      "evidence": {
+        "dispatcher": true,
+        "bridge": true
+      }
+    },
+    {
+      "name": "logger.error",
+      "call_count": 4,
+      "status": "WIRED_UNVERIFIED",
+      "evidence": {
+        "dispatcher": true,
+        "bridge": true
+      }
+    },
+    {
+      "name": "replaceInColRows",
+      "call_count": 4,
+      "status": "WIRED_UNVERIFIED",
+      "evidence": {
+        "dispatcher": true,
+        "bridge": true
+      }
+    },
+    {
+      "name": "saveGlobal",
+      "call_count": 3,
+      "status": "WIRED_UNVERIFIED",
+      "evidence": {
+        "dispatcher": true,
+        "bridge": true
+      }
+    },
+    {
+      "name": "stopMusic",
+      "call_count": 3,
+      "status": "WIRED_UNVERIFIED",
+      "evidence": {
+        "dispatcher": true,
+        "bridge": true
+      }
+    },
+    {
+      "name": "printWholeImage",
+      "call_count": 3,
+      "status": "WIRED_UNVERIFIED",
+      "evidence": {
+        "dispatcher": true,
+        "bridge": true
+      }
+    },
+    {
+      "name": "getAllCharacters",
+      "call_count": 2,
+      "status": "WIRED_UNVERIFIED",
+      "evidence": {
+        "dispatcher": true,
+        "bridge": true
+      }
+    },
+    {
+      "name": "loadData",
+      "call_count": 2,
+      "status": "WIRED_UNVERIFIED",
+      "evidence": {
+        "dispatcher": true,
+        "bridge": true
+      }
+    },
+    {
+      "name": "rmData",
+      "call_count": 2,
+      "status": "WIRED_UNVERIFIED",
+      "evidence": {
+        "dispatcher": true,
+        "bridge": true
+      }
+    },
+    {
+      "name": "endTrain",
+      "call_count": 2,
+      "status": "WIRED_UNVERIFIED",
+      "evidence": {
+        "dispatcher": true,
+        "bridge": true
+      }
+    },
+    {
+      "name": "notify",
+      "call_count": 2,
+      "status": "WIRED_UNVERIFIED",
+      "evidence": {
+        "dispatcher": true,
+        "bridge": true
+      }
+    },
+    {
+      "name": "setOverlay",
+      "call_count": 2,
+      "status": "WIRED_UNVERIFIED",
+      "evidence": {
+        "dispatcher": true,
+        "bridge": true
+      }
+    },
+    {
+      "name": "logger.assert",
+      "call_count": 1,
+      "status": "WIRED_UNVERIFIED",
+      "evidence": {
+        "dispatcher": true,
+        "bridge": true
+      }
+    },
+    {
+      "name": "logger.info",
+      "call_count": 1,
+      "status": "WIRED_UNVERIFIED",
+      "evidence": {
+        "dispatcher": true,
+        "bridge": true
+      }
+    },
+    {
+      "name": "logger.warn",
+      "call_count": 1,
+      "status": "WIRED_UNVERIFIED",
+      "evidence": {
+        "dispatcher": true,
+        "bridge": true
+      }
+    },
+    {
+      "name": "quit",
+      "call_count": 1,
+      "status": "WIRED_UNVERIFIED",
+      "evidence": {
+        "dispatcher": true,
+        "bridge": true
+      }
+    },
+    {
+      "name": "addCharacter",
+      "call_count": 1,
+      "status": "WIRED_UNVERIFIED",
+      "evidence": {
+        "dispatcher": true,
+        "bridge": true
+      }
+    },
+    {
+      "name": "addCharacterForTrain",
+      "call_count": 1,
+      "status": "WIRED_UNVERIFIED",
+      "evidence": {
+        "dispatcher": true,
+        "bridge": true
+      }
+    },
+    {
+      "name": "beginTrain",
+      "call_count": 1,
+      "status": "WIRED_UNVERIFIED",
+      "evidence": {
+        "dispatcher": true,
+        "bridge": true
+      }
+    },
+    {
+      "name": "resetData",
+      "call_count": 1,
+      "status": "WIRED_UNVERIFIED",
+      "evidence": {
+        "dispatcher": true,
+        "bridge": true
+      }
+    },
+    {
+      "name": "replaceText",
+      "call_count": 1,
+      "status": "WIRED_UNVERIFIED",
+      "evidence": {
+        "dispatcher": true,
+        "bridge": true
+      }
+    }
+  ]
+}

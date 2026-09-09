@@ -166,6 +166,8 @@ namespace uEmuera.Tests.EditMode
                 ".ere-min-version content must be read into RequiredRuntimeVersion");
             Assert.AreEqual("erauma", desc.Title,
                 "Title must be read from package.json name field");
+            Assert.AreEqual("3.0.00", desc.Version,
+                "Version must be read from package.json for launcher metadata");
         }
 
         [Test]
@@ -201,7 +203,7 @@ namespace uEmuera.Tests.EditMode
         }
 
         [Test]
-        public void EreDetector_RootMainJsOnly_ReturnsLow()
+        public void EreDetector_RootMainJsOnly_IsRejected()
         {
             string dir = MakeRootMainJsOnlyLayout();
             var detector = new EraElectronGameDetector();
@@ -209,10 +211,8 @@ namespace uEmuera.Tests.EditMode
 
             var result = detector.TryDetect(dir, files);
 
-            // Root main.js alone should return Low confidence (very generic)
-            if (result != null)
-                Assert.AreEqual(DetectionConfidence.Low, result.Confidence,
-                    "A bare root main.js must not exceed Low confidence");
+            Assert.IsNull(result,
+                "A bare root main.js is generic JavaScript and must not be listed as an ERE game.");
         }
 
         [Test]
@@ -315,6 +315,29 @@ namespace uEmuera.Tests.EditMode
         }
 
         [Test]
+        public void GameDetector_AmbiguousLayout_CanDetectEachRuntimeExplicitly()
+        {
+            string dir = MakeAmbiguousLayout();
+            var gd = GameDetector.CreateDefault();
+
+            var emu = gd.DetectAs(dir, RuntimeKind.Emuera);
+            var ere = gd.DetectAs(dir, RuntimeKind.EraElectron);
+
+            Assert.IsNotNull(emu);
+            Assert.IsNotNull(ere);
+            Assert.AreEqual(RuntimeKind.Emuera, emu.RuntimeKind);
+            Assert.AreEqual(RuntimeKind.EraElectron, ere.RuntimeKind);
+        }
+
+        [Test]
+        public void GameDetector_DetectAsWrongRuntime_ReturnsNull()
+        {
+            string dir = MakeEmueraLayout();
+            Assert.IsNull(GameDetector.CreateDefault().DetectAs(
+                dir, RuntimeKind.EraElectron));
+        }
+
+        [Test]
         public void GameDetector_UnknownDir_ReturnsNull()
         {
             string dir = MakeEmptyLayout();
@@ -356,6 +379,39 @@ namespace uEmuera.Tests.EditMode
             }
             Assert.IsTrue(foundEre, "EraElectron game must be discovered");
             Assert.IsTrue(foundEmu, "Emuera game must be discovered");
+        }
+
+        // ------------------------------------------------------------------ //
+        //  Runtime-neutral single-game discovery                               //
+        // ------------------------------------------------------------------ //
+
+        [Test]
+        public void GameDetector_FindSingle_EraElectron_ReturnsDescriptor()
+        {
+            MakeEraUmaSourceLayout("only-ere");
+            var result = GameDetector.CreateDefault().FindSingle(_tempRoot);
+
+            Assert.IsNotNull(result);
+            Assert.AreEqual(RuntimeKind.EraElectron, result.RuntimeKind);
+        }
+
+        [Test]
+        public void GameDetector_FindSingle_Emuera_ReturnsDescriptor()
+        {
+            MakeEmueraLayout("only-emu");
+            var result = GameDetector.CreateDefault().FindSingle(_tempRoot);
+
+            Assert.IsNotNull(result);
+            Assert.AreEqual(RuntimeKind.Emuera, result.RuntimeKind);
+        }
+
+        [Test]
+        public void GameDetector_FindSingle_MultipleGames_ReturnsNull()
+        {
+            MakeEraUmaSourceLayout("ere-game");
+            MakeEmueraLayout("emu-game");
+
+            Assert.IsNull(GameDetector.CreateDefault().FindSingle(_tempRoot));
         }
 
         // ------------------------------------------------------------------ //

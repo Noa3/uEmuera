@@ -70,7 +70,7 @@ public class OptionWindow : MonoBehaviour
         // Initialize directory input box for standalone platforms
         InitDirectoryInputBox();
         
-        // Apply dark theme to menus
+        // Apply the shared modern surface theme to legacy dialogs/in-game menus.
         ApplyDarkThemeToMenus();
 
         HideResolutionIcon();
@@ -280,6 +280,23 @@ public class OptionWindow : MonoBehaviour
         HideMenu();
     }
 
+    public void ShowResolutionBox()
+    {
+        HideMenu();
+        if (resolution_pad != null)
+            resolution_pad.SetActive(true);
+    }
+
+    public void OpenProjectPage()
+    {
+        OnGithub();
+    }
+
+    public void ShowExitConfirmation()
+    {
+        OnMenuExit();
+    }
+
     void OnResolutionOut()
     {
         resolution_pad.SetActive(false);
@@ -449,6 +466,7 @@ public class OptionWindow : MonoBehaviour
     {
         MultiLanguage.SetLanguage(e.pointerPress.name);
         language_box.SetActive(false);
+        FirstWindow.instance?.RefreshDashboardLocalization();
     }
     
     /// <summary>
@@ -584,21 +602,25 @@ public class OptionWindow : MonoBehaviour
             if (image != null)
             {
                 // Semi-transparent dark overlay
-                image.color = new Color(0f, 0f, 0f, 0.85f);
+                image.color = new Color(
+                    UIStyleManager.ModernTheme.Background.r,
+                    UIStyleManager.ModernTheme.Background.g,
+                    UIStyleManager.ModernTheme.Background.b,
+                    0.84f);
             }
         }
         
         // Style Menu 1
         if (menu_1 != null)
         {
-            UIStyleManager.ApplyDarkTheme(menu_1);
+            UIStyleManager.ApplyModernTheme(menu_1);
             StyleMenuPanel(menu_1);
         }
         
         // Style Menu 2
         if (menu_2 != null)
         {
-            UIStyleManager.ApplyDarkTheme(menu_2);
+            UIStyleManager.ApplyModernTheme(menu_2);
             StyleMenuPanel(menu_2);
         }
         
@@ -608,13 +630,17 @@ public class OptionWindow : MonoBehaviour
             var image = resolution_pad.GetComponent<Image>();
             if (image != null)
             {
-                image.color = new Color(0f, 0f, 0f, 0.85f);
+                image.color = new Color(
+                    UIStyleManager.ModernTheme.Background.r,
+                    UIStyleManager.ModernTheme.Background.g,
+                    UIStyleManager.ModernTheme.Background.b,
+                    0.84f);
             }
             
             var contentPanel = GenericUtils.FindChildByName(resolution_pad, "border");
             if (contentPanel != null)
             {
-                UIStyleManager.ApplyDarkTheme(contentPanel);
+                UIStyleManager.ApplyModernTheme(contentPanel);
                 StyleMenuPanel(contentPanel);
             }
         }
@@ -622,7 +648,7 @@ public class OptionWindow : MonoBehaviour
         // Style language box
         if (language_box != null)
         {
-            UIStyleManager.ApplyDarkTheme(language_box);
+            UIStyleManager.ApplyModernTheme(language_box);
             var border = GenericUtils.FindChildByName(language_box, "border");
             if (border != null)
             {
@@ -633,13 +659,13 @@ public class OptionWindow : MonoBehaviour
         // Style intent box
         if (intentbox != null)
         {
-            UIStyleManager.ApplyDarkTheme(intentbox);
+            UIStyleManager.ApplyModernTheme(intentbox);
         }
         
         // Style message box
         if (msg_box != null)
         {
-            UIStyleManager.ApplyDarkTheme(msg_box);
+            UIStyleManager.ApplyModernTheme(msg_box);
             var border = GenericUtils.FindChildByName(msg_box, "border");
             if (border != null)
             {
@@ -650,13 +676,13 @@ public class OptionWindow : MonoBehaviour
         // Style directory input box
         if (directoryInputBox != null)
         {
-            UIStyleManager.ApplyDarkTheme(directoryInputBox);
+            UIStyleManager.ApplyModernTheme(directoryInputBox);
         }
         
         // Style settings box
         if (settings_box != null)
         {
-            UIStyleManager.ApplyDarkTheme(settings_box);
+            UIStyleManager.ApplyModernTheme(settings_box);
             var border = GenericUtils.FindChildByName(settings_box, "border");
             if (border != null)
             {
@@ -677,7 +703,7 @@ public class OptionWindow : MonoBehaviour
         var image = panel.GetComponent<Image>();
         if (image != null)
         {
-            image.color = UIStyleManager.DarkTheme.BackgroundMedium;
+            image.color = UIStyleManager.ModernTheme.Surface;
         }
         
         // Check if outline already exists before adding
@@ -686,14 +712,14 @@ public class OptionWindow : MonoBehaviour
         {
             // Only add if not present - prefab should ideally have this pre-configured
             outline = panel.gameObject.AddComponent<Outline>();
-            outline.effectColor = UIStyleManager.DarkTheme.Border;
-            outline.effectDistance = new Vector2(2f, -2f);
+            outline.effectColor = UIStyleManager.ModernTheme.Border;
+            outline.effectDistance = new Vector2(1f, -1f);
         }
         else
         {
             // Update existing outline
-            outline.effectColor = UIStyleManager.DarkTheme.Border;
-            outline.effectDistance = new Vector2(2f, -2f);
+            outline.effectColor = UIStyleManager.ModernTheme.Border;
+            outline.effectDistance = new Vector2(1f, -1f);
         }
     }
 

@@ -193,6 +193,24 @@ namespace uEmuera.Tests.EditMode
         }
 
         [Test]
+        public void Get_IndexHtml_ReadyMeansEntryStarted_NotGamePromiseCompleted()
+        {
+            string body = GetString($"{_server.BaseUrl}/index.html");
+
+            int invoke = body.IndexOf("var running=entry()", StringComparison.Ordinal);
+            int ready = body.IndexOf("ready()", invoke, StringComparison.Ordinal);
+            int observePromise = body.IndexOf("Promise.resolve(running).catch(fail)", StringComparison.Ordinal);
+
+            Assert.That(invoke, Is.GreaterThanOrEqualTo(0));
+            Assert.That(ready, Is.GreaterThan(invoke),
+                "Loader should report ready immediately after invoking the game entry.");
+            Assert.That(observePromise, Is.GreaterThan(ready),
+                "The long-lived game Promise is only observed for errors after ready.");
+            Assert.IsFalse(body.Contains(".then(ready,fail)"),
+                "Waiting for the game Promise to resolve would block StartAsync for the entire session.");
+        }
+
+        [Test]
         public void Get_IndexHtml_SourceOnlyPackageLoadsCommonJsEntry()
         {
             File.Delete(Path.Combine(_tempDir, "era.bundle.js"));
@@ -243,6 +261,52 @@ namespace uEmuera.Tests.EditMode
     }
 
     [TestFixture]
+    public class FileGameStorageTests
+    {
+        string _tempDir;
+
+        [SetUp]
+        public void SetUp()
+        {
+            _tempDir = Path.Combine(Path.GetTempPath(),
+                "uEmuera_StorageTests_" + Guid.NewGuid().ToString("N"));
+            Directory.CreateDirectory(_tempDir);
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            try { Directory.Delete(_tempDir, true); } catch { }
+        }
+
+        [Test]
+        public void SaveLoadDelete_RoundTripsBytes()
+        {
+            var storage = new FileGameStorage("game-a", _tempDir);
+            byte[] expected = { 1, 2, 3, 4 };
+
+            storage.SaveSlot("save_0", expected);
+            CollectionAssert.AreEqual(expected, storage.LoadSlot("save_0"));
+            Assert.IsTrue(storage.SlotExists("save_0"));
+
+            storage.DeleteSlot("save_0");
+            Assert.IsFalse(storage.SlotExists("save_0"));
+        }
+
+        [Test]
+        public void SlotKey_CannotEscapeNamespace()
+        {
+            var storage = new FileGameStorage("../game", _tempDir);
+            storage.SaveSlot("../../outside", new byte[] { 1 });
+
+            string fullRoot = Path.GetFullPath(storage.RootPath);
+            string[] files = Directory.GetFiles(fullRoot, "*.bin");
+            Assert.AreEqual(1, files.Length);
+            StringAssert.StartsWith(fullRoot, Path.GetFullPath(files[0]));
+        }
+    }
+
+    [TestFixture]
     public class EraElectronRuntimeTests
     {
         string _tempDir;
@@ -254,7 +318,11 @@ namespace uEmuera.Tests.EditMode
                 Path.GetTempPath(),
                 "uEmuera_RuntimeTests_" + Guid.NewGuid().ToString("N").Substring(0, 8));
             Directory.CreateDirectory(_tempDir);
-            File.WriteAllText(Path.Combine(_tempDir, ".ere-min-version"), "4.8.0");
+            File.WriteAllText(Path.Combine(_tempDir, ".ere-min-version"), "2200");
+            File.WriteAllText(Path.Combine(_tempDir, "era.bundle.js"),
+                "window._era={version:{sdk:'4.7.0'}};", Encoding.UTF8);
+            File.WriteAllText(Path.Combine(_tempDir, "main.bundle.js"),
+                "window.game=async function(){};", Encoding.UTF8);
         }
 
         [TearDown]
@@ -323,6 +391,77 @@ namespace uEmuera.Tests.EditMode
         }
 
         [Test]
+        public async Task Dispatcher_ClearWithCount_RemovesOnlyTrailingLines()
+        {
+            using (var model = EreDataModel.Create(BuildDescriptor()))
+            {
+                var dispatcher = new EreApiDispatcher(model, new RuntimeContext());
+                dispatcher.DispatchSync("print", "[\"A\"]");
+                dispatcher.DispatchSync("println", "[]");
+                dispatcher.DispatchSync("drawLine", "[]");
+                Assert.AreEqual("3", dispatcher.DispatchSync("getLineCount", "[]"));
+
+                int callId = dispatcher.BeginAsync("clear", "[2]");
+                Assert.AreEqual("1", await dispatcher.AwaitAsync(callId));
+                Assert.AreEqual("1", dispatcher.DispatchSync("getLineCount", "[]"));
+            }
+        }
+
+        [Test]
+        public async Task Dispatcher_ClearWithoutCount_RemovesAllLines()
+        {
+            using (var model = EreDataModel.Create(BuildDescriptor()))
+            {
+                var dispatcher = new EreApiDispatcher(model, new RuntimeContext());
+                dispatcher.DispatchSync("print", "[\"A\"]");
+                dispatcher.DispatchSync("println", "[]");
+
+                int callId = dispatcher.BeginAsync("clear", "[]");
+                Assert.AreEqual("0", await dispatcher.AwaitAsync(callId));
+                Assert.AreEqual("0", dispatcher.DispatchSync("getLineCount", "[]"));
+            }
+        }
+
+        [Test]
+        public async Task Dispatcher_SaveAndLoadData_PersistsModelState()
+        {
+            string storageRoot = Path.Combine(_tempDir, "storage");
+            var context = new RuntimeContext
+            {
+                Storage = new FileGameStorage("ere-test", storageRoot),
+            };
+
+            using (var model = EreDataModel.Create(BuildDescriptor()))
+            {
+                var dispatcher = new EreApiDispatcher(model, context);
+                dispatcher.DispatchSync("set", "[\"flag:9\",123]");
+
+                int saveId = dispatcher.BeginAsync("saveData", "[0,\"slot comment\"]");
+                Assert.AreEqual("true", await dispatcher.AwaitAsync(saveId));
+
+                dispatcher.DispatchSync("set", "[\"flag:9\",999]");
+                int loadId = dispatcher.BeginAsync("loadData", "[0]");
+                Assert.AreEqual("true", await dispatcher.AwaitAsync(loadId));
+
+                Assert.AreEqual("123", dispatcher.DispatchSync("get", "[\"flag:9\"]"));
+            }
+        }
+
+        [Test]
+        public void Dispatcher_ReplaceText_DoesNotIncrementLineCount()
+        {
+            using (var model = EreDataModel.Create(BuildDescriptor()))
+            {
+                var dispatcher = new EreApiDispatcher(model, new RuntimeContext());
+                dispatcher.DispatchSync("print", "[\"first\"]");
+                dispatcher.DispatchSync("print", "[\"second\"]");
+
+                Assert.AreEqual("2", dispatcher.DispatchSync("replaceText", "[\"replacement\"]"));
+                Assert.AreEqual("2", dispatcher.DispatchSync("getLineCount", "[]"));
+            }
+        }
+
+        [Test]
         public void Dispatcher_ParsesAndSerializesJsonArguments()
         {
             using (var model = EreDataModel.Create(BuildDescriptor()))
@@ -342,11 +481,13 @@ namespace uEmuera.Tests.EditMode
             Version = "1.0",
             RuntimeKind = RuntimeKind.EraElectron,
             GameRoot = _tempDir,
-            RequiredRuntimeVersion = "4.8.0",
+            RequiredRuntimeVersion = "2200",
         };
 
         sealed class RecordingHost : IEraElectronHost
         {
+            public event Action CloseRequested;
+
             public EraElectronHostMode HostMode => EraElectronHostMode.Embedded;
             public HostCapabilities Capabilities { get; } = new HostCapabilities
             {
@@ -362,6 +503,8 @@ namespace uEmuera.Tests.EditMode
             public bool DisposeCalled { get; private set; }
             public string OriginUrl { get; private set; }
             public Exception LoadException { get; set; }
+
+            public void SimulateClose() => CloseRequested?.Invoke();
 
             public Task InitializeAsync(
                 GameDescriptor game,

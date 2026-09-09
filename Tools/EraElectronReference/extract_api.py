@@ -69,6 +69,68 @@ def classify(name):
     return cats or ['misc']
 
 
+def _contains_api(source: str, name: str) -> bool:
+    """Conservative textual implementation evidence; never upgrades to VERIFIED."""
+    if not source:
+        return False
+    if name.startswith('logger.'):
+        leaf = name.split('.', 1)[1]
+        return (f'"logger.{leaf}"' in source or f"'logger.{leaf}'" in source or
+                f'"{leaf}"' in source or f"'{leaf}'" in source)
+    return f'"{name}"' in source or f"'{name}'" in source
+
+
+def apply_local_implementation_status(apis, repo_root):
+    """Merge local C# implementation evidence into extracted upstream API metadata.
+
+    Presence in both bridge and dispatcher means the API has an end-to-end code
+    path, but it remains WIRED_UNVERIFIED until reference tests prove parity.
+    Presence in only one side is PARTIAL. This intentionally avoids false FULL
+    claims and fixes the older generator behaviour that marked every API MISSING.
+    """
+    if not repo_root:
+        return
+
+    root = Path(repo_root)
+    dispatcher_path = root / 'Assets' / 'Scripts' / 'Runtime' / 'EraElectron' / 'EreApiDispatcher.cs'
+    bridge_path = root / 'Assets' / 'Scripts' / 'Runtime' / 'EraElectron' / 'EraElectronBridgeScript.cs'
+
+    def read(path):
+        try:
+            return path.read_text(encoding='utf-8-sig', errors='replace')
+        except Exception:
+            return ''
+
+    dispatcher = read(dispatcher_path)
+    bridge = read(bridge_path)
+
+    test_chunks = []
+    test_root = root / 'Assets' / 'Tests'
+    if test_root.is_dir():
+        for path in test_root.rglob('*.cs'):
+            if 'EraElectron' in path.name or path.name.startswith('Ere'):
+                test_chunks.append(read(path))
+    tests = '\n'.join(test_chunks)
+
+    for api in apis:
+        name = api['name']
+        in_dispatcher = _contains_api(dispatcher, name)
+        in_bridge = _contains_api(bridge, name)
+
+        if in_dispatcher and in_bridge:
+            api['uEmuera_status'] = 'WIRED_UNVERIFIED'
+        elif in_dispatcher or in_bridge:
+            api['uEmuera_status'] = 'PARTIAL'
+        else:
+            api['uEmuera_status'] = 'MISSING'
+
+        api['test_status'] = 'LOCAL' if _contains_api(tests, name) else 'MISSING'
+        api['implementation_evidence'] = {
+            'dispatcher': in_dispatcher,
+            'bridge': in_bridge,
+        }
+
+
 def parse_params(jsdoc_text):
     params = []
     for m in RE_PARAM.finditer(jsdoc_text):
@@ -98,8 +160,8 @@ def extract_sdk_version(content):
     return m.group(1) if m else 'unknown'
 
 
-def extract_apis(path: Path) -> dict:
-    content = path.read_text(encoding='utf-8')
+def extract_apis(path: Path, repo_root=None) -> dict:
+    content = path.read_text(encoding='utf-8-sig')
     sdk_version = extract_sdk_version(content)
 
     # Remove comment-only lines to simplify matching
@@ -167,6 +229,8 @@ def extract_apis(path: Path) -> dict:
             'test_status': 'MISSING',
         })
 
+    apply_local_implementation_status(apis, repo_root)
+
     return {
         'generated_at': datetime.now(timezone.utc).isoformat(),
         'sdk_version': sdk_version,
@@ -181,6 +245,9 @@ def main():
     ap.add_argument('sdk_path', help='Path to era-electron.js')
     ap.add_argument('--output', default='API.generated.json',
                     help='Output JSON file (default: API.generated.json)')
+    ap.add_argument('--repo-root',
+                    default=str(Path(__file__).resolve().parents[2]),
+                    help='uEmuera repository root used to merge local implementation evidence')
     args = ap.parse_args()
 
     path = Path(args.sdk_path)
@@ -188,7 +255,7 @@ def main():
         print(f'ERROR: {path} does not exist', file=sys.stderr)
         sys.exit(1)
 
-    result = extract_apis(path)
+    result = extract_apis(path, args.repo_root)
     out = Path(args.output)
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(result, indent=2, ensure_ascii=False), encoding='utf-8')

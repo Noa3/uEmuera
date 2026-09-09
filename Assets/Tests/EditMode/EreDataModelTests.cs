@@ -194,8 +194,156 @@ namespace uEmuera.Tests.EditMode
         }
 
         // ------------------------------------------------------------------ //
+        //  Internal save fallback                                              //
+        // ------------------------------------------------------------------ //
+
+        [Test]
+        public void SerializeDeserialize_RoundTripsVariablesAndCharacters()
+        {
+            _model.Set("flag:5", 42L);
+            _model.Set("name:1", "Alice");
+            _model.AddCharacter(7);
+            _model.AddCharacterForTrain(7);
+
+            byte[] bytes = _model.Serialize("test comment");
+
+            _model.ResetAll();
+            Assert.AreEqual(0L, _model.Get("flag:5"));
+            Assert.IsTrue(_model.Deserialize(bytes));
+
+            Assert.AreEqual(42L, _model.Get("flag:5"));
+            Assert.AreEqual("Alice", _model.Get("name:1"));
+            Assert.Contains(7, (System.Collections.IList)_model.AddedCharacters);
+            Assert.Contains(7, (System.Collections.IList)_model.CharactersInTrain);
+        }
+
+        [Test]
+        public void Deserialize_RejectsUnknownOrLegacyMarkerWithoutDestroyingState()
+        {
+            _model.Set("flag:1", 99L);
+
+            Assert.IsFalse(_model.Deserialize(new byte[] { 0x45, 0x52, 0x45, 0x53 }));
+            Assert.AreEqual(99L, _model.Get("flag:1"),
+                "Invalid save bytes must not mutate live state.");
+        }
+
+        [Test]
+        public void GlobalSave_RoundTripsOnlyGlobalTables()
+        {
+            _model.Set("global:1", 123L);
+            _model.Set("flag:1", 77L);
+            byte[] global = _model.SerializeGlobal();
+
+            _model.Set("global:1", 999L);
+            _model.Set("flag:1", 88L);
+
+            Assert.IsTrue(_model.DeserializeGlobal(global));
+            Assert.AreEqual(123L, _model.Get("global:1"));
+            Assert.AreEqual(88L, _model.Get("flag:1"),
+                "Loading global data must not overwrite normal save variables.");
+        }
+
+        [Test]
+        public void GameBase_GetReturnsReadOnlyMetadataObjectWithNumericVersion()
+        {
+            string root = Path.Combine(
+                Path.GetTempPath(),
+                "uEmuera_gamebase_" + System.Guid.NewGuid().ToString("N"));
+            string csv = Path.Combine(root, "csv");
+            Directory.CreateDirectory(csv);
+            File.WriteAllText(Path.Combine(csv, "GameBase.csv"),
+                "タイトル,Synthetic Title\n" +
+                "作者,Test Author\n" +
+                "製作年,2026\n" +
+                "追加情報,Fixture Info\n" +
+                "コード,77\n" +
+                "バージョン,1001\n" +
+                "バージョン違い認める,1\n" +
+                "最初からいるキャラ,3\n" +
+                "アイテムなし,1\n",
+                System.Text.Encoding.UTF8);
+
+            try
+            {
+                using (var model = EreDataModel.Create(new GameDescriptor
+                {
+                    GameId = "gamebase-test",
+                    Title = "Fixture",
+                    RuntimeKind = RuntimeKind.EraElectron,
+                    GameRoot = root,
+                    SaveNamespace = "gamebase-test",
+                }))
+                {
+                    var gamebase = model.Get("gamebase") as
+                        System.Collections.Generic.Dictionary<string, object>;
+                    Assert.IsNotNull(gamebase);
+                    Assert.AreEqual("Synthetic Title", gamebase["title"]);
+                    Assert.AreEqual("Test Author", gamebase["author"]);
+                    Assert.AreEqual("2026", gamebase["year"]);
+                    Assert.AreEqual(77L, gamebase["code"]);
+                    Assert.AreEqual(1001L, gamebase["version"]);
+                    Assert.AreEqual(1L, gamebase["allowVersion"]);
+                    Assert.AreEqual(3L, gamebase["defaultChara"]);
+                    Assert.AreEqual(1L, gamebase["noItem"]);
+
+                    // GAMEBASE is static/read-only.
+                    model.Set("gamebase", 123);
+                    var after = model.Get("gamebase") as
+                        System.Collections.Generic.Dictionary<string, object>;
+                    Assert.AreEqual(1001L, after["version"]);
+                }
+            }
+            finally
+            {
+                try { Directory.Delete(root, true); } catch { }
+            }
+        }
+
+        // ------------------------------------------------------------------ //
         //  EraCsvParser                                                        //
         // ------------------------------------------------------------------ //
+
+        [Test]
+        public void EraCsvParser_Utf8WithoutBom_PreservesJapanese()
+        {
+            string path = TempCsvBytes(
+                "0,日本語\n1,テスト\n",
+                new System.Text.UTF8Encoding(false));
+            try
+            {
+                var result = new System.Collections.Generic.Dictionary<int, string>();
+                foreach (var kv in EraCsvParser.ParseIndexTable(path))
+                    result[kv.Key] = kv.Value;
+
+                Assert.AreEqual("日本語", result[0]);
+                Assert.AreEqual("テスト", result[1]);
+            }
+            finally { File.Delete(path); }
+        }
+
+        [Test]
+        public void EraCsvParser_Cp932_FallsBackWhenAvailable()
+        {
+            System.Text.Encoding cp932;
+            try { cp932 = System.Text.Encoding.GetEncoding(932); }
+            catch
+            {
+                Assert.Ignore("CP932 encoding provider is unavailable on this runtime.");
+                return;
+            }
+
+            string path = TempCsvBytes("0,日本語\n", cp932);
+            try
+            {
+                foreach (var kv in EraCsvParser.ParseIndexTable(path))
+                {
+                    Assert.AreEqual("日本語", kv.Value);
+                    return;
+                }
+                Assert.Fail("Expected one CP932 CSV entry.");
+            }
+            finally { File.Delete(path); }
+        }
 
         [Test]
         public void EraCsvParser_ParseIndexTable_BasicEntries()
@@ -273,6 +421,15 @@ namespace uEmuera.Tests.EditMode
             GameRoot    = Path.GetTempPath(), // empty dir; no real CSV
             SaveNamespace = "test",
         };
+
+        static string TempCsvBytes(string content, System.Text.Encoding encoding)
+        {
+            string path = Path.Combine(
+                Path.GetTempPath(),
+                "uEmuera_ere_" + System.IO.Path.GetRandomFileName() + ".csv");
+            File.WriteAllBytes(path, encoding.GetBytes(content));
+            return path;
+        }
 
         static string TempCsv(string content)
         {

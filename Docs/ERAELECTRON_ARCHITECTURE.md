@@ -1,6 +1,6 @@
 # EraElectron Architecture
 
-> Phase 8 · 2026-08-12  
+> Updated: 2026-09-09  
 > See also: `Docs/ADR/ERAELECTRON_RUNTIME.md`, `Docs/ADR/WEB_RUNTIME_HOST.md`
 
 ---
@@ -47,7 +47,7 @@ EraElectronRuntime
 
 ## SDK injection
 
-All 56 `era.*` methods are C# implementations registered as a bridge proxy.  
+EraElectron SDK calls are routed through the JS bridge and native dispatcher. Wiring is tracked separately from reference-verified semantics.  
 The proxy intercepts every `window._era.*` call and routes to `EreApiDispatcher`.
 
 **Async methods** return a JavaScript `Promise`.  
@@ -118,13 +118,16 @@ uEmuera does not need a runtime kojo parser for bundled games.
 
 | Component | Status |
 |---|---|
-| `EraElectronRuntime` | ⚠️ STUB — state machine only |
-| `EreDataModel` | ⚠️ STUB — no CSV loading yet |
-| `EreApiDispatcher` | ⚠️ STUB — routes calls, no real implementations |
-| `EmbeddedWebHost` | 🔲 MISSING — spike required (see WEB_RUNTIME_HOST ADR) |
-| `SidecarHost` | 🔲 MISSING — M13 |
-| `EreOutputApi` | 🔲 MISSING |
-| `EreInputApi` | 🔲 MISSING |
-| `EreDataApi` | 🔲 MISSING |
-| `EreSaveApi` | 🔲 MISSING |
-| `EreMediaApi` | 🔲 MISSING |
+| `EraElectronRuntime` | WIRED_UNVERIFIED |
+| `EreDataModel` | IMPLEMENTED_UNVERIFIED; local tests exist |
+| `EreApiDispatcher` | PARTIAL; several API branches remain simplified/placeholders |
+| `EraElectronBridgeScript` | PARTIAL; DOM/input compatibility layer exists |
+| `EreLocalFileServer` | IMPLEMENTED_UNVERIFIED |
+| Windows `WebView2Host` | IMPLEMENTED_UNVERIFIED (standalone only) |
+| `OfficialSidecarHost` | IMPLEMENTED_UNVERIFIED |
+| Android embedded host | MISSING |
+| Linux embedded host | MISSING |
+| Full EraUma gameplay | UNVERIFIED |
+
+See `CURRENT_STATE_AUDIT.md` and
+`../ReferenceParity/EraElectron/LOCAL_IMPLEMENTATION.generated.json`.

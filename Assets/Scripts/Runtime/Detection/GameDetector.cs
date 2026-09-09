@@ -90,6 +90,57 @@ namespace uEmuera.Runtime.Detection
         }
 
         /// <summary>
+        /// Returns the only detected game under <paramref name="root"/>, or null
+        /// when the workspace contains zero or multiple games.
+        ///
+        /// Unlike the legacy GameDiscovery.FindSingle path this method is runtime
+        /// neutral and therefore supports both Emuera and EraElectron packages.
+        /// </summary>
+        public GameDescriptor FindSingle(string root)
+        {
+            var games = DiscoverAll(root);
+            return games.Count == 1 ? games[0] : null;
+        }
+
+        /// <summary>
+        /// Detects a directory as one explicit runtime kind. This is used by the
+        /// launcher when a folder contains valid indicators for multiple runtimes
+        /// and the player chooses which interpretation to start.
+        /// </summary>
+        public GameDescriptor DetectAs(string directory, RuntimeKind kind)
+        {
+            if (string.IsNullOrWhiteSpace(directory) || !Directory.Exists(directory))
+                return null;
+
+            string[] files;
+            try
+            {
+                files = Directory.GetFiles(directory, "*", SearchOption.TopDirectoryOnly);
+            }
+            catch
+            {
+                files = Array.Empty<string>();
+            }
+
+            foreach (var detector in _detectors)
+            {
+                if (detector.Kind != kind)
+                    continue;
+
+                DetectionResult result;
+                try { result = detector.TryDetect(directory, files); }
+                catch { return null; }
+                if (result == null)
+                    return null;
+
+                try { return detector.BuildDescriptor(directory, result); }
+                catch { return null; }
+            }
+
+            return null;
+        }
+
+        /// <summary>
         /// Detect a single directory and return its <see cref="GameDescriptor"/>,
         /// or null if no registered detector recognises it.
         /// </summary>

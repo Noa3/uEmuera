@@ -116,12 +116,17 @@ public class FirstWindow : MonoBehaviour
         }
     }
 
-    IEnumerator StartSingleGame(string gamePath)
+    IEnumerator StartSingleGame(uEmuera.Runtime.GameDescriptor descriptor)
     {
         yield return null;
-        var path = gamePath;
+        if (descriptor == null)
+            yield break;
+
         gameObject.SetActive(false);
-        yield return Run(path);
+        if (descriptor.RuntimeKind == uEmuera.Runtime.RuntimeKind.EraElectron)
+            yield return LaunchEreGameCoroutine(descriptor);
+        else
+            yield return Run(descriptor.GameRoot);
     }
 
     void Awake()
@@ -148,10 +153,13 @@ public class FirstWindow : MonoBehaviour
         GenericUtils.FindChildByName<Text>(gameObject, "version")
             .text = Application.version + " ";
         
-        // Apply dark theme styling
+        // Keep legacy styling as a fallback, then build the flatter modern
+        // launcher presentation on top of the existing discovery/startup logic.
         ApplyDarkTheme();
+        EnsureDashboard();
 
-        setting_.SetActive(true);
+        if (setting_ != null)
+            setting_.SetActive(dashboard_ == null);
         PopulateGameList(true);
     }
     
@@ -358,6 +366,8 @@ public class FirstWindow : MonoBehaviour
         PlayerPrefs.SetString(CUSTOM_DIR_KEY, finalPath);
         PlayerPrefs.Save();
         
+        dashboard_?.RefreshLibraryPath();
+
         // Refresh the game list
         RefreshGameList();
     }
@@ -368,8 +378,44 @@ public class FirstWindow : MonoBehaviour
     void RebuildGameList()
     {
         EnsureListReferences();
+        EnsureDashboard();
         ClearGameItems();
         PopulateGameList(false);
+    }
+
+    void EnsureDashboard()
+    {
+        if (dashboard_ != null && dashboard_.IsBuilt)
+            return;
+
+        try
+        {
+            dashboard_ = GetComponent<LauncherDashboardController>();
+            if (dashboard_ == null)
+                dashboard_ = gameObject.AddComponent<LauncherDashboardController>();
+
+            if (!dashboard_.Build(this))
+                dashboard_ = null;
+        }
+        catch (System.Exception ex)
+        {
+            uEmuera.Logger.Error("[FirstWindow] Modern launcher initialization failed: " + ex.Message);
+            dashboard_ = null;
+        }
+    }
+
+    public void RefreshDashboardLocalization()
+    {
+        dashboard_?.RefreshLocalizedText();
+    }
+
+    public void OpenGameFolderPicker()
+    {
+#if UNITY_WEBGL && !UNITY_EDITOR
+        OnWebGLImportClick();
+#else
+        ShowDirectoryDialog();
+#endif
     }
 
     void EnsureListReferences()
@@ -387,12 +433,20 @@ public class FirstWindow : MonoBehaviour
 
     void ClearGameItems()
     {
-        for(var i = 0; i < game_items_.Count; i++)
+        if (dashboard_ != null && dashboard_.IsBuilt)
         {
-            if(game_items_[i] != null)
-                GameObject.Destroy(game_items_[i]);
+            dashboard_.ClearGames();
+            game_items_.Clear();
         }
-        game_items_.Clear();
+        else
+        {
+            for(var i = 0; i < game_items_.Count; i++)
+            {
+                if(game_items_[i] != null)
+                    GameObject.Destroy(game_items_[i]);
+            }
+            game_items_.Clear();
+        }
         listed_game_paths_.Clear();
         itemcount_ = 0;
 
@@ -436,9 +490,11 @@ public class FirstWindow : MonoBehaviour
         string customDir = PlayerPrefs.GetString(CUSTOM_DIR_KEY, "");
         if(!string.IsNullOrEmpty(customDir) && uEmuera.Utils.DirectoryExistsInsensitive(customDir))
         {
+            // A user-selected directory is a library, not a packaged single-game
+            // build. Always show the library so settings and game overview remain
+            // reachable even when it currently contains only one title.
             var normalized = uEmuera.Utils.NormalizeExistingDirectoryPath(customDir);
-            if(!openDirectoryDialog || !TryAutoStart(normalized))
-                GetList(normalized);
+            GetList(normalized);
         }
         else
         {
@@ -565,6 +621,14 @@ public class FirstWindow : MonoBehaviour
         string root = descriptor.GameRoot ?? "";
         if (!listed_game_paths_.Add(root)) return;
 
+        var desc = descriptor;
+        if (dashboard_ != null && dashboard_.IsBuilt)
+        {
+            dashboard_.AddGame(descriptor, () => LaunchDescriptor(desc));
+            itemcount_ += 1;
+            return;
+        }
+
         string badge = descriptor.RuntimeKind == uEmuera.Runtime.RuntimeKind.EraElectron
             ? "[EraElectron] "
             : "";
@@ -579,16 +643,7 @@ public class FirstWindow : MonoBehaviour
         var pathText = GenericUtils.FindChildByName<UnityEngine.UI.Text>(obj, "path");
         pathText.text = root;
 
-        // Capture for closure
-        var desc = descriptor;
-        GenericUtils.SetListenerOnClick(obj, () =>
-        {
-            gameObject.SetActive(false);
-            if (desc.RuntimeKind == uEmuera.Runtime.RuntimeKind.EraElectron)
-                GenericUtils.StartCoroutine(LaunchEreGameCoroutine(desc));
-            else
-                GenericUtils.StartCoroutine(Run(desc.GameRoot));
-        });
+        GenericUtils.SetListenerOnClick(obj, () => LaunchDescriptor(desc));
 
         var rt = obj.transform as UnityEngine.RectTransform;
         var content = scroll_rect_.content;
@@ -610,10 +665,58 @@ public class FirstWindow : MonoBehaviour
         obj.SetActive(true);
     }
 
+    void LaunchDescriptor(uEmuera.Runtime.GameDescriptor descriptor)
+    {
+        if (descriptor == null)
+            return;
+
+        var detection = descriptor.DetectionResult;
+        if (detection != null && detection.AmbiguousAlternative.HasValue)
+        {
+            var alternative = uEmuera.Runtime.Detection.GameDetector.CreateDefault()
+                .DetectAs(descriptor.GameRoot, detection.AmbiguousAlternative.Value);
+            if (alternative != null && dashboard_ != null && dashboard_.IsBuilt)
+            {
+                dashboard_.ShowRuntimeChoice(
+                    descriptor,
+                    alternative,
+                    LaunchDescriptorConfirmed);
+                return;
+            }
+
+            var ow = EmueraContent.instance?.option_window;
+            if (ow != null)
+            {
+                string body = MultiLanguage.GetText("[LauncherRuntimeChoiceBody]");
+                if (string.IsNullOrEmpty(body) || body == "[LauncherRuntimeChoiceBody]")
+                    body = "This folder matches more than one runtime. Please use the modern launcher to choose how to start it.\n\nFolder: {0}";
+                ow.ShowMessageBoxPublic(
+                    MultiLanguage.GetText("[LauncherRuntimeChoiceTitle]"),
+                    string.Format(body, descriptor.GameRoot ?? ""));
+            }
+            return;
+        }
+
+        LaunchDescriptorConfirmed(descriptor);
+    }
+
+    void LaunchDescriptorConfirmed(uEmuera.Runtime.GameDescriptor descriptor)
+    {
+        if (descriptor == null)
+            return;
+
+        gameObject.SetActive(false);
+        if (descriptor.RuntimeKind == uEmuera.Runtime.RuntimeKind.EraElectron)
+            GenericUtils.StartCoroutine(LaunchEreGameCoroutine(descriptor));
+        else
+            GenericUtils.StartCoroutine(Run(descriptor.GameRoot));
+    }
+
     /// <summary>
     /// Launches an EraElectron game via <see cref="uEmuera.Runtime.GameRuntimeManager"/>.
-    /// Currently routes to the EraElectronRuntime stub (logs STUB warning).
-    /// Full implementation requires WebView host spike (see Docs/ADR/WEB_RUNTIME_HOST.md).
+    /// Windows standalone builds can use the embedded WebView2 host; source-form
+    /// packages can use the configured official sidecar. Other embedded platform
+    /// hosts currently report a clear capability error.
     /// </summary>
     System.Collections.IEnumerator LaunchEreGameCoroutine(uEmuera.Runtime.GameDescriptor descriptor)
     {
@@ -707,11 +810,12 @@ public class FirstWindow : MonoBehaviour
 #if UNITY_WEBGL
         return false;
 #else
-        var gamePath = GameDiscovery.FindSingle(root);
-        if (string.IsNullOrEmpty(gamePath))
+        var game = uEmuera.Runtime.Detection.GameDetector.CreateDefault()
+            .FindSingle(root);
+        if (game == null)
             return false;
 
-        GenericUtils.StartCoroutine(StartSingleGame(gamePath));
+        GenericUtils.StartCoroutine(StartSingleGame(game));
         return true;
 #endif
     }
@@ -737,6 +841,7 @@ public class FirstWindow : MonoBehaviour
     [Tooltip("Title bar text component")]
     public Text titlebar = null;
     
+    LauncherDashboardController dashboard_ = null;
     ScrollRect scroll_rect_ = null;
     GameObject item_ = null;
     GameObject setting_ = null;
