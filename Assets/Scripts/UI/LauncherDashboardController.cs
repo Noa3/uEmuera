@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using uEmuera.Runtime;
 
@@ -293,7 +292,7 @@ public sealed class LauncherDashboardController : MonoBehaviour
 
         var button = card.AddComponent<Button>();
         button.targetGraphic = card.GetComponent<Image>();
-        UIStyleManager.ConfigureButton(button, true);
+        UIStyleManager.ConfigureButton(button, false);
         button.onClick.AddListener(() => launch?.Invoke());
 
         var badge = CreatePanel("RuntimeBadge", card.transform,
@@ -320,7 +319,7 @@ public sealed class LauncherDashboardController : MonoBehaviour
         SetAnchored(pathText.rectTransform,
             new Vector2(0, 0), new Vector2(0.72f, 0.5f), new Vector2(144, 8),
             new Vector2(-8, -2), new Vector2(0, 0));
-        pathText.text = descriptor.GameRoot ?? "";
+        pathText.text = ShortenPath(descriptor.GameRoot, 78);
 
         var statusText = CreateText("Status", card.transform, 12, FontStyle.Bold,
             GetStatusColor(descriptor), TextAnchor.MiddleRight);
@@ -479,6 +478,17 @@ public sealed class LauncherDashboardController : MonoBehaviour
         return confidence + " • Ready";
     }
 
+    static string ShortenPath(string path, int maxLength)
+    {
+        if (string.IsNullOrEmpty(path) || path.Length <= maxLength)
+            return path ?? "";
+        if (maxLength < 12)
+            return path.Substring(0, maxLength);
+        int tail = Math.Max(8, maxLength / 2);
+        int head = maxLength - tail - 3;
+        return path.Substring(0, head) + "..." + path.Substring(path.Length - tail);
+    }
+
     static string BuildSearchText(GameDescriptor descriptor, string title, string runtime)
     {
         return string.Join("\n", new[]
@@ -549,15 +559,15 @@ public sealed class LauncherDashboardController : MonoBehaviour
         text.supportRichText = false;
         text.horizontalOverflow = HorizontalWrapMode.Wrap;
         text.verticalOverflow = VerticalWrapMode.Truncate;
+        Stretch(text.rectTransform);
         text.rectTransform.offsetMin = new Vector2(14, 2);
         text.rectTransform.offsetMax = new Vector2(-12, -2);
-        Stretch(text.rectTransform);
 
         searchPlaceholder_ = CreateText("Placeholder", root.transform, 14, FontStyle.Italic,
             UIStyleManager.ModernTheme.TextMuted, TextAnchor.MiddleLeft);
+        Stretch(searchPlaceholder_.rectTransform);
         searchPlaceholder_.rectTransform.offsetMin = new Vector2(14, 2);
         searchPlaceholder_.rectTransform.offsetMax = new Vector2(-12, -2);
-        Stretch(searchPlaceholder_.rectTransform);
 
         input.textComponent = text;
         input.placeholder = searchPlaceholder_;

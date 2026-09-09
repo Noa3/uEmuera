@@ -144,3 +144,23 @@ EmueraMain.Template.template_text=uEmuera
 [LogFileOutputFailed]=日志文件只能保存在可执行文件所在目录下
 [LogFileOutputFailedTitle]=日志输出失败
 [UnrecognizedIdentifier]="{0}"是无法识别的标识符
+
+; Modern launcher
+[LauncherTitle]=Game Library
+[LauncherSubtitle]=Choose a game to start
+[LauncherChooseFolder]=Game Folder
+[LauncherRefresh]=Refresh
+[LauncherSettings]=Settings
+[LauncherDisplay]=Display
+[LauncherLanguage]=Language
+[LauncherMore]=More
+[LauncherProject]=GitHub
+[LauncherExit]=Exit
+[LauncherSearch]=Search games, paths, or runtimes...
+[LauncherGames]=games
+[LauncherNoGames]=No games found
+[LauncherNoGamesHint]=Choose a game folder or refresh the library.
+[LauncherNoSearchResults]=No games match your search
+[LauncherSearchHint]=Try another title, path, or runtime.
+[LauncherAutomaticLibrary]=Automatic game discovery
+[LauncherLibrary]=Library
