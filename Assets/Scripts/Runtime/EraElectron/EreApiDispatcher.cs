@@ -307,9 +307,13 @@ namespace uEmuera.Runtime.EraElectron
                     return SerializeBool(await RmDataAsync(ParseIntArg(argsJson)));
 
                 case "saveGlobal":
+                    return SerializeBool(await SaveGlobalAsync());
+
                 case "loadGlobal":
+                    return SerializeBool(await LoadGlobalAsync());
+
                 case "resetGlobal":
-                    return "true";
+                    return SerializeBool(await ResetGlobalAsync());
 
                 case "isLandscape":
                     return "true"; // always landscape on desktop
@@ -328,8 +332,12 @@ namespace uEmuera.Runtime.EraElectron
         {
             try
             {
-                byte[] data = _data.Serialize();
-                _context.Storage?.SaveSlot($"save_{slotIndex}", data);
+                if (_context.Storage == null)
+                    return Task.FromResult(false);
+
+                string comment = ParseStringArg(argsJson, 1);
+                byte[] data = _data.Serialize(comment);
+                _context.Storage.SaveSlot($"save_{slotIndex}", data);
                 return Task.FromResult(true);
             }
             catch (Exception ex)
@@ -343,7 +351,10 @@ namespace uEmuera.Runtime.EraElectron
         {
             try
             {
-                byte[] data = _context.Storage?.LoadSlot($"save_{slotIndex}");
+                if (_context.Storage == null)
+                    return Task.FromResult(false);
+
+                byte[] data = _context.Storage.LoadSlot($"save_{slotIndex}");
                 if (data == null) return Task.FromResult(false);
                 return Task.FromResult(_data.Deserialize(data));
             }
@@ -358,10 +369,60 @@ namespace uEmuera.Runtime.EraElectron
         {
             try
             {
-                _context.Storage?.DeleteSlot($"save_{slotIndex}");
+                if (_context.Storage == null)
+                    return Task.FromResult(false);
+
+                _context.Storage.DeleteSlot($"save_{slotIndex}");
                 return Task.FromResult(true);
             }
             catch { return Task.FromResult(false); }
+        }
+
+        Task<bool> SaveGlobalAsync()
+        {
+            try
+            {
+                if (_context.Storage == null)
+                    return Task.FromResult(false);
+                _context.Storage.SaveSlot("save_global", _data.SerializeGlobal());
+                return Task.FromResult(true);
+            }
+            catch (Exception ex)
+            {
+                _context.Logger?.Error("[EreApiDispatcher] saveGlobal: " + ex.Message);
+                return Task.FromResult(false);
+            }
+        }
+
+        Task<bool> LoadGlobalAsync()
+        {
+            try
+            {
+                if (_context.Storage == null)
+                    return Task.FromResult(false);
+                byte[] data = _context.Storage.LoadSlot("save_global");
+                return Task.FromResult(data != null && _data.DeserializeGlobal(data));
+            }
+            catch (Exception ex)
+            {
+                _context.Logger?.Error("[EreApiDispatcher] loadGlobal: " + ex.Message);
+                return Task.FromResult(false);
+            }
+        }
+
+        Task<bool> ResetGlobalAsync()
+        {
+            try
+            {
+                _data.ResetGlobal();
+                _context.Storage?.DeleteSlot("save_global");
+                return Task.FromResult(true);
+            }
+            catch (Exception ex)
+            {
+                _context.Logger?.Error("[EreApiDispatcher] resetGlobal: " + ex.Message);
+                return Task.FromResult(false);
+            }
         }
 
         // ------------------------------------------------------------------ //
@@ -401,6 +462,17 @@ namespace uEmuera.Runtime.EraElectron
                 case JTokenType.Null:    return null;
                 default:                 return value.ToString(Formatting.None);
             }
+        }
+
+        static string ParseStringArg(string argsJson, int index)
+        {
+            JArray args = ParseArgs(argsJson);
+            if (args == null || index < 0 || index >= args.Count ||
+                args[index] == null || args[index].Type == JTokenType.Null)
+                return null;
+            return args[index].Type == JTokenType.String
+                ? args[index].Value<string>()
+                : args[index].ToString(Formatting.None);
         }
 
         static int ParseIntArg(string argsJson)

@@ -194,6 +194,56 @@ namespace uEmuera.Tests.EditMode
         }
 
         // ------------------------------------------------------------------ //
+        //  Internal save fallback                                              //
+        // ------------------------------------------------------------------ //
+
+        [Test]
+        public void SerializeDeserialize_RoundTripsVariablesAndCharacters()
+        {
+            _model.Set("flag:5", 42L);
+            _model.Set("name:1", "Alice");
+            _model.AddCharacter(7);
+            _model.AddCharacterForTrain(7);
+
+            byte[] bytes = _model.Serialize("test comment");
+
+            _model.ResetAll();
+            Assert.AreEqual(0L, _model.Get("flag:5"));
+            Assert.IsTrue(_model.Deserialize(bytes));
+
+            Assert.AreEqual(42L, _model.Get("flag:5"));
+            Assert.AreEqual("Alice", _model.Get("name:1"));
+            Assert.Contains(7, (System.Collections.IList)_model.AddedCharacters);
+            Assert.Contains(7, (System.Collections.IList)_model.CharactersInTrain);
+        }
+
+        [Test]
+        public void Deserialize_RejectsUnknownOrLegacyMarkerWithoutDestroyingState()
+        {
+            _model.Set("flag:1", 99L);
+
+            Assert.IsFalse(_model.Deserialize(new byte[] { 0x45, 0x52, 0x45, 0x53 }));
+            Assert.AreEqual(99L, _model.Get("flag:1"),
+                "Invalid save bytes must not mutate live state.");
+        }
+
+        [Test]
+        public void GlobalSave_RoundTripsOnlyGlobalTables()
+        {
+            _model.Set("global:1", 123L);
+            _model.Set("flag:1", 77L);
+            byte[] global = _model.SerializeGlobal();
+
+            _model.Set("global:1", 999L);
+            _model.Set("flag:1", 88L);
+
+            Assert.IsTrue(_model.DeserializeGlobal(global));
+            Assert.AreEqual(123L, _model.Get("global:1"));
+            Assert.AreEqual(88L, _model.Get("flag:1"),
+                "Loading global data must not overwrite normal save variables.");
+        }
+
+        // ------------------------------------------------------------------ //
         //  EraCsvParser                                                        //
         // ------------------------------------------------------------------ //
 

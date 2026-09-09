@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using Newtonsoft.Json;
 
 namespace uEmuera.Runtime.EraElectron
 {
@@ -257,16 +258,161 @@ namespace uEmuera.Runtime.EraElectron
         //  Save / Load                                                         //
         // ------------------------------------------------------------------ //
 
+        const string InternalSaveHeader = "UEMUERA-ERE-SAVE-1\n";
+
+        [Serializable]
+        sealed class InternalSaveState
+        {
+            public int formatVersion = 1;
+            public string kind;
+            public string comment;
+            public string timestampUtc;
+            public Dictionary<string, long> intVars;
+            public Dictionary<string, string> strVars;
+            public List<int> addedCharacters;
+            public List<int> trainCharacters;
+        }
+
+        /// <summary>
+        /// Serializes uEmuera's internal fallback save format.
+        /// This is intentionally NOT advertised as official EraElectron-compatible.
+        /// </summary>
         public byte[] Serialize(string comment = null)
         {
-            // STUB — proper format documented in ERAELECTRON_SAVE_FORMAT.md
-            return new byte[] { 0x45, 0x52, 0x45, 0x53 }; // "ERES"
+            return SerializeState("slot", comment, globalOnly: false);
         }
 
         public bool Deserialize(byte[] data)
         {
-            _ = data;
-            return data != null && data.Length >= 4;
+            return DeserializeState(data, expectedKind: "slot", globalOnly: false);
+        }
+
+        public byte[] SerializeGlobal()
+        {
+            return SerializeState("global", null, globalOnly: true);
+        }
+
+        public bool DeserializeGlobal(byte[] data)
+        {
+            return DeserializeState(data, expectedKind: "global", globalOnly: true);
+        }
+
+        public void ResetGlobal()
+        {
+            RemoveGlobalKeys(_intVars);
+            RemoveGlobalKeys(_strVars);
+        }
+
+        byte[] SerializeState(string kind, string comment, bool globalOnly)
+        {
+            var state = new InternalSaveState
+            {
+                kind = kind,
+                comment = comment ?? "",
+                timestampUtc = DateTime.UtcNow.ToString("O"),
+                intVars = CopyVars(_intVars, globalOnly),
+                strVars = CopyVars(_strVars, globalOnly),
+                addedCharacters = globalOnly
+                    ? new List<int>()
+                    : new List<int>(_addedCharacters),
+                trainCharacters = globalOnly
+                    ? new List<int>()
+                    : new List<int>(_trainCharacters),
+            };
+
+            string json = JsonConvert.SerializeObject(state, Formatting.None);
+            return Encoding.UTF8.GetBytes(InternalSaveHeader + json);
+        }
+
+        bool DeserializeState(byte[] data, string expectedKind, bool globalOnly)
+        {
+            if (data == null || data.Length <= InternalSaveHeader.Length)
+                return false;
+
+            string text;
+            try { text = Encoding.UTF8.GetString(data); }
+            catch { return false; }
+
+            if (!text.StartsWith(InternalSaveHeader, StringComparison.Ordinal))
+                return false;
+
+            InternalSaveState state;
+            try
+            {
+                state = JsonConvert.DeserializeObject<InternalSaveState>(
+                    text.Substring(InternalSaveHeader.Length));
+            }
+            catch
+            {
+                return false;
+            }
+
+            if (state == null || state.formatVersion != 1 ||
+                !string.Equals(state.kind, expectedKind, StringComparison.Ordinal))
+                return false;
+
+            var ints = state.intVars ?? new Dictionary<string, long>();
+            var strings = state.strVars ?? new Dictionary<string, string>();
+
+            if (globalOnly)
+            {
+                RemoveGlobalKeys(_intVars);
+                RemoveGlobalKeys(_strVars);
+                foreach (var kv in ints)
+                    if (IsGlobalSaveKey(kv.Key)) _intVars[kv.Key] = kv.Value;
+                foreach (var kv in strings)
+                    if (IsGlobalSaveKey(kv.Key)) _strVars[kv.Key] = kv.Value ?? "";
+            }
+            else
+            {
+                _intVars.Clear();
+                _strVars.Clear();
+                _addedCharacters.Clear();
+                _trainCharacters.Clear();
+
+                foreach (var kv in ints) _intVars[kv.Key] = kv.Value;
+                foreach (var kv in strings) _strVars[kv.Key] = kv.Value ?? "";
+                if (state.addedCharacters != null)
+                    _addedCharacters.AddRange(state.addedCharacters);
+                if (state.trainCharacters != null)
+                    _trainCharacters.AddRange(state.trainCharacters);
+            }
+
+            return true;
+        }
+
+        static Dictionary<string, T> CopyVars<T>(
+            Dictionary<string, T> source, bool globalOnly)
+        {
+            var result = new Dictionary<string, T>(StringComparer.OrdinalIgnoreCase);
+            foreach (var kv in source)
+            {
+                if (!globalOnly || IsGlobalSaveKey(kv.Key))
+                    result[kv.Key] = kv.Value;
+            }
+            return result;
+        }
+
+        static bool IsGlobalSaveKey(string key)
+        {
+            if (string.IsNullOrEmpty(key))
+                return false;
+
+            int colon = key.IndexOf(':');
+            string table = colon >= 0 ? key.Substring(0, colon) : key;
+            return table.Equals("global", StringComparison.OrdinalIgnoreCase) ||
+                   table.Equals("globals", StringComparison.OrdinalIgnoreCase) ||
+                   table.Equals("globalstr", StringComparison.OrdinalIgnoreCase) ||
+                   table.Equals("global.str", StringComparison.OrdinalIgnoreCase);
+        }
+
+        static void RemoveGlobalKeys<T>(Dictionary<string, T> source)
+        {
+            var keys = new List<string>();
+            foreach (var key in source.Keys)
+                if (IsGlobalSaveKey(key)) keys.Add(key);
+            foreach (var key in keys)
+                source.Remove(key);
         }
 
         // ------------------------------------------------------------------ //

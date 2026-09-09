@@ -132,6 +132,14 @@ namespace uEmuera.Runtime
                     $"embeddedTarget={EraElectronCompatibility.EmulatedEngineVersion}, " +
                     $"sdkTarget={EraElectronCompatibility.EmulatedSdkVersion}");
 
+                if (_context.Storage == null)
+                {
+                    string saveNamespace = !string.IsNullOrWhiteSpace(_game.SaveNamespace)
+                        ? _game.SaveNamespace
+                        : _game.GameId;
+                    _context.Storage = new FileGameStorage(saveNamespace);
+                }
+
                 _data = EreDataModel.Create(_game);
                 _bridge = new EreApiDispatcher(_data, _context);
                 _bridge.SetEngineVersion(reportedEngineVersion);

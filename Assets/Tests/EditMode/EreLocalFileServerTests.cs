@@ -261,6 +261,52 @@ namespace uEmuera.Tests.EditMode
     }
 
     [TestFixture]
+    public class FileGameStorageTests
+    {
+        string _tempDir;
+
+        [SetUp]
+        public void SetUp()
+        {
+            _tempDir = Path.Combine(Path.GetTempPath(),
+                "uEmuera_StorageTests_" + Guid.NewGuid().ToString("N"));
+            Directory.CreateDirectory(_tempDir);
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            try { Directory.Delete(_tempDir, true); } catch { }
+        }
+
+        [Test]
+        public void SaveLoadDelete_RoundTripsBytes()
+        {
+            var storage = new FileGameStorage("game-a", _tempDir);
+            byte[] expected = { 1, 2, 3, 4 };
+
+            storage.SaveSlot("save_0", expected);
+            CollectionAssert.AreEqual(expected, storage.LoadSlot("save_0"));
+            Assert.IsTrue(storage.SlotExists("save_0"));
+
+            storage.DeleteSlot("save_0");
+            Assert.IsFalse(storage.SlotExists("save_0"));
+        }
+
+        [Test]
+        public void SlotKey_CannotEscapeNamespace()
+        {
+            var storage = new FileGameStorage("../game", _tempDir);
+            storage.SaveSlot("../../outside", new byte[] { 1 });
+
+            string fullRoot = Path.GetFullPath(storage.RootPath);
+            string[] files = Directory.GetFiles(fullRoot, "*.bin");
+            Assert.AreEqual(1, files.Length);
+            StringAssert.StartsWith(fullRoot, Path.GetFullPath(files[0]));
+        }
+    }
+
+    [TestFixture]
     public class EraElectronRuntimeTests
     {
         string _tempDir;
@@ -373,6 +419,31 @@ namespace uEmuera.Tests.EditMode
                 int callId = dispatcher.BeginAsync("clear", "[]");
                 Assert.AreEqual("0", await dispatcher.AwaitAsync(callId));
                 Assert.AreEqual("0", dispatcher.DispatchSync("getLineCount", "[]"));
+            }
+        }
+
+        [Test]
+        public async Task Dispatcher_SaveAndLoadData_PersistsModelState()
+        {
+            string storageRoot = Path.Combine(_tempDir, "storage");
+            var context = new RuntimeContext
+            {
+                Storage = new FileGameStorage("ere-test", storageRoot),
+            };
+
+            using (var model = EreDataModel.Create(BuildDescriptor()))
+            {
+                var dispatcher = new EreApiDispatcher(model, context);
+                dispatcher.DispatchSync("set", "[\"flag:9\",123]");
+
+                int saveId = dispatcher.BeginAsync("saveData", "[0,\"slot comment\"]");
+                Assert.AreEqual("true", await dispatcher.AwaitAsync(saveId));
+
+                dispatcher.DispatchSync("set", "[\"flag:9\",999]");
+                int loadId = dispatcher.BeginAsync("loadData", "[0]");
+                Assert.AreEqual("true", await dispatcher.AwaitAsync(loadId));
+
+                Assert.AreEqual("123", dispatcher.DispatchSync("get", "[\"flag:9\"]"));
             }
         }
 
