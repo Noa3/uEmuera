@@ -279,7 +279,16 @@ namespace uEmuera.Runtime.EraElectron
                     return "0"; // stub: always return 0
 
                 case "clear":
-                    _lineCount = 0;
+                    int? clearCount = ParseOptionalIntArg(argsJson);
+                    if (clearCount.HasValue)
+                    {
+                        int count = Math.Max(0, clearCount.Value);
+                        _lineCount = Math.Max(0, _lineCount - count);
+                    }
+                    else
+                    {
+                        _lineCount = 0;
+                    }
                     await Task.Yield();
                     return _lineCount.ToString();
 
@@ -401,6 +410,21 @@ namespace uEmuera.Runtime.EraElectron
             return args[0].Type == JTokenType.Integer
                 ? args[0].Value<int>()
                 : int.TryParse(args[0].ToString(), out int value) ? value : 0;
+        }
+
+        static int? ParseOptionalIntArg(string argsJson)
+        {
+            JArray args = ParseArgs(argsJson);
+            if (args == null || args.Count == 0 ||
+                args[0] == null || args[0].Type == JTokenType.Null)
+                return null;
+
+            if (args[0].Type == JTokenType.Integer)
+                return args[0].Value<int>();
+
+            return int.TryParse(args[0].ToString(), out int value)
+                ? value
+                : (int?)null;
         }
 
         static JArray ParseArgs(string argsJson)

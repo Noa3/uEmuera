@@ -345,6 +345,38 @@ namespace uEmuera.Tests.EditMode
         }
 
         [Test]
+        public async Task Dispatcher_ClearWithCount_RemovesOnlyTrailingLines()
+        {
+            using (var model = EreDataModel.Create(BuildDescriptor()))
+            {
+                var dispatcher = new EreApiDispatcher(model, new RuntimeContext());
+                dispatcher.DispatchSync("print", "[\"A\"]");
+                dispatcher.DispatchSync("println", "[]");
+                dispatcher.DispatchSync("drawLine", "[]");
+                Assert.AreEqual("3", dispatcher.DispatchSync("getLineCount", "[]"));
+
+                int callId = dispatcher.BeginAsync("clear", "[2]");
+                Assert.AreEqual("1", await dispatcher.AwaitAsync(callId));
+                Assert.AreEqual("1", dispatcher.DispatchSync("getLineCount", "[]"));
+            }
+        }
+
+        [Test]
+        public async Task Dispatcher_ClearWithoutCount_RemovesAllLines()
+        {
+            using (var model = EreDataModel.Create(BuildDescriptor()))
+            {
+                var dispatcher = new EreApiDispatcher(model, new RuntimeContext());
+                dispatcher.DispatchSync("print", "[\"A\"]");
+                dispatcher.DispatchSync("println", "[]");
+
+                int callId = dispatcher.BeginAsync("clear", "[]");
+                Assert.AreEqual("0", await dispatcher.AwaitAsync(callId));
+                Assert.AreEqual("0", dispatcher.DispatchSync("getLineCount", "[]"));
+            }
+        }
+
+        [Test]
         public void Dispatcher_ParsesAndSerializesJsonArguments()
         {
             using (var model = EreDataModel.Create(BuildDescriptor()))

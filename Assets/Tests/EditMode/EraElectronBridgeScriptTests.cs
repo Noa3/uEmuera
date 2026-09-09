@@ -246,6 +246,17 @@ namespace uEmuera.Tests.EditMode
         }
 
         [Test]
+        public void Build_ClearSupportsTrailingLineCount()
+        {
+            Assert.IsTrue(_js.Contains("lineCount===undefined||lineCount===null"),
+                "era.clear() must distinguish full clear from clear(lineCount).");
+            Assert.IsTrue(_js.Contains("r.lastElementChild"),
+                "Partial clear must remove rows from the bottom.");
+            Assert.IsTrue(_js.Contains("while(n-->0"),
+                "Partial clear must remove only the requested number of program rows.");
+        }
+
+        [Test]
         public void Build_ProvidesInteractiveInput()
         {
             Assert.IsTrue(_js.Contains("_supplyInput"));
