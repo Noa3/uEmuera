@@ -111,6 +111,59 @@ public class UIStyleManager : MonoBehaviour
     }
     
     /// <summary>
+    /// Applies the modern surface palette to an existing legacy menu subtree.
+    /// This lets the large Options prefab remain functionally stable while the
+    /// visible dialogs match the new launcher.
+    /// </summary>
+    public static void ApplyModernTheme(GameObject root)
+    {
+        if (root == null)
+            return;
+
+        var images = root.GetComponentsInChildren<Image>(true);
+        foreach (var image in images)
+        {
+            var button = image.GetComponent<Button>();
+            if (button != null)
+                continue;
+
+            string lower = image.name.ToLowerInvariant();
+            if (lower.Contains("background") || lower == "pad")
+                image.color = ModernTheme.Background;
+            else if (lower.Contains("border") || lower.Contains("panel") ||
+                     lower.Contains("box"))
+                image.color = ModernTheme.Surface;
+        }
+
+        var texts = root.GetComponentsInChildren<Text>(true);
+        foreach (var text in texts)
+        {
+            string lower = text.name.ToLowerInvariant();
+            if (lower.Contains("placeholder"))
+                text.color = ModernTheme.TextMuted;
+            else
+                text.color = ModernTheme.TextPrimary;
+        }
+
+        var buttons = root.GetComponentsInChildren<Button>(true);
+        foreach (var button in buttons)
+            ConfigureButton(button, false);
+
+        var inputs = root.GetComponentsInChildren<InputField>(true);
+        foreach (var input in inputs)
+        {
+            var image = input.targetGraphic as Image;
+            if (image != null)
+                image.color = ModernTheme.InputBackground;
+            if (input.textComponent != null)
+                input.textComponent.color = ModernTheme.TextPrimary;
+            var placeholder = input.placeholder as Text;
+            if (placeholder != null)
+                placeholder.color = ModernTheme.TextMuted;
+        }
+    }
+
+    /// <summary>
     /// Applies consistent interaction colors to modern launcher buttons.
     /// </summary>
     public static void ConfigureButton(Button button, bool primary = false)

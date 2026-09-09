@@ -203,7 +203,8 @@ namespace uEmuera.Runtime
                 State           = _state,
                 GameTitle       = _game?.Title,
                 GameVersion     = _game?.Version,
-                RuntimeVersion  = "EraElectron-uEmuera-0.1.0",
+                RuntimeVersion  = "EraElectron-uEmuera-" +
+                                  EraElectronCompatibility.BridgeVersion,
                 SessionId       = _context?.SessionId,
                 UptimeMs        = _state == RuntimeState.Running || _state == RuntimeState.Suspended
                                   ? (long)(DateTime.UtcNow - _startedAt).TotalMilliseconds
